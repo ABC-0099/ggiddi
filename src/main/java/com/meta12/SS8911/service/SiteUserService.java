@@ -43,4 +43,8 @@ public class SiteUserService implements UserDetailsService {
                 .roles(siteUser.getRole().name()) // Enum 이름을 권한으로 사용
                 .build();
     }
+    public SiteUser getUserByUsername(String username) {
+        return siteUserRepository.findByUsername(username)
+                .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+    }
 }
