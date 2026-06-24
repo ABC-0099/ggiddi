@@ -4,14 +4,15 @@ import com.meta12.SS8911.controller.Category;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
-import org.springframework.data.annotation.Id;
 
+import java.time.LocalDateTime;
 import java.util.Locale;
 
 @Entity
 @Getter @Setter
 public class Community {
-    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
     private String title;
@@ -24,4 +25,6 @@ public class Community {
     private SiteUser author; // 작성자 정보
 
     // 생성일, 수정일 등...
+
+    private LocalDateTime createdDate;
 }

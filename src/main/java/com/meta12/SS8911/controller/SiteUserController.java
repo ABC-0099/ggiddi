@@ -12,6 +12,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
+import java.security.Principal;
+
 @Controller
 @RequiredArgsConstructor
 public class SiteUserController {
@@ -43,5 +45,12 @@ public class SiteUserController {
     @GetMapping("/siteUser/login")
     public String login() {
         return "siteUser/login"; // 나중에 만들 로그인 HTML 파일명
+    }
+
+    @GetMapping("/siteUser/mypage")
+    public String mypage(Model model, Principal principal) {
+        SiteUser user = siteUserService.getUserByUsername(principal.getName());
+        model.addAttribute("siteUser", user);
+        return "siteUser/mypage";
     }
 }

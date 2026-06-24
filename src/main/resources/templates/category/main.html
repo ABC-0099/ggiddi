@@ -1,0 +1,121 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>학습센터 | 끼역띠귿</title>
+  <link rel="stylesheet" th:href="@{/css/layout/navbar.css}" />
+  <link rel="stylesheet" th:href="@{/css/layout/footer.css}" />
+  <link rel="stylesheet" th:href="@{/css/category/main.css}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&display=swap" rel="stylesheet" />
+
+</head>
+<body>
+
+<!-- 네브바 -->
+<div th:replace="~{layout/navbar :: navbar(currentMenu='lectures')}"></div>
+
+<!-- ── 풀스크린 히어로 ── -->
+<section class="hero">
+  <div class="hero-pattern"></div>
+  <div class="hero-grid"></div>
+  <div class="hero-nav-space"></div>
+
+  <div class="hero-content">
+    <div class="hero-tag">
+      <div class="hero-tag-dot"></div>
+      한국어 학습센터
+    </div>
+
+    <!--
+      ★ Thymeleaf:
+      <h1 class="hero-title">
+        <span th:if="${loginUser != null}" th:text="${loginUser.name} + '님의'">유니님의</span>
+        <span th:if="${loginUser == null}">끼역띠귿</span><br/>
+        <span class="accent">한국어 여정</span>
+      </h1>
+    -->
+    <h1 class="hero-title">
+      <span sec:authorize="isAuthenticated()" sec:authentication="name">유니</span>님의<br/>
+      <span class="accent">한국어 여정</span>
+    </h1>
+
+    <p class="hero-desc">
+      음절부터 일상회화까지, 4단계 픽셀 RPG 게임으로<br/>
+      한국어를 재밌게 정복해요.
+    </p>
+
+    <div class="hero-btns">
+      <a class="btn-primary" th:href="@{/lectures/category}">강의 목록 보기 →</a>
+      <a class="btn-ghost" th:href="@{/game}">게임으로 배우기</a>
+    </div>
+
+    <!--
+      ★ Thymeleaf:
+      <div class="hero-stats">
+        <div class="hero-stat">
+          <div class="hero-stat-num" th:text="${stats.completedCount} + '강'">8강</div>
+          <div class="hero-stat-label">완료 강의</div>
+        </div>
+        ...
+      </div>
+    -->
+    <!--
+      ★ Thymeleaf: sec:authorize="isAuthenticated()" → 로그인 시 내 통계
+                   sec:authorize="isAnonymous()"     → 비로그인 시 플랫폼 통계
+      Spring Boot 서버에서 실행하면 자동으로 하나만 노출됨
+    -->
+    <div class="hero-stats" sec:authorize="isAuthenticated()" id="statsAuth">
+      <div class="hero-stat">
+        <div class="hero-stat-num" th:text="${stats != null} ? ${stats.completedCount} + '강' : '8강'">8강</div>
+        <div class="hero-stat-label">완료 강의</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num" th:text="${stats != null} ? ${stats.totalProgressRate} + '%' : '30%'">30%</div>
+        <div class="hero-stat-label">전체 진도율</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num" th:text="${stats != null} ? ${stats.streakDays} + '일 🔥' : '7일 🔥'">7일 🔥</div>
+        <div class="hero-stat-label">연속 학습</div>
+      </div>
+    </div>
+    <div class="hero-stats" sec:authorize="isAnonymous()" id="statsAnon" style="display:none;">
+      <div class="hero-stat">
+        <div class="hero-stat-num">1,200+</div>
+        <div class="hero-stat-label">누적 학습자</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">38강</div>
+        <div class="hero-stat-label">전체 강의</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-num">4단계</div>
+        <div class="hero-stat-label">체계적 커리큘럼</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scroll-hint">
+    <span>scroll</span>
+    <span class="scroll-hint-arrow">↓</span>
+  </div>
+</section>
+
+
+<!-- 푸터 -->
+<div th:replace="~{layout/footer :: footer}"></div>
+
+<script>
+  // Spring Boot 없이 볼 때: statsAuth만 보이게 (로그인 통계가 기본)
+  // 실제 서버에서는 sec:authorize가 자동으로 처리함
+  const statsAuth = document.getElementById('statsAuth');
+  const statsAnon = document.getElementById('statsAnon');
+  if (statsAuth) statsAuth.style.display = '';
+  if (statsAnon) statsAnon.style.display = 'none';
+</script>
+</body>
+</html>

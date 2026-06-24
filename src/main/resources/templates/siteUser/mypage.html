@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>마이페이지 | 끼역띠귿</title>
+  <link rel="stylesheet" th:href="@{/css/layout/navbar.css}" />
+  <link rel="stylesheet" th:href="@{/css/layout/footer.css}" />
+  <link rel="stylesheet" th:href="@{/css/siteuser/mypage.css}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
+
+</head>
+<body>
+
+<div class="bg-orbs"><div class="orb o1"></div><div class="orb o2"></div></div>
+
+<!-- 네브바 -->
+<div th:replace="~{layout/navbar :: navbar(currentMenu='mypage')}"></div>
+
+<div class="main">
+
+  <!-- ── 사이드바 ── -->
+  <div class="sidebar">
+
+    <!-- 프로필 -->
+    <div class="profile-card">
+      <div class="profile-avatar" th:text="${#strings.substring(siteUser.name, 0, 1)}">유</div>
+      <div class="profile-name" th:text="${siteUser.name}">유니</div>
+      <div class="profile-id" th:text="'@' + ${siteUser.username}">@yuni_korean</div>
+      <div class="profile-plan">⭐ 연 구독 · D-285</div>
+      <div class="profile-stats">
+        <div class="ps-box">
+          <div class="ps-box-num">8강</div>
+          <div class="ps-box-label">완료 강의</div>
+        </div>
+        <div class="ps-box">
+          <div class="ps-box-num">142</div>
+          <div class="ps-box-label">습득 단어</div>
+        </div>
+        <div class="ps-box">
+          <div class="ps-box-num">7일🔥</div>
+          <div class="ps-box-label">연속 학습</div>
+        </div>
+        <div class="ps-box">
+          <div class="ps-box-num">23위</div>
+          <div class="ps-box-label">랭킹</div>
+        </div>
+      </div>
+      <button class="edit-btn">✏️ 프로필 수정</button>
+    </div>
+
+    <!-- 사이드 메뉴 -->
+    <div class="side-menu">
+      <div class="side-menu-item active" onclick="showSection('info')">
+        <span class="menu-icon">👤</span> 회원정보
+        <span class="menu-arrow">›</span>
+      </div>
+      <div class="side-menu-item" onclick="showSection('progress')">
+        <span class="menu-icon">📊</span> 학습 현황
+        <span class="menu-arrow">›</span>
+      </div>
+      <div class="side-menu-item" onclick="showSection('purchase')">
+        <span class="menu-icon">💳</span> 구매 내역
+        <span class="menu-arrow">›</span>
+      </div>
+      <div class="side-menu-item" onclick="showSection('posts')">
+        <span class="menu-icon">📝</span> 내 게시글
+        <span class="menu-arrow">›</span>
+      </div>
+      <div class="side-menu-item" onclick="showSection('ranking')">
+        <span class="menu-icon">🏆</span> 랭킹
+        <span class="menu-arrow">›</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── 메인 콘텐츠 ── -->
+  <div class="content">
+
+    <!-- 1. 회원정보 -->
+    <div class="section-card" id="section-info">
+      <div class="card-header">
+        <div class="card-header-left">
+          <span class="card-title">👤 회원정보</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="info-grid">
+          <div class="info-field">
+            <span class="info-label">이름</span>
+            <div class="info-value" th:text="${siteUser.name}">유니</div>
+          </div>
+          <div class="info-field">
+            <span class="info-label">아이디</span>
+            <div class="info-value" th:text="${siteUser.username}">yuni_korean</div>
+          </div>
+          <div class="info-field">
+            <span class="info-label">이메일</span>
+            <div class="info-value" th:text="${siteUser.email}">yuni@example.com</div>
+          </div>
+          <div class="info-field">
+            <span class="info-label">휴대폰</span>
+            <div class="info-value" th:text="${siteUser.phone}">010-1234-5678</div>
+          </div>
+          <div class="info-field">
+            <span class="info-label">생년월일</span>
+            <div class="info-value" th:text="${siteUser.birth}">1999.03.15</div>
+          </div>
+          <div class="info-field">
+            <span class="info-label">국적</span>
+            <div class="info-value" th:text="${siteUser.nationality != null} ? ${siteUser.nationality} : '미입력'">베트남 🇻🇳</div>
+          </div>
+          <div class="info-field">
+            <span class="info-label">가입일</span>
+            <div class="info-value">2025.01.10</div>
+          </div>
+          <div class="info-field">
+            <span class="info-label">비밀번호</span>
+            <div class="info-value" style="color:var(--ink-faint);">••••••••</div>
+          </div>
+        </div>
+        <a th:href="@{/siteUser/sujung}" class="info-edit-btn" style="display:inline-block;text-decoration:none;">정보 수정하기</a>
+        <div class="info-danger">
+          <p>계정 탈퇴 시 모든 학습 기록이 삭제돼요.</p>
+          <a th:href="@{/siteUser/view}" class="danger-btn" style="text-decoration:none;">회원 탈퇴</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. 학습 현황 -->
+    <div class="section-card" id="section-progress">
+      <div class="card-header">
+        <div class="card-header-left">
+          <span class="card-title">📊 학습 현황</span>
+          <span class="card-badge">전체 30%</span>
+        </div>
+        <a th:href="@{/lectures}" class="card-link">강의 목록 →</a>
+      </div>
+      <div class="card-body">
+
+        <!-- 요약 -->
+        <div class="learn-summary">
+          <div class="ls-box">
+            <div class="ls-icon">✅</div>
+            <div class="ls-num">8강</div>
+            <div class="ls-label">완료한 강의</div>
+          </div>
+          <div class="ls-box">
+            <div class="ls-icon">📖</div>
+            <div class="ls-num">142개</div>
+            <div class="ls-label">습득 단어</div>
+          </div>
+          <div class="ls-box">
+            <div class="ls-icon">🔥</div>
+            <div class="ls-num">7일</div>
+            <div class="ls-label">연속 학습</div>
+          </div>
+          <div class="ls-box">
+            <div class="ls-icon">⏱</div>
+            <div class="ls-num">14h</div>
+            <div class="ls-label">총 학습 시간</div>
+          </div>
+        </div>
+
+        <!-- 단계별 진도 -->
+        <div class="stage-progress">
+          <div class="sp-item">
+            <div class="sp-header">
+              <div class="sp-left">
+                <span class="sp-badge sb-1">1단계</span>
+                <span class="sp-name">음절 월드</span>
+              </div>
+              <span class="sp-pct" style="color:var(--mint-dark);">100% ✓</span>
+            </div>
+            <div class="sp-bar">
+              <div class="sp-fill" style="width:100%;background:linear-gradient(90deg,var(--mint-dark),var(--mint));"></div>
+            </div>
+            <div class="sp-meta"><span>4강 / 4강 완료</span><span>퀴즈 평균 92점</span></div>
+          </div>
+
+          <div class="sp-divider"></div>
+
+          <div class="sp-item">
+            <div class="sp-header">
+              <div class="sp-left">
+                <span class="sp-badge sb-2">2단계</span>
+                <span class="sp-name">단어 월드</span>
+              </div>
+              <span class="sp-pct" style="color:var(--navy);">33% 진행 중</span>
+            </div>
+            <div class="sp-bar">
+              <div class="sp-fill" style="width:33%;background:linear-gradient(90deg,var(--navy),#4A9FE0);"></div>
+            </div>
+            <div class="sp-meta"><span>4강 / 12강 완료</span><span>퀴즈 평균 78점</span></div>
+          </div>
+
+          <div class="sp-divider"></div>
+
+          <div class="sp-item">
+            <div class="sp-header">
+              <div class="sp-left">
+                <span class="sp-badge sb-3">3단계</span>
+                <span class="sp-name">문장 월드</span>
+              </div>
+              <span class="sp-pct" style="color:var(--ink-faint);">잠김 🔒</span>
+            </div>
+            <div class="sp-bar">
+              <div class="sp-fill" style="width:0%;background:var(--border);"></div>
+            </div>
+            <div class="sp-meta"><span>2단계 완료 후 해금</span></div>
+          </div>
+
+          <div class="sp-divider"></div>
+
+          <div class="sp-item">
+            <div class="sp-header">
+              <div class="sp-left">
+                <span class="sp-badge sb-4">4단계</span>
+                <span class="sp-name">회화 월드</span>
+              </div>
+              <span class="sp-pct" style="color:var(--ink-faint);">잠김 🔒</span>
+            </div>
+            <div class="sp-bar">
+              <div class="sp-fill" style="width:0%;background:var(--border);"></div>
+            </div>
+            <div class="sp-meta"><span>3단계 완료 후 해금</span></div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- 3. 구매 내역 -->
+    <div class="section-card" id="section-purchase">
+      <div class="card-header">
+        <div class="card-header-left">
+          <span class="card-title">💳 구매 내역</span>
+          <span class="card-badge">2건</span>
+        </div>
+      </div>
+      <div class="card-body">
+        <div class="purchase-list">
+          <div class="purchase-item">
+            <div class="purchase-icon">⭐</div>
+            <div class="purchase-info">
+              <div class="purchase-name">연 구독 플랜</div>
+              <div class="purchase-date">2025.01.10 결제 · 2026.01.10 만료</div>
+            </div>
+            <div class="purchase-right">
+              <div class="purchase-price">89,900원</div>
+              <span class="purchase-status ps-active">이용 중</span>
+            </div>
+          </div>
+          <div class="purchase-item">
+            <div class="purchase-icon">🎮</div>
+            <div class="purchase-info">
+              <div class="purchase-name">월 구독 플랜</div>
+              <div class="purchase-date">2024.12.10 결제 · 2025.01.10 만료</div>
+            </div>
+            <div class="purchase-right">
+              <div class="purchase-price">9,900원</div>
+              <span class="purchase-status ps-expired">만료</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. 내 게시글 -->
+    <div class="section-card" id="section-posts">
+      <div class="card-header">
+        <div class="card-header-left">
+          <span class="card-title">📝 내 게시글</span>
+          <span class="card-badge">5개</span>
+        </div>
+        <a href="#" class="card-link">전체 보기 →</a>
+      </div>
+      <div class="card-body">
+        <div class="post-list">
+          <div class="post-item">
+            <span class="post-cat pc-1">공지</span>
+            <span class="post-title">한국어 공부 시작한 지 한 달 후기예요 😊</span>
+            <div class="post-meta">
+              <span>👍 24</span>
+              <span>💬 8</span>
+              <span>2025.05.12</span>
+            </div>
+          </div>
+          <div class="post-item">
+            <span class="post-cat pc-2">질문</span>
+            <span class="post-title">받침 발음이 너무 어려운데 혹시 팁 있나요?</span>
+            <div class="post-meta">
+              <span>👍 11</span>
+              <span>💬 14</span>
+              <span>2025.04.28</span>
+            </div>
+          </div>
+          <div class="post-item">
+            <span class="post-cat pc-3">자유</span>
+            <span class="post-title">오늘 처음으로 한국 식당에서 혼자 주문했어요!</span>
+            <div class="post-meta">
+              <span>👍 38</span>
+              <span>💬 21</span>
+              <span>2025.04.15</span>
+            </div>
+          </div>
+          <div class="post-item">
+            <span class="post-cat pc-2">질문</span>
+            <span class="post-title">2단계 퀴즈 3번 문제 정답이 이해가 안 가요</span>
+            <div class="post-meta">
+              <span>👍 5</span>
+              <span>💬 6</span>
+              <span>2025.03.30</span>
+            </div>
+          </div>
+          <div class="post-item">
+            <span class="post-cat pc-3">자유</span>
+            <span class="post-title">끼역띠귿 덕분에 드라마 대사가 들려요 🎉</span>
+            <div class="post-meta">
+              <span>👍 52</span>
+              <span>💬 17</span>
+              <span>2025.03.10</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. 랭킹 -->
+    <div class="section-card" id="section-ranking">
+      <div class="card-header">
+        <div class="card-header-left">
+          <span class="card-title">🏆 랭킹</span>
+        </div>
+      </div>
+      <div class="card-body">
+
+        <!-- 탭 -->
+        <div class="rank-tab-row">
+          <button class="rank-tab active" onclick="setRankTab(this)">주간</button>
+          <button class="rank-tab" onclick="setRankTab(this)">월간</button>
+          <button class="rank-tab" onclick="setRankTab(this)">전체</button>
+        </div>
+
+        <!-- 헤더 -->
+        <div class="ranking-header-row">
+          <span style="text-align:center;">순위</span>
+          <span>학습자</span>
+          <span style="text-align:center;">강의수</span>
+          <span style="text-align:center;">단어수</span>
+          <span style="text-align:center;">점수</span>
+        </div>
+
+        <!-- 목록 -->
+        <div class="ranking-list">
+
+          <div class="rank-item">
+            <div class="rank-medal">🥇</div>
+            <div class="rank-user">
+              <div class="rank-avatar" style="background:linear-gradient(135deg,#F59E0B,#EF4444);">리</div>
+              <span class="rank-name">Li Wei</span>
+            </div>
+            <div class="rank-val highlight">28강</div>
+            <div class="rank-val highlight">412개</div>
+            <div class="rank-val highlight">9,840점</div>
+          </div>
+
+          <div class="rank-item">
+            <div class="rank-medal">🥈</div>
+            <div class="rank-user">
+              <div class="rank-avatar" style="background:linear-gradient(135deg,#6B7280,#9CA3AF);">김</div>
+              <span class="rank-name">김마리아</span>
+            </div>
+            <div class="rank-val">24강</div>
+            <div class="rank-val">380개</div>
+            <div class="rank-val">8,720점</div>
+          </div>
+
+          <div class="rank-item">
+            <div class="rank-medal">🥉</div>
+            <div class="rank-user">
+              <div class="rank-avatar" style="background:linear-gradient(135deg,#B45309,#D97706);">나</div>
+              <span class="rank-name">Nguyen Lan</span>
+            </div>
+            <div class="rank-val">21강</div>
+            <div class="rank-val">305개</div>
+            <div class="rank-val">7,560점</div>
+          </div>
+
+          <div class="rank-item">
+            <div class="rank-num">4</div>
+            <div class="rank-user">
+              <div class="rank-avatar" style="background:linear-gradient(135deg,#185FA5,#4A9FE0);">A</div>
+              <span class="rank-name">Ahmed K.</span>
+            </div>
+            <div class="rank-val">18강</div>
+            <div class="rank-val">276개</div>
+            <div class="rank-val">6,920점</div>
+          </div>
+
+          <div class="rank-item">
+            <div class="rank-num">5</div>
+            <div class="rank-user">
+              <div class="rank-avatar" style="background:linear-gradient(135deg,#7C3AED,#A78BFA);">S</div>
+              <span class="rank-name">Sara M.</span>
+            </div>
+            <div class="rank-val">16강</div>
+            <div class="rank-val">241개</div>
+            <div class="rank-val">6,140점</div>
+          </div>
+
+          <!-- ... -->
+          <div style="text-align:center;padding:10px 0;font-size:13px;color:var(--ink-faint);">•  •  •</div>
+
+          <!-- 내 순위 -->
+          <div class="rank-item me">
+            <div class="rank-num me-num">23</div>
+            <div class="rank-user">
+              <div class="rank-avatar" style="background:linear-gradient(135deg,var(--mint),var(--navy));">유</div>
+              <span class="rank-name">유니 <span class="rank-me-tag">나</span></span>
+            </div>
+            <div class="rank-val highlight">8강</div>
+            <div class="rank-val highlight">142개</div>
+            <div class="rank-val highlight">2,840점</div>
+          </div>
+
+        </div>
+
+        <!-- 내 위치 안내 -->
+        <div class="rank-my-position">
+          <span>현재 <strong>23위</strong>예요. 2위만 올라가면 상위 10%!</span>
+          <a th:href="@{/lectures}" style="font-size:13px;font-weight:700;color:var(--navy);">학습하러 가기 →</a>
+        </div>
+
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- 푸터 -->
+<div th:replace="~{layout/footer :: footer}"></div>
+
+<script>
+  function showSection(id) {
+    document.querySelectorAll('.side-menu-item').forEach(i => i.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+    document.getElementById(`section-${id}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
+  }
+
+  function setRankTab(el) {
+    document.querySelectorAll('.rank-tab').forEach(t => t.classList.remove('active'));
+    el.classList.add('active');
+  }
+</script>
+
+</body>
+</html>

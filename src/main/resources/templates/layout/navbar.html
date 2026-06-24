@@ -114,7 +114,7 @@
 
       <!-- 로그인 상태: 유저이름 + 로그아웃 버튼 -->
       <th:block sec:authorize="isAuthenticated()">
-        <a class="user-chip" th:href="@{/mypage}">
+        <a class="user-chip" th:href="@{/siteUser/mypage}">
           <span class="user-avatar"
                 th:text="${#strings.substring(#authentication.name, 0, 1)}">U</span>
           <span class="user-name" sec:authentication="name">사용자</span>
