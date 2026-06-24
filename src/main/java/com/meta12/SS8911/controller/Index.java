@@ -10,6 +10,6 @@ public class Index {
 
     @GetMapping("")
     public String list(){
-        return "list";
+        return "mainpage";
     }
 }
