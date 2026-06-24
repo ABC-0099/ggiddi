@@ -22,7 +22,8 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/",
                                 "/siteUser/login",
-                                "/siteUser/signup",
+                                "/siteUser/chuga",
+                                "/siteUser/chugaProc",
                                 "/notices",
                                 "/board/**",
                                 "/faq",
@@ -37,18 +38,18 @@ public class SecurityConfig {
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
-                        .loginPage("/siteUser/login")          // GET - 로그인 페이지
-                        .loginProcessingUrl("/siteUser/login") // POST - 실제 로그인 처리 ← 이거 추가
+                        .loginPage("/siteUser/login")
+                        .loginProcessingUrl("/siteUser/login")
                         .defaultSuccessUrl("/")
-                        .failureUrl("/siteUser/login?error")   // 실패 시 ← 이거 추가
+                        .failureUrl("/siteUser/login?error")
                         .permitAll()
                 )
                 .logout(logout -> logout
                         .logoutUrl("/logout")
                         .logoutSuccessUrl("/")
                         .permitAll()
-                )
-                .csrf(csrf -> csrf.disable());
+                );
+        // ★ csrf.disable() 제거 → CSRF 기본 활성화
 
         return http.build();
     }
