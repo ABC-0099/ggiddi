@@ -1,0 +1,136 @@
+ :root {
+      --mint: #5DCAA5; --mint-dark: #1D9E75; --mint-light: #9FE1CB;
+      --mint-pale: #E8F8F3; --navy: #185FA5; --navy-dark: #0C447C;
+      --navy-light: #EBF4FF; --bg: #F0FBF7; --border: #C8EFE1;
+      --ink: #0A1F17; --ink-soft: #6B7280; --ink-faint: #9CA3AF;
+      --white: #ffffff; --error: #EF4444; --error-pale: #FEF2F2;
+    }
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--ink); min-height: 100vh; display: flex; flex-direction: column; }
+    a { text-decoration: none; color: inherit; }
+
+    .bg-orbs { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+    .orb { position: absolute; border-radius: 50%; filter: blur(90px); }
+    .o1 { width:600px; height:600px; top:-150px; right:-100px; background:#9FE1CB; opacity:.5; }
+    .o2 { width:450px; height:450px; bottom:-100px; left:-80px; background:#B5D4F4; opacity:.4; }
+
+    .main {
+      flex: 1; position: relative; z-index: 1;
+      max-width: 680px; margin: 48px auto; width: 100%; padding: 0 24px;
+    }
+
+    .page-header {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 28px;
+    }
+
+    .btn-back {
+      display: flex; align-items: center; gap: 5px;
+      padding: 7px 14px; border-radius: 8px;
+      border: 1.5px solid var(--border); background: var(--white);
+      color: var(--ink-soft); font-size: 13px; font-weight: 500;
+      cursor: pointer; font-family: inherit; transition: all .15s;
+      text-decoration: none;
+    }
+    .btn-back:hover { border-color: var(--mint); color: var(--mint-dark); }
+
+    .page-header h1 { font-size: 24px; font-weight: 700; color: var(--ink); }
+
+    /* 수정 카드 */
+    .edit-card {
+      background: rgba(255,255,255,.85);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,.9);
+      border-radius: 20px;
+      padding: 36px;
+      box-shadow: 0 8px 40px rgba(29,158,117,.1);
+    }
+
+    .section-label {
+      font-size: 11px; font-weight: 700; color: var(--mint-dark);
+      text-transform: uppercase; letter-spacing: 1px;
+      margin-bottom: 16px; padding-bottom: 8px;
+      border-bottom: 1.5px solid var(--border);
+    }
+
+    .form-section { margin-bottom: 28px; }
+
+    .field { display: flex; flex-direction: column; gap: 5px; margin-bottom: 14px; }
+    .field:last-child { margin-bottom: 0; }
+
+    .field label { font-size: 13px; font-weight: 600; color: var(--ink); }
+
+    .field input, .field select {
+      padding: 11px 14px; border-radius: 10px;
+      border: 1.5px solid var(--border);
+      background: rgba(255,255,255,.7);
+      font-size: 14px; color: var(--ink);
+      font-family: inherit; outline: none;
+      transition: border-color .15s, box-shadow .15s;
+    }
+
+    .field input:focus, .field select:focus {
+      border-color: var(--mint);
+      box-shadow: 0 0 0 3px rgba(93,202,165,.15);
+      background: var(--white);
+    }
+
+    .field input::placeholder { color: var(--ink-faint); }
+
+    .field input[readonly] {
+      background: #f0f2f5;
+      color: var(--ink-soft);
+      border-color: #e0e0e0;
+      cursor: not-allowed;
+    }
+
+    .field-hint { font-size: 11px; color: var(--ink-faint); margin-top: 4px; }
+
+    /* 비밀번호 강도 */
+    .pw-strength { margin-top: 6px; }
+    .pw-bars { display: flex; gap: 4px; margin-bottom: 4px; }
+    .pw-bar { flex: 1; height: 3px; border-radius: 2px; background: var(--border); transition: background .2s; }
+    .pw-bar.weak   { background: #EF4444; }
+    .pw-bar.medium { background: #F59E0B; }
+    .pw-bar.strong { background: var(--mint); }
+    .pw-label { font-size: 11px; color: var(--ink-faint); }
+
+    /* 버튼 */
+    .form-actions { display: flex; gap: 10px; margin-top: 8px; }
+
+    .btn-submit {
+      flex: 1; padding: 13px; border-radius: 10px; border: none;
+      background: var(--mint); color: var(--white);
+      font-size: 15px; font-weight: 700;
+      font-family: inherit; cursor: pointer;
+      transition: all .18s;
+      box-shadow: 0 4px 16px rgba(29,158,117,.25);
+    }
+    .btn-submit:hover { background: var(--mint-dark); }
+
+    .btn-cancel {
+      padding: 13px 24px; border-radius: 10px;
+      border: 1.5px solid var(--border); background: #f5f5f5;
+      color: var(--ink-soft); font-size: 14px; font-weight: 600;
+      font-family: inherit; cursor: pointer; text-decoration: none;
+      display: flex; align-items: center; justify-content: center;
+      transition: all .15s;
+    }
+    .btn-cancel:hover { border-color: var(--ink-soft); color: var(--ink); }
+
+    /* 성공/오류 메시지 */
+    .alert-success {
+      background: var(--mint-pale); border: 1.5px solid var(--mint);
+      border-radius: 10px; padding: 12px 16px;
+      font-size: 13.5px; color: var(--mint-dark); margin-bottom: 20px;
+    }
+    .alert-error {
+      background: var(--error-pale); border: 1.5px solid var(--error);
+      border-radius: 10px; padding: 12px 16px;
+      font-size: 13.5px; color: var(--error); margin-bottom: 20px;
+    }
+
+    @media (max-width: 600px) {
+      .edit-card { padding: 24px 20px; }
+      .form-actions { flex-direction: column-reverse; }
+    }
