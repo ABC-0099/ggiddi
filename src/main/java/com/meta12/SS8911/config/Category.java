@@ -1,4 +1,4 @@
-package com.meta12.SS8911.controller;
+package com.meta12.SS8911.config;
 
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;

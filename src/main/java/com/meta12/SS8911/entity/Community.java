@@ -1,6 +1,6 @@
 package com.meta12.SS8911.entity;
 
-import com.meta12.SS8911.controller.Category;
+import com.meta12.SS8911.config.Category;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
