@@ -1,5 +1,7 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -8,27 +10,12 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&family=Nunito:wght@400;600;700&display=swap"
           rel="stylesheet" />
-
-    <link rel="stylesheet" th:href="@{/css/mainpage.css}">
-
-
+    <link rel="stylesheet" th:href="@{/css/main/mainpage.css}">
 </head>
 <body>
 
-<!-- NAV -->
-<nav>
-    <a href="#" class="logo">끼역띠귿<div class="logo-dot"></div></a>
-    <ul class="nav-links">
-        <li><a href="#">플랫폼 소개</a></li>
-        <li><a href="#">강의</a></li>
-        <li><a href="#">게시판</a></li>
-        <li><a href="#">학습 현황</a></li>
-    </ul>
-    <div class="nav-actions">
-        <a href="#" class="btn btn-outline">로그인</a>
-        <a href="#" class="btn btn-navy">회원가입</a>
-    </div>
-</nav>
+<!-- 네브바 -->
+<div th:replace="~{layout/navbar :: navbar(currentMenu='home')}"></div>
 
 <!-- HERO -->
 <div style="max-width:1440px;margin:0 auto;">
@@ -217,16 +204,8 @@
     </div>
 </div>
 
-<!-- FOOTER -->
-<footer>
-    <div class="footer-logo">끼역띠귿<div class="logo-dot"></div></div>
-    <ul class="footer-links">
-        <li><a href="#">이용약관</a></li>
-        <li><a href="#">개인정보처리방침</a></li>
-        <li><a href="#">고객문의</a></li>
-    </ul>
-    <p>© 2026 끼역띠귿. All rights reserved.</p>
-</footer>
+<!-- 푸터 -->
+<div th:replace="~{layout/footer :: footer}"></div>
 
 </body>
 </html>

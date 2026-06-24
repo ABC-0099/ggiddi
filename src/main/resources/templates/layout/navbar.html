@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<body>
+
+<!--
+  ================================
+  사용법 (다른 페이지에서 삽입):
+  <div th:replace="~{layout/navbar :: navbar(currentMenu='lectures')}"></div>
+
+  currentMenu 값 목록:
+    home | notices | board | lectures | game | faq | mypage
+  ================================
+-->
+<link th:href="@{/css/layout/navbar.css}" rel="stylesheet">
+
+<nav th:fragment="navbar(currentMenu)" class="navbar">
+  <div class="navbar-inner">
+
+    <!-- 로고 -->
+    <a class="navbar-logo" th:href="@{/}">
+      <span class="logo-pixel">끼</span>
+      <span class="logo-text">끼역띠귿</span>
+    </a>
+
+    <!-- 햄버거 (모바일) -->
+    <button class="navbar-toggle" id="navToggle" aria-label="메뉴 열기">
+      <span></span><span></span><span></span>
+    </button>
+
+    <!-- 메뉴 -->
+    <ul class="navbar-menu" id="navMenu">
+
+      <!-- 공지사항 -->
+      <li th:classappend="${currentMenu == 'notices'} ? 'active'">
+        <a th:href="@{/notices}">공지사항</a>
+      </li>
+
+      <!-- 자유게시판 -->
+      <li th:classappend="${currentMenu == 'board'} ? 'active'">
+        <a th:href="@{/board}">자유게시판</a>
+      </li>
+
+      <!-- 학습센터 드롭다운 -->
+      <li class="has-dropdown" th:classappend="${currentMenu == 'lectures' or currentMenu == 'game'} ? 'active'">
+        <a href="#" class="dropdown-trigger">
+          학습센터
+          <svg class="arrow-icon" viewBox="0 0 10 6" fill="none">
+            <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </a>
+        <ul class="dropdown-menu">
+          <li>
+            <a th:href="@{/lectures}" th:classappend="${currentMenu == 'lectures'} ? 'active'">
+              <span class="drop-icon">🎓</span>
+              <div>
+                <strong>동영상 강의</strong>
+                <small>단계별 한국어 강의</small>
+              </div>
+            </a>
+          </li>
+          <li>
+            <a th:href="@{/game}" th:classappend="${currentMenu == 'game'} ? 'active'">
+              <span class="drop-icon">🎮</span>
+              <div>
+                <strong>학습 게임</strong>
+                <small>픽셀 RPG로 배우기</small>
+              </div>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+      <!-- 질문센터 드롭다운 -->
+      <li class="has-dropdown" th:classappend="${currentMenu == 'faq' or currentMenu == 'qna'} ? 'active'">
+        <a href="#" class="dropdown-trigger">
+          질문센터
+          <svg class="arrow-icon" viewBox="0 0 10 6" fill="none">
+            <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+          </svg>
+        </a>
+        <ul class="dropdown-menu">
+          <li>
+            <a th:href="@{/faq}" th:classappend="${currentMenu == 'faq'} ? 'active'">
+              <span class="drop-icon">❓</span>
+              <div>
+                <strong>자주 묻는 질문</strong>
+                <small>FAQ</small>
+              </div>
+            </a>
+          </li>
+          <li>
+            <a th:href="@{/qna}" th:classappend="${currentMenu == 'qna'} ? 'active'">
+              <span class="drop-icon">✉️</span>
+              <div>
+                <strong>1:1 질문하기</strong>
+                <small>강사에게 직접 질문</small>
+              </div>
+            </a>
+          </li>
+        </ul>
+      </li>
+
+    </ul>
+
+    <!-- 우측 버튼 영역 -->
+    <div class="navbar-auth">
+
+      <!-- 비로그인 상태: 로그인 + 회원가입 버튼 -->
+      <th:block sec:authorize="isAnonymous()">
+        <a class="btn-login" th:href="@{/login}">로그인</a>
+        <a class="btn-signup" th:href="@{/signup}">회원가입</a>
+      </th:block>
+
+      <!-- 로그인 상태: 유저이름 + 로그아웃 버튼 -->
+      <!--
+        sec:authentication="name" → Spring Security UserDetails.getUsername() 값
+        닉네임을 따로 쓰고 싶으면:
+          th:text="${#authentication.principal.nickname}"  (커스텀 UserDetails 필드)
+          또는 Controller에서 model.addAttribute("loginUser", ...) 넘겨서
+          th:text="${loginUser.name}" 사용
+      -->
+      <th:block sec:authorize="isAuthenticated()">
+        <a class="user-chip" th:href="@{/mypage}">
+          <span class="user-avatar"
+                th:text="${#strings.substring(#authentication.name, 0, 1)}">U</span>
+          <span class="user-name" sec:authentication="name">사용자</span>
+          <span class="user-suffix">님</span>
+        </a>
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+          <button type="submit" class="btn-logout">로그아웃</button>
+        </form>
+      </th:block>
+
+    </div>
+  </div>
+</nav>
+
+
+
+<script th:inline="javascript">
+  // 햄버거 토글
+  document.getElementById('navToggle')?.addEventListener('click', () => {
+    document.getElementById('navMenu')?.classList.toggle('open');
+  });
+
+  // 모바일 드롭다운 토글
+  document.querySelectorAll('.has-dropdown .dropdown-trigger').forEach(trigger => {
+    trigger.addEventListener('click', e => {
+      if (window.innerWidth <= 768) {
+        e.preventDefault();
+        trigger.closest('.has-dropdown').classList.toggle('open');
+      }
+    });
+  });
+
+  // 외부 클릭 시 드롭다운 닫기
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.has-dropdown')) {
+      document.querySelectorAll('.has-dropdown.open').forEach(el => el.classList.remove('open'));
+    }
+  });
+</script>
+
+</body>
+</html>
