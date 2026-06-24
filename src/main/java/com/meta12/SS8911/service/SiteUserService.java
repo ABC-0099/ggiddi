@@ -1,7 +1,7 @@
 package com.meta12.SS8911.service;
 
 import com.meta12.SS8911.Dto.SiteUserDTO;
-import com.meta12.SS8911.config.Role; // Role 임포트
+import com.meta12.SS8911.config.Role;
 import com.meta12.SS8911.entity.SiteUser;
 import com.meta12.SS8911.repository.SiteUserRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,6 +18,11 @@ public class SiteUserService implements UserDetailsService {
 
     @Transactional
     public void chugaProc(SiteUserDTO dto) {
+        // [추가] 가입 전 중복 아이디 체크
+        if (siteUserRepository.existsByUsername(dto.getUsername())) {
+            throw new IllegalStateException("이미 존재하는 아이디입니다.");
+        }
+
         SiteUser user = new SiteUser();
         user.setUsername(dto.getUsername());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
@@ -40,9 +45,10 @@ public class SiteUserService implements UserDetailsService {
         return User.builder()
                 .username(siteUser.getUsername())
                 .password(siteUser.getPassword())
-                .roles(siteUser.getRole().name()) // Enum 이름을 권한으로 사용
+                .roles(siteUser.getRole().name())
                 .build();
     }
+
     public SiteUser getUserByUsername(String username) {
         return siteUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
