@@ -8,8 +8,8 @@ import org.springframework.web.bind.annotation.GetMapping;
 @RequiredArgsConstructor
 public class Index {
 
-    @GetMapping("")
+    @GetMapping("/")
     public String list(){
-        return "mainpage";
+        return "main/mainpage";
     }
 }
