@@ -12,6 +12,7 @@ import java.time.LocalDateTime;
 @Getter
 @Setter
 public class OrdrePay {
+    //결제
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;

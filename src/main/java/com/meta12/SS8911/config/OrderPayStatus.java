@@ -5,7 +5,7 @@ import lombok.Getter;
 
 @Getter
 public enum OrderPayStatus {
-
+    //결제용
     SUCCESS("SUCCESS", "결제 완료"),
     CANCEL("CANCEL", "결제 취소"),
     FAILED("FAILED", "결제 실패");
