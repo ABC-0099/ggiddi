@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title th:text="|${post.title} — 끼역띠귿|">게시글 — 끼역띠귿</title>
+  <link rel="stylesheet" th:href="@{/css/layout/navbar.css}" />
+  <link rel="stylesheet" th:href="@{/css/layout/footer.css}" />
+  <link rel="stylesheet" th:href="@{/css/community/view.css}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
+
+</head>
+<body>
+
+<div class="bg-orbs"><div class="orb o1"></div><div class="orb o2"></div></div>
+
+<div th:replace="~{layout/navbar :: navbar(currentMenu='community')}"></div>
+
+<!-- 본문 -->
+<div class="page-wrap">
+
+  <!-- 뒤로가기 -->
+  <a th:href="@{/community}" class="back-link">← 목록으로</a>
+
+  <!-- 게시글 카드 -->
+  <div class="post-card">
+
+    <!-- 태그 -->
+    <span class="post-tag"
+          th:classappend="${post.category.name() == 'DIARY'   ? 'pt-diary'   :
+                            post.category.name() == 'CULTURE' ? 'pt-culture' :
+                            post.category.name() == 'REVIEW'  ? 'pt-review'  : 'pt-free'}"
+          th:text="${post.category.name() == 'DIARY'   ? '일상일기'   :
+                     post.category.name() == 'CULTURE' ? '문화교류'   :
+                     post.category.name() == 'REVIEW'  ? '학습후기'   : '자유'}">일상일기</span>
+
+    <!-- 제목 -->
+    <div class="post-title" th:text="${post.title}">오늘 카페에서 한글로 주문했어요!</div>
+
+    <!-- 작성자 -->
+    <div class="post-author-row">
+      <div class="post-avatar"
+           th:text="${#strings.substring(post.author.username, 0, 1)}">리</div>
+      <div>
+        <div class="author-name" th:text="${post.author.username}">Li Wei</div>
+        <div class="author-meta"
+             th:text="${post.author.country + ' · ' + #temporals.format(post.createdAt, 'yyyy.MM.dd HH:mm')}">중국 · 2025.06.24 14:30</div>
+      </div>
+      <!-- 본인 글이 아닐 때만 팔로우 버튼 표시 -->
+      <button class="follow-btn"
+              sec:authorize="isAuthenticated()"
+              th:unless="${post.author.username == #authentication.name}"
+              onclick="toggleFollow(this)">팔로우</button>
+    </div>
+
+    <!-- 본문 -->
+    <div class="post-body" th:text="${post.content}">
+      처음으로 또박또박 한국어로 주문했는데 사장님이 알아들어주셔서 너무 기뻤어요.
+    </div>
+
+    <!-- 이미지 첨부 (있을 때만) -->
+    <div class="post-image" th:if="${post.imagePath != null}">
+      <img th:src="${post.imagePath}" alt="게시글 이미지" />
+    </div>
+
+    <!-- 액션 바 -->
+    <div class="post-actions">
+      <button class="action-btn" id="likeBtn"
+              th:classappend="${liked ? 'liked' : ''}"
+              th:data-id="${post.id}"
+              onclick="toggleLike(this)">
+        <span th:text="${liked ? '❤️' : '🤍'}">🤍</span>
+        <span id="likeCount" th:text="${post.likeCount}">24</span>
+      </button>
+      <button class="action-btn">
+        💬 <span th:text="${post.commentCount}">8</span>
+      </button>
+      <button class="action-btn" onclick="sharePost()">↗ 공유</button>
+      <div class="action-spacer"></div>
+      <button class="report-btn"
+              th:unless="${post.author.username == #authentication.name}"
+              sec:authorize="isAuthenticated()"
+              onclick="reportPost()">🚩 신고</button>
+    </div>
+
+    <!-- 수정/삭제 (본인 글일 때만) -->
+    <div class="owner-actions"
+         sec:authorize="isAuthenticated()"
+         th:if="${post.author.username == #authentication.name}">
+      <a th:href="@{/community/{id}/edit(id=${post.id})}">
+        <button class="edit-btn">✏️ 수정</button>
+      </a>
+      <form th:action="@{/community/{id}/delete(id=${post.id})}" method="post"
+            onsubmit="return confirm('정말 삭제할까요?')">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <button type="submit" class="del-btn">🗑 삭제</button>
+      </form>
+    </div>
+
+  </div>
+
+  <!-- 댓글 섹션 -->
+  <div class="comment-section">
+    <h2>
+      댓글
+      <span class="comment-count" th:text="${#lists.size(comments)}">3</span>
+    </h2>
+
+    <!-- 댓글 입력 (로그인 시) -->
+    <div class="comment-input-wrap" sec:authorize="isAuthenticated()">
+      <div class="mini-avatar"
+           th:text="${#strings.substring(#authentication.name, 0, 1)}">유</div>
+      <div class="comment-box">
+        <textarea id="commentInput" placeholder="댓글을 입력하세요..."></textarea>
+        <div class="comment-box-footer">
+          <button class="comment-submit"
+                  th:data-post-id="${post.id}"
+                  onclick="submitComment(this)">등록</button>
+        </div>
+      </div>
+    </div>
+
+    <!-- 비로그인 안내 -->
+    <div class="empty-comments" sec:authorize="isAnonymous()">
+      <a th:href="@{/login}" style="color:var(--navy); font-weight:600;">로그인</a> 후 댓글을 달 수 있어요.
+    </div>
+
+    <!-- 댓글 목록 -->
+    <div class="comment-list">
+
+      <div class="comment-item" th:each="comment : ${comments}">
+        <div class="mini-avatar"
+             th:style="${'background: linear-gradient(135deg,' + (comment.author.country == '중국' ? '#a8e6cf,#89d4f5' : '#9FE1CB,#185FA5') + ')'}"
+             th:text="${#strings.substring(comment.author.username, 0, 1)}">리</div>
+        <div class="comment-body">
+          <div class="comment-header">
+            <span class="comment-author" th:text="${comment.author.username}">Li Wei</span>
+            <span class="comment-time"
+                  th:text="${#temporals.format(comment.createdAt, 'MM.dd HH:mm')}">06.24 14:45</span>
+          </div>
+          <div class="comment-text" th:text="${comment.content}">정말 대단해요! 저도 연습해볼게요.</div>
+          <div class="comment-actions">
+            <button class="comment-act" onclick="toggleCommentLike(this)">🤍 좋아요</button>
+            <button class="comment-act"
+                    th:if="${comment.author.username == #authentication.name}"
+                    sec:authorize="isAuthenticated()"
+                    th:data-comment-id="${comment.id}"
+                    onclick="deleteComment(this)">삭제</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- 댓글 없을 때 -->
+      <div class="empty-comments" th:if="${#lists.isEmpty(comments)}">
+        아직 댓글이 없어요. 첫 번째 댓글을 남겨보세요! 💬
+      </div>
+
+    </div>
+  </div>
+
+</div>
+
+<div th:replace="~{layout/footer :: footer}"></div>
+
+<script>
+  // 좋아요 토글
+  function toggleLike(btn) {
+    const postId = btn.dataset.id;
+    fetch(`/community/${postId}/like`, { method: 'POST',
+      headers: { 'X-CSRF-TOKEN': document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] || '' }
+    })
+    .then(r => r.json())
+    .then(data => {
+      btn.classList.toggle('liked', data.liked);
+      btn.querySelector('span').textContent = data.liked ? '❤️' : '🤍';
+      document.getElementById('likeCount').textContent = data.likeCount;
+    });
+  }
+
+  // 댓글 등록
+  function submitComment(btn) {
+    const postId = btn.dataset.postId;
+    const content = document.getElementById('commentInput').value.trim();
+    if (!content) return;
+
+    fetch(`/community/${postId}/comment`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'X-CSRF-TOKEN': document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] || ''
+      },
+      body: JSON.stringify({ content })
+    })
+    .then(() => location.reload());
+  }
+
+  // 팔로우 토글
+  function toggleFollow(btn) {
+    btn.classList.toggle('following');
+    btn.textContent = btn.classList.contains('following') ? '팔로잉' : '팔로우';
+  }
+
+  // 댓글 좋아요
+  function toggleCommentLike(btn) {
+    btn.classList.toggle('liked');
+    btn.textContent = btn.classList.contains('liked') ? '❤️ 좋아요' : '🤍 좋아요';
+  }
+
+  // 댓글 삭제
+  function deleteComment(btn) {
+    if (!confirm('댓글을 삭제할까요?')) return;
+    const commentId = btn.dataset.commentId;
+    fetch(`/community/comment/${commentId}/delete`, { method: 'POST',
+      headers: { 'X-CSRF-TOKEN': document.cookie.match(/XSRF-TOKEN=([^;]+)/)?.[1] || '' }
+    })
+    .then(() => location.reload());
+  }
+
+  // 공유
+  function sharePost() {
+    navigator.clipboard.writeText(location.href).then(() => alert('링크가 복사되었어요!'));
+  }
+
+  // 신고
+  function reportPost() {
+    alert('신고가 접수되었습니다. 운영팀이 확인 후 처리할게요.');
+  }
+</script>
+
+</body>
+</html>
