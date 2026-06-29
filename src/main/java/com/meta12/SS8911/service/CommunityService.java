@@ -17,7 +17,18 @@ import java.util.List;
 public class CommunityService {
     private final CommunityRepository communityRepository;
 
-    public List<Community> getCommunityPosts(Category category, String sort) {
+    public List<Community> getCommunityPosts(Category category, String sort, String kw) {
+        boolean hasKeyword = kw != null && !kw.isBlank();
+
+        // 검색어가 있을 때
+        if (hasKeyword) {
+            if (category == null || category == Category.ALL) {
+                return communityRepository.findAllByKeyword(kw);
+            }
+            return communityRepository.findByCategoryAndKeyword(category, kw);
+        }
+
+        // 검색어 없을 때 (기존 정렬 로직)
         boolean oldest = "oldest".equals(sort);
         if (category == null || category == Category.ALL) {
             return oldest ? communityRepository.findAllWithAuthorOldest()
@@ -71,5 +82,4 @@ public class CommunityService {
             throw new RuntimeException("권한이 없습니다.");
         }
     }
-
 }

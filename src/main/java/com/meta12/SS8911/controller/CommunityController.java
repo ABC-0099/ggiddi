@@ -2,8 +2,10 @@ package com.meta12.SS8911.controller;
 
 import com.meta12.SS8911.Dto.CommunityDTO;
 import com.meta12.SS8911.config.Category;
+import com.meta12.SS8911.entity.Comment;
 import com.meta12.SS8911.entity.Community;
 import com.meta12.SS8911.entity.SiteUser;
+import com.meta12.SS8911.service.CommentService;
 import com.meta12.SS8911.service.CommunityService;
 import com.meta12.SS8911.service.SiteUserService;
 import lombok.RequiredArgsConstructor;
@@ -21,16 +23,19 @@ public class CommunityController {
 
     private final CommunityService communityService;
     private final SiteUserService siteUserService;
+    private final CommentService commentService;
 
     // 목록
     @GetMapping
     public String list(@RequestParam(required = false) Category category,
                        @RequestParam(required = false, defaultValue = "newest") String sort,
+                       @RequestParam(required = false, defaultValue = "") String kw,
                        Model model) {
-        List<Community> posts = communityService.getCommunityPosts(category, sort);
+        List<Community> posts = communityService.getCommunityPosts(category, sort, kw);
         model.addAttribute("postList", posts);
         model.addAttribute("category", category);
         model.addAttribute("sort", sort);
+        model.addAttribute("kw", kw);
         return "community/list";
     }
 
@@ -49,11 +54,13 @@ public class CommunityController {
         return "redirect:/community";
     }
 
-    // 상세보기
+    // 상세보기 - 댓글 목록 추가
     @GetMapping("/{id}")
     public String detail(@PathVariable Long id, Model model) {
         Community post = communityService.getPost(id);
+        List<Comment> comments = commentService.getComments(post);
         model.addAttribute("post", post);
+        model.addAttribute("comments", comments);
         return "community/view";
     }
 
@@ -63,7 +70,6 @@ public class CommunityController {
         Community post = communityService.getPost(id);
         SiteUser user = siteUserService.getUserByUsername(principal.getName());
 
-        // 권한 체크 (작성자 또는 관리자)
         boolean isAuthor = post.getAuthor().getId().equals(user.getId());
         boolean isAdmin = user.getRole().name().equals("ADMIN");
         if (!isAuthor && !isAdmin) {

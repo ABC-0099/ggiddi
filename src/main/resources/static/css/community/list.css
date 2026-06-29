@@ -216,3 +216,28 @@
           .search-wrap { max-width: none; }
           .toolbar-right { justify-content: space-between; }
         }
+
+        .search-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .search-btn {
+            padding: 9px 18px;
+            border-radius: 10px;
+            background: var(--mint);
+            color: #fff;
+            border: none;
+            font-size: 13.5px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background .15s;
+            white-space: nowrap;
+        }
+
+        .search-btn:hover {
+            background: var(--mint-dark);
+        }
