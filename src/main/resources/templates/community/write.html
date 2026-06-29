@@ -1,0 +1,75 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>끼역띠귿 — 글쓰기</title>
+    <link rel="stylesheet" th:href="@{/css/layout/navbar.css}" />
+    <link rel="stylesheet" th:href="@{/css/layout/footer.css}" />
+    <link rel="stylesheet" th:href="@{/css/community/list.css}" />
+    <link rel="stylesheet" th:href="@{/css/community/write.css}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<div class="bg-orbs"><div class="orb o1"></div><div class="orb o2"></div></div>
+<div th:replace="~{layout/navbar :: navbar(currentMenu='community')}"></div>
+
+<div class="page-header">
+    <h1>글쓰기</h1>
+    <p>나의 이야기를 자유롭게 나눠보세요</p>
+</div>
+
+<div class="write-container">
+    <div class="write-card">
+        <form th:action="@{/community/write}" th:object="${communityDTO}" method="post">
+
+            <!-- CSRF 토큰 -->
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+            <div class="field">
+                <label for="category">카테고리 <span class="required">*</span></label>
+                <select id="category" th:field="*{category}" required>
+                    <option value="">카테고리를 선택하세요</option>
+                    <option value="CULTURAL">문화교류</option>
+                    <option value="REVIEW">학습후기</option>
+                    <option value="FREE">자유</option>
+                </select>
+            </div>
+
+            <div class="field">
+                <label for="title">제목 <span class="required">*</span></label>
+                <input type="text" id="title" th:field="*{title}"
+                       placeholder="제목을 입력하세요" maxlength="100" required />
+            </div>
+
+            <div class="field">
+                <label for="content">내용 <span class="required">*</span></label>
+                <textarea id="content" th:field="*{content}"
+                          placeholder="내용을 입력하세요" maxlength="5000" required></textarea>
+                <div class="char-count"><span id="content-count">0</span> / 5000</div>
+            </div>
+
+            <div class="write-actions">
+                <a th:href="@{/community}" class="btn-cancel">취소</a>
+                <button type="submit" class="btn-submit">✏️ 등록하기</button>
+            </div>
+
+        </form>
+    </div>
+</div>
+
+<div th:replace="~{layout/footer :: footer}"></div>
+
+<script>
+    const textarea = document.getElementById('content');
+    const counter = document.getElementById('content-count');
+    textarea.addEventListener('input', () => {
+        counter.textContent = textarea.value.length;
+    });
+</script>
+</body>
+</html>

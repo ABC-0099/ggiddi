@@ -1,0 +1,126 @@
+.write-container {
+    max-width: 760px;
+    margin: 0 auto 80px;
+    padding: 0 20px;
+}
+
+.write-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    padding: 40px;
+}
+
+.write-card .field {
+    margin-bottom: 24px;
+}
+
+.write-card label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+    letter-spacing: 0.02em;
+}
+
+.write-card label .required {
+    color: #6366f1;
+    margin-left: 3px;
+}
+
+.write-card input[type="text"],
+.write-card select,
+.write-card textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 15px;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: #111827;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.write-card input[type="text"]:focus,
+.write-card select:focus,
+.write-card textarea:focus {
+    border-color: #6366f1;
+    box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.1);
+}
+
+.write-card textarea {
+    resize: vertical;
+    min-height: 280px;
+    line-height: 1.7;
+}
+
+.write-card select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+}
+
+.char-count {
+    text-align: right;
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 6px;
+}
+
+.write-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.btn-cancel {
+    padding: 11px 24px;
+    border-radius: 10px;
+    border: 1.5px solid #e5e7eb;
+    background: #fff;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.18s;
+}
+
+.btn-cancel:hover {
+    border-color: #d1d5db;
+    background: #f9fafb;
+}
+
+.btn-submit {
+    padding: 11px 28px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, #6366f1, #8b5cf6);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer;
+    transition: all 0.18s;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.3);
+}
+
+.btn-submit:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.4);
+}
+
+.btn-submit:active {
+    transform: translateY(0);
+}

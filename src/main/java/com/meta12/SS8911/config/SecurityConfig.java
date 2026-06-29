@@ -25,7 +25,7 @@ public class SecurityConfig {
                                 "/siteUser/chuga",
                                 "/siteUser/chugaProc",
                                 "/notices",
-                                "/board/**",
+                                "/community/**",
                                 "/faq",
                                 "/lectures",
                                 "/lectures/**",
