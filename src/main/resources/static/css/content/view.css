@@ -1,0 +1,343 @@
+
+        :root {
+          --mint:       #5DCAA5;
+          --mint-dark:  #1D9E75;
+          --mint-light: #9FE1CB;
+          --mint-pale:  #E8F8F3;
+          --navy:       #185FA5;
+          --navy-dark:  #0C447C;
+          --navy-light: #EBF4FF;
+          --bg:         #F0FBF7;
+          --border:     #C8EFE1;
+          --ink:        #0A1F17;
+          --ink-soft:   #6B7280;
+          --ink-faint:  #9CA3AF;
+          --white:      #ffffff;
+        }
+
+        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--ink); }
+        a { text-decoration: none; color: inherit; }
+
+        .bg-orbs { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+        .orb { position: absolute; border-radius: 50%; filter: blur(100px); }
+        .o1 { width:500px; height:500px; top:-120px; right:-80px; background:#9FE1CB; opacity:.4; }
+        .o2 { width:400px; height:400px; bottom:-80px; left:-60px; background:#B5D4F4; opacity:.35; }
+
+        /* NAV */
+        nav {
+          position: sticky; top: 0; z-index: 100;
+          height: 60px; padding: 0 6%;
+          display: flex; align-items: center; justify-content: space-between;
+          background: rgba(255,255,255,.6);
+          backdrop-filter: blur(16px);
+          border-bottom: 1px solid rgba(255,255,255,.8);
+        }
+
+        .logo { font-size: 18px; font-weight: 700; color: var(--mint-dark); letter-spacing: -.3px; display: flex; align-items: center; gap: 5px; }
+        .logo-dot { width:7px; height:7px; border-radius:50%; background:var(--navy); }
+
+        .nav-links { display: flex; gap: 28px; list-style: none; font-size: 14px; color: var(--ink-soft); }
+        .nav-links a:hover { color: var(--mint-dark); }
+
+        .nav-user { display: flex; align-items: center; gap: 10px; }
+        .avatar { width:34px; height:34px; border-radius:50%; background:linear-gradient(135deg,var(--mint),var(--navy)); display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700; color:#fff; }
+
+        /* 브레드크럼 */
+        .breadcrumb {
+          position: relative; z-index: 1;
+          padding: 16px 6% 0;
+          font-size: 13px; color: var(--ink-faint);
+          display: flex; align-items: center; gap: 6px;
+          max-width: 1440px; margin: 0 auto;
+        }
+
+        .breadcrumb a { color: var(--mint-dark); }
+        .breadcrumb a:hover { text-decoration: underline; }
+        .breadcrumb span { color: var(--ink-faint); }
+
+        /* 메인 레이아웃 */
+        .main {
+          position: relative; z-index: 1;
+          padding: 20px 6% 80px;
+          max-width: 1440px; margin: 0 auto;
+          display: grid;
+          grid-template-columns: 1fr 360px;
+          gap: 28px;
+          align-items: start;
+        }
+
+        /* ── 왼쪽 플레이어 영역 ── */
+        .player-col {}
+
+        /* 비디오 플레이어 */
+        .player-wrap {
+          background: #0A1F17;
+          border-radius: 18px;
+          overflow: hidden;
+          box-shadow: 0 8px 40px rgba(10,31,23,.2);
+          margin-bottom: 20px;
+        }
+
+        .player-screen {
+          position: relative;
+          aspect-ratio: 16/9;
+          background: linear-gradient(135deg, #0d2b1e, #1a4a32);
+          display: flex; align-items: center; justify-content: center;
+          cursor: pointer;
+        }
+
+        .player-thumb-icon { font-size: 80px; opacity: .3; }
+
+        .player-overlay {
+          position: absolute; inset: 0;
+          display: flex; align-items: center; justify-content: center;
+        }
+
+        .play-circle {
+          width: 72px; height: 72px; border-radius: 50%;
+          background: rgba(93,202,165,.9);
+          display: flex; align-items: center; justify-content: center;
+          font-size: 28px; color: #fff;
+          box-shadow: 0 4px 20px rgba(93,202,165,.4);
+          transition: transform .15s, box-shadow .15s;
+        }
+
+        .player-screen:hover .play-circle {
+          transform: scale(1.08);
+          box-shadow: 0 6px 28px rgba(93,202,165,.55);
+        }
+
+        /* 진행 바 */
+        .player-bar {
+          padding: 12px 18px 16px;
+        }
+
+        .progress-track {
+          height: 5px; background: rgba(255,255,255,.15);
+          border-radius: 3px; overflow: hidden; cursor: pointer;
+          margin-bottom: 10px;
+        }
+
+        .progress-current {
+          height: 100%; width: 38%;
+          background: linear-gradient(90deg, var(--mint-dark), var(--mint));
+          border-radius: 3px;
+        }
+
+        .bar-controls {
+          display: flex; align-items: center; justify-content: space-between;
+        }
+
+        .bar-left { display: flex; align-items: center; gap: 14px; }
+
+        .ctrl-btn {
+          background: none; border: none; cursor: pointer;
+          color: rgba(255,255,255,.7); font-size: 18px;
+          transition: color .15s; padding: 2px;
+          font-family: inherit;
+        }
+
+        .ctrl-btn:hover { color: var(--mint-light); }
+        .ctrl-btn.play { font-size: 22px; color: var(--mint-light); }
+
+        .time-display { font-size: 12px; color: rgba(255,255,255,.5); }
+
+        .bar-right { display: flex; align-items: center; gap: 12px; }
+
+        .speed-btn {
+          font-size: 12px; font-weight: 600;
+          color: rgba(255,255,255,.6);
+          background: rgba(255,255,255,.1);
+          border: 1px solid rgba(255,255,255,.15);
+          border-radius: 6px; padding: 3px 8px;
+          cursor: pointer; font-family: inherit; transition: all .15s;
+        }
+
+        .speed-btn:hover { background: rgba(255,255,255,.18); color: #fff; }
+
+        /* 강의 제목 + 메타 */
+        .lecture-info {
+          background: rgba(255,255,255,.62);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(255,255,255,.88);
+          border-radius: 16px;
+          padding: 22px 24px;
+          margin-bottom: 20px;
+          box-shadow: 0 4px 16px rgba(29,158,117,.06);
+        }
+
+        .li-top {
+          display: flex; align-items: flex-start; justify-content: space-between; gap: 12px;
+          margin-bottom: 14px;
+        }
+
+        .li-badge {
+          display: inline-block; font-size: 11px; font-weight: 700;
+          padding: 3px 10px; border-radius: 20px;
+          background: var(--mint-pale); color: var(--mint-dark);
+          margin-bottom: 8px;
+        }
+
+        .li-title { font-size: 20px; font-weight: 700; line-height: 1.3; letter-spacing: -.3px; }
+
+        .li-actions { display: flex; gap: 8px; flex-shrink: 0; }
+
+        .li-btn {
+          padding: 8px 14px; border-radius: 8px;
+          font-size: 13px; font-weight: 600;
+          cursor: pointer; transition: all .15s;
+          font-family: inherit; border: 1px solid var(--border);
+          background: rgba(255,255,255,.6); color: var(--ink-soft);
+          display: flex; align-items: center; gap: 5px;
+        }
+
+        .li-btn:hover { border-color: var(--mint-light); color: var(--mint-dark); background: var(--mint-pale); }
+
+        .li-meta { display: flex; gap: 16px; font-size: 13px; color: var(--ink-faint); flex-wrap: wrap; }
+
+        /* 강의 설명 */
+        .lecture-desc {
+          background: rgba(255,255,255,.62);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(255,255,255,.88);
+          border-radius: 16px;
+          padding: 22px 24px;
+          margin-bottom: 20px;
+        }
+
+        .desc-title { font-size: 15px; font-weight: 700; margin-bottom: 12px; }
+
+        .desc-text { font-size: 14px; color: var(--ink-soft); line-height: 1.8; font-weight: 300; margin-bottom: 16px; }
+
+        .keyword-list { display: flex; flex-wrap: wrap; gap: 8px; }
+
+        .keyword {
+          padding: 5px 12px; border-radius: 20px;
+          font-size: 13px; font-weight: 500;
+          background: var(--mint-pale); color: var(--mint-dark);
+          border: 1px solid rgba(93,202,165,.25);
+        }
+
+
+
+        /* ── 오른쪽 사이드바 ── */
+        .sidebar {}
+
+        .sidebar-card {
+          background: rgba(255,255,255,.62);
+          backdrop-filter: blur(20px);
+          border: 1px solid rgba(255,255,255,.88);
+          border-radius: 16px;
+          overflow: hidden;
+          margin-bottom: 16px;
+          box-shadow: 0 4px 16px rgba(29,158,117,.06);
+        }
+
+        .sidebar-header {
+          padding: 16px 18px;
+          border-bottom: 1px solid var(--border);
+          font-size: 14px; font-weight: 700;
+          background: rgba(255,255,255,.4);
+          display: flex; align-items: center; justify-content: space-between;
+        }
+
+        .sidebar-header span { font-size: 12px; color: var(--ink-faint); font-weight: 400; }
+
+        /* 강의 목록 사이드 */
+        .sl-item {
+          display: flex; gap: 12px; padding: 12px 16px;
+          border-bottom: 1px solid rgba(200,239,225,.5);
+          cursor: pointer; transition: background .15s; align-items: flex-start;
+        }
+
+        .sl-item:last-child { border-bottom: none; }
+        .sl-item:hover { background: rgba(232,248,243,.5); }
+        .sl-item.active { background: var(--mint-pale); }
+
+        .sl-thumb {
+          width: 72px; height: 42px; border-radius: 6px;
+          background: linear-gradient(135deg, #c8f0e2, #b5d4f4);
+          display: flex; align-items: center; justify-content: center;
+          font-size: 18px; flex-shrink: 0; position: relative;
+        }
+
+        .sl-done-mark {
+          position: absolute; inset: 0; background: rgba(29,158,117,.5);
+          display: flex; align-items: center; justify-content: center;
+          color: #fff; font-size: 16px; border-radius: 6px;
+        }
+
+        .sl-lock {
+          position: absolute; inset: 0; background: rgba(0,0,0,.35);
+          display: flex; align-items: center; justify-content: center;
+          border-radius: 6px;
+        }
+
+        .sl-info {}
+        .sl-num   { font-size: 11px; color: var(--ink-faint); margin-bottom: 3px; }
+        .sl-title { font-size: 13px; font-weight: 500; color: var(--ink); line-height: 1.4; margin-bottom: 4px; }
+        .sl-time  { font-size: 11px; color: var(--ink-faint); }
+
+
+
+
+
+        .cq-opt {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          padding: 9px 12px;
+          border-radius: 9px;
+          border: 1.5px solid var(--border);
+          background: rgba(255,255,255,.6);
+          cursor: pointer;
+          transition: all .15s;
+          font-size: 13px;
+          font-weight: 500;
+          color: var(--ink);
+          user-select: none;
+        }
+        .cq-opt:hover { border-color: var(--mint-light); background: var(--mint-pale); }
+        .cq-opt.selected { border-color: var(--navy); background: var(--navy-light); color: var(--navy); }
+        .cq-opt.correct  { border-color: var(--mint-dark); background: var(--mint-pale); color: var(--mint-dark); }
+        .cq-opt.wrong    { border-color: #EF4444; background: #FEF2F2; color: #EF4444; }
+
+        .cq-letter {
+          width: 22px; height: 22px; border-radius: 50%;
+          background: var(--border); color: var(--ink-soft);
+          display: flex; align-items: center; justify-content: center;
+          font-size: 11px; font-weight: 700; flex-shrink: 0;
+          transition: all .15s;
+        }
+        .cq-opt.selected .cq-letter { background: var(--navy); color: #fff; }
+        .cq-opt.correct  .cq-letter { background: var(--mint-dark); color: #fff; }
+        .cq-opt.wrong    .cq-letter { background: #EF4444; color: #fff; }
+
+        /* 퀴즈 잠금 오버레이 */
+        .quiz-locked-overlay {
+          position: absolute; inset: 0;
+          background: rgba(240,251,247,.88);
+          backdrop-filter: blur(6px);
+          border-radius: 16px;
+          display: flex; flex-direction: column;
+          align-items: center; justify-content: center;
+          gap: 10px; z-index: 10;
+          text-align: center; padding: 20px;
+        }
+        .quiz-lock-icon { font-size: 36px; }
+        .quiz-lock-title { font-size: 14px; font-weight: 700; color: var(--ink); }
+        .quiz-lock-desc  { font-size: 12px; color: var(--ink-soft); line-height: 1.6; }
+        .quiz-lock-bar-wrap { width: 100%; background: var(--border); border-radius: 4px; height: 6px; overflow: hidden; }
+        .quiz-lock-bar { height: 100%; background: linear-gradient(90deg, var(--mint-dark), var(--mint)); border-radius: 4px; transition: width .4s; }
+
+        /* 반응형 */
+        @media (max-width: 1024px) {
+          .main { grid-template-columns: 1fr; }
+          .sidebar { display: none; }
+        }
+
+        @media (max-width: 640px) {
+          .nav-links { display: none; }
+          .li-actions { display: none; }
+        }
