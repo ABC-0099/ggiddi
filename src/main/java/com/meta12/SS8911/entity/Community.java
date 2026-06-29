@@ -23,8 +23,6 @@ public class Community {
 
     @ManyToOne(fetch = FetchType.LAZY)
     private SiteUser author; // 작성자 정보
-
     // 생성일, 수정일 등...
-
     private LocalDateTime createdDate;
 }
