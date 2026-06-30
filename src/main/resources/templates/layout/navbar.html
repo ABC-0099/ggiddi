@@ -9,7 +9,7 @@
   <div th:replace="~{layout/navbar :: navbar(currentMenu='lectures')}"></div>
 
   currentMenu 값 목록:
-    home | notices | community | lectures | game | faq | mypage
+    home | notices | community | event | lectures | game | faq | mypage
   ================================
 -->
 
@@ -39,6 +39,11 @@
       <!-- 커뮤니티 -->
       <li th:classappend="${currentMenu == 'community'} ? 'active'">
         <a th:href="@{/community}">커뮤니티</a>
+      </li>
+
+      <!-- 이벤트 -->
+      <li th:classappend="${currentMenu == 'event'} ? 'active'">
+        <a th:href="@{/event}">이벤트</a>
       </li>
 
       <!-- 학습센터 드롭다운 -->

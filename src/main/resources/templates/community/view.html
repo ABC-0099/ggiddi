@@ -38,6 +38,30 @@
     <!-- 본문 -->
     <div class="view-content" th:text="${post.content}">내용</div>
 
+    <!-- 첨부 사진 -->
+    <div class="view-images" th:if="${!#lists.isEmpty(post.files) and post.files.?[fileType == 'IMAGE'].size() > 0}">
+      <div class="view-image-grid">
+        <a th:each="img : ${post.files}" th:if="${img.fileType == 'IMAGE'}"
+           th:href="@{${img.savedPath}}" target="_blank" class="view-image-item">
+          <img th:src="@{${img.savedPath}}" th:alt="${img.originalName}" />
+        </a>
+      </div>
+    </div>
+
+    <!-- 첨부 파일 -->
+    <div class="view-files" th:if="${!#lists.isEmpty(post.files) and post.files.?[fileType == 'ATTACH'].size() > 0}">
+      <div class="view-files-title">📎 첨부파일</div>
+      <ul class="view-file-list">
+        <li class="view-file-item" th:each="file : ${post.files}" th:if="${file.fileType == 'ATTACH'}">
+          <span class="vf-icon">📄</span>
+          <span class="vf-name" th:text="${file.originalName}">파일명</span>
+          <span class="vf-size"
+                th:text="${#numbers.formatDecimal(file.fileSize / 1048576.0, 1, 1)} + ' MB'">0.0 MB</span>
+          <a th:href="@{${file.savedPath}}" th:download="${file.originalName}" class="vf-download">다운로드</a>
+        </li>
+      </ul>
+    </div>
+
     <!-- 액션 버튼 (하트 제거, 공유/신고 기능 추가) -->
     <div class="view-footer">
       <span class="pf-action" id="btn-share" onclick="sharePost()">↗ 공유</span>
