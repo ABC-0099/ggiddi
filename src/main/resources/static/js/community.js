@@ -50,4 +50,5 @@ document.addEventListener('DOMContentLoaded', function() {
         if (cat !== 'ALL') url += `&category=${encodeURIComponent(cat)}`;
         location.href = url;
     }
+
 });
