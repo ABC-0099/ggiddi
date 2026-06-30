@@ -46,11 +46,11 @@
     justify-content: center;
   }
 
-  .footer-logo .logo-text {
-    font-size: 16px;
-    font-weight: 800;
-    color: #ffffff;
-  }
+.footer-logo .logo-text {
+  font-size: 16px;
+  font-weight: 600;
+  color: #ffffff;
+}
 
   .footer-tagline {
     font-size: 12.5px;

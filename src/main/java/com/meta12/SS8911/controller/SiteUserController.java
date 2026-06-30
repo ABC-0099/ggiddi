@@ -1,7 +1,11 @@
 package com.meta12.SS8911.controller;
 
 import com.meta12.SS8911.Dto.SiteUserDTO;
+import com.meta12.SS8911.entity.Comment;
+import com.meta12.SS8911.entity.Community;
 import com.meta12.SS8911.entity.SiteUser;
+import com.meta12.SS8911.service.CommentService;
+import com.meta12.SS8911.service.CommunityService;
 import com.meta12.SS8911.service.SiteUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -13,15 +17,18 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
 import java.security.Principal;
+import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
 public class SiteUserController {
     private final SiteUserService siteUserService;
+    private final CommunityService communityService;
+    private final CommentService commentService;
 
-    @GetMapping("/siteUser/chuga") // 사용자가 /siteUser/chuga로 접속하면
+    @GetMapping("/siteUser/chuga")
     public String chugaForm(SiteUserDTO siteUserDTO) {
-        return "siteUser/chuga"; // chuga.html 파일을 보여줌
+        return "siteUser/chuga";
     }
 
     @PostMapping("/siteUser/chugaProc")
@@ -39,18 +46,26 @@ public class SiteUserController {
     public String profile(@PathVariable("username") String username, Model model) {
         SiteUser user = siteUserService.getUserByUsername(username);
         model.addAttribute("siteUser", user);
-        return "siteUser/view"; // 유저 상세 페이지로 이동
+        return "siteUser/view";
     }
 
     @GetMapping("/siteUser/login")
     public String login() {
-        return "siteUser/login"; // 나중에 만들 로그인 HTML 파일명
+        return "siteUser/login";
     }
 
     @GetMapping("/siteUser/mypage")
     public String mypage(Model model, Principal principal) {
         SiteUser user = siteUserService.getUserByUsername(principal.getName());
+
+        // 내가 쓴 게시글
+        List<Community> myPosts = communityService.getPostsByAuthor(user);
+        // 내가 쓴 댓글
+        List<Comment> myComments = commentService.getCommentsByAuthor(user);
+
         model.addAttribute("siteUser", user);
+        model.addAttribute("myPosts", myPosts);
+        model.addAttribute("myComments", myComments);
         return "siteUser/mypage";
     }
 }
