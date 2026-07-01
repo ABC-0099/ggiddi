@@ -29,6 +29,7 @@ public class SecurityConfig {
                                 "/lectures",
                                 "/lectures/**",
                                 "/game",
+                                "/games/**",         // ★ 유니티 WebGL 빌드 정적 파일 인증 없이 접근 허용
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
@@ -57,6 +58,10 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf
                         // WebSocket 핸드셰이크는 STOMP 프레임 자체로 인증되므로 CSRF 토큰 검사에서 제외
                         .ignoringRequestMatchers("/ws/chat/**")
+                )
+                .headers(headers -> headers
+                        // ★ 기본값 DENY는 iframe(유니티 게임 창)을 전부 막으므로 같은 출처는 허용하도록 변경
+                        .frameOptions(frame -> frame.sameOrigin())
                 );
         // ★ csrf.disable() 제거 → CSRF 기본 활성화 (다른 요청에는 그대로 적용됨)
 

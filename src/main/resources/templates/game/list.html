@@ -50,13 +50,28 @@
 </div>
 
 <div class="game-wrap" style="padding-top:40px;">
-    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:340px; text-align:center; gap:24px;">
-        <div style="font-size:58px;">🗡️</div>
-        <div>
-            <h2 class="serif-font" style="font-size:20px; font-weight:900; margin-bottom:12px; color:var(--wood-deep);">한국어 모험을 시작해볼까요?</h2>
-            <p style="font-size:14px; color:var(--ink-soft);">버튼을 누르면 게임 창이 열려요.</p>
+    <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:28px; min-height:340px; padding-bottom:20px;">
+
+        <!-- 단어 맞추기 -->
+        <div style="flex:1 1 320px; max-width:380px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:20px; padding:36px 24px; border:2px solid var(--wood-deep, #7a5230); border-radius:16px; background:rgba(255,255,255,0.55);">
+            <div style="font-size:52px;">📖</div>
+            <div>
+                <h2 class="serif-font" style="font-size:19px; font-weight:900; margin-bottom:10px; color:var(--wood-deep);">단어 맞추기</h2>
+                <p style="font-size:13.5px; color:var(--ink-soft); line-height:1.6;">뜻과 발음을 보고<br>알맞은 단어를 맞혀보세요.</p>
+            </div>
+            <button class="gc-start-btn" style="width:auto; padding:14px 32px; font-size:13px;" data-game="단어 맞추기" data-path="/games/word/index.html" onclick="startAdventure(this)">모험을 떠나요 →</button>
         </div>
-        <button class="gc-start-btn" style="width:auto; padding:15px 36px; font-size:13px;" data-game="끼역띠귿 모험" onclick="startAdventure(this)">모험을 떠나요 →</button>
+
+        <!-- 액션 게임 -->
+        <div style="flex:1 1 320px; max-width:380px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:20px; padding:36px 24px; border:2px solid var(--wood-deep, #7a5230); border-radius:16px; background:rgba(255,255,255,0.55);">
+            <div style="font-size:52px;">🗡️</div>
+            <div>
+                <h2 class="serif-font" style="font-size:19px; font-weight:900; margin-bottom:10px; color:var(--wood-deep);">액션 게임</h2>
+                <p style="font-size:13.5px; color:var(--ink-soft); line-height:1.6;">몬스터를 물리치며<br>한국어 표현을 익혀보세요.</p>
+            </div>
+            <button class="gc-start-btn" style="width:auto; padding:14px 32px; font-size:13px;" data-game="액션 게임" data-path="/games/action/index.html" onclick="startAdventure(this)">모험을 떠나요 →</button>
+        </div>
+
     </div>
 </div>
 
@@ -90,6 +105,7 @@
     function startAdventure(el) {
       if (!el) return;
       var gameName = el.getAttribute('data-game');
+      var gamePath = el.getAttribute('data-path');
       if (!gameName) return;
       var overlay = document.getElementById('portalOverlay');
       document.getElementById('portalGameName').textContent = gameName + ' 모험을 떠나는 중';
@@ -97,7 +113,19 @@
       overlay.setAttribute('aria-hidden', 'false');
       setTimeout(function () {
         document.getElementById('gwTitle').textContent = gameName;
-        document.getElementById('gwPlaceholderTitle').textContent = gameName + ' 화면 위치';
+        var placeholder = document.getElementById('gwPlaceholder');
+        var frame = document.getElementById('unityFrame');
+        if (gamePath) {
+          // 실제 유니티 빌드가 있으면 iframe으로 로드
+          placeholder.style.display = 'none';
+          frame.style.display = 'block';
+          frame.src = gamePath;
+        } else {
+          // 경로가 없으면 안내 placeholder만 표시
+          document.getElementById('gwPlaceholderTitle').textContent = gameName + ' 화면 위치';
+          placeholder.style.display = 'flex';
+          frame.style.display = 'none';
+        }
         document.getElementById('gameWindow').classList.add('active');
         overlay.classList.remove('active');
         overlay.setAttribute('aria-hidden', 'true');
