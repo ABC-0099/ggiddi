@@ -38,7 +38,10 @@ public class CategoryController {
     private final ContentRepository contentRepository;
     private final ProgressRepository progressRepository;
 
-
+    @GetMapping("/category/main")
+    public String main() {
+        return "category/main";
+    }
 
 
     @GetMapping("/category/list")
