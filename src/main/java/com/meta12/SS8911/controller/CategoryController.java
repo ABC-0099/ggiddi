@@ -38,6 +38,7 @@ public class CategoryController {
     private final ContentRepository contentRepository;
     private final ProgressRepository progressRepository;
 
+
     @GetMapping("/category/list")
     public String list(
             @AuthenticationPrincipal SiteUser user,
