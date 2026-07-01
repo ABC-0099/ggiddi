@@ -117,8 +117,22 @@
         <a class="btn-signup" th:href="@{/siteUser/chuga}">회원가입</a>
       </th:block>
 
-      <!-- 로그인 상태: 유저이름 + 로그아웃 버튼 -->
-      <th:block sec:authorize="isAuthenticated()">
+      <!-- 로그인 상태 (관리자): 유저이름 클릭 시 관리자 대시보드로 -->
+      <th:block sec:authorize="hasRole('ADMIN')">
+        <a class="user-chip" th:href="@{/admin}">
+          <span class="user-avatar"
+                th:text="${#strings.substring(#authentication.name, 0, 1)}">U</span>
+          <span class="user-name" sec:authentication="name">사용자</span>
+          <span class="user-suffix">님</span>
+        </a>
+        <form th:action="@{/logout}" method="post" style="display:inline;">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+          <button type="submit" class="btn-logout">로그아웃</button>
+        </form>
+      </th:block>
+
+      <!-- 로그인 상태 (일반 유저): 유저이름 클릭 시 마이페이지로 -->
+      <th:block sec:authorize="isAuthenticated() and !hasRole('ADMIN')">
         <a class="user-chip" th:href="@{/siteUser/mypage}">
           <span class="user-avatar"
                 th:text="${#strings.substring(#authentication.name, 0, 1)}">U</span>
