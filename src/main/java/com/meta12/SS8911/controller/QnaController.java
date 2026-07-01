@@ -20,6 +20,11 @@ public class QnaController {
     private final QnaService qnaService;
     private final SiteUserService siteUserService;
 
+    @GetMapping("/main")
+    public String main() {
+        return "qna/main";
+    }
+
     @GetMapping("/write")
     public String writeForm(Model model) {
         model.addAttribute("qnaDTO", new QnaDTO());
@@ -30,7 +35,7 @@ public class QnaController {
     public String write(QnaDTO dto, Principal principal) {
         SiteUser user = siteUserService.getUserByUsername(principal.getName());
         qnaService.create(dto, user);
-        return "redirect:/siteUser/mypage?tab=posts&subtab=myinquiry";
+        return "redirect:/qna/main";
     }
 
     @GetMapping("/{id}")

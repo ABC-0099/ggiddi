@@ -30,6 +30,7 @@ public class SecurityConfig {
                                 "/lectures/**",
                                 "/game",
                                 "/games/**",         // ★ 유니티 WebGL 빌드 정적 파일 인증 없이 접근 허용
+                                "/qna/main",         // ★ 질문센터 메인(FAQ+1:1 문의 카드)은 비로그인도 열람 가능
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",

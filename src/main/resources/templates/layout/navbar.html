@@ -9,7 +9,7 @@
   <div th:replace="~{layout/navbar :: navbar(currentMenu='lectures')}"></div>
 
   currentMenu 값 목록:
-    home | notices | community | event | lectures | game | faq | mypage
+    home | notices | community | event | lectures | game | faq | qna | qnaMain | mypage
   ================================
 -->
 
@@ -77,8 +77,8 @@
       </li>
 
       <!-- 질문센터 드롭다운 -->
-      <li class="has-dropdown" th:classappend="${currentMenu == 'faq' or currentMenu == 'qna'} ? 'active'">
-        <a href="#" class="dropdown-trigger">
+      <li class="has-dropdown" th:classappend="${currentMenu == 'faq' or currentMenu == 'qna' or currentMenu == 'qnaMain'} ? 'active'">
+        <a th:href="@{/qna/main}" class="dropdown-trigger">
           질문센터
           <svg class="arrow-icon" viewBox="0 0 10 6" fill="none">
             <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>

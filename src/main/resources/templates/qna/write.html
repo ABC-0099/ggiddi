@@ -6,7 +6,7 @@
   <title>끼역띠귿 — 1:1 문의</title>
   <link rel="stylesheet" th:href="@{/css/layout/navbar.css}" />
   <link rel="stylesheet" th:href="@{/css/layout/footer.css}" />
-  <link rel="stylesheet" th:href="@{/css/qna/qna.css}" />
+  <link rel="stylesheet" th:href="@{/css/qna/write.css}" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
@@ -23,7 +23,7 @@
 
 <div class="qna-container">
   <div class="qna-card">
-    <form th:action="@{/qna/write}" th:object="${qnaDTO}" method="post">
+    <form id="qnaForm" th:action="@{/qna/write}" th:object="${qnaDTO}" method="post">
       <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
       <div class="field">
@@ -41,7 +41,7 @@
       <div class="qna-notice">🔒 이 문의는 작성자 본인과 관리자만 볼 수 있어요.</div>
 
       <div class="qna-actions">
-        <a th:href="@{/siteUser/mypage(tab='posts',subtab='myinquiry')}" class="btn-cancel">취소</a>
+        <a th:href="@{/qna/main}" class="btn-cancel">취소</a>
         <button type="submit" class="btn-submit">문의 등록</button>
       </div>
     </form>
@@ -49,5 +49,27 @@
 </div>
 
 <div th:replace="~{layout/footer :: footer}"></div>
+
+<!-- 문의 등록 확인 모달 -->
+<div class="qna-confirm-overlay" id="qnaConfirmOverlay">
+  <div class="qna-confirm-card">
+    <div class="qna-confirm-icon">✅</div>
+    <div class="qna-confirm-title">문의가 등록되었어요</div>
+    <div class="qna-confirm-desc">질문센터에서 다른 질문도 확인해보세요.</div>
+    <button type="button" class="qna-confirm-btn" id="qnaConfirmBtn">확인</button>
+  </div>
+</div>
+
+<script>
+  document.getElementById('qnaForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var form = this;
+    var overlay = document.getElementById('qnaConfirmOverlay');
+    overlay.classList.add('active');
+    document.getElementById('qnaConfirmBtn').addEventListener('click', function () {
+      form.submit(); // 확인 누르면 실제 서버로 전송 + 마이페이지 리다이렉트
+    }, { once: true });
+  });
+</script>
 </body>
 </html>
