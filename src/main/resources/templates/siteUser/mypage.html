@@ -200,9 +200,43 @@
                 </div>
             </div>
 
-            <!-- 1:1 문의 (준비중) -->
+            <!-- 1:1 문의 -->
             <div class="subtab-panel" id="subtab-myinquiry">
-                <div class="empty-panel">✉️ 1:1 문의 기능은 준비 중입니다</div>
+
+                <div class="my-inquiry-header">
+                    <a th:href="@{/inquiry/write}" class="btn-inquiry-write">✏️ 문의하기</a>
+                </div>
+
+                <div class="my-post-list" th:if="${!myInquiries.empty}">
+                    <a class="my-inquiry-item" th:each="inquiry : ${myInquiries.content}"
+                       th:href="@{/inquiry/{id}(id=${inquiry.id})}">
+            <span class="inquiry-status"
+                  th:text="${inquiry.status.description}"
+                  th:classappend="${inquiry.status.name() == 'ANSWERED'} ? 'answered' : 'pending'"></span>
+                        <span class="my-post-title" th:text="${inquiry.title}">제목</span>
+                        <span class="my-post-date" th:text="${#temporals.format(inquiry.createdDate, 'yyyy.MM.dd')}">날짜</span>
+                    </a>
+                </div>
+                <div class="empty-panel" th:if="${myInquiries.empty}">
+                    ✉️ 아직 등록한 문의가 없어요
+                </div>
+
+                <!-- ★ 문의 페이지네이션 -->
+                <div class="my-post-pagination" th:if="${!myInquiries.empty}">
+                    <a th:href="@{/siteUser/mypage(inquiryPage=${myInquiries.number - 1}, tab='posts', subtab='myinquiry')}"
+                       th:classappend="${myInquiries.first} ? 'disabled'"
+                       class="page-btn page-prev">‹</a>
+
+                    <a th:each="i : ${#numbers.sequence(0, myInquiries.totalPages - 1)}"
+                       th:href="@{/siteUser/mypage(inquiryPage=${i}, tab='posts', subtab='myinquiry')}"
+                       th:text="${i + 1}"
+                       th:classappend="${i == myInquiries.number} ? 'active'"
+                       class="page-btn"></a>
+
+                    <a th:href="@{/siteUser/mypage(inquiryPage=${myInquiries.number + 1}, tab='posts', subtab='myinquiry')}"
+                       th:classappend="${myInquiries.last} ? 'disabled'"
+                       class="page-btn page-next">›</a>
+                </div>
             </div>
         </section>
 

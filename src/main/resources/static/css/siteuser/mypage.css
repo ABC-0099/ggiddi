@@ -469,3 +469,44 @@ html, body {
     opacity: 0.4;
     pointer-events: none;
 }
+
+.my-inquiry-header {
+    display: flex;
+    justify-content: flex-end;
+    margin-bottom: 14px;
+}
+
+.btn-inquiry-write {
+    padding: 8px 16px;
+    border-radius: 8px;
+    background: var(--navy);
+    color: #fff;
+    font-size: 12.5px;
+    font-weight: 600;
+    text-decoration: none;
+    transition: background .15s;
+}
+.btn-inquiry-write:hover { background: var(--navy-dark); }
+
+.my-inquiry-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #f9fafb;
+    border-radius: 10px;
+    padding: 10px 16px;
+    text-decoration: none;
+    color: var(--ink);
+    transition: all 0.15s;
+}
+.my-inquiry-item:hover { background: var(--mint-pale); }
+
+.inquiry-status {
+    flex-shrink: 0;
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: 20px;
+}
+.inquiry-status.pending { background: #FEF3C7; color: #B45309; }
+.inquiry-status.answered { background: var(--mint-pale); color: var(--mint-dark); }
