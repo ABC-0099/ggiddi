@@ -61,28 +61,28 @@ document.addEventListener('DOMContentLoaded', function () {
 
         rooms.forEach(room => {
             const card = document.createElement('div');
-            card.className = 'chat-room-card' + (room.full ? ' is-full' : '');
+            card.className = 'quest-chat-room-card' + (room.full ? ' is-full' : '');
 
             const icon = document.createElement('div');
-            icon.className = 'chat-room-icon';
-            icon.textContent = '💬';
+            icon.className = 'quest-chat-room-icon';
+            icon.textContent = '🔥';
 
             const info = document.createElement('div');
-            info.className = 'chat-room-info';
+            info.className = 'quest-chat-room-info';
 
             const title = document.createElement('div');
-            title.className = 'chat-room-title';
+            title.className = 'quest-chat-room-title';
             title.textContent = room.name;
 
             const sub = document.createElement('div');
-            sub.className = 'chat-room-sub';
-            sub.textContent = room.full ? '인원이 가득 찼어요' : '입장해서 대화에 참여해보세요';
+            sub.className = 'quest-chat-room-sub';
+            sub.textContent = room.full ? '야영지가 가득 찼어요' : '모닥불에 둘러앉아 대화해보세요';
 
             info.appendChild(title);
             info.appendChild(sub);
 
             const count = document.createElement('div');
-            count.className = 'chat-room-count' + (room.full ? ' is-full' : '');
+            count.className = 'quest-chat-room-count' + (room.full ? ' is-full' : '');
             count.textContent = room.currentCount + ' / ' + room.capacity;
 
             card.appendChild(icon);
@@ -104,9 +104,9 @@ document.addEventListener('DOMContentLoaded', function () {
 
         chatMessages.innerHTML = '';
         const emptyEl = document.createElement('div');
-        emptyEl.className = 'chat-empty';
+        emptyEl.className = 'quest-chat-empty';
         emptyEl.id = 'chat-empty';
-        emptyEl.textContent = '아직 대화가 없어요. 첫 메시지를 남겨보세요 💬';
+        emptyEl.textContent = '아직 모닥불 앞에 아무도 없어요. 먼저 말을 걸어보세요 🔥';
         chatMessages.appendChild(emptyEl);
 
         viewRooms.style.display = 'none';
@@ -158,22 +158,22 @@ document.addEventListener('DOMContentLoaded', function () {
         const isMine = currentUser && msg.username === currentUser;
 
         const wrap = document.createElement('div');
-        wrap.className = 'chat-msg ' + (isMine ? 'is-mine' : 'is-other');
+        wrap.className = 'quest-chat-msg ' + (isMine ? 'is-mine' : 'is-other');
 
         const authorEl = document.createElement('div');
-        authorEl.className = 'chat-msg-author';
+        authorEl.className = 'quest-chat-msg-author';
         authorEl.textContent = isMine ? '나' : msg.username;
         wrap.appendChild(authorEl);
 
         const row = document.createElement('div');
-        row.className = 'chat-bubble-row';
+        row.className = 'quest-chat-bubble-row';
 
         const bubble = document.createElement('div');
-        bubble.className = 'chat-bubble';
+        bubble.className = 'quest-chat-bubble';
         bubble.textContent = msg.content;
 
         const time = document.createElement('div');
-        time.className = 'chat-msg-time';
+        time.className = 'quest-chat-msg-time';
         time.textContent = msg.time;
 
         row.appendChild(bubble);
