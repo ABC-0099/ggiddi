@@ -6,6 +6,8 @@ import com.meta12.SS8911.entity.Community;
 import com.meta12.SS8911.entity.SiteUser;
 import com.meta12.SS8911.repository.CommentRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
@@ -49,8 +51,8 @@ public class CommentService {
     }
 
     // 내가 쓴 댓글 목록 (마이페이지용)
-    public List<Comment> getCommentsByAuthor(SiteUser author) {
-        return commentRepository.findByAuthorOrderByCreatedDateDesc(author);
+    public Page<Comment> getCommentsByAuthor(SiteUser author, Pageable pageable) {
+        return commentRepository.findByAuthorOrderByCreatedDateDesc(author, pageable);
     }
 
     private void checkPermission(Comment comment, SiteUser user) {

@@ -71,8 +71,7 @@ public class CommunityController {
         SiteUser user = siteUserService.getUserByUsername(principal.getName());
 
         boolean isAuthor = post.getAuthor().getId().equals(user.getId());
-        boolean isAdmin = user.getRole().name().equals("ADMIN");
-        if (!isAuthor && !isAdmin) {
+        if (!isAuthor) {
             return "redirect:/community/" + id;
         }
 
@@ -80,6 +79,13 @@ public class CommunityController {
         dto.setTitle(post.getTitle());
         dto.setContent(post.getContent());
         dto.setCategory(post.getCategory());
+
+        dto.setExistingImages(post.getFiles().stream()
+                .filter(f -> "IMAGE".equals(f.getFileType()))
+                .collect(java.util.stream.Collectors.toList()));
+        dto.setExistingFiles(post.getFiles().stream()
+                .filter(f -> "ATTACH".equals(f.getFileType()))
+                .collect(java.util.stream.Collectors.toList()));
 
         model.addAttribute("communityDTO", dto);
         model.addAttribute("postId", id);
