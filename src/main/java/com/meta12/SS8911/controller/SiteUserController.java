@@ -9,12 +9,16 @@ import com.meta12.SS8911.service.CommunityService;
 import com.meta12.SS8911.service.SiteUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import java.security.Principal;
 import java.util.List;
@@ -55,12 +59,14 @@ public class SiteUserController {
     }
 
     @GetMapping("/siteUser/mypage")
-    public String mypage(Model model, Principal principal) {
+    public String mypage(Model model, Principal principal,
+                         @RequestParam(defaultValue = "0") int page) {
         SiteUser user = siteUserService.getUserByUsername(principal.getName());
 
-        // 내가 쓴 게시글
-        List<Community> myPosts = communityService.getPostsByAuthor(user);
-        // 내가 쓴 댓글
+        // ★ 페이지당 5개씩, 최신순
+        Pageable pageable = PageRequest.of(page, 5);
+        Page<Community> myPosts = communityService.getPostsByAuthor(user, pageable);
+
         List<Comment> myComments = commentService.getCommentsByAuthor(user);
 
         model.addAttribute("siteUser", user);

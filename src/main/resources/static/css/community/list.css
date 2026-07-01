@@ -312,3 +312,29 @@
 .report-cancel-btn:hover { background: var(--border); }
 .report-submit-btn { background: #E0556B; color: #fff; }
 .report-submit-btn:hover { background: #C2415A; }
+
+/* ── 게시글 목록 대표 이미지 ── */
+.post-image-wrap {
+    position: relative;
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    background: #f3f4f6;
+}
+.post-image-wrap img {
+    width: 100%;
+    max-height: 420px;
+    object-fit: cover;
+    display: block;
+}
+.post-image-count {
+    position: absolute;
+    right: 10px; bottom: 10px;
+    background: rgba(0,0,0,.55);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+}

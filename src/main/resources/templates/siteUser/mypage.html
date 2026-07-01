@@ -153,16 +153,33 @@
 
             <!-- 내가 쓴 글 -->
             <div class="subtab-panel active" id="subtab-myposts">
-                <div class="my-post-list" th:if="${!#lists.isEmpty(myPosts)}">
-                    <a class="my-post-item" th:each="post : ${myPosts}"
+                <div class="my-post-list" th:if="${!myPosts.empty}">
+                    <a class="my-post-item" th:each="post : ${myPosts.content}"
                        th:href="@{/community/{id}(id=${post.id})}">
                         <span class="my-post-tag" th:text="${post.category.description}">태그</span>
                         <div class="my-post-title" th:text="${post.title}">제목</div>
                         <div class="my-post-date" th:text="${#temporals.format(post.createdDate, 'yyyy.MM.dd')}">날짜</div>
                     </a>
                 </div>
-                <div class="empty-panel" th:if="${#lists.isEmpty(myPosts)}">
+                <div class="empty-panel" th:if="${myPosts.empty}">
                     📝 아직 작성한 게시글이 없어요
+                </div>
+
+                <!-- ★ 페이지네이션 -->
+                <div class="my-post-pagination" th:if="${myPosts.totalPages > 1}">
+                    <a th:href="@{/siteUser/mypage(page=${myPosts.number - 1}, tab='posts', subtab='myposts')}"
+                       th:classappend="${myPosts.first} ? 'disabled'"
+                       class="page-btn page-prev">‹</a>
+
+                    <a th:each="i : ${#numbers.sequence(0, myPosts.totalPages - 1)}"
+                       th:href="@{/siteUser/mypage(page=${i}, tab='posts', subtab='myposts')}"
+                       th:text="${i + 1}"
+                       th:classappend="${i == myPosts.number} ? 'active'"
+                       class="page-btn"></a>
+
+                    <a th:href="@{/siteUser/mypage(page=${myPosts.number + 1}, tab='posts', subtab='myposts')}"
+                       th:classappend="${myPosts.last} ? 'disabled'"
+                       class="page-btn page-next">›</a>
                 </div>
             </div>
 

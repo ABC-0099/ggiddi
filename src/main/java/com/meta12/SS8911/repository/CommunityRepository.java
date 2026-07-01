@@ -3,6 +3,8 @@ package com.meta12.SS8911.repository;
 import com.meta12.SS8911.config.Category;
 import com.meta12.SS8911.entity.Community;
 import com.meta12.SS8911.entity.SiteUser;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
@@ -47,4 +49,6 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     List<Community> findAllByOrderByCreatedDateDesc();
 
     List<Community> findByAuthorOrderByCreatedDateDesc(SiteUser author);
+
+    Page<Community> findByAuthorOrderByCreatedDateDesc(SiteUser author, Pageable pageable);
 }

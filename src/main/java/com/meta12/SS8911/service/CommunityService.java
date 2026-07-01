@@ -9,6 +9,8 @@ import com.meta12.SS8911.entity.SiteUser;
 import com.meta12.SS8911.repository.CommunityFileRepository;
 import com.meta12.SS8911.repository.CommunityRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
@@ -29,6 +31,7 @@ public class CommunityService {
 
     // 파일 저장 경로 (프로젝트 환경에 맞게 수정)
     private static final String UPLOAD_DIR = "C:/meta12/SS8911/uploads/community/";
+    private static final String URL_PREFIX = "/uploads/community/";   // ★ 이 줄 추가
 
     public List<Community> getCommunityPosts(Category category, String sort, String kw) {
         boolean hasKeyword = kw != null && !kw.isBlank();
@@ -82,7 +85,7 @@ public class CommunityService {
     @Transactional
     public void update(Long id, CommunityDTO dto, SiteUser user) {
         Community community = getPost(id);
-        checkPermission(community, user);
+        checkEditPermission(community, user);
         community.setTitle(dto.getTitle());
         community.setContent(dto.getContent());
         community.setCategory(dto.getCategory());
@@ -107,7 +110,7 @@ public class CommunityService {
     @Transactional
     public void delete(Long id, SiteUser user) {
         Community community = getPost(id);
-        checkPermission(community, user);
+        checkDeletePermission(community, user);
 
         // 첨부파일 실제 파일도 같이 삭제
         List<CommunityFile> files = communityFileRepository.findByCommunity(community);
@@ -120,7 +123,13 @@ public class CommunityService {
     }
 
     // 작성자 또는 관리자 권한 체크
-    private void checkPermission(Community community, SiteUser user) {
+    private void checkEditPermission(Community community, SiteUser user) {
+        if (!community.getAuthor().getId().equals(user.getId())) {
+            throw new RuntimeException("작성자만 수정할 수 있습니다.");
+        }
+    }
+
+    private void checkDeletePermission(Community community, SiteUser user) {
         boolean isAuthor = community.getAuthor().getId().equals(user.getId());
         boolean isAdmin = user.getRole() == Role.ADMIN;
         if (!isAuthor && !isAdmin) {
@@ -156,7 +165,7 @@ public class CommunityService {
                 CommunityFile cf = new CommunityFile();
                 cf.setCommunity(community);
                 cf.setOriginalName(originalName);
-                cf.setSavedPath(UPLOAD_DIR + savedName);
+                cf.setSavedPath(URL_PREFIX + savedName);
                 cf.setFileType(fileType);
                 cf.setFileSize(file.getSize());
                 communityFileRepository.save(cf);
@@ -169,11 +178,15 @@ public class CommunityService {
 
     private void deletePhysicalFile(String savedPath) {
         try {
-            Path path = Paths.get(savedPath);
+            String fileName = savedPath.substring(savedPath.lastIndexOf('/') + 1);
+            Path path = Paths.get(UPLOAD_DIR, fileName);
             Files.deleteIfExists(path);
-        } catch (IOException e) {
-            // 파일이 이미 없거나 삭제 실패해도 DB 삭제는 계속 진행
+        } catch (Exception e) {
             System.err.println("파일 삭제 실패: " + savedPath);
         }
+    }
+
+    public Page<Community> getPostsByAuthor(SiteUser author, Pageable pageable) {
+        return communityRepository.findByAuthorOrderByCreatedDateDesc(author, pageable);
     }
 }
