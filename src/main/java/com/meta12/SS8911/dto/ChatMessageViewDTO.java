@@ -1,4 +1,4 @@
-package com.meta12.SS8911.Dto;
+package com.meta12.SS8911.dto;
 
 import com.meta12.SS8911.entity.ChatMessage;
 import lombok.AllArgsConstructor;

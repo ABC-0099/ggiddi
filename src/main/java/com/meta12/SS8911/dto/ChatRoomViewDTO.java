@@ -1,4 +1,4 @@
-package com.meta12.SS8911.Dto;
+package com.meta12.SS8911.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
