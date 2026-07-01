@@ -39,11 +39,7 @@ public class CategoryController {
     private final ProgressRepository progressRepository;
 
 
-    // 🌟 [추가]: 메인 페이지로 이동하는 매핑
-    @GetMapping("/")
-    public String main() {
-        return "main";
-    }
+ 
 
     @GetMapping("/category/list")
     public String list(
