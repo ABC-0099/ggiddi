@@ -351,7 +351,7 @@ html, body {
     gap: 10px;
 }
 
-.my-post-item, .my-comment-item {
+.my-comment-item {
     display: block;
     background: #f9fafb;
     border-radius: 12px;
@@ -361,29 +361,50 @@ html, body {
     transition: all 0.15s;
 }
 
-.my-post-item:hover, .my-comment-item:hover {
+.my-comment-item:hover {
+    background: var(--mint-pale);
+}
+
+/* ★ 내가 쓴 글: 한 줄 리스트형 */
+.my-post-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: #f9fafb;
+    border-radius: 10px;
+    padding: 10px 16px;
+    text-decoration: none;
+    color: var(--ink);
+    transition: all 0.15s;
+}
+
+.my-post-item:hover {
     background: var(--mint-pale);
 }
 
 .my-post-tag {
-    display: inline-block;
+    flex-shrink: 0;
     font-size: 10.5px;
     font-weight: 700;
     color: var(--mint-dark);
-    background: var(--mint-pale);
-    padding: 2px 9px;
+    background: var(--white);
+    padding: 3px 9px;
     border-radius: 20px;
-    margin-bottom: 6px;
 }
 
 .my-post-title {
-    font-size: 14px;
+    flex: 1;
+    min-width: 0;
+    font-size: 13.5px;
     font-weight: 600;
     color: var(--ink);
-    margin-bottom: 4px;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
 }
 
 .my-post-date {
+    flex-shrink: 0;
     font-size: 11.5px;
     color: var(--ink-soft);
 }
@@ -406,4 +427,45 @@ html, body {
     .mypage-container { flex-direction: column; }
     .mypage-sidebar { width: 100%; }
     .info-grid { grid-template-columns: 1fr; }
+}
+
+/* ── 내 게시글 페이지네이션 ── */
+.my-post-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 20px;
+}
+
+.page-btn {
+    min-width: 32px;
+    height: 32px;
+    padding: 0 8px;
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    font-weight: 500;
+    color: var(--ink-soft);
+    background: #f9fafb;
+    text-decoration: none;
+    transition: all 0.15s;
+}
+
+.page-btn:hover {
+    background: var(--mint-pale);
+    color: var(--mint-dark);
+}
+
+.page-btn.active {
+    background: var(--navy);
+    color: #fff;
+    font-weight: 700;
+}
+
+.page-btn.disabled {
+    opacity: 0.4;
+    pointer-events: none;
 }

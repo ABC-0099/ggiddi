@@ -64,14 +64,17 @@ public class SiteUserController {
 
     @GetMapping("/siteUser/mypage")
     public String mypage(Model model, Principal principal,
-                         @RequestParam(defaultValue = "0") int page) {
+                         @RequestParam(defaultValue = "0") int postPage,
+                         @RequestParam(defaultValue = "0") int commentPage) {
         SiteUser user = siteUserService.getUserByUsername(principal.getName());
 
-        // ★ 페이지당 5개씩, 최신순
-        Pageable pageable = PageRequest.of(page, 5);
-        Page<Community> myPosts = communityService.getPostsByAuthor(user, pageable);
+        // ★ 게시글: 페이지당 5개
+        Pageable postPageable = PageRequest.of(postPage, 5);
+        Page<Community> myPosts = communityService.getPostsByAuthor(user, postPageable);
 
-        List<Comment> myComments = commentService.getCommentsByAuthor(user);
+        // ★ 댓글: 페이지당 5개
+        Pageable commentPageable = PageRequest.of(commentPage, 5);
+        Page<Comment> myComments = commentService.getCommentsByAuthor(user, commentPageable);
 
         model.addAttribute("siteUser", user);
         model.addAttribute("myPosts", myPosts);

@@ -157,8 +157,8 @@
                     <a class="my-post-item" th:each="post : ${myPosts.content}"
                        th:href="@{/community/{id}(id=${post.id})}">
                         <span class="my-post-tag" th:text="${post.category.description}">태그</span>
-                        <div class="my-post-title" th:text="${post.title}">제목</div>
-                        <div class="my-post-date" th:text="${#temporals.format(post.createdDate, 'yyyy.MM.dd')}">날짜</div>
+                        <span class="my-post-title" th:text="${post.title}">제목</span>
+                        <span class="my-post-date" th:text="${#temporals.format(post.createdDate, 'yyyy.MM.dd')}">날짜</span>
                     </a>
                 </div>
                 <div class="empty-panel" th:if="${myPosts.empty}">
@@ -166,7 +166,7 @@
                 </div>
 
                 <!-- ★ 페이지네이션 -->
-                <div class="my-post-pagination" th:if="${myPosts.totalPages > 1}">
+                <div class="my-post-pagination" th:if="${!myPosts.empty}">
                     <a th:href="@{/siteUser/mypage(page=${myPosts.number - 1}, tab='posts', subtab='myposts')}"
                        th:classappend="${myPosts.first} ? 'disabled'"
                        class="page-btn page-prev">‹</a>

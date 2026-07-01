@@ -38,6 +38,7 @@ public class SecurityConfig {
                                 "/.well-known/**"   // ★ 크롬 devtools 자동 요청 무시용
                         ).permitAll()
                         // ★ 커뮤니티는 로그인한 회원(및 관리자)만 열람 가능하도록 명시적으로 인증 필요 처리
+                        .requestMatchers("/api/ai-chat").authenticated()
                         .requestMatchers("/community/**").authenticated()
                         .anyRequest().authenticated()
                 )
