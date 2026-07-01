@@ -1,0 +1,223 @@
+
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>끼역띠귿 — 공지사항</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" th:href="@{/css/layout/navbar.css}" />
+  <link rel="stylesheet" th:href="@{/css/layout/footer.css}" />
+  <link rel="stylesheet" th:href="@{/css/notice/view.css}" />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
+
+</head>
+<body>
+
+<div class="bg-orbs"><div class="orb o1"></div><div class="orb o2"></div></div>
+
+<!-- NAV -->
+<div th:replace="~{layout/navbar :: navbar(currentMenu='quiz')}"></div>
+
+<!-- 헤더 -->
+<div class="page-header">
+  <div class="page-header-text">
+    <h1>공지사항</h1>
+    <p>학습에 필요한 새로운 소식과 안내를 가장 먼저 확인해보세요 📢</p>
+  </div>
+
+  <div class="notice-count-box">
+    <div class="ncb-item">
+      <div class="ncb-num">42건</div>
+      <div class="ncb-label">전체 공지</div>
+    </div>
+    <div class="ncb-divider"></div>
+    <div class="ncb-item">
+      <div class="ncb-num">3건</div>
+      <div class="ncb-label">신규</div>
+    </div>
+    <div class="ncb-divider"></div>
+    <div class="ncb-item">
+      <div class="ncb-num">2건</div>
+      <div class="ncb-label">고정</div>
+    </div>
+  </div>
+</div>
+
+<!-- 본문 -->
+<div class="board-wrap">
+
+  <div class="board-controls">
+    <div class="filter-tabs">
+      <button class="tab active">전체</button>
+      <button class="tab">공지</button>
+      <button class="tab">이벤트</button>
+      <button class="tab">시스템</button>
+      <button class="tab">업데이트</button>
+    </div>
+    <div class="search-box">
+      <span class="search-icon">🔍</span>
+      <input type="text" placeholder="제목으로 검색" />
+    </div>
+  </div>
+
+  <div class="board-card">
+
+    <!-- 고정 공지 -->
+    <div class="notice-row pinned-row">
+      <span class="pin-icon">📌</span>
+      <span class="badge b-notice">공지</span>
+      <div class="notice-main">
+        <div class="notice-title-row">
+          <span class="notice-title">끼역띠귿 메타버스 학습 공간 정식 오픈 안내</span>
+          <span class="new-dot"></span>
+          <span class="lang-tag">KO·EN·VI</span>
+        </div>
+      </div>
+      <div class="notice-meta">
+        <span class="meta-date">2026.06.20</span>
+        <span>👁 1,204</span>
+      </div>
+    </div>
+
+    <div class="notice-row pinned-row">
+      <span class="pin-icon">📌</span>
+      <span class="badge b-system">시스템</span>
+      <div class="notice-main">
+        <div class="notice-title-row">
+          <span class="notice-title">정기 점검 안내 (매주 화요일 02:00~04:00)</span>
+          <span class="clip-icon">📎</span>
+        </div>
+      </div>
+      <div class="notice-meta">
+        <span class="meta-date">2026.06.18</span>
+        <span>👁 860</span>
+      </div>
+    </div>
+
+    <!-- 일반 공지 -->
+    <div class="notice-row">
+      <span class="pin-icon"></span>
+      <span class="badge b-event">이벤트</span>
+      <div class="notice-main">
+        <div class="notice-title-row">
+          <span class="notice-title">다문화 가정 한국어 말하기 대회 참가자 모집</span>
+          <span class="new-dot"></span>
+          <span class="lang-tag">KO·EN</span>
+        </div>
+      </div>
+      <div class="notice-meta">
+        <span class="meta-date">2026.06.21</span>
+        <span>👁 532</span>
+      </div>
+    </div>
+
+    <div class="notice-row">
+      <span class="pin-icon"></span>
+      <span class="badge b-update">업데이트</span>
+      <div class="notice-main">
+        <div class="notice-title-row">
+          <span class="notice-title">2단계 단어 월드 — 신규 강의 4개 추가</span>
+        </div>
+      </div>
+      <div class="notice-meta">
+        <span class="meta-date">2026.06.17</span>
+        <span>👁 401</span>
+      </div>
+    </div>
+
+    <div class="notice-row">
+      <span class="pin-icon"></span>
+      <span class="badge b-notice">공지</span>
+      <div class="notice-main">
+        <div class="notice-title-row">
+          <span class="notice-title">외국인 유학생을 위한 TOPIK 연계반 안내</span>
+          <span class="clip-icon">📎</span>
+          <span class="lang-tag">KO·EN·VI·ZH</span>
+        </div>
+      </div>
+      <div class="notice-meta">
+        <span class="meta-date">2026.06.15</span>
+        <span>👁 689</span>
+      </div>
+    </div>
+
+    <div class="notice-row">
+      <span class="pin-icon"></span>
+      <span class="badge b-system">시스템</span>
+      <div class="notice-main">
+        <div class="notice-title-row">
+          <span class="notice-title">모바일 앱 로그인 오류 수정 완료 안내</span>
+        </div>
+      </div>
+      <div class="notice-meta">
+        <span class="meta-date">2026.06.12</span>
+        <span>👁 318</span>
+      </div>
+    </div>
+
+    <div class="notice-row">
+      <span class="pin-icon"></span>
+      <span class="badge b-event">이벤트</span>
+      <div class="notice-main">
+        <div class="notice-title-row">
+          <span class="notice-title">출석 7일 연속 시 학습 뱃지 지급 이벤트</span>
+        </div>
+      </div>
+      <div class="notice-meta">
+        <span class="meta-date">2026.06.10</span>
+        <span>👁 275</span>
+      </div>
+    </div>
+
+    <div class="notice-row">
+      <span class="pin-icon"></span>
+      <span class="badge b-notice">공지</span>
+      <div class="notice-main">
+        <div class="notice-title-row">
+          <span class="notice-title">개인정보처리방침 일부 개정 안내</span>
+          <span class="clip-icon">📎</span>
+        </div>
+      </div>
+      <div class="notice-meta">
+        <span class="meta-date">2026.06.05</span>
+        <span>👁 190</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 페이지네이션 -->
+  <div class="pagination">
+    <span class="page-btn">‹</span>
+    <span class="page-btn active">1</span>
+    <span class="page-btn">2</span>
+    <span class="page-btn">3</span>
+    <span class="page-btn">4</span>
+    <span class="page-btn">›</span>
+  </div>
+
+</div>
+
+<!-- 푸터 -->
+<div th:replace="~{layout/footer :: footer}"></div>
+<script>
+  document.querySelectorAll('.tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+      tab.classList.add('active');
+    });
+  });
+
+  document.querySelectorAll('.page-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      if (btn.textContent === '‹' || btn.textContent === '›') return;
+      document.querySelectorAll('.page-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    });
+  });
+</script>
+
+</body>
+</html>

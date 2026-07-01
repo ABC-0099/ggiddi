@@ -12,7 +12,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
 </head>
-<body>
+<body th:attr="data-current-user=${#authentication.name != null and #authentication.name != 'anonymousUser'} ? ${#authentication.name} : ''">
 
 <div class="bg-orbs"><div class="orb o1"></div><div class="orb o2"></div></div>
 <div th:replace="~{layout/navbar :: navbar(currentMenu='community')}"></div>
@@ -27,7 +27,7 @@
         <button type="button" class="tab category-btn" data-category="ALL">전체</button>
         <button type="button" class="tab category-btn" data-category="CULTURAL">문화교류</button>
         <button type="button" class="tab category-btn" data-category="REVIEW">학습후기</button>
-        <button type="button" class="tab category-btn" data-category="FREE">자유</button>
+        <button type="button" class="tab category-btn" data-category="FREE">자유게시판</button>
     </aside>
 </div>
 
@@ -49,7 +49,7 @@
 </div>
 
 <div class="post-wrap">
-    <div class="info-box">🔔 댓글 · 답변 · 좋아요 알림은 우측 상단 프로필에서 확인할 수 있어요.</div>
+    <div class="info-box">🔔  커뮤니티 이용 시 욕설·비방·혐오 표현은 삼가 주세요. 타인을 존중하는 건강한 소통 문화를 만들어요.</div>
 
     <div class="post" th:each="post : ${postList}">
         <div class="post-top">
@@ -58,22 +58,87 @@
                 <div class="post-author" th:text="${post.author.username}">사용자</div>
                 <div class="post-meta" th:text="${post.author.nationality + ' · ' + #temporals.format(post.createdDate, 'MM.dd HH:mm')}">시간</div>
             </div>
-            <button class="follow-btn">팔로우</button>
         </div>
 
-        <span class="post-tag" th:text="${post.category.description}">태그</span>
+        <a th:href="@{/community(category=${post.category})}"
+           class="post-tag"
+           th:text="${post.category.description}">태그</a>
 
         <a th:href="@{/community/{id}(id=${post.id})}">
             <div class="post-title" th:text="${post.title}">제목</div>
             <div class="post-text" th:text="${post.content}">내용</div>
+
+            <!-- 대표 이미지 (첫 번째 첨부 이미지) -->
+            <div class="post-image-wrap"
+                 th:if="${!#lists.isEmpty(post.files) and post.files.?[fileType == 'IMAGE'].size() > 0}">
+                <img th:src="@{${post.files.?[fileType == 'IMAGE'][0].savedPath}}"
+                     th:alt="${post.title}" />
+                <span class="post-image-count"
+                      th:if="${post.files.?[fileType == 'IMAGE'].size() > 1}"
+                      th:text="'+' + ${post.files.?[fileType == 'IMAGE'].size() - 1}"></span>
+            </div>
         </a>
 
         <div class="post-footer">
-            <span class="pf-action">❤️ 0</span>
-            <span class="pf-action">💬 0</span>
-            <span class="pf-action">↗ 공유</span>
+            <a th:href="@{/community/{id}(id=${post.id})}" class="pf-action">
+                💬 [[${#lists.size(post.comments)}]]
+            </a>
+            <span class="pf-action"
+                  th:onclick="|navigator.clipboard.writeText(window.location.origin + '/community/' + ${post.id}).then(function(){ alert('링크가 복사되었습니다! 😊'); })|">
+                ↗ 공유
+            </span>
             <span class="pf-spacer"></span>
-            <span class="pf-report">🚩 신고</span>
+            <span class="pf-report"
+                  th:attr="data-post-id=${post.id}"
+                  onclick="openReportModal(this)">
+                🚩 신고
+            </span>
+        </div>
+    </div>
+</div>
+
+<!-- 신고 사유 모달 -->
+<div class="report-overlay" id="report-overlay">
+    <div class="report-modal">
+        <div class="report-modal-head">
+            <h3>게시글 신고</h3>
+            <button type="button" class="report-close" onclick="closeReportModal()">✕</button>
+        </div>
+        <p class="report-modal-desc">신고 사유를 선택해주세요. 검토 후 적절한 조치가 이뤄집니다.</p>
+
+        <div class="report-reasons">
+            <label class="report-reason">
+                <input type="radio" name="report-reason" value="SPAM" />
+                <span>스팸 / 광고성 게시글</span>
+            </label>
+            <label class="report-reason">
+                <input type="radio" name="report-reason" value="ABUSE" />
+                <span>욕설 / 비방 / 혐오 표현</span>
+            </label>
+            <label class="report-reason">
+                <input type="radio" name="report-reason" value="OBSCENE" />
+                <span>음란물 / 선정적 콘텐츠</span>
+            </label>
+            <label class="report-reason">
+                <input type="radio" name="report-reason" value="FALSE_INFO" />
+                <span>허위 정보 / 사기</span>
+            </label>
+            <label class="report-reason">
+                <input type="radio" name="report-reason" value="PRIVACY" />
+                <span>개인정보 노출</span>
+            </label>
+            <label class="report-reason">
+                <input type="radio" name="report-reason" value="ETC" />
+                <span>기타</span>
+            </label>
+        </div>
+
+        <textarea class="report-detail" id="report-detail"
+                  placeholder="(선택) 신고 사유를 자세히 알려주세요"></textarea>
+
+        <div class="report-modal-actions">
+            <button type="button" class="report-cancel-btn" onclick="closeReportModal()">취소</button>
+            <button type="button" class="report-submit-btn" onclick="submitReport()">신고 제출</button>
         </div>
     </div>
 </div>

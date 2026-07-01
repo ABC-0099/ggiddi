@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>끼역띠귿 — 퀴즈 결과</title>
+    <link rel="stylesheet" th:href="@{/css/layout/navbar.css}" />
+    <link rel="stylesheet" th:href="@{/css/layout/footer.css}" />
+    <link rel="stylesheet" th:href="@{/css/quiz/quiz.css}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<div class="bg-orbs"><div class="orb o1"></div><div class="orb o2"></div></div>
+<div th:replace="~{layout/navbar :: navbar}"></div>
+
+<div class="quiz-container">
+    <div class="quiz-card">
+
+        <div class="result-header">
+            <div class="result-emoji">🎉</div>
+            <h1 class="quiz-title" th:text="${quiz.title} + ' 결과'">퀴즈 결과</h1>
+        </div>
+
+        <!-- 점수 표시 -->
+        <div class="score-box">
+            <div class="score-main">
+                <span class="score-num" th:text="${result != null ? result.score : 0}">0</span>
+                <span class="score-total" th:text="' / ' + ${units.size()}">/ 0</span>
+            </div>
+            <div class="score-label">정답</div>
+        </div>
+
+        <!-- 문항별 정답 확인 -->
+        <div class="unit-list">
+            <div class="unit result-unit" th:each="unit, stat : ${units}">
+                <div class="unit-number">Q<span th:text="${stat.index + 1}">1</span></div>
+                <div class="unit-content" th:text="${unit.content}">문항 내용</div>
+                <div class="correct-answer">
+                    정답: <strong th:text="${unit.answer}">A</strong>
+                    —
+                    <span th:switch="${unit.answer}">
+                        <span th:case="'A'" th:text="${unit.optionA}"></span>
+                        <span th:case="'B'" th:text="${unit.optionB}"></span>
+                        <span th:case="'C'" th:text="${unit.optionC}"></span>
+                        <span th:case="'D'" th:text="${unit.optionD}"></span>
+                    </span>
+                </div>
+            </div>
+        </div>
+
+        <div class="quiz-footer">
+            <a th:href="@{/quiz/{id}(id=${quiz.id})}" class="retry-btn">다시 풀기 🔄</a>
+            <a th:href="@{/}" class="home-btn">홈으로</a>
+        </div>
+
+    </div>
+</div>
+
+<div th:replace="~{layout/footer :: footer}"></div>
+</body>
+</html>

@@ -51,3 +51,55 @@ document.addEventListener('DOMContentLoaded', function() {
         location.href = url;
     }
 });
+// ───────── 신고 모달 ─────────
+let reportTargetPostId = null;
+
+function openReportModal(triggerEl) {
+    reportTargetPostId = triggerEl.getAttribute('data-post-id');
+
+    // 이전 선택 상태 초기화
+    document.querySelectorAll('input[name="report-reason"]').forEach(r => r.checked = false);
+    const detailInput = document.getElementById('report-detail');
+    if (detailInput) detailInput.value = '';
+
+    document.getElementById('report-overlay').classList.add('open');
+}
+
+function closeReportModal() {
+    document.getElementById('report-overlay').classList.remove('open');
+    reportTargetPostId = null;
+}
+
+function submitReport() {
+    const selected = document.querySelector('input[name="report-reason"]:checked');
+    if (!selected) {
+        alert('신고 사유를 선택해주세요.');
+        return;
+    }
+
+    const reason = selected.value;
+    const detail = document.getElementById('report-detail').value.trim();
+
+    // TODO: 백엔드 API 연동 시 아래 fetch로 교체
+    // fetch(`/community/${reportTargetPostId}/report`, {
+    //     method: 'POST',
+    //     headers: { 'Content-Type': 'application/json' },
+    //     body: JSON.stringify({ reason, detail }),
+    // });
+
+    console.log('신고 접수', { postId: reportTargetPostId, reason, detail });
+
+    closeReportModal();
+    alert('신고가 접수되었습니다. 검토 후 조치하겠습니다.');
+}
+
+// 오버레이 바깥 클릭 시 닫기
+document.addEventListener('click', function (e) {
+    const overlay = document.getElementById('report-overlay');
+    if (e.target === overlay) closeReportModal();
+});
+
+// ESC 키로 닫기
+document.addEventListener('keydown', function (e) {
+    if (e.key === 'Escape') closeReportModal();
+});

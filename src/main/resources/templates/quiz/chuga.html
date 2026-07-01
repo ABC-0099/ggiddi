@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/springsecurity6">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title th:text="${isEdit} ? '문제 수정 — 끼역띠귿 관리자' : '문제 등록 — 끼역띠귿 관리자'">문제 등록</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" th:href="@{/css/layout/navbar.css}" />
+  <link rel="stylesheet" th:href="@{/css/layout/footer.css}" />
+  <link rel="stylesheet" th:href="@{/css/quiz/chuga.css}" />
+</head>
+<body>
+
+<div class="bg-orbs"><div class="orb o1"></div><div class="orb o2"></div></div>
+
+<div th:replace="~{layout/navbar :: navbar(currentMenu='admin')}"></div>
+
+<main class="admin-wrap">
+
+  <!-- 페이지 헤더 -->
+  <div class="page-header">
+    <div class="page-header-inner">
+      <a th:href="@{/admin/quiz}" class="back-btn">← 문제은행 목록</a>
+      <div class="page-title-row">
+        <h1 class="page-title" th:text="${isEdit} ? '문제 수정' : '문제 등록'">문제 등록</h1>
+        <span class="page-badge">관리자</span>
+      </div>
+      <p class="page-desc" th:text="${isEdit} ? '기존 문제를 수정하세요.' : '새 퀴즈 문제를 등록하세요.'">새 퀴즈 문제를 등록하세요.</p>
+    </div>
+  </div>
+
+  <div class="admin-container">
+    <form th:action="${isEdit} ? @{/admin/quiz/edit} : @{/admin/quiz/write}"
+          method="post" th:object="${quizForm}" id="quiz-form">
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+      <input type="hidden" name="id" th:field="*{id}" th:if="${isEdit}" />
+
+      <div class="form-grid">
+
+        <!-- ── 왼쪽 메인 ── -->
+        <div class="form-main">
+
+          <!-- 문제 내용 -->
+          <section class="form-card">
+            <div class="card-header">
+              <span class="card-icon">❓</span>
+              <span class="card-title">문제 내용</span>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="question">문제 <span class="req">*</span></label>
+              <textarea class="field-textarea" id="question" name="question"
+                        th:field="*{question}"
+                        placeholder="문제를 입력하세요. 예: '밥'의 뜻으로 올바른 것은?"
+                        rows="3" required></textarea>
+            </div>
+
+            <!-- 보기 목록 -->
+            <div class="field-group">
+              <label class="field-label">보기 <span class="req">*</span> <span class="field-hint-inline">(최소 2개, 최대 5개)</span></label>
+              <div id="options-wrap">
+                <!-- 보기 4개 기본 -->
+                <div class="option-row" th:each="i : ${#numbers.sequence(0, 4)}">
+                  <span class="opt-letter" th:text="${#strings.listJoin({'A','B','C','D','E'}, ',').split(',')[i]}">A</span>
+                  <input class="field-input opt-input" type="text"
+                         th:name="'options[' + ${i} + ']'"
+                         th:value="${quizForm.options != null and quizForm.options.size() > i} ? ${quizForm.options[i]} : ''"
+                         th:placeholder="'보기 ' + ${i+1} + ' 입력'"
+                         th:required="${i < 2}" />
+                  <label class="opt-radio-wrap" th:title="'정답으로 설정'">
+                    <input type="radio" name="answer" th:value="${i}"
+                           th:checked="${quizForm.answer == i}" />
+                    <span class="opt-radio-label">정답</span>
+                  </label>
+                  <button type="button" class="opt-remove-btn"
+                          th:if="${i >= 2}"
+                          onclick="removeOption(this)">✕</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- 피드백 -->
+            <div class="field-row">
+              <div class="field-group">
+                <label class="field-label" for="feedbackCorrect">정답 피드백</label>
+                <input class="field-input" type="text" id="feedbackCorrect"
+                       name="feedbackCorrect" th:field="*{feedbackCorrect}"
+                       placeholder="예: ✅ 정답! 밥(bap)은 쌀로 만든 주식이에요." />
+              </div>
+              <div class="field-group">
+                <label class="field-label" for="feedbackWrong">오답 피드백</label>
+                <input class="field-input" type="text" id="feedbackWrong"
+                       name="feedbackWrong" th:field="*{feedbackWrong}"
+                       placeholder="예: ❌ 틀렸어요. 정답은 밥이에요." />
+              </div>
+            </div>
+
+          </section>
+
+          <!-- 해설 -->
+          <section class="form-card">
+            <div class="card-header">
+              <span class="card-icon">📝</span>
+              <span class="card-title">해설</span>
+              <span class="card-badge-opt">선택</span>
+            </div>
+            <div class="field-group">
+              <textarea class="field-textarea" name="explanation"
+                        th:field="*{explanation}"
+                        placeholder="틀렸을 때 보여줄 상세 해설을 입력하세요."
+                        rows="3"></textarea>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- ── 오른쪽 사이드 ── -->
+        <div class="form-side">
+
+          <!-- 분류 설정 -->
+          <section class="form-card">
+            <div class="card-header">
+              <span class="card-icon">⚙️</span>
+              <span class="card-title">분류 설정</span>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="stage">학습 단계 <span class="req">*</span></label>
+              <select class="field-select" id="stage" name="stage" th:field="*{stage}" required>
+                <option value="">단계 선택</option>
+                <option value="1">1단계 — K-POP</option>
+                <option value="2">2단계 — 드라마 대사</option>
+                <option value="3">3단계 — 일상 회화</option>
+                <option value="4">4단계 — 고급</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="quizType">문제 유형 <span class="req">*</span></label>
+              <select class="field-select" id="quizType" name="quizType" th:field="*{quizType}" required>
+                <option value="">유형 선택</option>
+                <option value="PRACTICE">연습 퀴즈</option>
+                <option value="EXAM">모의고사 풀</option>
+                <option value="BOTH">연습 + 모의고사</option>
+              </select>
+            </div>
+
+            <div class="field-group">
+              <label class="field-label" for="lectureId">연결 강의</label>
+              <select class="field-select" id="lectureId" name="lectureId" th:field="*{lectureId}">
+                <option value="">강의 연결 안 함</option>
+                <option th:each="lec : ${lectureList}"
+                        th:value="${lec.id}"
+                        th:text="${lec.stageLabel} + ' ' + ${lec.title}"
+                        th:selected="${quizForm.lectureId == lec.id}">강의명</option>
+              </select>
+              <span class="field-hint">강의와 연결하면 해당 강의 영상 페이지 퀴즈에도 표시돼요.</span>
+            </div>
+
+          </section>
+
+          <!-- 미리보기 -->
+          <section class="form-card preview-card">
+            <div class="card-header">
+              <span class="card-icon">👁</span>
+              <span class="card-title">미리보기</span>
+            </div>
+            <div class="quiz-preview" id="quiz-preview">
+              <div class="qp-question" id="qp-question">문제를 입력하면 여기에 표시돼요.</div>
+              <div class="qp-options" id="qp-options"></div>
+            </div>
+          </section>
+
+          <!-- 액션 -->
+          <div class="action-btns">
+            <a th:href="@{/admin/quiz}" class="btn-draft">취소</a>
+            <button type="submit" class="btn-publish"
+                    th:text="${isEdit} ? '💾 수정 저장' : '✅ 문제 등록'">문제 등록</button>
+          </div>
+
+          <!-- 수정 페이지 전용: 삭제 버튼 -->
+          <div class="danger-zone" th:if="${isEdit}">
+            <button type="button" class="btn-delete"
+                    th:onclick="'deleteQuiz(' + ${quizForm.id} + ')'">
+              🗑 문제 삭제
+            </button>
+          </div>
+
+        </div>
+      </div>
+    </form>
+  </div>
+</main>
+
+<!-- 삭제 모달 (수정 페이지) -->
+<div class="modal-backdrop" id="delete-modal" onclick="closeModal(event)" th:if="${isEdit}">
+  <div class="modal-box">
+    <div class="modal-icon">🗑</div>
+    <h2 class="modal-title">문제를 삭제할까요?</h2>
+    <p class="modal-desc">이 문제가 영구 삭제되며 복구할 수 없어요.</p>
+    <div class="modal-confirm-wrap">
+      <label class="modal-confirm-label">확인을 위해 <strong>삭제</strong>를 입력하세요</label>
+      <input type="text" id="delete-confirm-input" class="modal-confirm-input"
+             placeholder="삭제" oninput="checkDeleteInput()" autocomplete="off" />
+    </div>
+    <div class="modal-actions">
+      <button class="modal-btn-cancel" onclick="closeModal()">취소</button>
+      <button class="modal-btn-delete" id="modal-confirm-btn" disabled onclick="executeDelete()">삭제</button>
+    </div>
+  </div>
+</div>
+
+<form id="delete-form" th:if="${isEdit}"
+      th:action="@{/admin/quiz/delete}" method="post" style="display:none;">
+  <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+  <input type="hidden" name="ids" th:value="${quizForm.id}" />
+</form>
+
+<div th:replace="~{layout/footer :: footer}"></div>
+
+<script>
+  // ── 실시간 미리보기 ──
+  const letters = ['A','B','C','D','E'];
+
+  function updatePreview() {
+    const q = document.getElementById('question')?.value.trim() || '문제를 입력하면 여기에 표시돼요.';
+    document.getElementById('qp-question').textContent = q;
+
+    const opts = [...document.querySelectorAll('.opt-input')]
+      .map(i => i.value.trim()).filter(Boolean);
+    document.getElementById('qp-options').innerHTML = opts.map((o, i) =>
+      `<div class="qp-opt"><span class="qp-letter">${letters[i]}</span><span>${o}</span></div>`
+    ).join('');
+  }
+
+  document.getElementById('question')?.addEventListener('input', updatePreview);
+  document.querySelectorAll('.opt-input').forEach(inp =>
+    inp.addEventListener('input', updatePreview)
+  );
+  updatePreview();
+
+  // ── 보기 삭제 ──
+  function removeOption(btn) {
+    const row = btn.closest('.option-row');
+    const rows = document.querySelectorAll('.option-row');
+    if (rows.length <= 2) { alert('보기는 최소 2개 필요해요.'); return; }
+    row.remove();
+    // 인덱스 재정렬
+    document.querySelectorAll('.option-row').forEach((r, i) => {
+      r.querySelector('.opt-letter').textContent = letters[i];
+      r.querySelector('.opt-input').name = `options[${i}]`;
+      r.querySelector('input[type=radio]').value = i;
+      if (i < 2) r.querySelector('.opt-remove-btn')?.remove();
+    });
+    updatePreview();
+  }
+
+  // ── 삭제 모달 (수정 페이지) ──
+  function deleteQuiz(id) {
+    document.getElementById('delete-confirm-input').value = '';
+    document.getElementById('modal-confirm-btn').disabled = true;
+    document.getElementById('delete-modal').classList.add('active');
+  }
+
+  function checkDeleteInput() {
+    const val = document.getElementById('delete-confirm-input')?.value;
+    const btn = document.getElementById('modal-confirm-btn');
+    if (btn) btn.disabled = val !== '삭제';
+  }
+
+  function executeDelete() {
+    document.getElementById('delete-form')?.submit();
+  }
+
+  function closeModal(e) {
+    if (e && e.target !== document.getElementById('delete-modal')) return;
+    document.getElementById('delete-modal')?.classList.remove('active');
+  }
+
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') document.getElementById('delete-modal')?.classList.remove('active');
+  });
+</script>
+
+</body>
+</html>

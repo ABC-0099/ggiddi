@@ -4,3 +4,6 @@ grant all privileges on SS8911.* to SS8911@localhost;
 flush privileges;
 show databases;
 exit
+
+
+http://localhost:8911/

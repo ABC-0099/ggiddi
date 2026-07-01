@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>끼역띠귿 — 공지사항 상세</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
+
+</head>
+<body>
+
+<div class="bg-orbs"><div class="orb o1"></div><div class="orb o2"></div></div>
+
+<!-- NAV -->
+<div th:replace="~{layout/navbar :: navbar}"></div>
+
+<!-- 본문 -->
+<div class="view-wrap">
+
+  <!-- 뒤로가기 -->
+  <a href="board_notice_1.html" class="back-btn">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M19 12H5M12 5l-7 7 7 7"/>
+    </svg>
+    공지사항 목록
+  </a>
+
+  <div class="post-card">
+
+    <!-- 헤더 -->
+    <div class="post-header">
+      <div class="post-header-top">
+        <span class="pin-badge">📌 고정</span>
+        <span class="badge b-notice">공지</span>
+        <span class="lang-tag">KO · EN · VI</span>
+      </div>
+      <h1 class="post-title">끼역띠귿 메타버스 학습 공간 정식 오픈 안내</h1>
+      <div class="post-meta">
+        <span>✍️ 관리자</span>
+        <div class="meta-divider"></div>
+        <span>📅 2026.06.20</span>
+        <div class="meta-divider"></div>
+        <span>👁 1,204</span>
+        <div class="meta-divider"></div>
+        <span>❤️ 48</span>
+      </div>
+    </div>
+
+    <!-- 첨부파일 -->
+    <div class="attach-bar">
+      <span class="attach-label">📎 첨부파일</span>
+      <button class="attach-chip">📄 오픈안내_공식문서.pdf <span style="color:var(--ink-faint)">(1.2 MB)</span></button>
+      <button class="attach-chip">🖼️ 메타버스_맵_미리보기.png <span style="color:var(--ink-faint)">(840 KB)</span></button>
+    </div>
+
+    <!-- 본문 -->
+    <div class="post-body">
+      <p>안녕하세요, <strong>끼역띠귿</strong> 운영팀입니다. 😊</p>
+      <p>
+        오랫동안 기다려 주신 여러분께 기쁜 소식을 전합니다.<br>
+        2026년 6월 20일(토)부터 <strong>메타버스 학습 공간</strong>이 정식으로 오픈됩니다!
+      </p>
+
+      <div class="highlight-box">
+        🎉 오픈 일시: 2026년 6월 20일(토) 오전 10:00 (KST)<br>
+        🌐 지원 언어: 한국어 · English · Tiếng Việt<br>
+        🗺️ 오픈 구역: 1단계 픽셀 마을 / 2단계 단어 월드 / NPC 퀴즈 존
+      </div>
+
+      <p>이번 메타버스 공간에서는 다음 기능을 이용하실 수 있습니다.</p>
+      <ul>
+        <li>WASD 키로 캐릭터를 이동하며 학습 구역을 탐험</li>
+        <li>NPC에게 말을 걸어 퀴즈에 도전하고 학습 포인트 획득</li>
+        <li>미니맵으로 현재 위치 및 미방문 구역 확인</li>
+        <li>퀘스트 패널에서 오늘의 학습 미션 수행</li>
+        <li>친구와 같은 구역에서 실시간 채팅</li>
+      </ul>
+
+      <div class="warn-box">
+        ⚠️ 모바일 환경에서는 일부 기능이 제한될 수 있습니다. 최적의 학습 경험을 위해 PC 크롬 브라우저를 권장합니다.
+      </div>
+
+      <p>
+        앞으로도 끼역띠귿은 더욱 재미있고 효과적인 한국어 학습 환경을 만들기 위해 꾸준히 업데이트해 나가겠습니다.<br>
+        함께해 주셔서 감사합니다!
+      </p>
+      <p style="color:var(--ink-soft); font-size:13px;">끼역띠귿 운영팀 드림</p>
+    </div>
+
+    <!-- 좋아요 / 공유 -->
+    <div class="post-actions">
+      <div class="action-group">
+        <button class="action-btn" id="likeBtn" onclick="toggleLike()">❤️ 좋아요 <span id="likeCnt">48</span></button>
+      </div>
+      <button class="share-btn" onclick="copyLink()">🔗 링크 복사</button>
+    </div>
+
+    <!-- 이전 / 다음 글 -->
+    <div class="post-nav">
+      <div class="post-nav-row" onclick="location.href='board_notice_1.html'">
+        <span class="nav-dir">▲ 다음</span>
+        <span class="badge b-event nav-badge">이벤트</span>
+        <span class="nav-title">다문화 가정 한국어 말하기 대회 참가자 모집</span>
+        <span class="nav-date">2026.06.21</span>
+      </div>
+      <div class="post-nav-row" onclick="location.href='board_notice_1.html'">
+        <span class="nav-dir">▼ 이전</span>
+        <span class="badge b-system nav-badge">시스템</span>
+        <span class="nav-title">정기 점검 안내 (매주 화요일 02:00~04:00)</span>
+        <span class="nav-date">2026.06.18</span>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- 목록으로 -->
+  <div class="list-btn-wrap">
+    <a href="board_notice_1.html" class="list-btn">≡ 목록으로</a>
+  </div>
+
+</div>
+
+<script>
+  let liked = false;
+  function toggleLike() {
+    liked = !liked;
+    const btn = document.getElementById('likeBtn');
+    const cnt = document.getElementById('likeCnt');
+    btn.classList.toggle('liked', liked);
+    cnt.textContent = liked ? 49 : 48;
+  }
+
+  function copyLink() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      const btn = event.target;
+      const orig = btn.textContent;
+      btn.textContent = '✅ 복사 완료!';
+      setTimeout(() => btn.textContent = orig, 1500);
+    });
+  }
+</script>
+
+<!-- FOOTER -->
+<div th:replace="~{layout/footer :: footer}"></div>
+
+</body>
+</html>

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>끼역띠귿 — 자주 묻는 질문</title>
+    <link rel="stylesheet" th:href="@{/css/layout/navbar.css}" />
+    <link rel="stylesheet" th:href="@{/css/layout/footer.css}" />
+    <link rel="stylesheet" th:href="@{/css/faq/list.css}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<div class="bg-orbs"><div class="orb o1"></div><div class="orb o2"></div></div>
+<div th:replace="~{layout/navbar :: navbar(currentMenu='faq')}"></div>
+
+<!-- 헤더 -->
+<div class="faq-header">
+    <div class="faq-header-inner">
+        <h1>자주 묻는 질문</h1>
+        <p>끼역띠귿 이용 중 궁금한 점을 빠르게 찾아보세요</p>
+
+        <!-- 검색 -->
+        <div class="faq-search-wrap">
+            <input type="text" id="faq-search" class="faq-search-input"
+                   placeholder="질문을 검색해보세요 (예: 비밀번호, 환불, 게임)" />
+            <span class="faq-search-icon">🔍</span>
+        </div>
+    </div>
+</div>
+
+<main class="faq-main">
+
+    <!-- 카테고리 탭 -->
+    <div class="faq-tabs">
+        <button class="faq-tab active" data-cat="all">전체</button>
+        <button class="faq-tab" data-cat="account">회원가입/로그인</button>
+        <button class="faq-tab" data-cat="payment">결제</button>
+        <button class="faq-tab" data-cat="lecture">강의이용</button>
+        <button class="faq-tab" data-cat="game">게임</button>
+        <button class="faq-tab" data-cat="etc">기타</button>
+    </div>
+
+    <!-- 아코디언 목록 -->
+    <div class="faq-list" id="faq-list">
+
+        <!-- 회원가입/로그인 -->
+        <div class="faq-item" data-cat="account">
+            <button class="faq-q">
+                <span class="faq-cat-badge cat-account">회원가입/로그인</span>
+                <span class="faq-q-text">비밀번호를 잊어버렸어요. 어떻게 재설정하나요?</span>
+                <span class="faq-arrow">▾</span>
+            </button>
+            <div class="faq-a">
+                <p>로그인 페이지에서 <strong>'비밀번호 찾기'</strong>를 클릭한 뒤 가입 시 등록한 이메일을 입력하세요. 재설정 링크가 발송되며, 링크는 발송 후 30분간 유효해요.</p>
+            </div>
+        </div>
+
+        <div class="faq-item" data-cat="account">
+            <button class="faq-q">
+                <span class="faq-cat-badge cat-account">회원가입/로그인</span>
+                <span class="faq-q-text">외국인도 가입할 수 있나요? 한국 전화번호가 없어요.</span>
+                <span class="faq-arrow">▾</span>
+            </button>
+            <div class="faq-a">
+                <p>네, 가능해요. 이메일 인증만으로 가입할 수 있도록 되어 있어서 한국 전화번호가 없어도 문제 없어요. 가입 시 국가를 선택하면 맞춤 콘텐츠를 추천해드려요.</p>
+            </div>
+        </div>
+
+        <div class="faq-item" data-cat="account">
+            <button class="faq-q">
+                <span class="faq-cat-badge cat-account">회원가입/로그인</span>
+                <span class="faq-q-text">탈퇴하면 학습 기록도 모두 사라지나요?</span>
+                <span class="faq-arrow">▾</span>
+            </button>
+            <div class="faq-a">
+                <p>네, 탈퇴 시 학습 진도, 퀴즈 기록, 작성한 게시글 등 모든 데이터가 삭제되며 복구할 수 없어요. 탈퇴 전 꼭 한 번 더 확인해주세요.</p>
+            </div>
+        </div>
+
+        <!-- 결제 -->
+        <div class="faq-item" data-cat="payment">
+            <button class="faq-q">
+                <span class="faq-cat-badge cat-payment">결제</span>
+                <span class="faq-q-text">결제 후 환불이 가능한가요?</span>
+                <span class="faq-arrow">▾</span>
+            </button>
+            <div class="faq-a">
+                <p>결제일로부터 <strong>7일 이내, 강의를 50% 미만 수강</strong>한 경우 전액 환불이 가능해요. 50% 이상 수강했거나 7일이 지난 경우 부분 환불 또는 환불이 제한될 수 있어요. 마이페이지 &gt; 결제내역에서 환불 요청을 진행할 수 있어요.</p>
+            </div>
+        </div>
+
+        <div class="faq-item" data-cat="payment">
+            <button class="faq-q">
+                <span class="faq-cat-badge cat-payment">결제</span>
+                <span class="faq-q-text">어떤 결제 수단을 지원하나요?</span>
+                <span class="faq-arrow">▾</span>
+            </button>
+            <div class="faq-a">
+                <p>카카오페이, 토스페이, 신용/체크카드 결제를 지원해요. 해외 발급 카드도 대부분 사용 가능하지만, 일부 카드사는 해외 결제 차단으로 실패할 수 있어요.</p>
+            </div>
+        </div>
+
+        <div class="faq-item" data-cat="payment">
+            <button class="faq-q">
+                <span class="faq-cat-badge cat-payment">결제</span>
+                <span class="faq-q-text">결제했는데 강의가 보이지 않아요.</span>
+                <span class="faq-arrow">▾</span>
+            </button>
+            <div class="faq-a">
+                <p>결제 승인까지 최대 5분 정도 걸릴 수 있어요. 5분 후에도 보이지 않으면 마이페이지 &gt; 결제내역에서 결제 상태를 확인해주시고, '결제완료'인데도 강의가 안 보이면 1:1 질문하기로 문의해주세요.</p>
+            </div>
+        </div>
+
+        <!-- 강의이용 -->
+        <div class="faq-item" data-cat="lecture">
+            <button class="faq-q">
+                <span class="faq-cat-badge cat-lecture">강의이용</span>
+                <span class="faq-q-text">강의를 어디까지 봤는지 저장되나요?</span>
+                <span class="faq-arrow">▾</span>
+            </button>
+            <div class="faq-a">
+                <p>네, 시청 위치가 자동으로 저장돼요. 강의를 다시 열면 이전에 보던 부분부터 이어서 재생할 수 있어요.</p>
+            </div>
+        </div>
+
+        <div class="faq-item" data-cat="lecture">
+            <button class="faq-q">
+                <span class="faq-cat-badge cat-lecture">강의이용</span>
+                <span class="faq-q-text">퀴즈는 꼭 영상을 다 봐야 풀 수 있나요?</span>
+                <span class="faq-arrow">▾</span>
+            </button>
+            <div class="faq-a">
+                <p>네, 강의 영상을 100% 시청해야 해당 강의의 연습 퀴즈가 열려요. 학습 효과를 높이기 위한 장치이니 영상을 끝까지 봐주세요. 모의고사는 해당 단계의 모든 강의를 완료해야 응시할 수 있어요.</p>
+            </div>
+        </div>
+
+        <div class="faq-item" data-cat="lecture">
+            <button class="faq-q">
+                <span class="faq-cat-badge cat-lecture">강의이용</span>
+                <span class="faq-q-text">다음 단계로 넘어가려면 어떤 조건이 필요한가요?</span>
+                <span class="faq-arrow">▾</span>
+            </button>
+            <div class="faq-a">
+                <p>현재 단계의 모든 강의 영상을 시청하고, 해당 단계 모의고사에서 일정 점수 이상을 받으면 다음 단계가 해금돼요. 정확한 기준 점수는 모의고사 페이지에 표시돼요.</p>
+            </div>
+        </div>
+
+        <div class="faq-item" data-cat="lecture">
+            <button class="faq-q">
+                <span class="faq-cat-badge cat-lecture">강의이용</span>
+                <span class="faq-q-text">강의 자막을 다른 언어로 볼 수 있나요?</span>
+                <span class="faq-arrow">▾</span>
+            </button>
+            <div class="faq-a">
+                <p>현재는 한국어/영어 자막을 지원하고 있어요. 더 많은 언어는 추가될 예정이니 공지사항을 확인해주세요.</p>
+            </div>
+        </div>
+
+        <!-- 게임 -->
+        <div class="faq-item" data-cat="game">
+            <button class="faq-q">
+                <span class="faq-cat-badge cat-game">게임</span>
+                <span class="faq-q-text">학습 게임은 어떻게 시작하나요?</span>
+                <span class="faq-arrow">▾</span>
+            </button>
+            <div class="faq-a">
+                <p>학습센터 &gt; 학습 게임 메뉴에서 입장할 수 있어요. 방향키(WASD)로 캐릭터를 이동시켜 맵을 탐험하고, NPC와 만나면 퀴즈가 시작돼요.</p>
+            </div>
+        </div>
+
+        <div class="faq-item" data-cat="game">
+            <button class="faq-q">
+                <span class="faq-cat-badge cat-game">게임</span>
+                <span class="faq-q-text">게임이 멈추거나 캐릭터가 움직이지 않아요.</span>
+                <span class="faq-arrow">▾</span>
+            </button>
+            <div class="faq-a">
+                <p>대부분 브라우저 캐시 문제예요. 새로고침(F5) 후에도 안 되면 크롬/엣지 최신 버전으로 접속해주세요. 계속 문제가 있으면 1:1 질문하기로 화면 캡처와 함께 문의해주세요.</p>
+            </div>
+        </div>
+
+        <div class="faq-item" data-cat="game">
+            <button class="faq-q">
+                <span class="faq-cat-badge cat-game">게임</span>
+                <span class="faq-q-text">게임 점수도 랭킹에 반영되나요?</span>
+                <span class="faq-arrow">▾</span>
+            </button>
+            <div class="faq-a">
+                <p>네, 게임 내 퀴즈 정답률이 출석 랭킹 점수에 일부 반영돼요. 마이페이지에서 내 랭킹과 점수 구성을 확인할 수 있어요.</p>
+            </div>
+        </div>
+
+        <!-- 기타 -->
+        <div class="faq-item" data-cat="etc">
+            <button class="faq-q">
+                <span class="faq-cat-badge cat-etc">기타</span>
+                <span class="faq-q-text">모바일에서도 이용할 수 있나요?</span>
+                <span class="faq-arrow">▾</span>
+            </button>
+            <div class="faq-a">
+                <p>네, 모바일 웹으로 대부분의 기능을 이용할 수 있어요. 다만 학습 게임은 PC 환경에서 더 원활하게 플레이할 수 있어요.</p>
+            </div>
+        </div>
+
+        <div class="faq-item" data-cat="etc">
+            <button class="faq-q">
+                <span class="faq-cat-badge cat-etc">기타</span>
+                <span class="faq-q-text">원하는 답을 찾지 못했어요. 어떻게 하나요?</span>
+                <span class="faq-arrow">▾</span>
+            </button>
+            <div class="faq-a">
+                <p><a th:href="@{/qna}">1:1 질문하기</a>를 통해 강사에게 직접 문의할 수 있어요. 보통 1~2일 내에 답변을 받을 수 있어요.</p>
+            </div>
+        </div>
+
+        <!-- 검색 결과 없을 때 -->
+        <div class="faq-empty" id="faq-empty" style="display:none;">
+            검색 결과가 없어요. <a th:href="@{/qna}">1:1 질문하기</a>로 직접 물어보세요.
+        </div>
+
+    </div>
+
+    <!-- 하단 CTA -->
+    <div class="faq-cta">
+        <div class="faq-cta-text">
+            <strong>원하는 답을 찾지 못하셨나요?</strong>
+            <span>강사에게 직접 질문해보세요</span>
+        </div>
+        <a th:href="@{/qna}" class="faq-cta-btn">1:1 질문하기 →</a>
+    </div>
+
+</main>
+
+<div th:replace="~{layout/footer :: footer}"></div>
+
+<script>
+    const tabs = document.querySelectorAll('.faq-tab');
+    const items = document.querySelectorAll('.faq-item');
+    const searchInput = document.getElementById('faq-search');
+    const emptyEl = document.getElementById('faq-empty');
+
+    let currentCat = 'all';
+
+    // 아코디언 토글
+    document.querySelectorAll('.faq-q').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const item = btn.closest('.faq-item');
+        const isOpen = item.classList.contains('open');
+        // 같은 그룹 내 다른 항목은 그대로 두고 토글만
+        item.classList.toggle('open', !isOpen);
+      });
+    });
+
+    // 카테고리 탭
+    tabs.forEach(tab => {
+      tab.addEventListener('click', () => {
+        tabs.forEach(t => t.classList.remove('active'));
+        tab.classList.add('active');
+        currentCat = tab.dataset.cat;
+        applyFilter();
+      });
+    });
+
+    // 검색
+    searchInput.addEventListener('input', applyFilter);
+
+    function applyFilter() {
+      const keyword = searchInput.value.trim().toLowerCase();
+      let visibleCount = 0;
+
+      items.forEach(item => {
+        const cat = item.dataset.cat;
+        const text = item.querySelector('.faq-q-text').textContent.toLowerCase();
+        const answer = item.querySelector('.faq-a').textContent.toLowerCase();
+
+        const catMatch = currentCat === 'all' || cat === currentCat;
+        const kwMatch = !keyword || text.includes(keyword) || answer.includes(keyword);
+
+        const visible = catMatch && kwMatch;
+        item.style.display = visible ? '' : 'none';
+        if (visible) visibleCount++;
+      });
+
+      emptyEl.style.display = visibleCount === 0 ? 'block' : 'none';
+    }
+</script>
+
+</body>
+</html>

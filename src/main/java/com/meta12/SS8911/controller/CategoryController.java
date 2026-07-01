@@ -25,8 +25,8 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
 import java.security.Principal;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
+
 @RequiredArgsConstructor
 @Controller
 public class CategoryController {
@@ -39,25 +39,33 @@ public class CategoryController {
     private final ProgressRepository progressRepository;
 
 
-    // 컨트롤러 코드 예시
     @GetMapping("/category/list")
     public String list(
-            @AuthenticationPrincipal SiteUser user, // 필요하다면
+            @AuthenticationPrincipal SiteUser user,
             Model model
     ) {
-        // 1. 서비스에서 전체 카테고리 목록을 가져옵니다.
-        // (이전에 정의한 findAll() 메서드를 사용하세요)
         List<Category> categoryList = categoryService.findAll();
 
-        // 유저가 로그인한 경우, 각 카테고리별 진도율을 계산하여 모델에 전달
-        if (user != null) {
-            for (Category category : categoryList) {
-                // 해당 카테고리의 진도율 평균을 구하는 로직(예: categoryService.calculateProgress(category, user)) 호출
+        Map<Long, List<Content>> contentMap = new LinkedHashMap<>();
+        Map<Long, Boolean> paidMap = new HashMap<>();
+
+        for (Category category : categoryList) {
+            contentMap.put(category.getId(), contentService.list(category.getId(), user));
+
+            boolean isPaid = false;
+            if (user != null) {
+                if (user.getRole() == Role.ADMIN) {
+                    isPaid = true;
+                } else {
+                    isPaid = orderPayRepository.existsBySiteUserAndCategory(user, category);
+                }
             }
+            paidMap.put(category.getId(), isPaid);
         }
 
-        // 2. 반드시 HTML의 ${list}와 일치하는 "list"라는 이름으로 담아야 합니다.
         model.addAttribute("list", categoryList);
+        model.addAttribute("contentMap", contentMap);
+        model.addAttribute("paidMap", paidMap);
 
         return "category/list";
     }

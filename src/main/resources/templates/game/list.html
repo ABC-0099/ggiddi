@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>끼역띠귿 — 게임</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Galmuri11&family=Jua&family=Gowun+Dodum&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" th:href="@{/css/game/list.css}" />
+    <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1/dist/sockjs.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/@stomp/stompjs@7/bundles/stomp.umd.min.js"></script>
+</head>
+<body th:attr="data-current-user=${#authentication.name != null and #authentication.name != 'anonymousUser'} ? ${#authentication.name} : ''">
+
+<h2 class="sr-only">끼역띠귿 게임 게시판 페이지. 단계별 한국어 학습 미니게임 목록을 카드 형태로 보여주며, 게임을 선택하면 모험을 떠나는 전환 화면을 거쳐 유니티 게임 창이 열립니다.</h2>
+
+<div class="paper-texture"></div>
+
+<nav>
+    <a th:href="@{/}" class="logo">끼역띠귿<div class="logo-dot"></div></a>
+    <ul class="nav-links">
+        <li><a th:href="@{/}">홈</a></li>
+        <li><a th:href="@{/lectures}">강의</a></li>
+        <li><a th:href="@{/game}" class="active">게임</a></li>
+        <li><a th:href="@{/community}">커뮤니티</a></li>
+        <li><a th:href="@{/siteUser/mypage}">마이페이지</a></li>
+    </ul>
+    <div sec:authorize="isAuthenticated()">
+        <div class="avatar" sec:authentication="name" th:text="${#strings.substring(#authentication.name,0,1)}">유</div>
+    </div>
+    <div sec:authorize="isAnonymous()">
+        <a th:href="@{/siteUser/login}" class="avatar" style="font-size:11px; text-decoration:none;">로그인</a>
+    </div>
+</nav>
+
+<div class="page-header">
+    <div class="page-header-text">
+        <span class="eyebrow pixel-font">★ QUEST BOARD ★</span>
+        <h1>모험 게시판</h1>
+        <p>배운 한국어를 게임으로 모험하듯 익혀봐요 🗡️</p>
+    </div>
+    <div class="last-game-box">
+        <div class="lgb-header">📜 안내</div>
+        <p style="font-size:12.5px; color:var(--ink-soft); line-height:1.8; font-weight:500;">
+            퀘스트를 선택하고 <b style="color:var(--crimson);">모험을 떠나요</b> 버튼을 누르면<br>바로 게임 창이 열려요.
+        </p>
+    </div>
+</div>
+
+<div class="game-wrap" style="padding-top:40px;">
+    <div style="display:flex; flex-direction:column; align-items:center; justify-content:center; min-height:340px; text-align:center; gap:24px;">
+        <div style="font-size:58px;">🗡️</div>
+        <div>
+            <h2 class="serif-font" style="font-size:20px; font-weight:900; margin-bottom:12px; color:var(--wood-deep);">한국어 모험을 시작해볼까요?</h2>
+            <p style="font-size:14px; color:var(--ink-soft);">버튼을 누르면 게임 창이 열려요.</p>
+        </div>
+        <button class="gc-start-btn" style="width:auto; padding:15px 36px; font-size:13px;" data-game="끼역띠귿 모험" onclick="startAdventure(this)">모험을 떠나요 →</button>
+    </div>
+</div>
+
+<div class="portal-overlay" id="portalOverlay" aria-hidden="true">
+    <div class="portal-card">
+        <div class="portal-ring"></div>
+        <div class="portal-text" id="portalGameName">모험을 떠나는 중</div>
+        <div class="portal-sub">잠시 후 게임이 시작됩니다<span class="portal-dots"><span>.</span><span>.</span><span>.</span></span></div>
+    </div>
+</div>
+
+<div class="game-window" id="gameWindow" role="dialog" aria-modal="true" aria-labelledby="gwTitle">
+    <div class="gw-topbar">
+        <div style="display:flex;align-items:center;">
+            <span class="gw-title" id="gwTitle">게임 실행 중</span>
+            <span class="gw-title-badge">PLAYING</span>
+        </div>
+        <button class="gw-exit-btn" onclick="exitGame()">✕ 나가기</button>
+    </div>
+    <div class="gw-frame-wrap">
+        <div class="gw-frame-placeholder" id="gwPlaceholder">
+            <div class="icon">🗡️</div>
+            <div id="gwPlaceholderTitle">게임 로딩 위치</div>
+            <p>여기에 유니티 WebGL build/index.html 을<br>iframe으로 연결하세요</p>
+        </div>
+        <iframe class="unity-frame" id="unityFrame" title="유니티 게임 화면"></iframe>
+    </div>
+</div>
+
+<script>
+    function startAdventure(el) {
+      if (!el) return;
+      var gameName = el.getAttribute('data-game');
+      if (!gameName) return;
+      var overlay = document.getElementById('portalOverlay');
+      document.getElementById('portalGameName').textContent = gameName + ' 모험을 떠나는 중';
+      overlay.classList.add('active');
+      overlay.setAttribute('aria-hidden', 'false');
+      setTimeout(function () {
+        document.getElementById('gwTitle').textContent = gameName;
+        document.getElementById('gwPlaceholderTitle').textContent = gameName + ' 화면 위치';
+        document.getElementById('gameWindow').classList.add('active');
+        overlay.classList.remove('active');
+        overlay.setAttribute('aria-hidden', 'true');
+      }, 1300);
+    }
+    function exitGame() {
+      document.getElementById('gameWindow').classList.remove('active');
+      var frame = document.getElementById('unityFrame');
+      frame.src = ''; frame.style.display = 'none';
+      document.getElementById('gwPlaceholder').style.display = 'flex';
+    }
+</script>
+
+<!-- 모험가 로비 채팅 위젯 -->
+<div class="quest-chat-widget" sec:authorize="isAuthenticated()">
+    <button type="button" class="quest-chat-toggle-btn" id="chat-toggle-btn" onclick="toggleChat()">
+        <span class="quest-chat-toggle-icon">🏕️</span>
+        <span class="quest-chat-unread-badge" id="chat-unread-badge" style="display:none;">0</span>
+    </button>
+    <div class="quest-chat-panel" id="chat-panel">
+        <div class="quest-chat-view" id="chat-view-rooms">
+            <div class="quest-chat-head">
+                <div class="quest-chat-title pixel-font">⛺ 모험가의 야영지</div>
+                <button type="button" class="quest-chat-close" onclick="toggleChat()">✕</button>
+            </div>
+            <div class="quest-chat-room-list" id="chat-room-list">
+                <div class="quest-chat-loading">야영지를 찾는 중...</div>
+            </div>
+        </div>
+        <div class="quest-chat-view" id="chat-view-room" style="display:none;">
+            <div class="quest-chat-head">
+                <button type="button" class="quest-chat-back" onclick="leaveRoom()">←</button>
+                <div class="quest-chat-title">
+                    <span class="quest-chat-status-dot" id="chat-status-dot"></span>
+                    <span id="chat-room-name">야영지</span>
+                </div>
+                <button type="button" class="quest-chat-close" onclick="toggleChat()">✕</button>
+            </div>
+            <div class="quest-chat-messages" id="chat-messages">
+                <div class="quest-chat-empty" id="chat-empty">아직 모닥불 앞에 아무도 없어요. 먼저 말을 걸어보세요 🔥</div>
+            </div>
+            <form class="quest-chat-input-row" id="chat-form" onsubmit="return false;">
+                <input type="text" id="chat-input" class="quest-chat-input"
+                       placeholder="동료에게 말을 건네보세요" maxlength="500" autocomplete="off" />
+                <button type="submit" class="quest-chat-send-btn pixel-font" id="chat-send-btn">전송</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+<div class="quest-chat-widget" sec:authorize="isAnonymous()">
+    <a th:href="@{/login}" class="quest-chat-toggle-btn" title="로그인 후 야영지 채팅을 이용할 수 있어요">
+        <span class="quest-chat-toggle-icon">🏕️</span>
+    </a>
+</div>
+
+<footer class="game-footer">
+    <div class="game-footer-inner">
+
+        <!-- 상단: 브랜드 + 링크 컬럼 -->
+        <div class="game-footer-top">
+
+            <div class="game-footer-brand">
+                <div class="game-footer-logo pixel-font">끼역띠귿</div>
+                <p class="game-footer-tagline">외국인과 다문화 가족을 위한<br>한국어 학습 플랫폼</p>
+                <div class="game-footer-sns">
+                    <a th:href="@{/}" class="game-sns-btn" aria-label="인스타그램">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <rect x="2" y="2" width="20" height="20" rx="5" ry="5"/>
+                            <circle cx="12" cy="12" r="4"/>
+                            <circle cx="17.5" cy="6.5" r="1" fill="currentColor" stroke="none"/>
+                        </svg>
+                    </a>
+                    <a th:href="@{/}" class="game-sns-btn" aria-label="유튜브">
+                        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+                            <path d="M22.5 6.5a2.83 2.83 0 0 0-2-2C18.9 4 12 4 12 4s-6.9 0-8.5.5a2.83 2.83 0 0 0-2 2C1 8.1 1 12 1 12s0 3.9.5 5.5a2.83 2.83 0 0 0 2 2C5.1 20 12 20 12 20s6.9 0 8.5-.5a2.83 2.83 0 0 0 2-2C23 15.9 23 12 23 12s0-3.9-.5-5.5z"/>
+                            <polygon points="10 15.5 16 12 10 8.5 10 15.5" fill="currentColor" stroke="none"/>
+                        </svg>
+                    </a>
+                </div>
+            </div>
+
+            <div class="game-footer-cols">
+                <div class="game-footer-col">
+                    <h4>학습</h4>
+                    <ul>
+                        <li><a th:href="@{/lectures}">동영상 강의</a></li>
+                        <li><a th:href="@{/game}">학습 게임</a></li>
+                        <li><a th:href="@{/payment}">구독 안내</a></li>
+                    </ul>
+                </div>
+                <div class="game-footer-col">
+                    <h4>커뮤니티</h4>
+                    <ul>
+                        <li><a th:href="@{/notices}">공지사항</a></li>
+                        <li><a th:href="@{/community}">커뮤니티</a></li>
+                        <li><a th:href="@{/faq/list}">자주 묻는 질문</a></li>
+                        <li><a th:href="@{/qna}">1:1 질문하기</a></li>
+                    </ul>
+                </div>
+                <div class="game-footer-col">
+                    <h4>고객지원</h4>
+                    <ul>
+                        <li><a th:href="@{/terms}">이용약관</a></li>
+                        <li><a th:href="@{/privacy}">개인정보처리방침</a></li>
+                        <li><a th:href="@{/siteUser/mypage}">마이페이지</a></li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- 구분선 -->
+        <div class="game-footer-divider"></div>
+
+        <!-- 하단: 카피라이트 + 사업자 정보 -->
+        <div class="game-footer-bottom">
+            <p class="game-footer-copy">© 2026 끼역띠귿. All rights reserved.</p>
+            <p class="game-footer-biz">사업자등록번호 123-45-67890 &nbsp;|&nbsp; 대표자 홍길동 &nbsp;|&nbsp; 이메일 help@kkiyeok.com</p>
+        </div>
+
+    </div>
+</footer>
+<script th:src="@{/js/chat.js}"></script>
+
+</body>
+</html>

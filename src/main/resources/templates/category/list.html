@@ -142,270 +142,51 @@
 -->
 <div class="lecture-wrap">
 
-    <!-- 1단계 -->
-    <div class="stage-section">
+    <div class="stage-section" th:each="category, catStat : ${list}">
         <div class="stage-header">
-            <span class="stage-badge sb-1">1단계</span>
-            <h2>음절 월드</h2>
-            <span class="stage-count">8강 완료</span>
+            <span class="stage-badge" th:classappend="'sb-' + ${catStat.count}" th:text="${catStat.count} + '단계'"></span>
+            <h2 th:text="${category.title}"></h2>
+            <span class="stage-count" th:text="${category.instructor}"></span>
         </div>
+
         <div class="lecture-grid">
-
-            <a th:href="@{/lectures/content}" class="lc">
-                <div class="lc-thumb">
-                    <div class="lc-thumb-icon">🔤</div>
-                    <div class="lc-play"><div class="play-btn">▶</div></div>
-                    <span class="lc-status ls-done">완료</span>
-                </div>
-                <div class="lc-body">
-                    <div class="lc-top">
-                        <span class="lc-num">1-1강</span>
-                        <span class="lc-time-badge">⏱ 12분</span>
-                    </div>
-                    <div class="lc-title">한글 자음 익히기 — ㄱ부터 ㅎ까지</div>
-                    <div class="lc-meta"><span>👁 1,240명 수강</span></div>
-                    <div class="lc-progress-wrap">
-                        <div class="lc-prog-header">
-                            <span class="lc-prog-label">진행률</span>
-                            <span class="lc-prog-pct done">100% 완료 ✓</span>
-                        </div>
-                        <div class="lc-prog-bar"><div class="lc-prog-fill" style="width:100%"></div></div>
-                    </div>
-                </div>
-            </a>
-
-            <a th:href="@{/lectures/content}" class="lc">
-                <div class="lc-thumb t2">
-                    <div class="lc-thumb-icon">🔤</div>
-                    <div class="lc-play"><div class="play-btn">▶</div></div>
-                    <span class="lc-status ls-done">완료</span>
-                </div>
-                <div class="lc-body">
-                    <div class="lc-top">
-                        <span class="lc-num">1-2강</span>
-                        <span class="lc-time-badge">⏱ 10분</span>
-                    </div>
-                    <div class="lc-title">한글 모음 익히기 — ㅏ부터 ㅣ까지</div>
-                    <div class="lc-meta"><span>👁 980명 수강</span></div>
-                    <div class="lc-progress-wrap">
-                        <div class="lc-prog-header">
-                            <span class="lc-prog-label">진행률</span>
-                            <span class="lc-prog-pct done">100% 완료 ✓</span>
-                        </div>
-                        <div class="lc-prog-bar"><div class="lc-prog-fill" style="width:100%"></div></div>
-                    </div>
-                </div>
-            </a>
-
-            <a th:href="@{/lectures/content}" class="lc">
-                <div class="lc-thumb t3">
-                    <div class="lc-thumb-icon">🔤</div>
-                    <div class="lc-play"><div class="play-btn">▶</div></div>
-                    <span class="lc-status ls-done">완료</span>
-                </div>
-                <div class="lc-body">
-                    <div class="lc-top">
-                        <span class="lc-num">1-3강</span>
-                        <span class="lc-time-badge">⏱ 15분</span>
-                    </div>
-                    <div class="lc-title">받침 있는 글자 읽기</div>
-                    <div class="lc-meta"><span>👁 870명 수강</span></div>
-                    <div class="lc-progress-wrap">
-                        <div class="lc-prog-header">
-                            <span class="lc-prog-label">진행률</span>
-                            <span class="lc-prog-pct done">100% 완료 ✓</span>
-                        </div>
-                        <div class="lc-prog-bar"><div class="lc-prog-fill" style="width:100%"></div></div>
-                    </div>
-                </div>
-            </a>
-
-            <a th:href="@{/lectures/content}" class="lc">
-                <div class="lc-thumb t4">
-                    <div class="lc-thumb-icon">🔤</div>
-                    <div class="lc-play"><div class="play-btn">▶</div></div>
-                    <span class="lc-status ls-done">완료</span>
-                </div>
-                <div class="lc-body">
-                    <div class="lc-top">
-                        <span class="lc-num">1-4강</span>
-                        <span class="lc-time-badge">⏱ 18분</span>
-                    </div>
-                    <div class="lc-title">소리와 글자 연결하기 실습</div>
-                    <div class="lc-meta"><span>👁 760명 수강</span></div>
-                    <div class="lc-progress-wrap">
-                        <div class="lc-prog-header">
-                            <span class="lc-prog-label">진행률</span>
-                            <span class="lc-prog-pct done">100% 완료 ✓</span>
-                        </div>
-                        <div class="lc-prog-bar"><div class="lc-prog-fill" style="width:100%"></div></div>
-                    </div>
-                </div>
-            </a>
-
-        </div>
-    </div>
-
-    <!-- 2단계 -->
-    <div class="stage-section">
-        <div class="stage-header">
-            <span class="stage-badge sb-2">2단계</span>
-            <h2>단어 월드</h2>
-            <span class="stage-count">진행 중 · 12강 중 2강 완료</span>
-        </div>
-        <div class="lecture-grid">
-
-            <a th:href="@{/lectures/content}" class="lc">
+            <a th:each="content : ${contentMap.get(category.id)}"
+               th:href="${paidMap.get(category.id)} ? @{/content/view/{id}(id=${content.id})} : @{/category/view/{id}(id=${category.id})}"
+               th:classappend="${paidMap.get(category.id)} ? '' : 'locked'"
+               class="lc">
                 <div class="lc-thumb">
                     <div class="lc-thumb-icon">📖</div>
-                    <div class="lc-play"><div class="play-btn">▶</div></div>
-                    <span class="lc-status ls-done">완료</span>
+                    <div class="lc-play" th:if="${paidMap.get(category.id)}"><div class="play-btn">▶</div></div>
+                    <div class="lc-lock" th:unless="${paidMap.get(category.id)}">🔒</div>
+                    <span th:if="${paidMap.get(category.id)} and ${content.progressPercent} == 100" class="lc-status ls-done">완료</span>
+                    <span th:if="${paidMap.get(category.id)} and ${content.progressPercent} > 0 and ${content.progressPercent} < 100" class="lc-status ls-ing">진행 중</span>
                 </div>
                 <div class="lc-body">
                     <div class="lc-top">
-                        <span class="lc-num">2-1강</span>
-                        <span class="lc-time-badge">⏱ 14분</span>
+                        <span class="lc-num" th:text="${catStat.count} + '-' + ${content.sequence} + '강'"></span>
                     </div>
-                    <div class="lc-title">인사말 단어 — 안녕하세요, 감사합니다</div>
-                    <div class="lc-meta"><span>👁 640명 수강</span></div>
+                    <div class="lc-title" th:text="${content.title}"></div>
                     <div class="lc-progress-wrap">
                         <div class="lc-prog-header">
                             <span class="lc-prog-label">진행률</span>
-                            <span class="lc-prog-pct done">100% 완료 ✓</span>
+                            <span class="lc-prog-pct"
+                                  th:classappend="${!paidMap.get(category.id)} ? 'none' : (${content.progressPercent} == 100 ? 'done' : (${content.progressPercent} > 0 ? 'ing' : 'none'))"
+                                  th:text="${!paidMap.get(category.id)} ? '🔒 잠김' : (${content.progressPercent} == 100 ? '100% 완료 ✓' : ${content.progressPercent} + '%')">
+                            </span>
                         </div>
-                        <div class="lc-prog-bar"><div class="lc-prog-fill" style="width:100%"></div></div>
+                        <div class="lc-prog-bar">
+                            <div class="lc-prog-fill"
+                                 th:classappend="${paidMap.get(category.id)} and ${content.progressPercent} > 0 and ${content.progressPercent} < 100 ? 'ing'"
+                                 th:style="'width:' + (${paidMap.get(category.id)} ? ${content.progressPercent} : 0) + '%'">
+                            </div>
+                        </div>
                     </div>
                 </div>
             </a>
 
-            <a th:href="@{/lectures/content}" class="lc">
-                <div class="lc-thumb t2">
-                    <div class="lc-thumb-icon">📖</div>
-                    <div class="lc-play"><div class="play-btn">▶</div></div>
-                    <span class="lc-status ls-ing">진행 중</span>
-                </div>
-                <div class="lc-body">
-                    <div class="lc-top">
-                        <span class="lc-num">2-2강</span>
-                        <span class="lc-time-badge">⏱ 16분</span>
-                    </div>
-                    <div class="lc-title">음식 단어 — 밥, 물, 고기, 채소</div>
-                    <div class="lc-meta"><span>👁 510명 수강</span></div>
-                    <div class="lc-progress-wrap">
-                        <div class="lc-prog-header">
-                            <span class="lc-prog-label">진행률</span>
-                            <span class="lc-prog-pct ing">60% 진행 중</span>
-                        </div>
-                        <div class="lc-prog-bar"><div class="lc-prog-fill ing" style="width:60%"></div></div>
-                    </div>
-                </div>
-            </a>
-
-            <a th:href="@{/lectures/content}" class="lc">
-                <div class="lc-thumb t3">
-                    <div class="lc-thumb-icon">📖</div>
-                    <div class="lc-play"><div class="play-btn">▶</div></div>
-                    <span class="lc-status ls-new">NEW</span>
-                </div>
-                <div class="lc-body">
-                    <div class="lc-top">
-                        <span class="lc-num">2-3강</span>
-                        <span class="lc-time-badge">⏱ 20분</span>
-                    </div>
-                    <div class="lc-title">숫자와 날짜 표현</div>
-                    <div class="lc-meta"><span>👁 430명 수강</span></div>
-                    <div class="lc-progress-wrap">
-                        <div class="lc-prog-header">
-                            <span class="lc-prog-label">진행률</span>
-                            <span class="lc-prog-pct none">미시작</span>
-                        </div>
-                        <div class="lc-prog-bar"><div class="lc-prog-fill" style="width:0%"></div></div>
-                    </div>
-                </div>
-            </a>
-
-            <div class="lc locked">
-                <div class="lc-thumb t4">
-                    <div class="lc-thumb-icon">📖</div>
-                    <div class="lc-lock">🔒</div>
-                </div>
-                <div class="lc-body">
-                    <div class="lc-top">
-                        <span class="lc-num">2-4강</span>
-                        <span class="lc-time-badge">⏱ 13분</span>
-                    </div>
-                    <div class="lc-title">색깔과 모양 단어</div>
-                    <div class="lc-meta"><span style="color:var(--ink-faint);">2-3강 완료 후 해금</span></div>
-                    <div class="lc-progress-wrap">
-                        <div class="lc-prog-header">
-                            <span class="lc-prog-label">진행률</span>
-                            <span class="lc-prog-pct none">🔒 잠김</span>
-                        </div>
-                        <div class="lc-prog-bar"><div class="lc-prog-fill" style="width:0%"></div></div>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-    </div>
-
-    <!-- 3단계 -->
-    <div class="stage-section">
-        <div class="stage-header">
-            <span class="stage-badge sb-3">3단계</span>
-            <h2>문장 월드</h2>
-            <span class="stage-count">🔒 2단계 완료 후 해금</span>
-        </div>
-        <div class="lecture-grid">
-
-            <div class="lc locked">
-                <div class="lc-thumb t3"><div class="lc-thumb-icon">💬</div><div class="lc-lock">🔒</div></div>
-                <div class="lc-body">
-                    <div class="lc-top"><span class="lc-num">3-1강</span><span class="lc-time-badge">⏱ 18분</span></div>
-                    <div class="lc-title">기본 문장 구조 익히기</div>
-                    <div class="lc-progress-wrap">
-                        <div class="lc-prog-header"><span class="lc-prog-label">진행률</span><span class="lc-prog-pct none">🔒 잠김</span></div>
-                        <div class="lc-prog-bar"><div class="lc-prog-fill" style="width:0%"></div></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="lc locked">
-                <div class="lc-thumb"><div class="lc-thumb-icon">💬</div><div class="lc-lock">🔒</div></div>
-                <div class="lc-body">
-                    <div class="lc-top"><span class="lc-num">3-2강</span><span class="lc-time-badge">⏱ 22분</span></div>
-                    <div class="lc-title">주어 + 동사 패턴</div>
-                    <div class="lc-progress-wrap">
-                        <div class="lc-prog-header"><span class="lc-prog-label">진행률</span><span class="lc-prog-pct none">🔒 잠김</span></div>
-                        <div class="lc-prog-bar"><div class="lc-prog-fill" style="width:0%"></div></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="lc locked">
-                <div class="lc-thumb t2"><div class="lc-thumb-icon">💬</div><div class="lc-lock">🔒</div></div>
-                <div class="lc-body">
-                    <div class="lc-top"><span class="lc-num">3-3강</span><span class="lc-time-badge">⏱ 19분</span></div>
-                    <div class="lc-title">형용사 활용하기</div>
-                    <div class="lc-progress-wrap">
-                        <div class="lc-prog-header"><span class="lc-prog-label">진행률</span><span class="lc-prog-pct none">🔒 잠김</span></div>
-                        <div class="lc-prog-bar"><div class="lc-prog-fill" style="width:0%"></div></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="lc locked">
-                <div class="lc-thumb t4"><div class="lc-thumb-icon">💬</div><div class="lc-lock">🔒</div></div>
-                <div class="lc-body">
-                    <div class="lc-top"><span class="lc-num">3-4강</span><span class="lc-time-badge">⏱ 17분</span></div>
-                    <div class="lc-title">부정문 만들기</div>
-                    <div class="lc-progress-wrap">
-                        <div class="lc-prog-header"><span class="lc-prog-label">진행률</span><span class="lc-prog-pct none">🔒 잠김</span></div>
-                        <div class="lc-prog-bar"><div class="lc-prog-fill" style="width:0%"></div></div>
-                    </div>
-                </div>
-            </div>
-
+            <p th:if="${#lists.isEmpty(contentMap.get(category.id))}" style="padding:20px;color:var(--ink-faint);">
+                아직 등록된 강의가 없어요.
+            </p>
         </div>
     </div>
 

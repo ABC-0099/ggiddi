@@ -32,26 +32,48 @@
           <div class="post-author" th:text="${post.author.username}">사용자</div>
           <div class="post-meta" th:text="${post.author.nationality + ' · ' + #temporals.format(post.createdDate, 'yyyy.MM.dd HH:mm')}">시간</div>
         </div>
-        <button class="follow-btn">팔로우</button>
       </div>
     </div>
 
     <!-- 본문 -->
     <div class="view-content" th:text="${post.content}">내용</div>
 
-    <!-- 액션 버튼 -->
+    <!-- 첨부 사진 -->
+    <div class="view-images" th:if="${!#lists.isEmpty(post.files) and post.files.?[fileType == 'IMAGE'].size() > 0}">
+      <div class="view-image-grid">
+        <a th:each="img : ${post.files}" th:if="${img.fileType == 'IMAGE'}"
+           th:href="@{${img.savedPath}}" target="_blank" class="view-image-item">
+          <img th:src="@{${img.savedPath}}" th:alt="${img.originalName}" />
+        </a>
+      </div>
+    </div>
+
+    <!-- 첨부 파일 -->
+    <div class="view-files" th:if="${!#lists.isEmpty(post.files) and post.files.?[fileType == 'ATTACH'].size() > 0}">
+      <div class="view-files-title">📎 첨부파일</div>
+      <ul class="view-file-list">
+        <li class="view-file-item" th:each="file : ${post.files}" th:if="${file.fileType == 'ATTACH'}">
+          <span class="vf-icon">📄</span>
+          <span class="vf-name" th:text="${file.originalName}">파일명</span>
+          <span class="vf-size"
+                th:text="${#numbers.formatDecimal(file.fileSize / 1048576.0, 1, 1)} + ' MB'">0.0 MB</span>
+          <a th:href="@{${file.savedPath}}" th:download="${file.originalName}" class="vf-download">다운로드</a>
+        </li>
+      </ul>
+    </div>
+
+    <!-- 액션 버튼 (하트 제거, 공유/신고 기능 추가) -->
     <div class="view-footer">
-      <span class="pf-action">❤️ 0</span>
-      <span class="pf-action">💬 0</span>
-      <span class="pf-action">↗ 공유</span>
+      <span class="pf-action" id="btn-share" onclick="sharePost()">↗ 공유</span>
       <span class="pf-spacer"></span>
-      <span class="pf-report">🚩 신고</span>
+      <span class="pf-report" onclick="reportPost()">🚩 신고</span>
     </div>
 
     <!-- 수정/삭제 버튼 (작성자 또는 관리자만 표시) -->
     <div class="view-actions"
          th:if="${#authentication.name == post.author.username or #authorization.expression('hasRole(''ADMIN'')')}">
-      <a th:href="@{/community/{id}/edit(id=${post.id})}" class="btn-edit">✏️ 수정</a>
+      <a th:if="${#authentication.name == post.author.username}"
+         th:href="@{/community/{id}/edit(id=${post.id})}" class="btn-edit">✏️ 수정</a>
       <form th:action="@{/community/{id}/delete(id=${post.id})}" method="post" style="display:inline;">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
         <button type="submit" class="btn-delete"
@@ -64,9 +86,121 @@
       <a th:href="@{/community}" class="btn-back">← 목록으로</a>
     </div>
 
+    <!-- 댓글 섹션 -->
+    <div class="comment-section">
+      <h3 class="comment-title">댓글 <span th:text="${#lists.size(comments)}">0</span>개</h3>
+
+      <!-- 댓글 목록 -->
+      <div class="comment-list">
+        <div class="comment-item" th:each="comment : ${comments}">
+          <div class="comment-top">
+            <div class="comment-avatar" th:text="${#strings.substring(comment.author.username, 0, 1)}">리</div>
+            <div class="comment-info">
+              <span class="comment-author" th:text="${comment.author.username}">작성자</span>
+              <span class="comment-date" th:text="${#temporals.format(comment.createdDate, 'MM.dd HH:mm')}">날짜</span>
+            </div>
+            <!-- 수정/삭제: 작성자 또는 관리자만 -->
+            <div class="comment-actions"
+                 th:if="${#authentication.name == comment.author.username or #authorization.expression('hasRole(''ADMIN'')')}">
+              <button class="comment-edit-btn"
+                      th:onclick="|toggleEdit(${comment.id})|">수정</button>
+              <form th:action="@{/community/{postId}/comment/{commentId}/delete(postId=${post.id}, commentId=${comment.id})}"
+                    method="post" style="display:inline;">
+                <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+                <button type="submit" class="comment-delete-btn"
+                        onclick="return confirm('댓글을 삭제할까요?')">삭제</button>
+              </form>
+            </div>
+          </div>
+
+          <!-- 댓글 본문 -->
+          <div th:id="|comment-text-${comment.id}|" class="comment-content"
+               th:text="${comment.content}">내용</div>
+
+          <!-- 댓글 수정 폼 (기본 숨김) -->
+          <form th:id="|comment-edit-form-${comment.id}|"
+                th:action="@{/community/{postId}/comment/{commentId}/edit(postId=${post.id}, commentId=${comment.id})}"
+                method="post" class="comment-edit-form" style="display:none;">
+            <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+            <textarea name="content" class="comment-edit-textarea"
+                      th:text="${comment.content}"></textarea>
+            <div class="comment-edit-btns">
+              <button type="button" class="btn-cancel-edit"
+                      th:onclick="|toggleEdit(${comment.id})|">취소</button>
+              <button type="submit" class="btn-save-edit">저장</button>
+            </div>
+          </form>
+        </div>
+
+        <!-- 댓글 없을 때 -->
+        <div class="comment-empty" th:if="${#lists.isEmpty(comments)}">
+          첫 번째 댓글을 남겨보세요 💬
+        </div>
+      </div>
+
+      <!-- 댓글 작성 폼 (로그인한 경우만) -->
+      <div class="comment-write" sec:authorize="isAuthenticated()">
+        <form th:action="@{/community/{id}/comment(id=${post.id})}" method="post">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+          <textarea name="content" class="comment-textarea"
+                    placeholder="댓글을 입력하세요" maxlength="500" required></textarea>
+          <div class="comment-write-footer">
+            <span class="comment-char-count">0 / 500</span>
+            <button type="submit" class="comment-submit-btn">댓글 등록</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- 비로그인 안내 -->
+      <div class="comment-login-notice" sec:authorize="isAnonymous()">
+        <a th:href="@{/login}">로그인</a> 후 댓글을 남길 수 있어요.
+      </div>
+    </div>
+
   </div>
 </div>
 
 <div th:replace="~{layout/footer :: footer}"></div>
+
+<script>
+  // 공유: URL 클립보드 복사
+  function sharePost() {
+    navigator.clipboard.writeText(window.location.href).then(() => {
+      alert('링크가 클립보드에 복사되었습니다! 😊');
+    }).catch(() => {
+      // 구형 브라우저 대응
+      const el = document.createElement('input');
+      el.value = window.location.href;
+      document.body.appendChild(el);
+      el.select();
+      document.execCommand('copy');
+      document.body.removeChild(el);
+      alert('링크가 클립보드에 복사되었습니다! 😊');
+    });
+  }
+
+  // 신고: 알림창 팝업
+  function reportPost() {
+    alert('신고가 접수되었습니다. 검토 후 조치하겠습니다.');
+  }
+
+  // 댓글 수정 폼 토글
+  function toggleEdit(commentId) {
+    const textEl = document.getElementById('comment-text-' + commentId);
+    const formEl = document.getElementById('comment-edit-form-' + commentId);
+    const isHidden = formEl.style.display === 'none';
+    textEl.style.display = isHidden ? 'none' : 'block';
+    formEl.style.display = isHidden ? 'block' : 'none';
+  }
+
+  // 댓글 글자수 카운트
+  const commentTextarea = document.querySelector('.comment-textarea');
+  const charCount = document.querySelector('.comment-char-count');
+  if (commentTextarea && charCount) {
+    commentTextarea.addEventListener('input', () => {
+      charCount.textContent = commentTextarea.value.length + ' / 500';
+    });
+  }
+</script>
 </body>
 </html>

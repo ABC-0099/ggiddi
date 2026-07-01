@@ -11,6 +11,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDateTime;
+
 @Service
 @RequiredArgsConstructor
 public class SiteUserService implements UserDetailsService {
@@ -34,6 +36,7 @@ public class SiteUserService implements UserDetailsService {
         user.setNationality(dto.getNationality());
 
         user.setRole(Role.USER); // 가입 시 기본 권한 USER 부여
+        user.setJoinDate(LocalDateTime.now()); // 가입일 저장
 
         siteUserRepository.save(user);
     }

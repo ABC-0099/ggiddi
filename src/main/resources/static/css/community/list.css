@@ -1,5 +1,4 @@
-
-        :root {
+:root {
           --mint:       #5DCAA5;
           --mint-dark:  #1D9E75;
           --mint-light: #9FE1CB;
@@ -216,3 +215,126 @@
           .search-wrap { max-width: none; }
           .toolbar-right { justify-content: space-between; }
         }
+
+        .search-area {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            flex: 1;
+        }
+
+        .search-btn {
+            padding: 9px 18px;
+            border-radius: 10px;
+            background: var(--mint);
+            color: #fff;
+            border: none;
+            font-size: 13.5px;
+            font-weight: 600;
+            font-family: inherit;
+            cursor: pointer;
+            transition: background .15s;
+            white-space: nowrap;
+        }
+
+        .search-btn:hover {
+            background: var(--mint-dark);
+        }
+
+/* ── 신고 사유 모달 ── */
+.report-overlay {
+    position: fixed; inset: 0; z-index: 2000;
+    background: rgba(10, 31, 23, .45);
+    display: none; align-items: center; justify-content: center;
+    padding: 20px;
+}
+.report-overlay.open { display: flex; }
+
+.report-modal {
+    background: var(--white);
+    border-radius: 18px;
+    width: 100%; max-width: 400px;
+    padding: 24px 24px 20px;
+    box-shadow: 0 16px 48px rgba(10, 31, 23, .25);
+}
+
+.report-modal-head {
+    display: flex; align-items: center; justify-content: space-between;
+    margin-bottom: 6px;
+}
+.report-modal-head h3 { font-size: 17px; font-weight: 700; color: var(--ink); }
+.report-close {
+    background: none; border: none; cursor: pointer;
+    font-size: 15px; color: var(--ink-faint);
+    width: 28px; height: 28px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+}
+.report-close:hover { background: var(--mint-pale); color: var(--ink); }
+
+.report-modal-desc {
+    font-size: 12.5px; color: var(--ink-soft);
+    margin-bottom: 16px; line-height: 1.6;
+}
+
+.report-reasons {
+    display: flex; flex-direction: column; gap: 4px;
+    margin-bottom: 14px;
+}
+.report-reason {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 12px; border-radius: 10px;
+    cursor: pointer; transition: background .15s;
+    font-size: 13.5px; color: var(--ink);
+}
+.report-reason:hover { background: var(--mint-pale); }
+.report-reason input[type="radio"] {
+    width: 16px; height: 16px; accent-color: var(--mint-dark);
+    cursor: pointer; flex-shrink: 0;
+}
+
+.report-detail {
+    width: 100%; min-height: 70px;
+    border: 1px solid var(--border); border-radius: 10px;
+    padding: 10px 12px; font-family: inherit; font-size: 13px;
+    color: var(--ink); resize: vertical; outline: none;
+    margin-bottom: 18px; background: var(--mint-pale);
+}
+.report-detail:focus { border-color: var(--mint); }
+
+.report-modal-actions { display: flex; gap: 8px; }
+.report-cancel-btn, .report-submit-btn {
+    flex: 1; padding: 11px; border-radius: 10px;
+    font-size: 13.5px; font-weight: 700; cursor: pointer;
+    font-family: inherit; border: none; transition: all .15s;
+}
+.report-cancel-btn { background: var(--mint-pale); color: var(--ink-soft); }
+.report-cancel-btn:hover { background: var(--border); }
+.report-submit-btn { background: #E0556B; color: #fff; }
+.report-submit-btn:hover { background: #C2415A; }
+
+/* ── 게시글 목록 대표 이미지 ── */
+.post-image-wrap {
+    position: relative;
+    width: 100%;
+    border-radius: 12px;
+    overflow: hidden;
+    margin-bottom: 12px;
+    background: #f3f4f6;
+}
+.post-image-wrap img {
+    width: 100%;
+    max-height: 420px;
+    object-fit: cover;
+    display: block;
+}
+.post-image-count {
+    position: absolute;
+    right: 10px; bottom: 10px;
+    background: rgba(0,0,0,.55);
+    color: #fff;
+    font-size: 12px;
+    font-weight: 700;
+    padding: 4px 10px;
+    border-radius: 20px;
+}

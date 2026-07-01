@@ -1,0 +1,335 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>끼역띠귿 — 구독 결제</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="/css/orderpay/list.css" />
+</head>
+<body>
+
+<div class="bg-orbs"><div class="orb o1"></div><div class="orb o2"></div></div>
+
+<!-- NAV -->
+<div th:replace="~{layout/navbar :: navbar(currentMenu='')}"></div>
+
+<!-- 헤더 -->
+<div class="page-header">
+    <h1>플랜 선택</h1>
+    <p>월 구독, 연 구독, 또는 평생 소장 중 원하는 플랜을 선택해요 🎮</p>
+</div>
+
+<!-- 메인 -->
+<div class="main">
+
+    <!-- 왼쪽 -->
+    <div class="left-col">
+
+        <!-- 1. 플랜 선택 -->
+        <div class="section-title">
+            <div class="step-badge">1</div>
+            플랜 선택
+        </div>
+
+        <div class="plan-grid">
+
+            <!-- 월 구독 -->
+            <div class="plan-card" onclick="selectPlan(this, '월 구독', 9900, '매월 자동 결제', '월구독')">
+                <div class="plan-radio"></div>
+                <div class="plan-name">월 구독</div>
+                <div class="plan-price">9,900<span>원</span></div>
+                <div class="plan-per">/ 매월 자동 갱신</div>
+                <div class="plan-divider"></div>
+                <div class="plan-features">
+                    <div class="plan-feat">전체 강의 이용</div>
+                    <div class="plan-feat">RPG 게임 학습</div>
+                    <div class="plan-feat">단계별 퀴즈</div>
+                    <div class="plan-feat off">커뮤니티 이용</div>
+                    <div class="plan-feat off">학습 분석 리포트</div>
+                    <div class="plan-feat off">평생 업데이트</div>
+                </div>
+            </div>
+
+            <!-- 연 구독 (인기) -->
+            <div class="plan-card popular selected" onclick="selectPlan(this, '연 구독', 89900, '월 7,492원 · 25% 절약', '연구독')">
+                <div class="popular-badge">🔥 인기</div>
+                <div class="plan-radio"></div>
+                <div class="plan-name">연 구독</div>
+                <div class="plan-price">89,900<span>원</span></div>
+                <div class="plan-per">/ 매년 자동 갱신</div>
+                <div class="plan-save">월 7,492원 · 25% 절약</div>
+                <div class="plan-divider"></div>
+                <div class="plan-features">
+                    <div class="plan-feat">전체 강의 이용</div>
+                    <div class="plan-feat">RPG 게임 학습</div>
+                    <div class="plan-feat">단계별 퀴즈</div>
+                    <div class="plan-feat">커뮤니티 이용</div>
+                    <div class="plan-feat">학습 분석 리포트</div>
+                    <div class="plan-feat off">평생 업데이트</div>
+                </div>
+            </div>
+
+            <!-- 평생 소장 -->
+            <div class="plan-card" onclick="selectPlan(this, '평생 소장', 199000, '한 번만 결제, 영구 이용', '평생')">
+                <div class="plan-radio"></div>
+                <div class="plan-name">평생 소장 ✨</div>
+                <div class="plan-price">199,000<span>원</span></div>
+                <div class="plan-per">/ 1회 결제 · 영구 이용</div>
+                <div class="plan-save">가장 합리적인 선택</div>
+                <div class="plan-divider"></div>
+                <div class="plan-features">
+                    <div class="plan-feat">전체 강의 이용</div>
+                    <div class="plan-feat">RPG 게임 학습</div>
+                    <div class="plan-feat">단계별 퀴즈</div>
+                    <div class="plan-feat">커뮤니티 이용</div>
+                    <div class="plan-feat">학습 분석 리포트</div>
+                    <div class="plan-feat">평생 업데이트 포함</div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- 2. 결제 수단 -->
+        <div class="section-title">
+            <div class="step-badge">2</div>
+            결제 수단
+        </div>
+
+        <div class="pay-methods">
+            <div class="pay-method selected" onclick="selectPay(this)">
+                <span class="pay-icon">💳</span>
+                <span>신용 / 체크카드</span>
+                <div class="pay-radio"></div>
+            </div>
+            <div class="pay-method" onclick="selectPay(this)">
+                <span class="pay-icon" style="font-size:18px;background:#FEE500;padding:2px 6px;border-radius:4px;">K</span>
+                <span>카카오페이</span>
+                <div class="pay-radio"></div>
+            </div>
+            <div class="pay-method" onclick="selectPay(this)">
+                <span class="pay-icon">🔵</span>
+                <span>토스페이</span>
+                <div class="pay-radio"></div>
+            </div>
+            <div class="pay-method" onclick="selectPay(this)">
+                <span class="pay-icon">🏦</span>
+                <span>계좌이체</span>
+                <div class="pay-radio"></div>
+            </div>
+        </div>
+
+        <!-- 카드 입력 -->
+        <div class="card-form" id="card-form">
+            <div class="card-form-title">💳 카드 정보 입력</div>
+            <div class="field">
+                <label>카드 번호</label>
+                <input type="text" placeholder="0000 - 0000 - 0000 - 0000" maxlength="19"
+                       oninput="formatCard(this)" />
+            </div>
+            <div class="field-row">
+                <div class="field">
+                    <label>유효기간</label>
+                    <input type="text" placeholder="MM / YY" maxlength="7"
+                           oninput="formatExpiry(this)" />
+                </div>
+                <div class="field">
+                    <label>CVC</label>
+                    <input type="text" placeholder="000" maxlength="3" />
+                </div>
+            </div>
+            <div class="field">
+                <label>카드 소유자 이름</label>
+                <input type="text" placeholder="카드에 표시된 이름" />
+            </div>
+        </div>
+
+        <!-- 3. 쿠폰 -->
+        <div class="section-title">
+            <div class="step-badge">3</div>
+            쿠폰 / 할인코드
+        </div>
+
+        <div class="coupon-row">
+            <input class="coupon-input" type="text" placeholder="쿠폰 코드를 입력하세요" id="coupon-input" />
+            <button class="coupon-btn" onclick="applyCoupon()">적용</button>
+        </div>
+
+    </div>
+
+    <!-- 오른쪽 주문 요약 -->
+    <div class="order-summary">
+        <div class="summary-title">주문 요약</div>
+
+        <!-- 선택한 플랜 -->
+        <div class="selected-plan-box">
+            <div class="spb-icon">🎮</div>
+            <div>
+                <div class="spb-name" id="summary-plan-name">연 구독</div>
+                <div class="spb-desc" id="summary-plan-desc">월 7,492원 · 25% 절약</div>
+            </div>
+        </div>
+
+        <!-- 금액 내역 -->
+        <div class="price-rows">
+            <div class="price-row">
+                <span class="label">정가</span>
+                <span class="value" id="original-price">118,800원</span>
+            </div>
+            <div class="price-row">
+                <span class="label">플랜 할인</span>
+                <span class="discount" id="plan-discount">-28,900원</span>
+            </div>
+            <div class="price-row" id="coupon-row" style="display:none;">
+                <span class="label">쿠폰 할인</span>
+                <span class="discount" id="coupon-discount">-0원</span>
+            </div>
+        </div>
+
+        <div class="price-divider"></div>
+
+        <div class="price-total">
+            <span class="label">최종 결제 금액</span>
+            <span class="value" id="total-price">89,900원</span>
+        </div>
+        <div class="price-vat">VAT 포함</div>
+
+        <!-- 구독 혜택 -->
+        <div class="benefits">
+            <div class="benefit-item">첫 구독 시 7일 무료 체험</div>
+            <div class="benefit-item">언제든지 해지 가능</div>
+            <div class="benefit-item">다음 결제일 전 알림 발송</div>
+        </div>
+
+        <!-- 약관 동의 -->
+        <label class="agree-check">
+            <input type="checkbox" id="agree" />
+            <span>
+        <a href="#">이용약관</a> 및 <a href="#">개인정보처리방침</a>,
+        <a href="#">구독 및 결제 정책</a>에 동의합니다.
+      </span>
+        </label>
+
+        <!-- 결제 버튼 -->
+        <button class="pay-btn" onclick="handlePay()">
+            49,900원 결제하기
+        </button>
+
+        <div class="pay-security">🔒 SSL 보안 결제</div>
+    </div>
+
+</div>
+
+<!-- FOOTER -->
+<div th:replace="~{layout/footer :: footer}"></div>
+
+<script>
+    // 플랜 선택
+    const plans = {
+      '월 구독':  { price: 9900,   original: 9900,   discount: 0,      desc: '매월 자동 결제',            tag: '월구독' },
+      '연 구독':  { price: 89900,  original: 118800,  discount: 28900,  desc: '월 7,492원 · 25% 절약',    tag: '연구독' },
+      '평생 소장':{ price: 199000, original: 199000,  discount: 0,      desc: '1회 결제 · 영구 이용 ✨',   tag: '평생'   },
+    };
+
+    let selectedPlan = plans['연 구독'];
+    let couponDiscount = 0;
+
+    function selectPlan(el, name, price, desc, tag) {
+      document.querySelectorAll('.plan-card').forEach(c => c.classList.remove('selected'));
+      el.classList.add('selected');
+      selectedPlan = plans[name];
+
+      // 평생소장이면 "결제하기", 구독이면 "구독 시작하기"
+      const btnLabel = tag === '평생' ? '결제하기' : '구독 시작하기';
+      document.querySelector('.pay-btn').dataset.label = btnLabel;
+
+      // 연구독/월구독 혜택 문구 업데이트
+      const benefits = document.querySelectorAll('.benefit-item');
+      if (tag === '평생') {
+        benefits[0].textContent = '한 번만 결제, 영구 이용';
+        benefits[1].textContent = '신규 강의 무료 업데이트';
+        benefits[2].textContent = '커뮤니티 평생 이용 가능';
+      } else if (tag === '연구독') {
+        benefits[0].textContent = '첫 구독 시 7일 무료 체험';
+        benefits[1].textContent = '언제든지 해지 가능';
+        benefits[2].textContent = '다음 결제일 전 알림 발송';
+      } else {
+        benefits[0].textContent = '첫 구독 시 7일 무료 체험';
+        benefits[1].textContent = '언제든지 해지 가능';
+        benefits[2].textContent = '다음 결제일 전 알림 발송';
+      }
+
+      updateSummary(name, desc);
+    }
+
+    function updateSummary(name, desc) {
+      const p = selectedPlan;
+      document.getElementById('summary-plan-name').textContent = name;
+      document.getElementById('summary-plan-desc').textContent = desc;
+      document.getElementById('original-price').textContent = p.original.toLocaleString() + '원';
+      document.getElementById('plan-discount').textContent = p.discount > 0 ? '-' + p.discount.toLocaleString() + '원' : '0원';
+      updateTotal();
+    }
+
+    function updateTotal() {
+      const total = selectedPlan.price - couponDiscount;
+      document.getElementById('total-price').textContent = total.toLocaleString() + '원';
+      const lbl = document.querySelector('.pay-btn').dataset.label || '구독 시작하기';
+      document.querySelector('.pay-btn').textContent = total.toLocaleString() + '원 ' + lbl;
+    }
+
+    // 결제 수단 선택
+    function selectPay(el) {
+      document.querySelectorAll('.pay-method').forEach(m => m.classList.remove('selected'));
+      el.classList.add('selected');
+      const isCard = el.querySelector('span:nth-child(2)').textContent.includes('카드');
+      document.getElementById('card-form').style.display = isCard ? 'block' : 'none';
+    }
+
+    // 카드 번호 포맷
+    function formatCard(el) {
+      let v = el.value.replace(/\D/g, '').substring(0, 16);
+      el.value = v.replace(/(.{4})/g, '$1 - ').trim().replace(/ - $/, '');
+    }
+
+    // 유효기간 포맷
+    function formatExpiry(el) {
+      let v = el.value.replace(/\D/g, '').substring(0, 4);
+      if (v.length >= 2) v = v.substring(0, 2) + ' / ' + v.substring(2);
+      el.value = v;
+    }
+
+    // 쿠폰 적용
+    function applyCoupon() {
+      const code = document.getElementById('coupon-input').value.trim().toUpperCase();
+      const coupons = { 'WELCOME10': 1000, 'STUDY20': 2000 };
+      if (coupons[code]) {
+        couponDiscount = coupons[code];
+        document.getElementById('coupon-row').style.display = 'flex';
+        document.getElementById('coupon-discount').textContent = '-' + couponDiscount.toLocaleString() + '원';
+        updateTotal();
+        alert('✅ 쿠폰이 적용되었어요! ' + couponDiscount.toLocaleString() + '원 할인');
+      } else {
+        alert('유효하지 않은 쿠폰 코드예요.');
+      }
+    }
+
+    // 결제
+    function handlePay() {
+      if (!document.getElementById('agree').checked) {
+        alert('약관에 동의해주세요.');
+        return;
+      }
+      const tag = selectedPlan.tag || '';
+      const msg = tag === '평생'
+        ? '✅ 평생 소장 결제가 완료되었어요!\n이제 영구적으로 이용하실 수 있어요 🎉'
+        : '✅ 구독이 시작되었어요!\n한국어 학습을 시작해볼까요? 🎮';
+      alert(msg);
+    }
+</script>
+
+</body>
+</html>

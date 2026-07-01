@@ -9,7 +9,7 @@
   <div th:replace="~{layout/navbar :: navbar(currentMenu='lectures')}"></div>
 
   currentMenu 값 목록:
-    home | notices | community | lectures | game | faq | mypage
+    home | notices | community | event | lectures | game | faq | mypage
   ================================
 -->
 
@@ -41,6 +41,11 @@
         <a th:href="@{/community}">커뮤니티</a>
       </li>
 
+      <!-- 이벤트 -->
+      <li th:classappend="${currentMenu == 'event'} ? 'active'">
+        <a th:href="@{/event}">이벤트</a>
+      </li>
+
       <!-- 학습센터 드롭다운 -->
       <li class="has-dropdown" th:classappend="${currentMenu == 'lectures' or currentMenu == 'game'} ? 'active'">
         <a href="#" class="dropdown-trigger">
@@ -49,9 +54,9 @@
             <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
         </a>
-        <ul class="dropdown-menu">
+        <ul class="dropdown-menu dropdown-menu-card">
           <li>
-            <a th:href="@{/lectures}" th:classappend="${currentMenu == 'lectures'} ? 'active'">
+            <a th:href="@{/category}" th:classappend="${currentMenu == 'category'} ? 'active'">
               <span class="drop-icon">🎓</span>
               <div>
                 <strong>동영상 강의</strong>
@@ -79,9 +84,9 @@
             <path d="M1 1l4 4 4-4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
           </svg>
         </a>
-        <ul class="dropdown-menu">
+        <ul class="dropdown-menu dropdown-menu-card">
           <li>
-            <a th:href="@{/faq}" th:classappend="${currentMenu == 'faq'} ? 'active'">
+            <a th:href="@{/faq/list}" th:classappend="${currentMenu == 'faq'} ? 'active'">
               <span class="drop-icon">❓</span>
               <div>
                 <strong>자주 묻는 질문</strong>

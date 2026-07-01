@@ -1,0 +1,292 @@
+/* edit.css */
+
+.write-container {
+    max-width: 760px;
+    margin: 0 auto 80px;
+    padding: 0 20px;
+}
+
+.write-card {
+    background: rgba(255, 255, 255, 0.85);
+    backdrop-filter: blur(12px);
+    border-radius: 16px;
+    border: 1px solid rgba(255, 255, 255, 0.6);
+    box-shadow: 0 4px 24px rgba(0, 0, 0, 0.08);
+    padding: 40px;
+}
+
+.write-card .field {
+    margin-bottom: 24px;
+}
+
+.write-card label {
+    display: block;
+    font-size: 13px;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 8px;
+    letter-spacing: 0.02em;
+}
+
+.write-card label .required {
+    color: #1D9E75;
+    margin-left: 3px;
+}
+
+.field-hint-inline {
+    font-size: 12px;
+    color: #9ca3af;
+    font-weight: 400;
+    margin-left: 4px;
+}
+
+.write-card input[type="text"],
+.write-card select,
+.write-card textarea {
+    width: 100%;
+    box-sizing: border-box;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    padding: 12px 14px;
+    font-size: 15px;
+    font-family: 'Noto Sans KR', sans-serif;
+    color: #111827;
+    background: #fff;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.write-card input[type="text"]:focus,
+.write-card select:focus,
+.write-card textarea:focus {
+    border-color: #1D9E75;
+    box-shadow: 0 0 0 3px rgba(29,158,117,.1);
+}
+
+.write-card textarea {
+    resize: vertical;
+    min-height: 280px;
+    line-height: 1.7;
+}
+
+.write-card select {
+    cursor: pointer;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%236b7280' stroke-width='2'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 14px center;
+    padding-right: 40px;
+}
+
+.char-count {
+    text-align: right;
+    font-size: 12px;
+    color: #9ca3af;
+    margin-top: 6px;
+}
+
+/* ── 업로드 존 공통 ── */
+.upload-zone {
+    border: 2px dashed #e5e7eb;
+    border-radius: 10px;
+    background: #fafafa;
+    cursor: pointer;
+    transition: border-color .15s, background .15s;
+    position: relative;
+    overflow: hidden;
+}
+.upload-zone:hover,
+.upload-zone.drag-over {
+    border-color: #1D9E75;
+    background: rgba(29,158,117,.04);
+}
+.upload-input {
+    position: absolute; inset: 0;
+    opacity: 0; cursor: pointer; z-index: 1;
+    pointer-events: none;
+}
+.upload-placeholder {
+    padding: 22px 16px;
+    display: flex; flex-direction: column;
+    align-items: center; gap: 5px;
+    pointer-events: none;
+}
+.upload-icon { font-size: 26px; }
+.upload-text { font-size: 14px; font-weight: 600; color: #374151; }
+.upload-sub  { font-size: 12px; color: #9ca3af; }
+
+/* ── 기존 첨부파일 영역 (수정 페이지 전용) ── */
+.existing-label {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 10px;
+}
+.existing-badge {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: 20px;
+    background: rgba(29,158,117,.1);
+    color: #1D9E75;
+    border: 1px solid rgba(29,158,117,.2);
+}
+.existing-badge.attach {
+    background: rgba(24,95,165,.08);
+    color: #185FA5;
+    border-color: rgba(24,95,165,.18);
+}
+
+/* 기존 이미지 그리드 (재사용: img-thumb 동일 구조) */
+.existing-img-list {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    margin-bottom: 14px;
+}
+
+/* 기존 첨부파일 목록 (재사용: file-item 동일 구조) */
+.existing-file-list {
+    list-style: none;
+    display: flex; flex-direction: column; gap: 8px;
+    margin-bottom: 14px;
+}
+
+/* 삭제 표시된 항목 */
+.img-thumb.marked-delete img,
+.file-item.marked-delete {
+    opacity: .4;
+}
+.file-item.marked-delete {
+    background: #fef2f2;
+    border-color: rgba(239,68,68,.25);
+    text-decoration: line-through;
+}
+.img-thumb.marked-delete .img-remove,
+.file-item.marked-delete .file-remove {
+    background: #1D9E75;
+}
+.img-thumb.marked-delete .img-remove:hover,
+.file-item.marked-delete .file-remove:hover {
+    background: #18895f;
+}
+
+/* 새 파일 추가 섹션 구분선 */
+.add-file-divider {
+    font-size: 12px;
+    color: #9ca3af;
+    margin: 4px 0 10px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.add-file-divider::after {
+    content: '';
+    flex: 1;
+    height: 1px;
+    background: #e5e7eb;
+}
+
+/* ── 이미지 미리보기 (신규 업로드) ── */
+.img-preview-list {
+    display: flex; flex-wrap: wrap; gap: 10px;
+    margin-top: 12px;
+}
+.img-thumb {
+    position: relative;
+    width: 88px;
+    display: flex; flex-direction: column; align-items: center; gap: 4px;
+}
+.img-thumb img {
+    width: 88px; height: 88px;
+    object-fit: cover; border-radius: 10px;
+    border: 1.5px solid #e5e7eb;
+}
+.img-remove {
+    position: absolute; top: 4px; right: 4px;
+    width: 20px; height: 20px; border-radius: 50%;
+    background: rgba(239, 68, 68, .85); color: #fff;
+    border: none; font-size: 10px; font-weight: 700;
+    cursor: pointer; display: flex; align-items: center; justify-content: center;
+    transition: background .15s;
+}
+.img-remove:hover { background: #ef4444; }
+.img-name {
+    font-size: 11px; color: #9ca3af;
+    text-align: center; word-break: break-all;
+}
+
+/* ── 파일 목록 (신규 업로드) ── */
+.file-list {
+    list-style: none;
+    margin-top: 10px;
+    display: flex; flex-direction: column; gap: 8px;
+}
+.file-item {
+    display: flex; align-items: center; gap: 10px;
+    padding: 10px 14px;
+    background: #fff;
+    border: 1.5px solid #e5e7eb;
+    border-radius: 10px;
+    font-size: 13px;
+    transition: all .15s;
+}
+.file-icon { font-size: 18px; flex-shrink: 0; }
+.file-name {
+    flex: 1; overflow: hidden;
+    text-overflow: ellipsis; white-space: nowrap;
+    color: #111827; font-weight: 500;
+}
+.file-size { font-size: 12px; color: #9ca3af; flex-shrink: 0; }
+.file-remove {
+    background: none; border: none; cursor: pointer;
+    color: #9ca3af; font-size: 13px;
+    padding: 2px 6px; border-radius: 6px;
+    transition: color .15s, background .15s;
+}
+.file-remove:hover { color: #ef4444; background: #fef2f2; }
+
+/* ── 액션 버튼 ── */
+.write-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 8px;
+}
+
+.btn-cancel {
+    padding: 11px 24px;
+    border-radius: 10px;
+    border: 1.5px solid #e5e7eb;
+    background: #fff;
+    color: #6b7280;
+    font-size: 14px;
+    font-weight: 500;
+    font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer;
+    text-decoration: none;
+    transition: all 0.18s;
+}
+.btn-cancel:hover {
+    border-color: #d1d5db;
+    background: #f9fafb;
+}
+
+.btn-submit {
+    padding: 11px 28px;
+    border-radius: 10px;
+    border: none;
+    background: linear-gradient(135deg, #1D9E75, #185FA5);
+    color: #fff;
+    font-size: 14px;
+    font-weight: 600;
+    font-family: 'Noto Sans KR', sans-serif;
+    cursor: pointer;
+    transition: all 0.18s;
+    box-shadow: 0 2px 8px rgba(29,158,117,.25);
+}
+.btn-submit:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(29,158,117,.35);
+}
+.btn-submit:active {
+    transform: translateY(0);
+}

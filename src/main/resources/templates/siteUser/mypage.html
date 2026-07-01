@@ -1,463 +1,222 @@
 <!DOCTYPE html>
-<html lang="ko"
-      xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>마이페이지 | 끼역띠귿</title>
-  <link rel="stylesheet" th:href="@{/css/layout/navbar.css}" />
-  <link rel="stylesheet" th:href="@{/css/layout/footer.css}" />
-  <link rel="stylesheet" th:href="@{/css/siteuser/mypage.css}" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
-
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>끼역띠귿 — 마이페이지</title>
+    <link rel="stylesheet" th:href="@{/css/layout/navbar.css}" />
+    <link rel="stylesheet" th:href="@{/css/layout/footer.css}" />
+    <link rel="stylesheet" th:href="@{/css/siteUser/mypage.css}" />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
 </head>
 <body>
 
 <div class="bg-orbs"><div class="orb o1"></div><div class="orb o2"></div></div>
-
-<!-- 네브바 -->
 <div th:replace="~{layout/navbar :: navbar(currentMenu='mypage')}"></div>
 
-<div class="main">
+<div class="mypage-container">
 
-  <!-- ── 사이드바 ── -->
-  <div class="sidebar">
+    <!-- 좌측 사이드바 -->
+    <aside class="mypage-sidebar">
 
-    <!-- 프로필 -->
-    <div class="profile-card">
-      <div class="profile-avatar" th:text="${#strings.substring(siteUser.name, 0, 1)}">유</div>
-      <div class="profile-name" th:text="${siteUser.name}">유니</div>
-      <div class="profile-id" th:text="'@' + ${siteUser.username}">@yuni_korean</div>
-      <div class="profile-plan">⭐ 연 구독 · D-285</div>
-      <div class="profile-stats">
-        <div class="ps-box">
-          <div class="ps-box-num">8강</div>
-          <div class="ps-box-label">완료 강의</div>
-        </div>
-        <div class="ps-box">
-          <div class="ps-box-num">142</div>
-          <div class="ps-box-label">습득 단어</div>
-        </div>
-        <div class="ps-box">
-          <div class="ps-box-num">7일🔥</div>
-          <div class="ps-box-label">연속 학습</div>
-        </div>
-        <div class="ps-box">
-          <div class="ps-box-num">23위</div>
-          <div class="ps-box-label">랭킹</div>
-        </div>
-      </div>
-      <button class="edit-btn">✏️ 프로필 수정</button>
-    </div>
+        <!-- 프로필 카드 -->
+        <div class="profile-card">
+            <div class="profile-avatar" th:text="${#strings.substring(siteUser.username, 0, 1)}">유</div>
+            <div class="profile-name" th:text="${siteUser.name}">이름</div>
+            <div class="profile-username" th:text="'@' + ${siteUser.username}">아이디</div>
 
-    <!-- 사이드 메뉴 -->
-    <div class="side-menu">
-      <div class="side-menu-item active" onclick="showSection('info')">
-        <span class="menu-icon">👤</span> 회원정보
-        <span class="menu-arrow">›</span>
-      </div>
-      <div class="side-menu-item" onclick="showSection('progress')">
-        <span class="menu-icon">📊</span> 학습 현황
-        <span class="menu-arrow">›</span>
-      </div>
-      <div class="side-menu-item" onclick="showSection('purchase')">
-        <span class="menu-icon">💳</span> 구매 내역
-        <span class="menu-arrow">›</span>
-      </div>
-      <div class="side-menu-item" onclick="showSection('posts')">
-        <span class="menu-icon">📝</span> 내 게시글
-        <span class="menu-arrow">›</span>
-      </div>
-      <div class="side-menu-item" onclick="showSection('ranking')">
-        <span class="menu-icon">🏆</span> 랭킹
-        <span class="menu-arrow">›</span>
-      </div>
-    </div>
+            <!-- 구독 뱃지: subscription 객체가 모델에 있을 때만 표시 -->
+            <!-- 추후 구독 엔티티/서비스 연결 후 Controller에서 model.addAttribute("subscription", ...) 추가하면 자동 표시됨 -->
+            <div class="subscribe-badge" th:if="${subscription != null}">
+                ⭐ <span th:text="${subscription.planName}">구독</span> · D-<span th:text="${subscription.remainingDays}">0</span>
+            </div>
 
-  </div>
+            <div class="profile-stats">
+                <div class="stat-box">
+                    <div class="stat-value">준비중</div>
+                    <div class="stat-label">완료 강의</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">준비중</div>
+                    <div class="stat-label">랭킹</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">🔥 <span th:text="${siteUser.streakDays}">0</span>일</div>
+                    <div class="stat-label">연속 학습</div>
+                </div>
+                <div class="stat-box">
+                    <div class="stat-value">준비중</div>
+                    <div class="stat-label">총 학습시간</div>
+                </div>
+            </div>
 
-  <!-- ── 메인 콘텐츠 ── -->
-  <div class="content">
-
-    <!-- 1. 회원정보 -->
-    <div class="section-card" id="section-info">
-      <div class="card-header">
-        <div class="card-header-left">
-          <span class="card-title">👤 회원정보</span>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="info-grid">
-          <div class="info-field">
-            <span class="info-label">이름</span>
-            <div class="info-value" th:text="${siteUser.name}">유니</div>
-          </div>
-          <div class="info-field">
-            <span class="info-label">아이디</span>
-            <div class="info-value" th:text="${siteUser.username}">yuni_korean</div>
-          </div>
-          <div class="info-field">
-            <span class="info-label">이메일</span>
-            <div class="info-value" th:text="${siteUser.email}">yuni@example.com</div>
-          </div>
-          <div class="info-field">
-            <span class="info-label">휴대폰</span>
-            <div class="info-value" th:text="${siteUser.phone}">010-1234-5678</div>
-          </div>
-          <div class="info-field">
-            <span class="info-label">생년월일</span>
-            <div class="info-value" th:text="${siteUser.birth}">1999.03.15</div>
-          </div>
-          <div class="info-field">
-            <span class="info-label">국적</span>
-            <div class="info-value" th:text="${siteUser.nationality != null} ? ${siteUser.nationality} : '미입력'">베트남 🇻🇳</div>
-          </div>
-          <div class="info-field">
-            <span class="info-label">가입일</span>
-            <div class="info-value">2025.01.10</div>
-          </div>
-          <div class="info-field">
-            <span class="info-label">비밀번호</span>
-            <div class="info-value" style="color:var(--ink-faint);">••••••••</div>
-          </div>
-        </div>
-        <a th:href="@{/siteUser/sujung}" class="info-edit-btn" style="display:inline-block;text-decoration:none;">정보 수정하기</a>
-        <div class="info-danger">
-          <p>계정 탈퇴 시 모든 학습 기록이 삭제돼요.</p>
-          <a th:href="@{/siteUser/view}" class="danger-btn" style="text-decoration:none;">회원 탈퇴</a>
-        </div>
-      </div>
-    </div>
-
-    <!-- 2. 학습 현황 -->
-    <div class="section-card" id="section-progress">
-      <div class="card-header">
-        <div class="card-header-left">
-          <span class="card-title">📊 학습 현황</span>
-          <span class="card-badge">전체 30%</span>
-        </div>
-        <a th:href="@{/lectures}" class="card-link">강의 목록 →</a>
-      </div>
-      <div class="card-body">
-
-        <!-- 요약 -->
-        <div class="learn-summary">
-          <div class="ls-box">
-            <div class="ls-icon">✅</div>
-            <div class="ls-num">8강</div>
-            <div class="ls-label">완료한 강의</div>
-          </div>
-          <div class="ls-box">
-            <div class="ls-icon">📖</div>
-            <div class="ls-num">142개</div>
-            <div class="ls-label">습득 단어</div>
-          </div>
-          <div class="ls-box">
-            <div class="ls-icon">🔥</div>
-            <div class="ls-num">7일</div>
-            <div class="ls-label">연속 학습</div>
-          </div>
-          <div class="ls-box">
-            <div class="ls-icon">⏱</div>
-            <div class="ls-num">14h</div>
-            <div class="ls-label">총 학습 시간</div>
-          </div>
+            <button type="button" class="btn-profile-edit">✏️ 프로필 수정</button>
         </div>
 
-        <!-- 단계별 진도 -->
-        <div class="stage-progress">
-          <div class="sp-item">
-            <div class="sp-header">
-              <div class="sp-left">
-                <span class="sp-badge sb-1">1단계</span>
-                <span class="sp-name">음절 월드</span>
-              </div>
-              <span class="sp-pct" style="color:var(--mint-dark);">100% ✓</span>
+        <!-- 메뉴 -->
+        <nav class="mypage-menu">
+            <button type="button" class="menu-item active" data-tab="info">
+                <span>👤 회원정보</span><span class="menu-arrow">›</span>
+            </button>
+            <button type="button" class="menu-item" data-tab="study">
+                <span>📊 학습 현황</span><span class="menu-arrow">›</span>
+            </button>
+            <button type="button" class="menu-item" data-tab="purchase">
+                <span>💳 구매 내역</span><span class="menu-arrow">›</span>
+            </button>
+            <button type="button" class="menu-item" data-tab="posts">
+                <span>📝 내 게시글</span><span class="menu-arrow">›</span>
+            </button>
+            <button type="button" class="menu-item" data-tab="ranking">
+                <span>🏆 랭킹</span><span class="menu-arrow">›</span>
+            </button>
+        </nav>
+    </aside>
+
+    <!-- 우측 상세 컨텐츠 -->
+    <main class="mypage-content">
+
+        <!-- 회원 정보 -->
+        <section class="content-panel" id="panel-info">
+            <h2 class="panel-title">👤 회원정보</h2>
+
+            <div class="info-grid">
+                <div class="info-field">
+                    <label>이름</label>
+                    <div class="info-box" th:text="${siteUser.name}">이름</div>
+                </div>
+                <div class="info-field">
+                    <label>아이디</label>
+                    <div class="info-box" th:text="${siteUser.username}">아이디</div>
+                </div>
+                <div class="info-field">
+                    <label>이메일</label>
+                    <div class="info-box" th:text="${siteUser.email}">이메일</div>
+                </div>
+                <div class="info-field">
+                    <label>휴대폰</label>
+                    <div class="info-box" th:text="${siteUser.phone}">휴대폰</div>
+                </div>
+                <div class="info-field">
+                    <label>생년월일</label>
+                    <div class="info-box" th:text="${siteUser.birth}">생년월일</div>
+                </div>
+                <div class="info-field">
+                    <label>국적</label>
+                    <div class="info-box" th:text="${siteUser.nationality != null ? siteUser.nationality : '미입력'}">국적</div>
+                </div>
+                <div class="info-field">
+                    <label>가입일</label>
+                    <div class="info-box"
+                         th:text="${siteUser.joinDate != null ? #temporals.format(siteUser.joinDate, 'yyyy.MM.dd') : '-'}">가입일</div>
+                </div>
+                <div class="info-field">
+                    <label>비밀번호</label>
+                    <div class="info-box">••••••••</div>
+                </div>
             </div>
-            <div class="sp-bar">
-              <div class="sp-fill" style="width:100%;background:linear-gradient(90deg,var(--mint-dark),var(--mint));"></div>
+
+            <button type="button" class="btn-edit-info">정보 수정하기</button>
+
+            <div class="danger-row">
+                <span class="danger-text">계정 탈퇴 시 모든 학습 기록이 삭제돼요.</span>
+                <button type="button" class="btn-withdraw">회원 탈퇴</button>
             </div>
-            <div class="sp-meta"><span>4강 / 4강 완료</span><span>퀴즈 평균 92점</span></div>
-          </div>
+        </section>
 
-          <div class="sp-divider"></div>
-
-          <div class="sp-item">
-            <div class="sp-header">
-              <div class="sp-left">
-                <span class="sp-badge sb-2">2단계</span>
-                <span class="sp-name">단어 월드</span>
-              </div>
-              <span class="sp-pct" style="color:var(--navy);">33% 진행 중</span>
+        <!-- 학습 현황 -->
+        <section class="content-panel" id="panel-study">
+            <div class="panel-header-row">
+                <h2 class="panel-title">📊 학습 현황</h2>
             </div>
-            <div class="sp-bar">
-              <div class="sp-fill" style="width:33%;background:linear-gradient(90deg,var(--navy),#4A9FE0);"></div>
+            <div class="empty-panel">📚 학습 현황 기능은 준비 중입니다</div>
+        </section>
+
+        <!-- 구매 내역 -->
+        <section class="content-panel" id="panel-purchase">
+            <h2 class="panel-title">💳 구매 내역</h2>
+            <div class="empty-panel">🛒 구매 내역 기능은 준비 중입니다</div>
+        </section>
+
+        <!-- 내 게시글 -->
+        <section class="content-panel" id="panel-posts">
+            <h2 class="panel-title">📝 내 게시글</h2>
+
+            <!-- 서브탭 -->
+            <div class="subtab-bar">
+                <button type="button" class="subtab-item active" data-subtab="myposts">내가 쓴 글</button>
+                <button type="button" class="subtab-item" data-subtab="mycomments">내가 쓴 댓글</button>
+                <button type="button" class="subtab-item" data-subtab="myinquiry">1:1 문의</button>
             </div>
-            <div class="sp-meta"><span>4강 / 12강 완료</span><span>퀴즈 평균 78점</span></div>
-          </div>
 
-          <div class="sp-divider"></div>
+            <!-- 내가 쓴 글 -->
+            <div class="subtab-panel active" id="subtab-myposts">
+                <div class="my-post-list" th:if="${!myPosts.empty}">
+                    <a class="my-post-item" th:each="post : ${myPosts.content}"
+                       th:href="@{/community/{id}(id=${post.id})}">
+                        <span class="my-post-tag" th:text="${post.category.description}">태그</span>
+                        <div class="my-post-title" th:text="${post.title}">제목</div>
+                        <div class="my-post-date" th:text="${#temporals.format(post.createdDate, 'yyyy.MM.dd')}">날짜</div>
+                    </a>
+                </div>
+                <div class="empty-panel" th:if="${myPosts.empty}">
+                    📝 아직 작성한 게시글이 없어요
+                </div>
 
-          <div class="sp-item">
-            <div class="sp-header">
-              <div class="sp-left">
-                <span class="sp-badge sb-3">3단계</span>
-                <span class="sp-name">문장 월드</span>
-              </div>
-              <span class="sp-pct" style="color:var(--ink-faint);">잠김 🔒</span>
+                <!-- ★ 페이지네이션 -->
+                <div class="my-post-pagination" th:if="${myPosts.totalPages > 1}">
+                    <a th:href="@{/siteUser/mypage(page=${myPosts.number - 1}, tab='posts', subtab='myposts')}"
+                       th:classappend="${myPosts.first} ? 'disabled'"
+                       class="page-btn page-prev">‹</a>
+
+                    <a th:each="i : ${#numbers.sequence(0, myPosts.totalPages - 1)}"
+                       th:href="@{/siteUser/mypage(page=${i}, tab='posts', subtab='myposts')}"
+                       th:text="${i + 1}"
+                       th:classappend="${i == myPosts.number} ? 'active'"
+                       class="page-btn"></a>
+
+                    <a th:href="@{/siteUser/mypage(page=${myPosts.number + 1}, tab='posts', subtab='myposts')}"
+                       th:classappend="${myPosts.last} ? 'disabled'"
+                       class="page-btn page-next">›</a>
+                </div>
             </div>
-            <div class="sp-bar">
-              <div class="sp-fill" style="width:0%;background:var(--border);"></div>
+
+            <!-- 내가 쓴 댓글 -->
+            <div class="subtab-panel" id="subtab-mycomments">
+                <div class="my-post-list" th:if="${!#lists.isEmpty(myComments)}">
+                    <a class="my-comment-item" th:each="comment : ${myComments}"
+                       th:href="@{/community/{id}(id=${comment.community.id})}">
+                        <div class="my-comment-content" th:text="${comment.content}">댓글 내용</div>
+                        <div class="my-comment-meta">
+                            <span th:text="'원글: ' + ${comment.community.title}">원글 제목</span>
+                            <span th:text="${#temporals.format(comment.createdDate, 'yyyy.MM.dd')}">날짜</span>
+                        </div>
+                    </a>
+                </div>
+                <div class="empty-panel" th:if="${#lists.isEmpty(myComments)}">
+                    💬 아직 작성한 댓글이 없어요
+                </div>
             </div>
-            <div class="sp-meta"><span>2단계 완료 후 해금</span></div>
-          </div>
 
-          <div class="sp-divider"></div>
-
-          <div class="sp-item">
-            <div class="sp-header">
-              <div class="sp-left">
-                <span class="sp-badge sb-4">4단계</span>
-                <span class="sp-name">회화 월드</span>
-              </div>
-              <span class="sp-pct" style="color:var(--ink-faint);">잠김 🔒</span>
+            <!-- 1:1 문의 (준비중) -->
+            <div class="subtab-panel" id="subtab-myinquiry">
+                <div class="empty-panel">✉️ 1:1 문의 기능은 준비 중입니다</div>
             </div>
-            <div class="sp-bar">
-              <div class="sp-fill" style="width:0%;background:var(--border);"></div>
-            </div>
-            <div class="sp-meta"><span>3단계 완료 후 해금</span></div>
-          </div>
-        </div>
+        </section>
 
-      </div>
-    </div>
+        <!-- 랭킹 -->
+        <section class="content-panel" id="panel-ranking">
+            <h2 class="panel-title">🏆 랭킹</h2>
+            <div class="empty-panel">🏆 랭킹 기능은 준비 중입니다</div>
+        </section>
 
-    <!-- 3. 구매 내역 -->
-    <div class="section-card" id="section-purchase">
-      <div class="card-header">
-        <div class="card-header-left">
-          <span class="card-title">💳 구매 내역</span>
-          <span class="card-badge">2건</span>
-        </div>
-      </div>
-      <div class="card-body">
-        <div class="purchase-list">
-          <div class="purchase-item">
-            <div class="purchase-icon">⭐</div>
-            <div class="purchase-info">
-              <div class="purchase-name">연 구독 플랜</div>
-              <div class="purchase-date">2025.01.10 결제 · 2026.01.10 만료</div>
-            </div>
-            <div class="purchase-right">
-              <div class="purchase-price">89,900원</div>
-              <span class="purchase-status ps-active">이용 중</span>
-            </div>
-          </div>
-          <div class="purchase-item">
-            <div class="purchase-icon">🎮</div>
-            <div class="purchase-info">
-              <div class="purchase-name">월 구독 플랜</div>
-              <div class="purchase-date">2024.12.10 결제 · 2025.01.10 만료</div>
-            </div>
-            <div class="purchase-right">
-              <div class="purchase-price">9,900원</div>
-              <span class="purchase-status ps-expired">만료</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 4. 내 게시글 -->
-    <div class="section-card" id="section-posts">
-      <div class="card-header">
-        <div class="card-header-left">
-          <span class="card-title">📝 내 게시글</span>
-          <span class="card-badge">5개</span>
-        </div>
-        <a href="#" class="card-link">전체 보기 →</a>
-      </div>
-      <div class="card-body">
-        <div class="post-list">
-          <div class="post-item">
-            <span class="post-cat pc-1">공지</span>
-            <span class="post-title">한국어 공부 시작한 지 한 달 후기예요 😊</span>
-            <div class="post-meta">
-              <span>👍 24</span>
-              <span>💬 8</span>
-              <span>2025.05.12</span>
-            </div>
-          </div>
-          <div class="post-item">
-            <span class="post-cat pc-2">질문</span>
-            <span class="post-title">받침 발음이 너무 어려운데 혹시 팁 있나요?</span>
-            <div class="post-meta">
-              <span>👍 11</span>
-              <span>💬 14</span>
-              <span>2025.04.28</span>
-            </div>
-          </div>
-          <div class="post-item">
-            <span class="post-cat pc-3">자유</span>
-            <span class="post-title">오늘 처음으로 한국 식당에서 혼자 주문했어요!</span>
-            <div class="post-meta">
-              <span>👍 38</span>
-              <span>💬 21</span>
-              <span>2025.04.15</span>
-            </div>
-          </div>
-          <div class="post-item">
-            <span class="post-cat pc-2">질문</span>
-            <span class="post-title">2단계 퀴즈 3번 문제 정답이 이해가 안 가요</span>
-            <div class="post-meta">
-              <span>👍 5</span>
-              <span>💬 6</span>
-              <span>2025.03.30</span>
-            </div>
-          </div>
-          <div class="post-item">
-            <span class="post-cat pc-3">자유</span>
-            <span class="post-title">끼역띠귿 덕분에 드라마 대사가 들려요 🎉</span>
-            <div class="post-meta">
-              <span>👍 52</span>
-              <span>💬 17</span>
-              <span>2025.03.10</span>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <!-- 5. 랭킹 -->
-    <div class="section-card" id="section-ranking">
-      <div class="card-header">
-        <div class="card-header-left">
-          <span class="card-title">🏆 랭킹</span>
-        </div>
-      </div>
-      <div class="card-body">
-
-        <!-- 탭 -->
-        <div class="rank-tab-row">
-          <button class="rank-tab active" onclick="setRankTab(this)">주간</button>
-          <button class="rank-tab" onclick="setRankTab(this)">월간</button>
-          <button class="rank-tab" onclick="setRankTab(this)">전체</button>
-        </div>
-
-        <!-- 헤더 -->
-        <div class="ranking-header-row">
-          <span style="text-align:center;">순위</span>
-          <span>학습자</span>
-          <span style="text-align:center;">강의수</span>
-          <span style="text-align:center;">단어수</span>
-          <span style="text-align:center;">점수</span>
-        </div>
-
-        <!-- 목록 -->
-        <div class="ranking-list">
-
-          <div class="rank-item">
-            <div class="rank-medal">🥇</div>
-            <div class="rank-user">
-              <div class="rank-avatar" style="background:linear-gradient(135deg,#F59E0B,#EF4444);">리</div>
-              <span class="rank-name">Li Wei</span>
-            </div>
-            <div class="rank-val highlight">28강</div>
-            <div class="rank-val highlight">412개</div>
-            <div class="rank-val highlight">9,840점</div>
-          </div>
-
-          <div class="rank-item">
-            <div class="rank-medal">🥈</div>
-            <div class="rank-user">
-              <div class="rank-avatar" style="background:linear-gradient(135deg,#6B7280,#9CA3AF);">김</div>
-              <span class="rank-name">김마리아</span>
-            </div>
-            <div class="rank-val">24강</div>
-            <div class="rank-val">380개</div>
-            <div class="rank-val">8,720점</div>
-          </div>
-
-          <div class="rank-item">
-            <div class="rank-medal">🥉</div>
-            <div class="rank-user">
-              <div class="rank-avatar" style="background:linear-gradient(135deg,#B45309,#D97706);">나</div>
-              <span class="rank-name">Nguyen Lan</span>
-            </div>
-            <div class="rank-val">21강</div>
-            <div class="rank-val">305개</div>
-            <div class="rank-val">7,560점</div>
-          </div>
-
-          <div class="rank-item">
-            <div class="rank-num">4</div>
-            <div class="rank-user">
-              <div class="rank-avatar" style="background:linear-gradient(135deg,#185FA5,#4A9FE0);">A</div>
-              <span class="rank-name">Ahmed K.</span>
-            </div>
-            <div class="rank-val">18강</div>
-            <div class="rank-val">276개</div>
-            <div class="rank-val">6,920점</div>
-          </div>
-
-          <div class="rank-item">
-            <div class="rank-num">5</div>
-            <div class="rank-user">
-              <div class="rank-avatar" style="background:linear-gradient(135deg,#7C3AED,#A78BFA);">S</div>
-              <span class="rank-name">Sara M.</span>
-            </div>
-            <div class="rank-val">16강</div>
-            <div class="rank-val">241개</div>
-            <div class="rank-val">6,140점</div>
-          </div>
-
-          <!-- ... -->
-          <div style="text-align:center;padding:10px 0;font-size:13px;color:var(--ink-faint);">•  •  •</div>
-
-          <!-- 내 순위 -->
-          <div class="rank-item me">
-            <div class="rank-num me-num">23</div>
-            <div class="rank-user">
-              <div class="rank-avatar" style="background:linear-gradient(135deg,var(--mint),var(--navy));">유</div>
-              <span class="rank-name">유니 <span class="rank-me-tag">나</span></span>
-            </div>
-            <div class="rank-val highlight">8강</div>
-            <div class="rank-val highlight">142개</div>
-            <div class="rank-val highlight">2,840점</div>
-          </div>
-
-        </div>
-
-        <!-- 내 위치 안내 -->
-        <div class="rank-my-position">
-          <span>현재 <strong>23위</strong>예요. 2위만 올라가면 상위 10%!</span>
-          <a th:href="@{/lectures}" style="font-size:13px;font-weight:700;color:var(--navy);">학습하러 가기 →</a>
-        </div>
-
-      </div>
-    </div>
-
-  </div>
+    </main>
 </div>
 
-<!-- 푸터 -->
 <div th:replace="~{layout/footer :: footer}"></div>
 
-<script>
-  function showSection(id) {
-    document.querySelectorAll('.side-menu-item').forEach(i => i.classList.remove('active'));
-    event.currentTarget.classList.add('active');
-    document.getElementById(`section-${id}`).scrollIntoView({ behavior: 'smooth', block: 'start' });
-  }
-
-  function setRankTab(el) {
-    document.querySelectorAll('.rank-tab').forEach(t => t.classList.remove('active'));
-    el.classList.add('active');
-  }
-</script>
-
+<script th:src="@{/js/mypage.js}"></script>
 </body>
 </html>

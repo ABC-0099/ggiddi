@@ -1,9 +1,11 @@
 package com.meta12.SS8911.entity;
 
-import com.meta12.SS8911.config.Role; // 1. 추가한 Role Enum import
+import com.meta12.SS8911.config.Role;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+
+import java.time.LocalDateTime;
 
 @Entity
 @Getter @Setter
@@ -21,7 +23,12 @@ public class SiteUser {
     private String password;
     private String nationality;
 
-    // 2. 권한 필드 추가
     @Enumerated(EnumType.STRING)
     private Role role;
+
+    // 연속 출석 관련 필드
+    private int streakDays;              // 연속 출석일수
+    private LocalDateTime lastLoginDate; // 마지막 로그인 시각
+
+    private LocalDateTime joinDate;      // 가입일
 }

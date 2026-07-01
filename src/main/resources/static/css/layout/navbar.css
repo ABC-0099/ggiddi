@@ -1,5 +1,4 @@
-
-  /* ── NAVBAR STYLES ── */
+/* ── NAVBAR STYLES ── */
   .navbar {
     position: sticky;
     top: 0;
@@ -105,18 +104,19 @@
     position: relative;
   }
 
+  /*
+    호버 끊김 방지:
+    트리거와 메뉴 사이 빈 공간을 padding-top으로 만들어서
+    마우스가 그 구간을 지나가도 .has-dropdown:hover가 계속 유지되게 함.
+    (margin-top으로 띄우면 그 틈에서 마우스가 빠져나가 깜빡이듯 사라짐)
+  */
   .dropdown-menu {
     display: none;
     position: absolute;
-    top: calc(100% + 8px);
+    top: 100%;
     left: 0;
-    background: #ffffff;
-    border: 1.5px solid #dce6f0;
-    border-radius: 12px;
-    box-shadow: 0 8px 32px rgba(24, 95, 165, 0.12);
-    list-style: none;
-    padding: 6px;
-    min-width: 220px;
+    padding-top: 10px;
+    background: transparent;
     z-index: 100;
   }
 
@@ -128,6 +128,31 @@
   .has-dropdown:hover .arrow-icon,
   .has-dropdown.open .arrow-icon {
     transform: rotate(180deg);
+  }
+
+  /* 실제 보이는 카드 모양은 ul 자체에 적용 */
+  .dropdown-menu {
+    list-style: none;
+  }
+
+  .dropdown-menu::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 10px; /* padding-top과 동일한 핫존 */
+  }
+
+  .dropdown-menu > li:first-child {
+    margin-top: 0;
+  }
+
+  .dropdown-menu-card {
+    background: #ffffff;
+    border: 1.5px solid #dce6f0;
+    border-radius: 12px;
+    box-shadow: 0 8px 32px rgba(24, 95, 165, 0.12);
+    padding: 6px;
+    min-width: 220px;
   }
 
   .dropdown-menu li a {
@@ -316,11 +341,15 @@
 
     .dropdown-menu {
       position: static;
+      padding-top: 0;
+      margin: 4px 0;
+    }
+
+    .dropdown-menu-card {
       box-shadow: none;
       border: none;
       background: #f7fafd;
       border-radius: 8px;
-      margin: 4px 0;
     }
 
     .has-dropdown:hover .dropdown-menu { display: none; }

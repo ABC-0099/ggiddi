@@ -33,6 +33,9 @@ dependencies {
 	// ★ 추가 2: Thymeleaf에서 sec:authorize 쓰려면 필수
 	implementation 'org.thymeleaf.extras:thymeleaf-extras-springsecurity6'
 
+	// ★ 추가 3: WebSocket (STOMP) - 실시간 채팅에 필요
+	implementation 'org.springframework.boot:spring-boot-starter-websocket'
+
 	compileOnly 'org.projectlombok:lombok'
 	developmentOnly 'org.springframework.boot:spring-boot-devtools'
 	runtimeOnly 'org.mariadb.jdbc:mariadb-java-client'
