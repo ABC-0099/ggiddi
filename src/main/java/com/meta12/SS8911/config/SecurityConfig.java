@@ -25,7 +25,6 @@ public class SecurityConfig {
                                 "/siteUser/chuga",
                                 "/siteUser/chugaProc",
                                 "/notices",
-                                "/community/**",
                                 "/faq",
                                 "/lectures",
                                 "/lectures/**",
@@ -35,8 +34,11 @@ public class SecurityConfig {
                                 "/images/**",
                                 "/fonts/**",
                                 "/ws/chat/**",
-                                "/api/chat/**"
+                                "/api/chat/**",
+                                "/.well-known/**"   // ★ 크롬 devtools 자동 요청 무시용
                         ).permitAll()
+                        // ★ 커뮤니티는 로그인한 회원(및 관리자)만 열람 가능하도록 명시적으로 인증 필요 처리
+                        .requestMatchers("/community/**").authenticated()
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
@@ -64,4 +66,5 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
 }
