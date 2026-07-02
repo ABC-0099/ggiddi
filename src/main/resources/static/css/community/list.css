@@ -45,7 +45,18 @@ nav {
     padding: 44px 6% 24px;
     max-width: 1100px; margin: 0 auto;
 }
-.page-header h1 { font-size: 30px; font-weight: 700; letter-spacing: -.5px; margin-bottom: 6px; }
+.page-header-title-row {
+    display: flex; align-items: center; gap: 10px;
+    margin-bottom: 6px;
+}
+.page-header-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--mint), var(--navy));
+    box-shadow: 0 4px 14px rgba(29,158,117,.25);
+    flex-shrink: 0;
+}
+.page-header h1 { font-size: 30px; font-weight: 700; letter-spacing: -.5px; margin-bottom: 0; }
 .page-header p  { font-size: 14.5px; color: var(--ink-soft); font-weight: 300; }
 
 /* 태그 탭 */

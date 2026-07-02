@@ -42,10 +42,22 @@
       margin-bottom: 12px; display: inline-block;
       letter-spacing: 1px;
     }
+    .page-header-title-row {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 12px;
+    }
+    .page-header-badge {
+      width: 44px; height: 44px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--wood-deep);
+      border: 3px solid var(--gold);
+      border-radius: 8px;
+      box-shadow: 3px 3px 0 0 rgba(61,38,24,.25);
+    }
     .page-header-text h1 {
       font-family: 'Jua', sans-serif;
       font-size: 32px; font-weight: 400;
-      margin-bottom: 12px; color: var(--wood-deep);
+      margin-bottom: 0; color: var(--wood-deep);
       line-height: 1.4;
     }
     .page-header-text p { font-size: 14.5px; color: var(--ink-soft); font-weight: 500; }
