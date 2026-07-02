@@ -1,107 +1,83 @@
 :root {
-    --navy: #185FA5;
-    --navy-dark: #0C447C;
-    --navy-deep: #042C53;
-    --mint-light: #9FE1CB;
-    --mint-mid: #5DCAA5;
-    --mint-bg: #E1F5EE;
-    --navy-bg: #E6F1FB;
-    --amber: #EF9F27;
-    --amber-bg: #FAEEDA;
-    --coral: #D85A30;
-    --coral-bg: #FAECE7;
-    --red: #E24B4A;
-    --red-bg: #FCEBEB;
-    --green: #0F6E56;
     --gray-50: #F7F7F6;
-    --gray-100: #EFEFED;
-    --gray-200: #DDDDD9;
-    --gray-400: #888780;
     --gray-600: #5F5E5A;
     --gray-800: #2C2C2A;
-    --white: #ffffff;
-
-    --sidebar-w: 220px;
-    --topbar-h: 56px;
-
-    --radius-sm: 6px;
-    --radius-md: 8px;
-    --radius-lg: 12px;
 
     --shadow-sm: 0 1px 3px rgba(0,0,0,0.07);
     --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
 }
 
 *{
-    box-sizing: border-box;
     margin: 0;
     padding: 0;
+    box-sizing: border-box;
 }
 
 body{
-    font-family: 'Pretendard', 'Noto Sans KR', -apple-system,
-                 BlinkMacSystemFont, sans-serif;
+    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
     background: var(--gray-50);
     color: var(--gray-800);
-    font-size: 14px;
-    min-height: 100vh;
 }
 
 /* ==========================
-        배너 영역
+         배너 영역
 ========================== */
 
 .banner{
-    background: #dce7f3;
-
-    margin: 20px;
-    padding: 30px 50px;
-
+    position: relative;
     height: 260px;
-
+    margin: 20px;
+    overflow: hidden;
     border-radius: 12px;
-    box-shadow: var(--shadow-sm);
-
-    display: flex;
-    align-items: center;
 }
 
-.banner-left img{
-    width: 150px;
-}
-
-.banner-content{
-    flex: 1;
-
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-
+.banner-slide{
+    display: none;
+    position: relative;
+    width: 100%;
     height: 100%;
 }
 
-.banner-content h2{
-    font-size: 36px;
-    font-weight: 700;
-
-    margin-top: 20px;
+.banner-slide.active{
+    display: block;
 }
 
-/* 여기 수정된 부분 */
+.banner-slide:nth-child(1){
+    background: #dce7f3;
+}
+
+.banner-slide:nth-child(2){
+    background: #f7e7da;
+}
+
+.banner-slide:nth-child(3){
+    background: #f5efc8;
+}
+
+.banner-image{
+    width: 90%;
+    height: 100%;
+    object-fit: contain;
+
+    display: block;
+    margin: 0 auto;
+}
+
 .banner-controls{
+    position: absolute;
+
+    bottom: 15px;
+    left: 50%;
+    transform: translateX(-50%);
+
     display: flex;
     align-items: center;
     gap: 15px;
-
-    margin-top: auto;
-    margin-bottom: 20px;
 }
 
-.page{
+.page-number{
     background: white;
-
     padding: 10px 24px;
-
     border-radius: 10px;
 
     font-size: 16px;
@@ -116,15 +92,12 @@ body{
 
     border: none;
     border-radius: 50%;
-
     background: white;
 
     font-size: 18px;
     font-weight: bold;
 
     cursor: pointer;
-
-    box-shadow: var(--shadow-sm);
     transition: 0.2s;
 }
 
@@ -133,7 +106,7 @@ body{
 }
 
 /* ==========================
-        이벤트 영역
+         이벤트 영역
 ========================== */
 
 .event-section{
@@ -155,13 +128,16 @@ body{
     gap: 30px;
 }
 
+/* 카드 */
+
 .event-card{
     background: white;
-
     border: 1px solid #ddd;
     border-radius: 12px;
 
-    padding: 15px;
+    padding: 18px;
+
+    min-height: 520px;
 
     box-shadow: var(--shadow-sm);
     transition: 0.2s;
@@ -174,12 +150,12 @@ body{
 
 .event-card img{
     width: 100%;
-    height: 180px;
+    height: 280px;
 
     object-fit: cover;
 
     border-radius: 8px;
-    margin-bottom: 15px;
+    margin-bottom: 20px;
 }
 
 .event-card h3{
@@ -190,7 +166,6 @@ body{
 .event-card p{
     font-size: 13px;
     color: var(--gray-600);
-
     margin-bottom: 8px;
 }
 
@@ -198,31 +173,32 @@ body{
     margin-top: 15px;
 
     border: 2px solid #4A6FA5;
-    background: white;
     color: #4A6FA5;
+    background: white;
+
+    padding: 8px 18px;
+    border-radius: 8px;
 
     font-weight: bold;
-    padding: 8px 18px;
-
-    border-radius: 8px;
+    cursor: pointer;
 }
 
 .result-btn{
     margin-top: 15px;
 
     border: 2px solid #E24B4A;
-    background: white;
     color: #E24B4A;
+    background: white;
+
+    padding: 8px 18px;
+    border-radius: 8px;
 
     font-weight: bold;
-    padding: 8px 18px;
-
-    border-radius: 8px;
+    cursor: pointer;
 }
 
 .pagination{
     text-align: center;
-
     margin: 50px 0;
 
     font-size: 18px;
