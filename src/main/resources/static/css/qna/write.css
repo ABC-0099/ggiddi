@@ -186,3 +186,10 @@ a { text-decoration: none; color: inherit; }
     font-family: inherit;
 }
 .qna-confirm-btn:hover { filter: brightness(1.06); }
+
+.img-preview-item.marked-delete {
+    opacity: .35;
+}
+.img-preview-item.marked-delete .img-remove-btn {
+    background: var(--mint-dark);
+}

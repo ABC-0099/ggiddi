@@ -65,6 +65,8 @@ public class QnaController {
         QnaDTO dto = new QnaDTO();
         dto.setTitle(qna.getTitle());
         dto.setContent(qna.getContent());
+        dto.setCategory(qna.getCategory());
+        dto.setExistingImages(qna.getFiles());
 
         model.addAttribute("qnaDTO", dto);
         model.addAttribute("qnaId", id);
