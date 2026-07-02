@@ -17,8 +17,16 @@ public class NoticeService {
 
     @Transactional(readOnly = true)
     public Page<NoticeDTO> getNoticePage(int page) {
+        return getNoticePage(page, null);
+    }
+
+    @Transactional(readOnly = true)
+    public Page<NoticeDTO> getNoticePage(int page, String category) {
         Pageable pageable = PageRequest.of(page, 5, Sort.by(Sort.Direction.DESC, "id"));
-        return repository.findAll(pageable).map(this::toDTO);
+        if (category == null || category.isBlank()) {
+            return repository.findAll(pageable).map(this::toDTO);
+        }
+        return repository.findByCategory(category, pageable).map(this::toDTO);
     }
 
     @Transactional(readOnly = true)

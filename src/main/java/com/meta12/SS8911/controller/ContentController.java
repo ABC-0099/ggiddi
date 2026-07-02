@@ -42,6 +42,8 @@ public class ContentController {
     private final SiteUserRepository siteUserRepository;
     private final ProgressRepository progressRepository;
 
+
+
     @GetMapping("/content/chuga/{categoryId}")
     public String chuga(Model model, @PathVariable("categoryId") Long categoryId) {
         Category category = categoryService.view(categoryId);

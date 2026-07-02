@@ -3,13 +3,41 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>끼역띠귿 — 공지사항 등록</title>
+  <title>끼역띠귿 — 공지사항 작성</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" th:href="@{/css/layout/navbar.css}" />
   <link rel="stylesheet" th:href="@{/css/layout/footer.css}" />
-  <link rel="stylesheet" th:href="@{/css/notice/form.css}" />
+  <link rel="stylesheet" th:href="@{/css/notice/view.css}" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
+
+  <style>
+    /* view.css의 post-card 톤을 재사용하는 최소한의 폼 전용 스타일 */
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; margin-bottom: 8px; font-weight: 500; }
+    .form-input,
+    .form-select,
+    .form-textarea {
+      width: 100%;
+      box-sizing: border-box;
+      padding: 12px 14px;
+      border: 1px solid rgba(0,0,0,0.15);
+      border-radius: 10px;
+      font-family: inherit;
+      font-size: 15px;
+    }
+    .form-textarea { min-height: 260px; resize: vertical; white-space: pre-wrap; }
+    .form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
+    .btn-submit, .btn-cancel {
+      padding: 10px 22px;
+      border-radius: 10px;
+      border: none;
+      cursor: pointer;
+      font-size: 15px;
+    }
+    .btn-submit { background: #4b6bfb; color: #fff; }
+    .btn-cancel { background: #eee; color: #333; text-decoration: none; display: inline-flex; align-items: center; }
+  </style>
 </head>
 <body>
 
@@ -18,158 +46,58 @@
 <!-- NAV -->
 <div th:replace="~{layout/navbar :: navbar(currentMenu='quiz')}"></div>
 
-<div class="form-wrap">
+<!-- 본문 -->
+<div class="view-wrap">
 
   <!-- 뒤로가기 -->
-  <a href="board_notice_1.html" class="back-btn">
+  <a th:href="@{/notice/list}" class="back-btn">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M19 12H5M12 5l-7 7 7 7"/>
     </svg>
     공지사항 목록
   </a>
 
-  <form class="form-card" id="noticeForm" onsubmit="return handleSubmit(event)">
+  <div class="post-card">
 
-    <div class="form-header">
-      <h1>공지사항 등록</h1>
-      <p>새로운 공지사항을 작성합니다. 필수 항목을 모두 입력해주세요.</p>
+    <div class="post-header">
+      <h1 class="post-title">공지사항 작성</h1>
     </div>
 
-    <div class="form-body">
+    <form th:action="@{/notice/save}" th:object="${noticeDTO}" method="post">
 
-      <!-- 카테고리 -->
       <div class="form-group">
-        <label class="form-label">카테고리<span class="req">*</span></label>
-        <div class="category-picker">
-          <input type="radio" name="category" id="cat-notice" value="notice" checked>
-          <label for="cat-notice">공지</label>
-          <input type="radio" name="category" id="cat-event" value="event">
-          <label for="cat-event">이벤트</label>
-          <input type="radio" name="category" id="cat-system" value="system">
-          <label for="cat-system">시스템</label>
-          <input type="radio" name="category" id="cat-update" value="update">
-          <label for="cat-update">업데이트</label>
-        </div>
+        <label class="form-label" for="category">카테고리</label>
+        <select class="form-select" id="category" th:field="*{category}">
+          <option value="notice">공지</option>
+          <option value="event">이벤트</option>
+          <option value="system">시스템</option>
+          <option value="update">업데이트</option>
+        </select>
       </div>
 
-      <!-- 제목 -->
       <div class="form-group">
-        <label class="form-label" for="title">제목<span class="req">*</span></label>
-        <input type="text" id="title" class="form-input" placeholder="공지 제목을 입력하세요" maxlength="100" required>
+        <label class="form-label" for="title">제목</label>
+        <input class="form-input" type="text" id="title" th:field="*{title}" placeholder="제목을 입력하세요" required />
       </div>
 
-      <!-- 지원 언어 -->
       <div class="form-group">
-        <label class="form-label">지원 언어 <span class="optional">(다국어 뱃지 표시용, 선택)</span></label>
-        <div class="lang-picker">
-          <input type="checkbox" id="lang-ko" value="KO" checked>
-          <label for="lang-ko">한국어</label>
-          <input type="checkbox" id="lang-en" value="EN">
-          <label for="lang-en">English</label>
-          <input type="checkbox" id="lang-vi" value="VI">
-          <label for="lang-vi">Tiếng Việt</label>
-          <input type="checkbox" id="lang-zh" value="ZH">
-          <label for="lang-zh">中文</label>
-        </div>
+        <label class="form-label" for="content">내용</label>
+        <textarea class="form-textarea" id="content" th:field="*{content}" placeholder="내용을 입력하세요" required></textarea>
       </div>
 
-      <!-- 상단 고정 -->
-      <div class="form-group">
-        <div class="toggle-row">
-          <div>
-            <div class="toggle-row-text">📌 상단 고정</div>
-            <div class="toggle-row-sub">목록 최상단에 고정 노출됩니다</div>
-          </div>
-          <label class="switch">
-            <input type="checkbox" id="pinToggle">
-            <span class="switch-track"></span>
-          </label>
-        </div>
+      <div class="form-actions">
+        <a th:href="@{/notice/list}" class="btn-cancel">취소</a>
+        <button type="submit" class="btn-submit">등록</button>
       </div>
 
-      <!-- 첨부파일 -->
-      <div class="form-group">
-        <label class="form-label">첨부파일 <span class="optional">(선택, 최대 10MB)</span></label>
-        <label class="upload-zone" id="uploadZone" for="fileInput">
-          <div class="up-icon">📎</div>
-          <div class="up-text">클릭하거나 파일을 끌어다 놓으세요</div>
-          <div class="up-sub">PDF, PNG, JPG, DOCX 지원</div>
-          <input type="file" id="fileInput" multiple>
-        </label>
-        <div class="file-list" id="fileList"></div>
-      </div>
+    </form>
 
-      <!-- 본문 -->
-      <div class="form-group">
-        <label class="form-label" for="content">내용<span class="req">*</span></label>
-        <textarea id="content" class="form-textarea" placeholder="공지 내용을 입력하세요" maxlength="3000" required oninput="updateCharCount()"></textarea>
-        <div class="char-count"><span id="charCount">0</span> / 3000</div>
-      </div>
+  </div>
 
-    </div>
-
-    <div class="form-actions">
-      <a href="board_notice_1.html" class="btn btn-cancel">취소</a>
-      <button type="submit" class="btn btn-primary">등록하기</button>
-    </div>
-
-  </form>
 </div>
 
 <!-- FOOTER -->
 <div th:replace="~{layout/footer :: footer}"></div>
-
-<script>
-  const uploadZone = document.getElementById('uploadZone');
-  const fileInput = document.getElementById('fileInput');
-  const fileList = document.getElementById('fileList');
-  let attachedFiles = [];
-
-  fileInput.addEventListener('change', () => {
-    attachedFiles = [...attachedFiles, ...Array.from(fileInput.files)];
-    renderFileList();
-    fileInput.value = '';
-  });
-
-  ['dragover', 'dragenter'].forEach(evt => {
-    uploadZone.addEventListener(evt, (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
-  });
-  ['dragleave', 'drop'].forEach(evt => {
-    uploadZone.addEventListener(evt, (e) => { e.preventDefault(); uploadZone.classList.remove('dragover'); });
-  });
-  uploadZone.addEventListener('drop', (e) => {
-    attachedFiles = [...attachedFiles, ...Array.from(e.dataTransfer.files)];
-    renderFileList();
-  });
-
-  function renderFileList() {
-    fileList.innerHTML = attachedFiles.map((f, i) => `
-      <div class="file-chip">
-        <span>📄</span>
-        <span class="file-name">${f.name}</span>
-        <span>${(f.size / 1024).toFixed(0)} KB</span>
-        <span class="file-remove" onclick="removeFile(${i})">✕</span>
-      </div>
-    `).join('');
-  }
-
-  function removeFile(i) {
-    attachedFiles.splice(i, 1);
-    renderFileList();
-  }
-
-  function updateCharCount() {
-    const content = document.getElementById('content');
-    document.getElementById('charCount').textContent = content.value.length;
-  }
-
-  function handleSubmit(e) {
-    e.preventDefault();
-    alert('공지사항이 등록되었습니다.');
-    window.location.href = 'board_notice_1.html';
-    return false;
-  }
-</script>
 
 </body>
 </html>

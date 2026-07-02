@@ -27,11 +27,14 @@ public class NoticeController {
 
     // 1. 공지 리스트
     @GetMapping("/list")
-    public String list(@RequestParam(defaultValue = "0") int page, Model model) {
-        Page<NoticeDTO> noticePage = noticeService.getNoticePage(page);
+    public String list(@RequestParam(defaultValue = "0") int page,
+                       @RequestParam(required = false) String category,
+                       Model model) {
+        Page<NoticeDTO> noticePage = noticeService.getNoticePage(page, category);
         model.addAttribute("list", noticePage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", noticePage.getTotalPages());
+        model.addAttribute("category", category);
         return "notice/list";
     }
 
@@ -45,7 +48,7 @@ public class NoticeController {
     // 3. 작성 페이지 이동
     @GetMapping("/chuga")
     public String chuga(@AuthenticationPrincipal UserDetails userDetails, Model model) {
-        if (userDetails == null || !"admin777".equals(userDetails.getUsername())) {
+        if (userDetails == null || !"admin888".equals(userDetails.getUsername())) {
             return "redirect:/notice/list?error=unauthorized";
         }
         model.addAttribute("noticeDTO", new NoticeDTO());
@@ -55,7 +58,7 @@ public class NoticeController {
     // 4. 새 글 저장 (중요: DB에서 유저를 찾아 서비스에 전달)
     @PostMapping("/save")
     public String save(@ModelAttribute("noticeDTO") NoticeDTO dto, @AuthenticationPrincipal UserDetails userDetails) {
-        if (userDetails == null || !"admin777".equals(userDetails.getUsername())) {
+        if (userDetails == null || !"admin888".equals(userDetails.getUsername())) {
             return "redirect:/notice/list?error=unauthorized";
         }
 
@@ -76,7 +79,7 @@ public class NoticeController {
     // 5. 수정 페이지 이동
     @GetMapping("/edit/{id}")
     public String edit(@PathVariable Long id, Model model, @AuthenticationPrincipal UserDetails userDetails) {
-        if (userDetails == null || !"admin777".equals(userDetails.getUsername())) {
+        if (userDetails == null || !"admin888".equals(userDetails.getUsername())) {
             return "redirect:/notice/list?error=unauthorized";
         }
         model.addAttribute("notice", noticeService.getNotice(id));
@@ -86,7 +89,7 @@ public class NoticeController {
     // 6. 실제 수정 처리
     @PostMapping("/update/{id}")
     public String update(@PathVariable Long id, @ModelAttribute("notice") NoticeDTO dto, @AuthenticationPrincipal UserDetails userDetails) {
-        if (userDetails == null || !"admin777".equals(userDetails.getUsername())) {
+        if (userDetails == null || !"admin888".equals(userDetails.getUsername())) {
             return "redirect:/notice/list?error=unauthorized";
         }
 
@@ -107,7 +110,7 @@ public class NoticeController {
     // 7. 삭제 확인 페이지
     @GetMapping("/delete/{id}")
     public String deleteConfirm(@PathVariable Long id, Model model, @AuthenticationPrincipal UserDetails userDetails) {
-        if (userDetails == null || !"admin777".equals(userDetails.getUsername())) {
+        if (userDetails == null || !"admin888".equals(userDetails.getUsername())) {
             return "redirect:/notice/list?error=unauthorized";
         }
         model.addAttribute("notice", noticeService.getNotice(id));
@@ -117,7 +120,7 @@ public class NoticeController {
     // 8. 실제 삭제 실행
     @PostMapping("/delete/{id}")
     public String deleteReal(@PathVariable Long id, @AuthenticationPrincipal UserDetails userDetails) {
-        if (userDetails == null || !"admin777".equals(userDetails.getUsername())) {
+        if (userDetails == null || !"admin888".equals(userDetails.getUsername())) {
             return "redirect:/notice/list?error=unauthorized";
         }
         try {

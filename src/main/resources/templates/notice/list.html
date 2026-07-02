@@ -8,7 +8,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link rel="stylesheet" th:href="@{/css/layout/navbar.css}" />
   <link rel="stylesheet" th:href="@{/css/layout/footer.css}" />
-  <link rel="stylesheet" th:href="@{/css/notice/view.css}" />
+  <link rel="stylesheet" th:href="@{/css/notice/list.css}" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
 
 </head>
@@ -49,11 +49,11 @@
 
   <div class="board-controls">
     <div class="filter-tabs">
-      <button class="tab active">전체</button>
-      <button class="tab">공지</button>
-      <button class="tab">이벤트</button>
-      <button class="tab">시스템</button>
-      <button class="tab">업데이트</button>
+      <a class="tab" th:classappend="${category == null} ? 'active'" th:href="@{/notice/list}">전체</a>
+      <a class="tab" th:classappend="${category == 'notice'} ? 'active'" th:href="@{/notice/list(category='notice')}">공지</a>
+      <a class="tab" th:classappend="${category == 'event'} ? 'active'" th:href="@{/notice/list(category='event')}">이벤트</a>
+      <a class="tab" th:classappend="${category == 'system'} ? 'active'" th:href="@{/notice/list(category='system')}">시스템</a>
+      <a class="tab" th:classappend="${category == 'update'} ? 'active'" th:href="@{/notice/list(category='update')}">업데이트</a>
     </div>
     <div class="search-box">
       <span class="search-icon">🔍</span>
@@ -73,9 +73,10 @@
     <!-- 공지 목록 (동적) -->
     <div class="notice-row" th:each="notice : ${list}">
       <span class="pin-icon"></span>
-      <span class="badge"
-            th:classappend="${notice.category == '공지'} ? 'b-notice' : (${notice.category == '이벤트'} ? 'b-event' : (${notice.category == '시스템'} ? 'b-system' : 'b-update'))"
-            th:text="${notice.category}">공지</span>
+      <span class="badge b-notice" th:if="${notice.category == 'notice'}">공지</span>
+      <span class="badge b-event" th:if="${notice.category == 'event'}">이벤트</span>
+      <span class="badge b-system" th:if="${notice.category == 'system'}">시스템</span>
+      <span class="badge b-update" th:if="${notice.category != 'notice' and notice.category != 'event' and notice.category != 'system'}">업데이트</span>
       <div class="notice-main">
         <div class="notice-title-row">
           <a class="notice-title" th:href="@{/notice/view/{id}(id=${notice.id})}" th:text="${notice.title}">제목</a>
@@ -92,17 +93,17 @@
   <!-- 페이지네이션 -->
   <div class="pagination" th:if="${totalPages > 0}">
     <a class="page-btn"
-       th:href="@{/notice/list(page=${currentPage - 1})}"
+       th:href="@{/notice/list(page=${currentPage - 1}, category=${category})}"
        th:classappend="${currentPage == 0} ? 'disabled'">‹</a>
 
     <a class="page-btn"
        th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
-       th:href="@{/notice/list(page=${i})}"
+       th:href="@{/notice/list(page=${i}, category=${category})}"
        th:classappend="${i == currentPage} ? 'active'"
        th:text="${i + 1}">1</a>
 
     <a class="page-btn"
-       th:href="@{/notice/list(page=${currentPage + 1})}"
+       th:href="@{/notice/list(page=${currentPage + 1}, category=${category})}"
        th:classappend="${currentPage == totalPages - 1} ? 'disabled'">›</a>
   </div>
 
@@ -110,22 +111,5 @@
 
 <!-- 푸터 -->
 <div th:replace="~{layout/footer :: footer}"></div>
-<script>
-  document.querySelectorAll('.tab').forEach(tab => {
-    tab.addEventListener('click', () => {
-      document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
-      tab.classList.add('active');
-    });
-  });
-
-  document.querySelectorAll('.page-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      if (btn.textContent === '‹' || btn.textContent === '›') return;
-      document.querySelectorAll('.page-btn').forEach(b => b.classList.remove('active'));
-      btn.classList.add('active');
-    });
-  });
-</script>
-
 </body>
 </html>
