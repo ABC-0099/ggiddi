@@ -54,4 +54,36 @@ public class QnaController {
         qnaService.answer(id, answer, admin);
         return "redirect:/qna/" + id;
     }
+
+    // 수정 폼
+    @GetMapping("/{id}/edit")
+    public String editForm(@PathVariable Long id, Model model, Principal principal) {
+        Qna qna = qnaService.getQna(id);
+        SiteUser user = siteUserService.getUserByUsername(principal.getName());
+        qnaService.checkEditDeletePermission(qna, user);
+
+        QnaDTO dto = new QnaDTO();
+        dto.setTitle(qna.getTitle());
+        dto.setContent(qna.getContent());
+
+        model.addAttribute("qnaDTO", dto);
+        model.addAttribute("qnaId", id);
+        return "qna/edit";
+    }
+
+    // 수정 처리
+    @PostMapping("/{id}/edit")
+    public String edit(@PathVariable Long id, QnaDTO dto, Principal principal) {
+        SiteUser user = siteUserService.getUserByUsername(principal.getName());
+        qnaService.update(id, dto, user);
+        return "redirect:/qna/" + id;
+    }
+
+    // 삭제 처리
+    @PostMapping("/{id}/delete")
+    public String delete(@PathVariable Long id, Principal principal) {
+        SiteUser user = siteUserService.getUserByUsername(principal.getName());
+        qnaService.delete(id, user);
+        return "redirect:/siteUser/mypage?tab=posts&subtab=myinquiry";
+    }
 }

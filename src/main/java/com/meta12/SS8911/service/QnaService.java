@@ -66,4 +66,31 @@ public class QnaService {
             throw new RuntimeException("권한이 없습니다.");
         }
     }
+
+    // 수정/삭제 권한: 작성자 본인 + 아직 답변 안 된 상태(PENDING)일 때만
+    public void checkEditDeletePermission(Qna qna, SiteUser user) {
+        boolean isAuthor = qna.getAuthor().getId().equals(user.getId());
+        if (!isAuthor) {
+            throw new RuntimeException("작성자만 수정/삭제할 수 있습니다.");
+        }
+        if (qna.getStatus() == InquiryStatus.ANSWERED) {
+            throw new RuntimeException("답변이 완료된 문의는 수정/삭제할 수 없습니다.");
+        }
+    }
+
+    @Transactional
+    public void update(Long id, QnaDTO dto, SiteUser user) {
+        Qna qna = getQna(id);
+        checkEditDeletePermission(qna, user);
+        qna.setTitle(dto.getTitle());
+        qna.setContent(dto.getContent());
+        qnaRepository.save(qna);
+    }
+
+    @Transactional
+    public void delete(Long id, SiteUser user) {
+        Qna qna = getQna(id);
+        checkEditDeletePermission(qna, user);
+        qnaRepository.delete(qna);
+    }
 }

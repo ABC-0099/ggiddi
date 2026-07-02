@@ -18,9 +18,20 @@ a { text-decoration: none; color: inherit; }
 .o1 { width:500px; height:500px; top:-100px; left:-100px; background:#9FE1CB; opacity:.45; }
 .o2 { width:400px; height:400px; bottom:-80px; right:-80px; background:#B5D4F4; opacity:.35; }
 
-.page-header { position: relative; z-index: 1; padding: 44px 6% 24px; max-width: 700px; margin: 0 auto; }
-.page-header h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; }
-.page-header p { font-size: 14px; color: var(--ink-soft); }
+.page-header {
+    position: relative; z-index: 1;
+    max-width: 700px; margin: 0 auto;
+    padding: 44px 20px 20px;
+}
+.page-header .page-header-badge {
+    display: inline-flex; align-items: center; justify-content: center;
+    width: 40px; height: 40px; border-radius: 12px;
+    background: linear-gradient(135deg, var(--mint), var(--navy));
+    font-size: 19px; margin-bottom: 12px;
+    box-shadow: 0 4px 14px rgba(29,158,117,.25);
+}
+.page-header h1 { font-size: 24px; font-weight: 700; margin-bottom: 6px; letter-spacing: -.3px; }
+.page-header p { font-size: 13.5px; color: var(--ink-soft); }
 
 .qna-container {
     position: relative; z-index: 1;
