@@ -1,6 +1,5 @@
-
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -64,138 +63,47 @@
 
   <div class="board-card">
 
-    <!-- 고정 공지 -->
-    <div class="notice-row pinned-row">
-      <span class="pin-icon">📌</span>
-      <span class="badge b-notice">공지</span>
-      <div class="notice-main">
-        <div class="notice-title-row">
-          <span class="notice-title">끼역띠귿 메타버스 학습 공간 정식 오픈 안내</span>
-          <span class="new-dot"></span>
-          <span class="lang-tag">KO·EN·VI</span>
-        </div>
-      </div>
-      <div class="notice-meta">
-        <span class="meta-date">2026.06.20</span>
-        <span>👁 1,204</span>
+    <!-- 공지 없음 -->
+    <div class="notice-row" th:if="${#lists.isEmpty(list)}">
+      <div class="notice-main" style="text-align:center; padding:24px 0;">
+        <span class="notice-title">등록된 공지사항이 없습니다.</span>
       </div>
     </div>
 
-    <div class="notice-row pinned-row">
-      <span class="pin-icon">📌</span>
-      <span class="badge b-system">시스템</span>
-      <div class="notice-main">
-        <div class="notice-title-row">
-          <span class="notice-title">정기 점검 안내 (매주 화요일 02:00~04:00)</span>
-          <span class="clip-icon">📎</span>
-        </div>
-      </div>
-      <div class="notice-meta">
-        <span class="meta-date">2026.06.18</span>
-        <span>👁 860</span>
-      </div>
-    </div>
-
-    <!-- 일반 공지 -->
-    <div class="notice-row">
+    <!-- 공지 목록 (동적) -->
+    <div class="notice-row" th:each="notice : ${list}">
       <span class="pin-icon"></span>
-      <span class="badge b-event">이벤트</span>
+      <span class="badge"
+            th:classappend="${notice.category == '공지'} ? 'b-notice' : (${notice.category == '이벤트'} ? 'b-event' : (${notice.category == '시스템'} ? 'b-system' : 'b-update'))"
+            th:text="${notice.category}">공지</span>
       <div class="notice-main">
         <div class="notice-title-row">
-          <span class="notice-title">다문화 가정 한국어 말하기 대회 참가자 모집</span>
-          <span class="new-dot"></span>
-          <span class="lang-tag">KO·EN</span>
+          <a class="notice-title" th:href="@{/notice/view/{id}(id=${notice.id})}" th:text="${notice.title}">제목</a>
+          <span class="new-dot" th:if="${notice.recentPost}"></span>
         </div>
       </div>
       <div class="notice-meta">
-        <span class="meta-date">2026.06.21</span>
-        <span>👁 532</span>
-      </div>
-    </div>
-
-    <div class="notice-row">
-      <span class="pin-icon"></span>
-      <span class="badge b-update">업데이트</span>
-      <div class="notice-main">
-        <div class="notice-title-row">
-          <span class="notice-title">2단계 단어 월드 — 신규 강의 4개 추가</span>
-        </div>
-      </div>
-      <div class="notice-meta">
-        <span class="meta-date">2026.06.17</span>
-        <span>👁 401</span>
-      </div>
-    </div>
-
-    <div class="notice-row">
-      <span class="pin-icon"></span>
-      <span class="badge b-notice">공지</span>
-      <div class="notice-main">
-        <div class="notice-title-row">
-          <span class="notice-title">외국인 유학생을 위한 TOPIK 연계반 안내</span>
-          <span class="clip-icon">📎</span>
-          <span class="lang-tag">KO·EN·VI·ZH</span>
-        </div>
-      </div>
-      <div class="notice-meta">
-        <span class="meta-date">2026.06.15</span>
-        <span>👁 689</span>
-      </div>
-    </div>
-
-    <div class="notice-row">
-      <span class="pin-icon"></span>
-      <span class="badge b-system">시스템</span>
-      <div class="notice-main">
-        <div class="notice-title-row">
-          <span class="notice-title">모바일 앱 로그인 오류 수정 완료 안내</span>
-        </div>
-      </div>
-      <div class="notice-meta">
-        <span class="meta-date">2026.06.12</span>
-        <span>👁 318</span>
-      </div>
-    </div>
-
-    <div class="notice-row">
-      <span class="pin-icon"></span>
-      <span class="badge b-event">이벤트</span>
-      <div class="notice-main">
-        <div class="notice-title-row">
-          <span class="notice-title">출석 7일 연속 시 학습 뱃지 지급 이벤트</span>
-        </div>
-      </div>
-      <div class="notice-meta">
-        <span class="meta-date">2026.06.10</span>
-        <span>👁 275</span>
-      </div>
-    </div>
-
-    <div class="notice-row">
-      <span class="pin-icon"></span>
-      <span class="badge b-notice">공지</span>
-      <div class="notice-main">
-        <div class="notice-title-row">
-          <span class="notice-title">개인정보처리방침 일부 개정 안내</span>
-          <span class="clip-icon">📎</span>
-        </div>
-      </div>
-      <div class="notice-meta">
-        <span class="meta-date">2026.06.05</span>
-        <span>👁 190</span>
+        <span class="meta-date" th:text="${#temporals.format(notice.createdAt, 'yyyy.MM.dd')}">2026.01.01</span>
       </div>
     </div>
 
   </div>
 
   <!-- 페이지네이션 -->
-  <div class="pagination">
-    <span class="page-btn">‹</span>
-    <span class="page-btn active">1</span>
-    <span class="page-btn">2</span>
-    <span class="page-btn">3</span>
-    <span class="page-btn">4</span>
-    <span class="page-btn">›</span>
+  <div class="pagination" th:if="${totalPages > 0}">
+    <a class="page-btn"
+       th:href="@{/notice/list(page=${currentPage - 1})}"
+       th:classappend="${currentPage == 0} ? 'disabled'">‹</a>
+
+    <a class="page-btn"
+       th:each="i : ${#numbers.sequence(0, totalPages - 1)}"
+       th:href="@{/notice/list(page=${i})}"
+       th:classappend="${i == currentPage} ? 'active'"
+       th:text="${i + 1}">1</a>
+
+    <a class="page-btn"
+       th:href="@{/notice/list(page=${currentPage + 1})}"
+       th:classappend="${currentPage == totalPages - 1} ? 'disabled'">›</a>
   </div>
 
 </div>

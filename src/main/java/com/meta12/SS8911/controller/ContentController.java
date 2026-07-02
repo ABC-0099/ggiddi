@@ -19,6 +19,7 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriUtils;
 
@@ -129,8 +130,19 @@ public class ContentController {
         return "content/sakje";
     }
 
+//    @PostMapping("/content/chugaProc")
+//    public String chugaProc(ContentDTO contentDTO) {
+//        contentService.chugaProc(contentDTO);
+//        return "redirect:/category/view/" + contentDTO.getCategoryId();
+//    }
+
     @PostMapping("/content/chugaProc")
-    public String chugaProc(ContentDTO contentDTO) {
+    public String chugaProc(ContentDTO contentDTO, BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            // 로그 찍어서 원인 확인
+            bindingResult.getAllErrors().forEach(e -> System.out.println(e));
+            return "redirect:/content/chuga/" + contentDTO.getCategoryId();
+        }
         contentService.chugaProc(contentDTO);
         return "redirect:/category/view/" + contentDTO.getCategoryId();
     }

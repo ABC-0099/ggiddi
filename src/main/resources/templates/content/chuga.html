@@ -27,7 +27,7 @@
         <h1 class="page-title">강의 등록</h1>
         <span class="page-badge">관리자</span>
       </div>
-      <p class="page-desc"><strong th:text="${category.title}">강좌명</strong> 강좌에 새 강의 영상과 학습 자료를 업로드하세요.</p>
+      <p class="page-desc"><strong th:text="${category?.title}">강좌명</strong> 강좌에 새 강의 영상과 학습 자료를 업로드하세요.</p>
     </div>
   </div>
 
@@ -251,7 +251,131 @@
 <div th:replace="~{layout/footer :: footer}"></div>
 
 <script>
+  document.addEventListener('DOMContentLoaded', function () {
+   const videoInput = document.getElementById('videoFile');
+   const videoZone = document.getElementById('video-zone');
+   const videoPlaceholder = document.getElementById('video-placeholder');
+   const videoPreview = document.getElementById('video-preview');
+   const videoPlayer = document.getElementById('video-preview-player');
+   const videoInfo = document.getElementById('video-info');
+   const btnPublish = document.getElementById('btn-publish');
+   const actionHint = document.querySelector('.action-hint');
+   const summaryVideo = document.getElementById('summary-video');
 
+   // ── 영상 업로드 처리 ──
+   videoInput.addEventListener('change', function () {
+     const file = this.files[0];
+     if (!file) return;
+
+     const url = URL.createObjectURL(file);
+     videoPlayer.src = url;
+     videoInfo.textContent = file.name + ' (' + (file.size / (1024*1024)).toFixed(1) + 'MB)';
+
+     videoPlaceholder.style.display = 'none';
+     videoPreview.style.display = 'block';
+
+     // 등록 버튼 활성화
+     btnPublish.disabled = false;
+     actionHint.style.display = 'none';
+
+     summaryVideo.textContent = file.name;
+   });
+
+   window.removeFile = function (type) {
+     if (type === 'video') {
+       videoInput.value = '';
+       videoPlayer.src = '';
+       videoPlaceholder.style.display = 'flex';
+       videoPreview.style.display = 'none';
+       btnPublish.disabled = true;
+       actionHint.style.display = 'block';
+       summaryVideo.textContent = '미선택';
+     }
+   };
+
+   // ── 키워드 태그 ──
+   const keywordInput = document.getElementById('keyword-input');
+   const keywordsHidden = document.getElementById('keywords-hidden');
+   const keywordTags = document.getElementById('keyword-tags');
+   let keywords = [];
+
+   function renderKeywords() {
+     keywordTags.innerHTML = '';
+     keywords.forEach(function (kw, idx) {
+       const tag = document.createElement('span');
+       tag.className = 'ktag';
+       tag.innerHTML = kw + ' <button type="button">✕</button>';
+       tag.querySelector('button').addEventListener('click', function () {
+         keywords.splice(idx, 1);
+         renderKeywords();
+       });
+       keywordTags.appendChild(tag);
+     });
+     keywordsHidden.value = keywords.join(',');
+   }
+
+   keywordInput.addEventListener('keydown', function (e) {
+     if (e.key === 'Enter') {
+       e.preventDefault();
+       const val = this.value.trim();
+       if (val && !keywords.includes(val)) {
+         keywords.push(val);
+         renderKeywords();
+       }
+       this.value = '';
+     }
+   });
+
+   // ── 첨부파일 목록 ──
+   const attachInput = document.getElementById('attachFiles');
+   const attachList = document.getElementById('attach-list');
+   const summaryAttach = document.getElementById('summary-attach');
+
+   attachInput.addEventListener('change', function () {
+     attachList.innerHTML = '';
+     const files = Array.from(this.files);
+     files.forEach(function (file) {
+       const li = document.createElement('li');
+       li.className = 'attach-item';
+       li.innerHTML = '<span class="attach-icon">📄</span>' +
+         '<span class="attach-name">' + file.name + '</span>' +
+         '<span class="attach-size">' + (file.size / 1024).toFixed(0) + 'KB</span>';
+       attachList.appendChild(li);
+     });
+     summaryAttach.textContent = files.length + '개';
+   });
+
+   // ── 공개 상태에 따른 예약 필드 표시 ──
+   const statusSelect = document.getElementById('status');
+   const scheduleField = document.getElementById('schedule-field');
+   const summaryStatus = document.getElementById('summary-status');
+   const statusLabels = { DRAFT: '임시저장', PUBLISHED: '즉시 공개', SCHEDULED: '예약 공개' };
+
+   statusSelect.addEventListener('change', function () {
+     scheduleField.style.display = this.value === 'SCHEDULED' ? 'block' : 'none';
+     summaryStatus.textContent = statusLabels[this.value] || '임시저장';
+   });
+
+   // ── 무료/유료 토글 ──
+   const freeCheckbox = document.getElementById('free');
+   const freeLabel = document.getElementById('free-label');
+   freeCheckbox.addEventListener('change', function () {
+     freeLabel.textContent = this.checked ? '무료' : '유료';
+   });
+
+   // ── 제목/단계 요약 실시간 반영 ──
+   const titleInput = document.getElementById('title');
+   const stageSelect = document.getElementById('stage');
+   const summaryTitle = document.getElementById('summary-title');
+   const summaryStage = document.getElementById('summary-stage');
+
+   titleInput.addEventListener('input', function () {
+     summaryTitle.textContent = this.value || '—';
+   });
+   stageSelect.addEventListener('change', function () {
+     summaryStage.textContent = this.options[this.selectedIndex].text;
+   });
+ });
 </script>
 
 </body>

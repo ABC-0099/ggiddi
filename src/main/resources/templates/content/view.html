@@ -1,260 +1,467 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/springsecurity6">
+<html lang="ko">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>강의 등록 — 끼역띠귿 관리자</title>
+    <title>끼역띠귿 — 2-2강 음식 단어</title>
+    <link rel="stylesheet" th:href="@{/css/layout/navbar.css}" />
+    <link rel="stylesheet" th:href="@{/css/layout/footer.css}" />
+    <link rel="stylesheet" th:href="@{/css/content/view.css}" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" th:href="@{/css/layout/navbar.css}" />
-    <link rel="stylesheet" th:href="@{/css/layout/footer.css}" />
-    <link rel="stylesheet" th:href="@{/css/content/chuga.css}" />
+
 </head>
 <body>
 
-<!-- 네브바 -->
-<div th:replace="~{layout/navbar :: navbar(currentMenu='admin')}"></div>
+<div class="bg-orbs"><div class="orb o1"></div><div class="orb o2"></div></div>
 
-<main class="upload-wrap">
+<!-- NAV -->
+<<div th:replace="~{layout/navbar :: navbar(currentMenu='community')}"></div>
 
-    <!-- 페이지 헤더 -->
-    <div class="page-header">
-        <div class="page-header-inner">
-            <a th:href="@{/category/view/{id}(id=${category.id})}" class="back-btn">← 강의 목록으로</a>
-            <div class="page-title-row">
-                <h1 class="page-title">강의 등록</h1>
-                <span class="page-badge" th:text="${category.title}">관리자</span>
+
+<!-- 브레드크럼 -->
+<div class="breadcrumb">
+    <a href="lectures.html">강의 목록</a>
+    <span>›</span>
+    <a href="#">2단계 단어 월드</a>
+    <span>›</span>
+    <span style="color:var(--ink);">2-2강 음식 단어</span>
+</div>
+
+<!-- 메인 -->
+<div class="main">
+
+    <!-- 왼쪽 플레이어 -->
+    <div class="player-col">
+
+        <!-- 플레이어 -->
+        <div class="player-wrap">
+            <div class="player-screen">
+                <div class="player-thumb-icon">📖</div>
+                <div class="player-overlay">
+                    <div class="play-circle">▶</div>
+                </div>
             </div>
-            <p class="page-desc">
-                <span th:text="${category.title}">카테고리</span> 에 새 강의 영상과 학습 자료를 업로드하세요.
-            </p>
+            <div class="player-bar">
+                <div class="progress-track">
+                    <div class="progress-current"></div>
+                </div>
+                <div class="bar-controls">
+                    <div class="bar-left">
+                        <button class="ctrl-btn">⏮</button>
+                        <button class="ctrl-btn play">⏸</button>
+                        <button class="ctrl-btn">⏭</button>
+                        <span class="time-display">06:08 / 16:20</span>
+                    </div>
+                    <div class="bar-right">
+                        <button class="speed-btn">1.0x</button>
+                        <button class="ctrl-btn" style="font-size:15px;">⛶</button>
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <!-- 강의 정보 -->
+        <div class="lecture-info">
+            <div class="li-top">
+                <div>
+                    <div class="li-badge">2단계 · 단어 월드</div>
+                    <div class="li-title">2-2강 — 음식 단어<br />밥, 물, 고기, 채소</div>
+                </div>
+                <div class="li-actions">
+                    <button class="li-btn">🔖 저장</button>
+                    <button class="li-btn">📝 메모</button>
+                </div>
+            </div>
+            <div class="li-meta">
+                <span>⏱ 16분 20초</span>
+                <span>👁 510명 수강</span>
+                <span>📅 2025.04.12</span>
+                <span>✅ 진행 중 (38%)</span>
+            </div>
+        </div>
+
+        <!-- 강의 설명 -->
+        <div class="lecture-desc">
+            <div class="desc-title">📖 강의 소개</div>
+            <div class="desc-text">
+                이번 강의에서는 일상에서 자주 쓰는 음식 관련 단어를 배워봐요.<br />
+                밥, 물, 고기, 채소 등 기본 음식 단어부터 식당에서 쓰는 표현까지 익혀봐요.
+                각 단어는 발음, 한자 어원과 함께 설명해드려요.
+            </div>
+            <div class="keyword-list">
+                <span class="keyword">밥 (bap)</span>
+                <span class="keyword">물 (mul)</span>
+                <span class="keyword">고기 (gogi)</span>
+                <span class="keyword">채소 (chaeso)</span>
+                <span class="keyword">과일 (gwail)</span>
+                <span class="keyword">음료 (eumryo)</span>
+                <span class="keyword">식당 (sikdang)</span>
+                <span class="keyword">주문 (jumun)</span>
+            </div>
+        </div>
+
     </div>
 
-    <!-- 폼 -->
-    <div class="form-container">
-        <!-- ContentController.chugaProc(ContentDTO) 이 파라미터 이름으로 자동 바인딩하므로
-             th:object 없이 각 input의 name 속성만 ContentDTO 필드명과 맞춰주면 됩니다. -->
-        <form th:action="@{/content/chugaProc}" method="post" enctype="multipart/form-data" id="upload-form">
-            <input type="hidden" th:if="${_csrf != null}" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-            <input type="hidden" name="categoryId" th:value="${category.id}" />
-            <input type="hidden" name="duration" id="duration-hidden" value="" />
+    <!-- 오른쪽 사이드바 -->
+    <div class="sidebar">
 
-            <div class="form-grid">
+        <!-- 강의 목록 -->
+        <div class="sidebar-card">
+            <div class="sidebar-header">2단계 강의 목록 <span>12강</span></div>
 
-                <!-- ── 왼쪽 메인 ── -->
-                <div class="form-main">
+            <div class="sl-item">
+                <div class="sl-thumb" style="background:linear-gradient(135deg,#c8f0e2,#b5d4f4);">
+                    📖<div class="sl-done-mark">✓</div>
+                </div>
+                <div class="sl-info">
+                    <div class="sl-num">2-1강</div>
+                    <div class="sl-title">인사말 단어</div>
+                    <div class="sl-time">⏱ 14분 · 완료</div>
+                </div>
+            </div>
 
-                    <!-- 기본 정보 -->
-                    <section class="form-card">
-                        <div class="card-header">
-                            <span class="card-icon">📋</span>
-                            <span class="card-title">기본 정보</span>
-                        </div>
+            <div class="sl-item active">
+                <div class="sl-thumb" style="background:linear-gradient(135deg,#b5d4f4,#c8f0e2);">📖</div>
+                <div class="sl-info">
+                    <div class="sl-num">2-2강</div>
+                    <div class="sl-title">음식 단어 — 밥, 물, 고기, 채소</div>
+                    <div class="sl-time">⏱ 16분 · 진행 중 38%</div>
+                </div>
+            </div>
 
-                        <div class="field-group">
-                            <label class="field-label" for="title">강의 제목 <span class="req">*</span></label>
-                            <input class="field-input" type="text" id="title" name="title"
-                                   placeholder="예: 2-2강 — 음식 단어 (밥, 물, 고기, 채소)"
-                                   maxlength="100" required />
-                            <span class="field-hint">최대 100자</span>
-                        </div>
+            <div class="sl-item">
+                <div class="sl-thumb" style="background:linear-gradient(135deg,#d4f4ec,#9FE1CB);">📖</div>
+                <div class="sl-info">
+                    <div class="sl-num">2-3강</div>
+                    <div class="sl-title">숫자와 날짜 표현</div>
+                    <div class="sl-time">⏱ 20분</div>
+                </div>
+            </div>
 
-                        <div class="field-row">
-                            <div class="field-group">
-                                <label class="field-label" for="stage">학습 단계 <span class="req">*</span></label>
-                                <select class="field-select" id="stage" name="stage" required>
-                                    <option value="">단계 선택</option>
-                                    <option value="1">1단계 — K-POP</option>
-                                    <option value="2">2단계 — 드라마 대사</option>
-                                    <option value="3">3단계 — 일상 회화</option>
-                                    <option value="4">4단계 — 고급</option>
-                                </select>
-                            </div>
-                            <div class="field-group">
-                                <label class="field-label" for="sequence">강의 순서 <span class="req">*</span></label>
-                                <input class="field-input" type="number" id="sequence" name="sequence"
-                                       placeholder="예: 2" min="1" required />
-                            </div>
-                        </div>
+            <div class="sl-item">
+                <div class="sl-thumb" style="background:linear-gradient(135deg,#e0f5ee,#b5d4f4);">
+                    📖<div class="sl-lock">🔒</div>
+                </div>
+                <div class="sl-info">
+                    <div class="sl-num">2-4강</div>
+                    <div class="sl-title">색깔과 모양 단어</div>
+                    <div class="sl-time">⏱ 13분 · 잠김</div>
+                </div>
+            </div>
 
-                        <!-- ⚠ description/keywords/stage/status/publishAt/free 는 ContentDTO에는 있지만
-                             아직 ContentService.createEntity()에서 Content 엔티티로 매핑/저장하지 않고 있어요.
-                             저장하려면 Content 엔티티에 해당 필드를 추가하고 createEntity()에서 세팅해줘야 합니다. -->
-                        <div class="field-group">
-                            <label class="field-label" for="description">강의 설명</label>
-                            <textarea class="field-textarea" id="description" name="description"
-                                      placeholder="이번 강의에서 배울 내용을 간략히 소개해주세요."
-                                      rows="4" maxlength="500"></textarea>
-                            <span class="field-hint">최대 500자</span>
-                        </div>
+            <div class="sl-item">
+                <div class="sl-thumb" style="background:linear-gradient(135deg,#c8f0e2,#e0f5ee);">
+                    📖<div class="sl-lock">🔒</div>
+                </div>
+                <div class="sl-info">
+                    <div class="sl-num">2-5강</div>
+                    <div class="sl-title">날씨와 계절 단어</div>
+                    <div class="sl-time">⏱ 17분 · 잠김</div>
+                </div>
+            </div>
 
-                        <div class="field-group">
-                            <label class="field-label">핵심 키워드</label>
-                            <div class="keyword-input-wrap">
-                                <input class="field-input" type="text" id="keyword-input"
-                                       placeholder="키워드 입력 후 Enter" />
-                                <input type="hidden" name="keywords" id="keywords-hidden" />
-                            </div>
-                            <div class="keyword-tags" id="keyword-tags"></div>
-                            <span class="field-hint">강의에서 다루는 단어/표현 (예: 밥, 물, 고기)</span>
-                        </div>
-                    </section>
+        </div>
 
-                    <!-- 영상 업로드 -->
-                    <section class="form-card">
-                        <div class="card-header">
-                            <span class="card-icon">🎬</span>
-                            <span class="card-title">강의 영상</span>
-                        </div>
+        <!-- 퀴즈 (컴팩트) -->
+        <div class="sidebar-card" style="position:relative;" id="quiz-card">
+            <!-- 잠금 오버레이 -->
+            <div class="quiz-locked-overlay" id="quiz-locked-overlay">
+                <div class="quiz-lock-icon">🔒</div>
+                <div class="quiz-lock-title">강의를 완료하면 퀴즈가 열려요!</div>
+                <div class="quiz-lock-desc">영상을 끝까지 시청하고<br/>실력을 확인해보세요 ✨</div>
+                <div class="quiz-lock-bar-wrap" style="margin-top:4px;">
+                    <div class="quiz-lock-bar" id="quiz-lock-bar" style="width:38%;"></div>
+                </div>
+                <div style="font-size:11px;color:var(--ink-faint);margin-top:2px;" id="quiz-lock-pct">38% 시청</div>
+            </div>
 
-                        <div class="upload-zone" id="video-zone">
-                            <input type="file" id="videoFile" name="videoFile"
-                                   accept="video/mp4,video/webm,video/ogg"
-                                   class="upload-input" />
-                            <div class="upload-placeholder" id="video-placeholder">
-                                <div class="upload-icon">▶</div>
-                                <div class="upload-text">영상 파일을 드래그하거나 클릭해서 업로드</div>
-                                <div class="upload-sub">MP4, WebM, OGG · 최대 2GB</div>
-                            </div>
-                            <div class="upload-preview" id="video-preview" style="display:none;">
-                                <video id="video-preview-player" controls style="width:100%;border-radius:10px;"></video>
-                                <div class="preview-info" id="video-info"></div>
-                                <button type="button" class="preview-remove" onclick="removeFile('video')">✕ 제거</button>
-                            </div>
-                        </div>
+            <div class="sidebar-header">
+                📋 퀴즈 <span id="quiz-count">1 / 4</span>
+            </div>
 
-                        <!-- 업로드 진행 바 (업로드 중에만 표시) -->
-                        <div class="upload-progress" id="video-progress" style="display:none;">
-                            <div class="progress-label">
-                                <span>업로드 중...</span>
-                                <span id="video-progress-pct">0%</span>
-                            </div>
-                            <div class="progress-track">
-                                <div class="progress-bar" id="video-progress-bar"></div>
-                            </div>
-                        </div>
-                    </section>
+            <div style="padding:16px;">
 
-                    <!-- 첨부파일 -->
-                    <section class="form-card">
-                        <div class="card-header">
-                            <span class="card-icon">📎</span>
-                            <span class="card-title">학습 자료 첨부</span>
-                            <span class="card-badge-opt">선택</span>
-                        </div>
-
-                        <div class="upload-zone attach-zone" id="attach-zone">
-                            <input type="file" id="attachFiles" name="newAttachFiles"
-                                   multiple
-                                   accept=".pdf,.ppt,.pptx,.doc,.docx,.hwp,.zip,.jpg,.png"
-                                   class="upload-input" />
-                            <div class="upload-placeholder" id="attach-placeholder">
-                                <div class="upload-icon" style="font-size:28px;">📄</div>
-                                <div class="upload-text">파일을 드래그하거나 클릭해서 업로드</div>
-                                <div class="upload-sub">PDF, PPT, HWP, 이미지, ZIP · 파일당 최대 100MB · 최대 5개</div>
-                            </div>
-                        </div>
-
-                        <!-- 첨부파일 목록 -->
-                        <ul class="attach-list" id="attach-list"></ul>
-                    </section>
-
+                <!-- 진행 바 -->
+                <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:14px;">
+                    <div id="qp-fill" style="height:100%;width:25%;background:linear-gradient(90deg,var(--mint-dark),var(--mint));border-radius:2px;transition:width .3s;"></div>
                 </div>
 
-                <!-- ── 오른쪽 사이드 ── -->
-                <div class="form-side">
-
-                    <!-- 공개 설정 -->
-                    <section class="form-card">
-                        <div class="card-header">
-                            <span class="card-icon">⚙️</span>
-                            <span class="card-title">공개 설정</span>
-                        </div>
-
-                        <div class="field-group">
-                            <label class="field-label" for="status">공개 상태 <span class="req">*</span></label>
-                            <select class="field-select" id="status" name="status">
-                                <option value="DRAFT">임시저장</option>
-                                <option value="PUBLISHED">즉시 공개</option>
-                                <option value="SCHEDULED">예약 공개</option>
-                            </select>
-                        </div>
-
-                        <div class="field-group" id="schedule-field" style="display:none;">
-                            <label class="field-label" for="publishAt">공개 일시</label>
-                            <input class="field-input" type="datetime-local" id="publishAt"
-                                   name="publishAt" />
-                        </div>
-
-                        <div class="field-group">
-                            <label class="field-label">무료 공개 여부</label>
-                            <div class="toggle-row">
-                                <label class="toggle">
-                                    <!-- ContentDTO의 boolean 필드명이 free 라서(getter: isFree()) name도 free 로 맞춰야 자동 바인딩됩니다 -->
-                                    <input type="checkbox" name="free" id="free" />
-                                    <span class="toggle-slider"></span>
-                                </label>
-                                <span class="toggle-label" id="free-label">유료</span>
-                            </div>
-                        </div>
-                    </section>
-
-                    <!-- 미리보기 요약 -->
-                    <section class="form-card preview-card">
-                        <div class="card-header">
-                            <span class="card-icon">👁</span>
-                            <span class="card-title">등록 요약</span>
-                        </div>
-                        <ul class="summary-list">
-                            <li>
-                                <span class="sl">제목</span>
-                                <span class="sv" id="summary-title">—</span>
-                            </li>
-                            <li>
-                                <span class="sl">단계</span>
-                                <span class="sv" id="summary-stage">—</span>
-                            </li>
-                            <li>
-                                <span class="sl">영상</span>
-                                <span class="sv" id="summary-video">미선택</span>
-                            </li>
-                            <li>
-                                <span class="sl">첨부</span>
-                                <span class="sv" id="summary-attach">0개</span>
-                            </li>
-                            <li>
-                                <span class="sl">상태</span>
-                                <span class="sv" id="summary-status">임시저장</span>
-                            </li>
-                        </ul>
-                    </section>
-
-                    <!-- 액션 버튼 -->
-                    <div class="action-btns">
-                        <button type="submit" name="action" value="DRAFT" class="btn-draft">
-                            임시저장
-                        </button>
-                        <button type="submit" name="action" value="PUBLISH" class="btn-publish"
-                                id="btn-publish" disabled>
-                            🚀 강의 등록
-                        </button>
+                <!-- 문제 -->
+                <div id="quiz-main">
+                    <div id="quiz-question" style="font-size:13px;font-weight:700;color:var(--ink);line-height:1.55;margin-bottom:12px;">
+                        <span style="display:inline-block;background:var(--mint);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;margin-right:5px;vertical-align:middle;">Q1</span>
+                        "밥"의 뜻으로 올바른 것은?
                     </div>
 
-                    <p class="action-hint">영상 파일을 업로드해야 등록할 수 있어요.</p>
+                    <div id="quiz-options" style="display:flex;flex-direction:column;gap:7px;margin-bottom:12px;">
+                        <div class="cq-opt" onclick="selectOption(this,0)"><span class="cq-letter">A</span><span>물</span></div>
+                        <div class="cq-opt" onclick="selectOption(this,1)"><span class="cq-letter">B</span><span>밥 (쌀로 만든 음식)</span></div>
+                        <div class="cq-opt" onclick="selectOption(this,2)"><span class="cq-letter">C</span><span>고기</span></div>
+                        <div class="cq-opt" onclick="selectOption(this,3)"><span class="cq-letter">D</span><span>채소</span></div>
+                    </div>
 
+                    <div id="quiz-feedback" style="display:none;font-size:12px;padding:9px 12px;border-radius:8px;margin-bottom:10px;line-height:1.55;"></div>
+
+                    <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
+                        <button onclick="skipQuestion()" style="font-size:12px;padding:7px 12px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--ink-faint);cursor:pointer;font-family:inherit;">건너뛰기</button>
+                        <div style="display:flex;gap:7px;">
+                            <button id="qbtn-submit" onclick="submitAnswer()" disabled
+                                    style="font-size:12px;padding:7px 16px;border-radius:8px;border:none;background:var(--mint);color:#fff;font-weight:700;cursor:pointer;font-family:inherit;opacity:0.5;">확인</button>
+                            <button id="qbtn-next" onclick="nextQuestion()"
+                                    style="display:none;font-size:12px;padding:7px 16px;border-radius:8px;border:none;background:var(--navy);color:#fff;font-weight:700;cursor:pointer;font-family:inherit;">다음 →</button>
+                        </div>
+                    </div>
                 </div>
+
+                <!-- 결과 -->
+                <div id="quiz-result" style="display:none;text-align:center;padding:12px 0;">
+                    <div id="result-emoji" style="font-size:36px;margin-bottom:8px;">🎉</div>
+                    <div id="result-score" style="font-size:26px;font-weight:700;color:var(--mint-dark);letter-spacing:-0.5px;margin-bottom:4px;"></div>
+                    <div id="result-label" style="font-size:12px;color:var(--ink-soft);margin-bottom:14px;"></div>
+                    <button onclick="resetQuiz()" style="padding:8px 20px;border-radius:8px;background:var(--mint-pale);color:var(--mint-dark);border:1px solid rgba(93,202,165,.3);font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;">다시 풀기 🔄</button>
+                </div>
+
+                <!-- 점수 -->
+                <div style="margin-top:12px;padding-top:12px;border-top:1px solid var(--border);display:flex;justify-content:space-between;align-items:center;">
+                    <span style="font-size:12px;color:var(--ink-faint);">현재 점수</span>
+                    <span id="quiz-score-badge" style="font-size:13px;font-weight:700;color:var(--navy);">0점</span>
+                </div>
+
             </div>
-        </form>
+        </div>
+
     </div>
-</main>
-
-<!-- 푸터 -->
+</div>
 <div th:replace="~{layout/footer :: footer}"></div>
-
 <script>
+    // ── 속도 버튼 ──
+    const speeds = ['0.75x','1.0x','1.25x','1.5x','2.0x'];
+    let si = 1;
+    document.querySelector('.speed-btn').addEventListener('click', function() {
+      si = (si + 1) % speeds.length;
+      this.textContent = speeds[si];
+    });
+
+    // ── 영상 진행 시뮬레이션 (실제 연동 시 <video> timeupdate 이벤트로 교체) ──
+    // 현재 진행률 (0~100). 실제 구현에선 video.currentTime / video.duration * 100
+    let videoProgress = 38; // 예: DB에서 불러온 lastWatchedTime 반영값
+    let videoPlaying = false;
+    let videoInterval = null;
+
+    const progressBar   = document.querySelector('.progress-current');
+    const lockBar       = document.getElementById('quiz-lock-bar');
+    const lockPct       = document.getElementById('quiz-lock-pct');
+    const lockOverlay   = document.getElementById('quiz-locked-overlay');
+    const playBtn       = document.querySelector('.ctrl-btn.play');
+    const timeDisplay   = document.querySelector('.time-display');
+
+    const TOTAL_SEC = 16 * 60 + 20; // 16:20 = 980초
+
+    function secToStr(s) {
+      const m = Math.floor(s / 60), sec = Math.floor(s % 60);
+      return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
+    }
+
+    function updateProgressUI(pct) {
+      progressBar.style.width = pct + '%';
+      lockBar.style.width     = pct + '%';
+      lockPct.textContent     = Math.round(pct) + '% 시청';
+      const cur = Math.round(TOTAL_SEC * pct / 100);
+      timeDisplay.textContent = `${secToStr(cur)} / ${secToStr(TOTAL_SEC)}`;
+    }
+
+    function unlockQuiz() {
+      lockOverlay.style.transition = 'opacity .5s';
+      lockOverlay.style.opacity = '0';
+      setTimeout(() => { lockOverlay.style.display = 'none'; }, 500);
+    }
+
+    function checkUnlock(pct) {
+      if (pct >= 100) unlockQuiz();
+    }
+
+    // 초기 UI 반영
+    updateProgressUI(videoProgress);
+    if (videoProgress >= 100) unlockQuiz();
+
+    // 재생/일시정지 토글
+    function togglePlay() {
+      videoPlaying = !videoPlaying;
+      playBtn.textContent = videoPlaying ? '⏸' : '▶';
+      playBtn.classList.toggle('play', true);
+
+      if (videoPlaying) {
+        videoInterval = setInterval(() => {
+          if (videoProgress >= 100) {
+            videoProgress = 100;
+            clearInterval(videoInterval);
+            videoPlaying = false;
+            playBtn.textContent = '▶';
+            updateProgressUI(100);
+            unlockQuiz();
+            return;
+          }
+          // 1초마다 1/TOTAL_SEC 진행 (실제 영상은 훨씬 빠르게 테스트하려면 값 조정)
+          videoProgress += (100 / TOTAL_SEC);
+          updateProgressUI(videoProgress);
+        }, 1000);
+      } else {
+        clearInterval(videoInterval);
+      }
+    }
+
+    // 진행 바 클릭으로 탐색
+    document.querySelector('.progress-track').addEventListener('click', function(e) {
+      const rect = this.getBoundingClientRect();
+      const pct  = Math.max(0, Math.min(100, (e.clientX - rect.left) / rect.width * 100));
+      videoProgress = pct;
+      updateProgressUI(pct);
+      checkUnlock(pct);
+    });
+
+    // 재생 버튼 / 플레이어 화면 클릭
+    document.querySelector('.player-screen').addEventListener('click', togglePlay);
+    playBtn.addEventListener('click', function(e) { e.stopPropagation(); togglePlay(); });
+
+
+    // ── 퀴즈 ──
+    const quizData = [
+      {
+        q: '"밥"의 뜻으로 올바른 것은?',
+        options: ['물', '밥 (쌀로 만든 음식)', '고기', '채소'],
+        answer: 1,
+        fc: '✅ 정답! 밥(bap)은 쌀로 만든 한국의 주식이에요.',
+        fw: '❌ 틀렸어요. 정답은 "밥 (쌀로 만든 음식)"이에요.'
+      },
+      {
+        q: '"물 주세요"를 한국어로 올바르게 표현한 것은?',
+        options: ['밥 주세요', '고기 주세요', '물 주세요 (mul juseyo)', '채소 주세요'],
+        answer: 2,
+        fc: '✅ 정답! "물 주세요 (mul juseyo)"는 식당에서 자주 써요.',
+        fw: '❌ 틀렸어요. "물 주세요 (mul juseyo)"가 정답이에요.'
+      },
+      {
+        q: '"고기 (gogi)"의 종류가 아닌 것은?',
+        options: ['소고기 (sogogi)', '돼지고기 (dwaejigogi)', '채소고기 (chaesogogi)', '닭고기 (dakgogi)'],
+        answer: 2,
+        fc: '✅ 정답! 채소고기는 없는 표현이에요.',
+        fw: '❌ 틀렸어요. "채소고기"는 존재하지 않는 표현이에요.'
+      },
+      {
+        q: '"채소 (chaeso)"와 같은 의미로 쓰이는 단어는?',
+        options: ['고기', '야채', '과일', '음료'],
+        answer: 1,
+        fc: '✅ 정답! 채소와 야채는 같은 뜻으로 사용돼요.',
+        fw: '❌ 틀렸어요. 채소는 "야채"라고도 해요.'
+      },
+    ];
+
+    let currentQ = 0, selectedOpt = null, score = 0, answered = false;
+
+    document.getElementById('quiz-options').addEventListener('click', function(e) {
+      const opt = e.target.closest('.cq-opt');
+      if (!opt || answered) return;
+      document.querySelectorAll('#quiz-options .cq-opt').forEach(o => o.classList.remove('selected'));
+      opt.classList.add('selected');
+      selectedOpt = parseInt(opt.dataset.idx);
+      const btn = document.getElementById('qbtn-submit');
+      btn.disabled = false;
+      btn.style.opacity = '1';
+    });
+
+    function renderQuestion() {
+      const q = quizData[currentQ];
+      const letters = ['A','B','C','D'];
+
+      document.getElementById('quiz-question').innerHTML =
+        `<span style="display:inline-block;background:var(--mint);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;margin-right:5px;vertical-align:middle;">Q${currentQ+1}</span>${q.q}`;
+
+      document.getElementById('quiz-options').innerHTML = q.options.map((o, i) =>
+        `<div class="cq-opt" data-idx="${i}"><span class="cq-letter">${letters[i]}</span><span>${o}</span></div>`
+      ).join('');
+
+      const fb = document.getElementById('quiz-feedback');
+      fb.style.display = 'none'; fb.style.background = ''; fb.style.color = ''; fb.style.border = ''; fb.textContent = '';
+
+      const submit = document.getElementById('qbtn-submit');
+      submit.style.display = ''; submit.disabled = true; submit.style.opacity = '0.5';
+
+      document.getElementById('qbtn-next').style.display = 'none';
+      document.getElementById('qbtn-next').textContent = '다음 →';
+      document.querySelector('[onclick="skipQuestion()"]').style.display = '';
+      document.getElementById('quiz-count').textContent = `${currentQ+1} / ${quizData.length}`;
+      document.getElementById('qp-fill').style.width = `${((currentQ+1)/quizData.length)*100}%`;
+
+      selectedOpt = null; answered = false;
+    }
+
+    function submitAnswer() {
+      if (selectedOpt === null || answered) return;
+      answered = true;
+      const q = quizData[currentQ];
+      const opts = document.querySelectorAll('#quiz-options .cq-opt');
+      const fb = document.getElementById('quiz-feedback');
+
+      if (selectedOpt === q.answer) {
+        opts[selectedOpt].classList.remove('selected'); opts[selectedOpt].classList.add('correct');
+        opts[selectedOpt].querySelector('.cq-letter').style.background = 'var(--mint-dark)';
+        opts[selectedOpt].querySelector('.cq-letter').style.color = '#fff';
+        fb.style.background = 'var(--mint-pale)'; fb.style.color = 'var(--mint-dark)';
+        fb.style.border = '1px solid rgba(93,202,165,.3)'; fb.textContent = q.fc; score++;
+      } else {
+        opts[selectedOpt].classList.remove('selected'); opts[selectedOpt].classList.add('wrong');
+        opts[selectedOpt].querySelector('.cq-letter').style.background = '#EF4444';
+        opts[selectedOpt].querySelector('.cq-letter').style.color = '#fff';
+        opts[q.answer].classList.add('correct');
+        opts[q.answer].querySelector('.cq-letter').style.background = 'var(--mint-dark)';
+        opts[q.answer].querySelector('.cq-letter').style.color = '#fff';
+        fb.style.background = '#FEF2F2'; fb.style.color = '#EF4444';
+        fb.style.border = '1px solid rgba(239,68,68,.2)'; fb.textContent = q.fw;
+      }
+
+      fb.style.display = 'block';
+      document.getElementById('qbtn-submit').style.display = 'none';
+      document.getElementById('qbtn-next').style.display = '';
+      document.querySelector('[onclick="skipQuestion()"]').style.display = 'none';
+      document.getElementById('quiz-score-badge').textContent = `${score}점`;
+      if (currentQ === quizData.length - 1) document.getElementById('qbtn-next').textContent = '결과 보기 →';
+    }
+
+    function nextQuestion() {
+      currentQ++;
+      if (currentQ >= quizData.length) showResult();
+      else renderQuestion();
+    }
+
+    function skipQuestion() {
+      if (answered) return;
+      currentQ++;
+      if (currentQ >= quizData.length) showResult();
+      else renderQuestion();
+    }
+
+    function showResult() {
+      document.getElementById('quiz-main').style.display = 'none';
+      document.getElementById('quiz-result').style.display = 'block';
+      const pct = Math.round((score / quizData.length) * 100);
+      document.getElementById('result-score').textContent = `${score} / ${quizData.length}`;
+      document.getElementById('result-emoji').textContent = pct >= 75 ? '🎉' : pct >= 50 ? '🙂' : '😅';
+      document.getElementById('result-label').textContent =
+        pct >= 75 ? '훌륭해요! 다음 강의로 넘어가볼까요?' :
+        pct >= 50 ? '잘 하셨어요! 한 번 더 풀어볼까요?' : '조금 더 복습하고 다시 도전해봐요!';
+      document.getElementById('quiz-score-badge').textContent = `최종: ${score}점`;
+      document.getElementById('quiz-count').textContent = '완료!';
+    }
+
+    function resetQuiz() {
+      currentQ = 0; score = 0; selectedOpt = null; answered = false;
+      document.getElementById('quiz-main').style.display = 'block';
+      document.getElementById('quiz-result').style.display = 'none';
+      document.getElementById('quiz-score-badge').textContent = '0점';
+      renderQuestion();
+    }
 
 </script>
 
