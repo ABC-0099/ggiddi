@@ -165,17 +165,17 @@
 
                 <!-- ★ 페이지네이션 -->
                 <div class="my-post-pagination" th:if="${!myPosts.empty}">
-                    <a th:href="@{/siteUser/mypage(page=${myPosts.number - 1}, tab='posts', subtab='myposts')}"
+                    <a th:href="@{/siteUser/mypage(postPage=${myPosts.number - 1}, tab='posts', subtab='myposts')}"
                        th:classappend="${myPosts.first} ? 'disabled'"
                        class="page-btn page-prev">‹</a>
 
                     <a th:each="i : ${#numbers.sequence(0, myPosts.totalPages - 1)}"
-                       th:href="@{/siteUser/mypage(page=${i}, tab='posts', subtab='myposts')}"
+                       th:href="@{/siteUser/mypage(postPage=${i}, tab='posts', subtab='myposts')}"
                        th:text="${i + 1}"
                        th:classappend="${i == myPosts.number} ? 'active'"
                        class="page-btn"></a>
 
-                    <a th:href="@{/siteUser/mypage(page=${myPosts.number + 1}, tab='posts', subtab='myposts')}"
+                    <a th:href="@{/siteUser/mypage(postPage=${myPosts.number + 1}, tab='posts', subtab='myposts')}"
                        th:classappend="${myPosts.last} ? 'disabled'"
                        class="page-btn page-next">›</a>
                 </div>
@@ -183,8 +183,8 @@
 
             <!-- 내가 쓴 댓글 -->
             <div class="subtab-panel" id="subtab-mycomments">
-                <div class="my-post-list" th:if="${!#lists.isEmpty(myComments)}">
-                    <a class="my-comment-item" th:each="comment : ${myComments}"
+                <div class="my-post-list" th:if="${!myComments.empty}">
+                    <a class="my-comment-item" th:each="comment : ${myComments.content}"
                        th:href="@{/community/{id}(id=${comment.community.id})}">
                         <div class="my-comment-content" th:text="${comment.content}">댓글 내용</div>
                         <div class="my-comment-meta">
@@ -193,8 +193,25 @@
                         </div>
                     </a>
                 </div>
-                <div class="empty-panel" th:if="${#lists.isEmpty(myComments)}">
+                <div class="empty-panel" th:if="${myComments.empty}">
                     💬 아직 작성한 댓글이 없어요
+                </div>
+
+                <!-- ★ 댓글 페이지네이션 -->
+                <div class="my-post-pagination" th:if="${!myComments.empty}">
+                    <a th:href="@{/siteUser/mypage(commentPage=${myComments.number - 1}, tab='posts', subtab='mycomments')}"
+                       th:classappend="${myComments.first} ? 'disabled'"
+                       class="page-btn page-prev">‹</a>
+
+                    <a th:each="i : ${#numbers.sequence(0, myComments.totalPages - 1)}"
+                       th:href="@{/siteUser/mypage(commentPage=${i}, tab='posts', subtab='mycomments')}"
+                       th:text="${i + 1}"
+                       th:classappend="${i == myComments.number} ? 'active'"
+                       class="page-btn"></a>
+
+                    <a th:href="@{/siteUser/mypage(commentPage=${myComments.number + 1}, tab='posts', subtab='mycomments')}"
+                       th:classappend="${myComments.last} ? 'disabled'"
+                       class="page-btn page-next">›</a>
                 </div>
             </div>
 

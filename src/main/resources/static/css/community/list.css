@@ -514,6 +514,7 @@ nav {
         bottom: 80px; right: 8px; border-radius: 16px;
     }
     .kk-fab { bottom: 20px; right: 16px; }
+}
 
 /* ── 게시글 목록 대표 이미지 ── */
 .post-image-wrap {
@@ -539,5 +540,46 @@ nav {
     font-weight: 700;
     padding: 4px 10px;
     border-radius: 20px;
+}
 
+/* ── 커뮤니티 페이지네이션 ── */
+.community-pagination {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 6px;
+    margin-top: 24px;
+}
+
+.community-pagination .page-btn {
+    min-width: 36px;
+    height: 36px;
+    padding: 0 10px;
+    border-radius: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13.5px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    background: rgba(255,255,255,.7);
+    border: 1px solid var(--border);
+    text-decoration: none;
+    transition: all 0.15s;
+}
+
+.community-pagination .page-btn:hover {
+    background: var(--mint-pale);
+    color: var(--mint-dark);
+}
+
+.community-pagination .page-btn.active {
+    background: var(--mint);
+    color: #fff;
+    border-color: var(--mint);
+}
+
+.community-pagination .page-btn.disabled {
+    opacity: 0.4;
+    pointer-events: none;
 }

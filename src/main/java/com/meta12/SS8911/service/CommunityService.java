@@ -77,6 +77,10 @@ public class CommunityService {
         return communityRepository.findByAuthorOrderByCreatedDateDesc(author);
     }
 
+    public Page<Community> getPostsByAuthor(SiteUser author, Pageable pageable) {
+        return communityRepository.findByAuthorOrderByCreatedDateDesc(author, pageable);
+    }
+
     public List<CommunityFile> getFiles(Community community) {
         return communityFileRepository.findByCommunity(community);
     }
@@ -186,7 +190,22 @@ public class CommunityService {
         }
     }
 
-    public Page<Community> getPostsByAuthor(SiteUser author, Pageable pageable) {
-        return communityRepository.findByAuthorOrderByCreatedDateDesc(author, pageable);
+    public Page<Community> getCommunityPosts(Category category, String sort, String kw, Pageable pageable) {
+        boolean hasKeyword = kw != null && !kw.isBlank();
+
+        if (hasKeyword) {
+            if (category == null || category == Category.ALL) {
+                return communityRepository.findAllByKeyword(kw, pageable);
+            }
+            return communityRepository.findByCategoryAndKeyword(category, kw, pageable);
+        }
+
+        boolean oldest = "oldest".equals(sort);
+        if (category == null || category == Category.ALL) {
+            return oldest ? communityRepository.findAllWithAuthorOldest(pageable)
+                    : communityRepository.findAllWithAuthor(pageable);
+        }
+        return oldest ? communityRepository.findByCategoryWithAuthorOldest(category, pageable)
+                : communityRepository.findByCategoryWithAuthor(category, pageable);
     }
 }
