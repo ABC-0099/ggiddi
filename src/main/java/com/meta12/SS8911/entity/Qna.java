@@ -5,6 +5,8 @@ import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
 import com.meta12.SS8911.config.QnaCategory;
+import java.util.ArrayList;
+import java.util.List;
 
 import java.time.LocalDateTime;
 
@@ -43,4 +45,7 @@ public class Qna {
         if (this.status == null) this.status = InquiryStatus.PENDING;
         if (this.category == null) this.category = QnaCategory.ETC;
     }
+
+    @OneToMany(mappedBy = "qna", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<QnaFile> files = new ArrayList<>();
 }
