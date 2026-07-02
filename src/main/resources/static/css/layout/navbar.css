@@ -172,7 +172,6 @@
   }
 
   .drop-icon {
-    font-size: 20px;
     width: 32px;
     height: 32px;
     background: #e8f1fb;
@@ -181,6 +180,12 @@
     align-items: center;
     justify-content: center;
     flex-shrink: 0;
+    color: #185FA5;
+  }
+
+  .drop-icon svg {
+    width: 18px;
+    height: 18px;
   }
 
   .dropdown-menu li a div strong {

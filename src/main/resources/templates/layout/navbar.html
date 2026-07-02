@@ -57,7 +57,12 @@
         <ul class="dropdown-menu dropdown-menu-card">
           <li>
             <a th:href="@{/category/list}" th:classappend="${currentMenu == 'category'} ? 'active'">
-              <span class="drop-icon">🎓</span>
+              <span class="drop-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 3L2 8l10 5 8-4.09V15h2V8L12 3z" stroke="currentColor" stroke-width="1.5" stroke-linejoin="round" fill="none"/>
+                  <path d="M6 10.5V15c0 1.5 2.5 3.5 6 3.5s6-2 6-3.5v-4.5" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
               <div>
                 <strong>동영상 강의</strong>
                 <small>단계별 한국어 강의</small>
@@ -66,7 +71,14 @@
           </li>
           <li>
             <a th:href="@{/game}" th:classappend="${currentMenu == 'game'} ? 'active'">
-              <span class="drop-icon">🎮</span>
+              <span class="drop-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="2" y="7" width="20" height="11" rx="4" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M7 10v4M5 12h4" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                  <circle cx="16" cy="10.5" r="1" fill="currentColor"/>
+                  <circle cx="18.5" cy="13" r="1" fill="currentColor"/>
+                </svg>
+              </span>
               <div>
                 <strong>학습 게임</strong>
                 <small>픽셀 RPG로 배우기</small>
@@ -87,7 +99,13 @@
         <ul class="dropdown-menu dropdown-menu-card">
           <li>
             <a th:href="@{/faq/list}" th:classappend="${currentMenu == 'faq'} ? 'active'">
-              <span class="drop-icon">❓</span>
+              <span class="drop-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M9.5 9.3c0-1.4 1.1-2.5 2.5-2.5s2.5 1 2.5 2.3c0 1.5-2.5 1.7-2.5 3.7" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="12" cy="16.3" r="1" fill="currentColor"/>
+                </svg>
+              </span>
               <div>
                 <strong>자주 묻는 질문</strong>
                 <small>FAQ</small>
@@ -96,7 +114,12 @@
           </li>
           <li>
             <a th:href="@{/qna/write}" th:classappend="${currentMenu == 'qna'} ? 'active'">
-              <span class="drop-icon">✉️</span>
+              <span class="drop-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <rect x="3" y="5" width="18" height="14" rx="2.5" stroke="currentColor" stroke-width="1.5"/>
+                  <path d="M4 7l8 6 8-6" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </span>
               <div>
                 <strong>1:1 질문하기</strong>
                 <small>강사에게 직접 질문</small>
