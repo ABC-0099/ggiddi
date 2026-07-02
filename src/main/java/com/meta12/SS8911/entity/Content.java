@@ -2,7 +2,6 @@ package com.meta12.SS8911.entity;
 
 
 import jakarta.persistence.*;
-;
 import lombok.Getter;
 import lombok.Setter;
 
@@ -17,11 +16,9 @@ public class Content {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Id
     private Long id;
-
     private String title;
     private String videoUrl;
     private Integer sequence;
-
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "category_id")
     private Category category;
@@ -44,8 +41,5 @@ public class Content {
         return (progressPercent == null) ? 0 : progressPercent;
     }
     public void setProgressPercent(int progressPercent) { this.progressPercent = progressPercent; }
-
-
-
 
 }

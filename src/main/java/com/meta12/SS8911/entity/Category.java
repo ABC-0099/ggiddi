@@ -29,8 +29,14 @@ public class Category {
     private String fileName;
     private String fileOrigin;
 
+
     @OneToMany(mappedBy = "category")
     @JsonIgnore // 💡 이 어노테이션을 추가하세요!
     private List<Content> contentList;
+
+
+//    @OneToMany(mappedBy = "category")
+//    @JsonIgnore //
+//    private List<Content> contentList;
 
 }
