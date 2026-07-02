@@ -95,3 +95,23 @@ a { text-decoration: none; color: inherit; }
 @media (max-width: 640px) {
     .qna-card { padding: 24px 20px; }
 }
+
+.qna-owner-actions {
+    display: flex; justify-content: flex-end; gap: 8px;
+    margin-top: 20px; padding-top: 20px;
+    border-top: 1px solid #f3f4f6;
+}
+.qna-owner-actions .btn-edit {
+    padding: 8px 18px; border-radius: 8px;
+    border: 1.5px solid var(--navy); background: #fff; color: var(--navy);
+    font-size: 13px; font-weight: 500; text-decoration: none;
+    transition: all .18s;
+}
+.qna-owner-actions .btn-edit:hover { background: var(--navy); color: #fff; }
+.qna-owner-actions .btn-delete {
+    padding: 8px 18px; border-radius: 8px;
+    border: 1.5px solid #ef4444; background: #fff; color: #ef4444;
+    font-size: 13px; font-weight: 500; cursor: pointer;
+    font-family: inherit; transition: all .18s;
+}
+.qna-owner-actions .btn-delete:hover { background: #ef4444; color: #fff; }
