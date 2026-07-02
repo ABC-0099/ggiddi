@@ -486,7 +486,7 @@
       form.addEventListener('submit', function (e) {
         e.preventDefault();
         var isEdit = !!idInput.value;
-        var url = isEdit ? ('/category/sujung/' + idInput.value) : '/category/chuga';
+        var url = isEdit ? '/category/sujungProc' : '/category/chugaProc';
 
         submitBtn.disabled = true;
         submitBtn.textContent = isEdit ? '수정 중...' : '등록 중...';
