@@ -50,10 +50,20 @@
 
     <!-- 첨부 파일 -->
     <div class="view-files" th:if="${!#lists.isEmpty(post.files) and post.files.?[fileType == 'ATTACH'].size() > 0}">
-      <div class="view-files-title">📎 첨부파일</div>
+      <div class="view-files-title" style="display:flex; align-items:center; gap:6px;">
+        <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21.44 11.05l-9.19 9.19a5 5 0 0 1-7.07-7.07l9.19-9.19a3.5 3.5 0 0 1 4.95 4.95l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+        </svg>
+        첨부파일
+      </div>
       <ul class="view-file-list">
         <li class="view-file-item" th:each="file : ${post.files}" th:if="${file.fileType == 'ATTACH'}">
-          <span class="vf-icon">📄</span>
+          <span class="vf-icon">
+            <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/>
+              <polyline points="14 2 14 8 20 8"/>
+            </svg>
+          </span>
           <span class="vf-name" th:text="${file.originalName}">파일명</span>
           <span class="vf-size"
                 th:text="${#numbers.formatDecimal(file.fileSize / 1048576.0, 1, 1)} + ' MB'">0.0 MB</span>
@@ -66,18 +76,38 @@
     <div class="view-footer">
       <span class="pf-action" id="btn-share" onclick="sharePost()">↗ 공유</span>
       <span class="pf-spacer"></span>
-      <span class="pf-report" onclick="reportPost()">🚩 신고</span>
+      <span class="pf-report" onclick="reportPost()">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:3px;">
+          <path d="M5 21V4"/>
+          <path d="M5 4h13l-2.5 4L18 12H5"/>
+        </svg>
+        신고
+      </span>
     </div>
 
     <!-- 수정/삭제 버튼 (작성자 또는 관리자만 표시) -->
     <div class="view-actions"
          th:if="${#authentication.name == post.author.username or #authorization.expression('hasRole(''ADMIN'')')}">
       <a th:if="${#authentication.name == post.author.username}"
-         th:href="@{/community/{id}/edit(id=${post.id})}" class="btn-edit">✏️ 수정</a>
+         th:href="@{/community/{id}/edit(id=${post.id})}" class="btn-edit">
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:3px;">
+          <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/>
+        </svg>
+        수정
+      </a>
       <form th:action="@{/community/{id}/delete(id=${post.id})}" method="post" style="display:inline;">
         <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
         <button type="submit" class="btn-delete"
-                onclick="return confirm('정말 삭제할까요?')">🗑️ 삭제</button>
+                onclick="return confirm('정말 삭제할까요?')">
+          <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:3px;">
+            <polyline points="3 6 5 6 21 6"/>
+            <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+            <path d="M10 11v6"/>
+            <path d="M14 11v6"/>
+            <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+          </svg>
+          삭제
+        </button>
       </form>
     </div>
 
@@ -134,7 +164,10 @@
 
         <!-- 댓글 없을 때 -->
         <div class="comment-empty" th:if="${#lists.isEmpty(comments)}">
-          첫 번째 댓글을 남겨보세요 💬
+          첫 번째 댓글을 남겨보세요
+          <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-left:2px;">
+            <path d="M4 4h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H9l-5 4v-4H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/>
+          </svg>
         </div>
       </div>
 
