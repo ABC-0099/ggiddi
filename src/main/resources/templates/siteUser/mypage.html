@@ -27,8 +27,6 @@
             <div class="profile-name" th:text="${siteUser.name}">이름</div>
             <div class="profile-username" th:text="'@' + ${siteUser.username}">아이디</div>
 
-            <!-- 구독 뱃지: subscription 객체가 모델에 있을 때만 표시 -->
-            <!-- 추후 구독 엔티티/서비스 연결 후 Controller에서 model.addAttribute("subscription", ...) 추가하면 자동 표시됨 -->
             <div class="subscribe-badge" th:if="${subscription != null}">
                 ⭐ <span th:text="${subscription.planName}">구독</span> · D-<span th:text="${subscription.remainingDays}">0</span>
             </div>
@@ -167,17 +165,17 @@
 
                 <!-- ★ 페이지네이션 -->
                 <div class="my-post-pagination" th:if="${!myPosts.empty}">
-                    <a th:href="@{/siteUser/mypage(page=${myPosts.number - 1}, tab='posts', subtab='myposts')}"
+                    <a th:href="@{/siteUser/mypage(postPage=${myPosts.number - 1}, tab='posts', subtab='myposts')}"
                        th:classappend="${myPosts.first} ? 'disabled'"
                        class="page-btn page-prev">‹</a>
 
                     <a th:each="i : ${#numbers.sequence(0, myPosts.totalPages - 1)}"
-                       th:href="@{/siteUser/mypage(page=${i}, tab='posts', subtab='myposts')}"
+                       th:href="@{/siteUser/mypage(postPage=${i}, tab='posts', subtab='myposts')}"
                        th:text="${i + 1}"
                        th:classappend="${i == myPosts.number} ? 'active'"
                        class="page-btn"></a>
 
-                    <a th:href="@{/siteUser/mypage(page=${myPosts.number + 1}, tab='posts', subtab='myposts')}"
+                    <a th:href="@{/siteUser/mypage(postPage=${myPosts.number + 1}, tab='posts', subtab='myposts')}"
                        th:classappend="${myPosts.last} ? 'disabled'"
                        class="page-btn page-next">›</a>
                 </div>
@@ -185,8 +183,8 @@
 
             <!-- 내가 쓴 댓글 -->
             <div class="subtab-panel" id="subtab-mycomments">
-                <div class="my-post-list" th:if="${!#lists.isEmpty(myComments)}">
-                    <a class="my-comment-item" th:each="comment : ${myComments}"
+                <div class="my-post-list" th:if="${!myComments.empty}">
+                    <a class="my-comment-item" th:each="comment : ${myComments.content}"
                        th:href="@{/community/{id}(id=${comment.community.id})}">
                         <div class="my-comment-content" th:text="${comment.content}">댓글 내용</div>
                         <div class="my-comment-meta">
@@ -195,14 +193,65 @@
                         </div>
                     </a>
                 </div>
-                <div class="empty-panel" th:if="${#lists.isEmpty(myComments)}">
+                <div class="empty-panel" th:if="${myComments.empty}">
                     💬 아직 작성한 댓글이 없어요
+                </div>
+
+                <!-- ★ 댓글 페이지네이션 -->
+                <div class="my-post-pagination" th:if="${!myComments.empty}">
+                    <a th:href="@{/siteUser/mypage(commentPage=${myComments.number - 1}, tab='posts', subtab='mycomments')}"
+                       th:classappend="${myComments.first} ? 'disabled'"
+                       class="page-btn page-prev">‹</a>
+
+                    <a th:each="i : ${#numbers.sequence(0, myComments.totalPages - 1)}"
+                       th:href="@{/siteUser/mypage(commentPage=${i}, tab='posts', subtab='mycomments')}"
+                       th:text="${i + 1}"
+                       th:classappend="${i == myComments.number} ? 'active'"
+                       class="page-btn"></a>
+
+                    <a th:href="@{/siteUser/mypage(commentPage=${myComments.number + 1}, tab='posts', subtab='mycomments')}"
+                       th:classappend="${myComments.last} ? 'disabled'"
+                       class="page-btn page-next">›</a>
                 </div>
             </div>
 
-            <!-- 1:1 문의 (준비중) -->
+            <!-- 1:1 문의 -->
             <div class="subtab-panel" id="subtab-myinquiry">
-                <div class="empty-panel">✉️ 1:1 문의 기능은 준비 중입니다</div>
+
+                <div class="my-inquiry-header">
+                    <a th:href="@{/qna/write}" class="btn-inquiry-write">✏️ 문의하기</a>
+                </div>
+
+                <div class="my-post-list" th:if="${!myInquiries.empty}">
+                    <a class="my-inquiry-item" th:each="inquiry : ${myInquiries.content}"
+                       th:href="@{/qna/{id}(id=${inquiry.id})}">
+            <span class="inquiry-status"
+                  th:text="${inquiry.status.description}"
+                  th:classappend="${inquiry.status.name() == 'ANSWERED'} ? 'answered' : 'pending'"></span>
+                        <span class="my-post-title" th:text="${inquiry.title}">제목</span>
+                        <span class="my-post-date" th:text="${#temporals.format(inquiry.createdDate, 'yyyy.MM.dd')}">날짜</span>
+                    </a>
+                </div>
+                <div class="empty-panel" th:if="${myInquiries.empty}">
+                    ✉️ 아직 등록한 문의가 없어요
+                </div>
+
+                <!-- ★ 문의 페이지네이션 -->
+                <div class="my-post-pagination" th:if="${!myInquiries.empty}">
+                    <a th:href="@{/siteUser/mypage(inquiryPage=${myInquiries.number - 1}, tab='posts', subtab='myinquiry')}"
+                       th:classappend="${myInquiries.first} ? 'disabled'"
+                       class="page-btn page-prev">‹</a>
+
+                    <a th:each="i : ${#numbers.sequence(0, myInquiries.totalPages - 1)}"
+                       th:href="@{/siteUser/mypage(inquiryPage=${i}, tab='posts', subtab='myinquiry')}"
+                       th:text="${i + 1}"
+                       th:classappend="${i == myInquiries.number} ? 'active'"
+                       class="page-btn"></a>
+
+                    <a th:href="@{/siteUser/mypage(inquiryPage=${myInquiries.number + 1}, tab='posts', subtab='myinquiry')}"
+                       th:classappend="${myInquiries.last} ? 'disabled'"
+                       class="page-btn page-next">›</a>
+                </div>
             </div>
         </section>
 

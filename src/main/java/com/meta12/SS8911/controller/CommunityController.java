@@ -9,6 +9,9 @@ import com.meta12.SS8911.service.CommentService;
 import com.meta12.SS8911.service.CommunityService;
 import com.meta12.SS8911.service.SiteUserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
@@ -30,8 +33,10 @@ public class CommunityController {
     public String list(@RequestParam(required = false) Category category,
                        @RequestParam(required = false, defaultValue = "newest") String sort,
                        @RequestParam(required = false, defaultValue = "") String kw,
+                       @RequestParam(required = false, defaultValue = "0") int page,
                        Model model) {
-        List<Community> posts = communityService.getCommunityPosts(category, sort, kw);
+        Pageable pageable = PageRequest.of(page, 10);
+        Page<Community> posts = communityService.getCommunityPosts(category, sort, kw, pageable);
         model.addAttribute("postList", posts);
         model.addAttribute("category", category);
         model.addAttribute("sort", sort);

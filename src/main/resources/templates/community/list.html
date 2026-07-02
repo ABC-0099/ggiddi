@@ -38,7 +38,7 @@
     <div class="search-area">
         <div class="search-wrap">
             <span>🔍</span>
-            <input type="text" id="search_kw" placeholder="제목, 내용, 태그로 검색" />
+            <input type="text" id="search_kw" placeholder="제목 및 내용 검색" />
         </div>
         <button type="button" id="btn_search" class="search-btn">검색</button>
     </div>
@@ -52,14 +52,14 @@
 </div>
 
 <div class="post-wrap">
-    <div class="info-box">🔔  커뮤니티 이용 시 욕설·비방·혐오 표현은 삼가 주세요. 타인을 존중하는 건강한 소통 문화를 만들어요.</div>
+    <div class="info-box">🔔 커뮤니티 이용 시 욕설·비방·혐오 표현은 삼가 주세요. 타인을 존중하는 건강한 소통 문화를 만들어요.</div>
 
-    <div class="post" th:each="post : ${postList}">
+    <div class="post" th:each="post : ${postList.content}">
         <div class="post-top">
             <div class="post-avatar" th:text="${#strings.substring(post.author.username, 0, 1)}">리</div>
             <div>
                 <div class="post-author" th:text="${post.author.username}">사용자</div>
-                <div class="post-meta" th:text="${post.author.nationality + ' · ' + #temporals.format(post.createdDate, 'MM.dd HH:mm')}">시간</div>
+                <div class="post-meta" th:text="${post.author.nationality + ' · ' + #temporals.format(post.createdDate, 'yy.MM.dd HH:mm')}">시간</div>
             </div>
         </div>
 
@@ -97,6 +97,23 @@
                 🚩 신고
             </span>
         </div>
+    </div>
+
+    <!-- ★ 페이지네이션 -->
+    <div class="community-pagination" th:if="${!postList.empty}">
+        <a th:href="@{/community(category=${category}, sort=${sort}, kw=${kw}, page=${postList.number - 1})}"
+           th:classappend="${postList.first} ? 'disabled'"
+           class="page-btn page-prev">‹</a>
+
+        <a th:each="i : ${#numbers.sequence(0, postList.totalPages - 1)}"
+           th:href="@{/community(category=${category}, sort=${sort}, kw=${kw}, page=${i})}"
+           th:text="${i + 1}"
+           th:classappend="${i == postList.number} ? 'active'"
+           class="page-btn"></a>
+
+        <a th:href="@{/community(category=${category}, sort=${sort}, kw=${kw}, page=${postList.number + 1})}"
+           th:classappend="${postList.last} ? 'disabled'"
+           class="page-btn page-next">›</a>
     </div>
 </div>
 

@@ -51,4 +51,36 @@ public interface CommunityRepository extends JpaRepository<Community, Long> {
     List<Community> findByAuthorOrderByCreatedDateDesc(SiteUser author);
 
     Page<Community> findByAuthorOrderByCreatedDateDesc(SiteUser author, Pageable pageable);
+
+    @Query(value = "SELECT c FROM Community c JOIN FETCH c.author " +
+            "WHERE c.category = :category " +
+            "AND (c.title LIKE %:kw% OR c.content LIKE %:kw%) " +
+            "ORDER BY c.createdDate DESC",
+            countQuery = "SELECT count(c) FROM Community c " +
+                    "WHERE c.category = :category " +
+                    "AND (c.title LIKE %:kw% OR c.content LIKE %:kw%)")
+    Page<Community> findByCategoryAndKeyword(@Param("category") Category category, @Param("kw") String kw, Pageable pageable);
+
+    @Query(value = "SELECT c FROM Community c JOIN FETCH c.author " +
+            "WHERE (c.title LIKE %:kw% OR c.content LIKE %:kw%) " +
+            "ORDER BY c.createdDate DESC",
+            countQuery = "SELECT count(c) FROM Community c " +
+                    "WHERE (c.title LIKE %:kw% OR c.content LIKE %:kw%)")
+    Page<Community> findAllByKeyword(@Param("kw") String kw, Pageable pageable);
+
+    @Query(value = "SELECT c FROM Community c JOIN FETCH c.author ORDER BY c.createdDate DESC",
+            countQuery = "SELECT count(c) FROM Community c")
+    Page<Community> findAllWithAuthor(Pageable pageable);
+
+    @Query(value = "SELECT c FROM Community c JOIN FETCH c.author ORDER BY c.createdDate ASC",
+            countQuery = "SELECT count(c) FROM Community c")
+    Page<Community> findAllWithAuthorOldest(Pageable pageable);
+
+    @Query(value = "SELECT c FROM Community c JOIN FETCH c.author WHERE c.category = :category ORDER BY c.createdDate DESC",
+            countQuery = "SELECT count(c) FROM Community c WHERE c.category = :category")
+    Page<Community> findByCategoryWithAuthor(@Param("category") Category category, Pageable pageable);
+
+    @Query(value = "SELECT c FROM Community c JOIN FETCH c.author WHERE c.category = :category ORDER BY c.createdDate ASC",
+            countQuery = "SELECT count(c) FROM Community c WHERE c.category = :category")
+    Page<Community> findByCategoryWithAuthorOldest(@Param("category") Category category, Pageable pageable);
 }

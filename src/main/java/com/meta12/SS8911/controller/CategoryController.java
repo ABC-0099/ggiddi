@@ -38,12 +38,18 @@ public class CategoryController {
     private final ContentRepository contentRepository;
     private final ProgressRepository progressRepository;
 
+    @GetMapping("/category/main")
+    public String main() {
+        return "category/main";
+    }
+
+
 
     @GetMapping("/category/list")
     public String list(
             @AuthenticationPrincipal SiteUser user,
             Model model
-    ) {
+    ) { 
         List<Category> categoryList = categoryService.findAll();
 
         Map<Long, List<Content>> contentMap = new LinkedHashMap<>();

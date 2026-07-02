@@ -7,9 +7,11 @@ import com.meta12.SS8911.dto.SiteUserDTO;
 import com.meta12.SS8911.entity.Comment;
 import com.meta12.SS8911.entity.Community;
 
+import com.meta12.SS8911.entity.Qna;
 import com.meta12.SS8911.entity.SiteUser;
 import com.meta12.SS8911.service.CommentService;
 import com.meta12.SS8911.service.CommunityService;
+import com.meta12.SS8911.service.QnaService;
 import com.meta12.SS8911.service.SiteUserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
@@ -33,6 +35,7 @@ public class SiteUserController {
     private final SiteUserService siteUserService;
     private final CommunityService communityService;
     private final CommentService commentService;
+    private final QnaService qnaService;
 
     @GetMapping("/siteUser/chuga")
     public String chugaForm(SiteUserDTO siteUserDTO) {
@@ -65,20 +68,23 @@ public class SiteUserController {
     @GetMapping("/siteUser/mypage")
     public String mypage(Model model, Principal principal,
                          @RequestParam(defaultValue = "0") int postPage,
-                         @RequestParam(defaultValue = "0") int commentPage) {
+                         @RequestParam(defaultValue = "0") int commentPage,
+                         @RequestParam(defaultValue = "0") int inquiryPage) {
         SiteUser user = siteUserService.getUserByUsername(principal.getName());
 
-        // ★ 게시글: 페이지당 5개
         Pageable postPageable = PageRequest.of(postPage, 5);
         Page<Community> myPosts = communityService.getPostsByAuthor(user, postPageable);
 
-        // ★ 댓글: 페이지당 5개
         Pageable commentPageable = PageRequest.of(commentPage, 5);
         Page<Comment> myComments = commentService.getCommentsByAuthor(user, commentPageable);
+
+        Pageable qnaPageable = PageRequest.of(inquiryPage, 5);
+        Page<Qna> myInquiries = qnaService.getMyQnas(user, qnaPageable);
 
         model.addAttribute("siteUser", user);
         model.addAttribute("myPosts", myPosts);
         model.addAttribute("myComments", myComments);
+        model.addAttribute("myInquiries", myInquiries);
         return "siteUser/mypage";
     }
 }
