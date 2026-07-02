@@ -32,8 +32,8 @@
     <ul class="navbar-menu" id="navMenu">
 
       <!-- 공지사항 -->
-      <li th:classappend="${currentMenu == 'notices'} ? 'active'">
-        <a th:href="@{/notices}">공지사항</a>
+      <li th:classappend="${currentMenu == 'notice'} ? 'active'">
+        <a th:href="@{/notice/list}">공지사항</a>
       </li>
 
       <!-- 커뮤니티 -->
