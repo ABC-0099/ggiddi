@@ -21,14 +21,18 @@
 <div class="form-wrap">
 
   <!-- 뒤로가기 -->
-  <a href="board_notice_view.html" class="back-btn">
+  <a th:href="@{/notice/view/{id}(id=${notice.id})}" class="back-btn">
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
       <path d="M19 12H5M12 5l-7 7 7 7"/>
     </svg>
     공지사항으로 돌아가기
   </a>
 
-  <form class="form-card" id="noticeForm" onsubmit="return handleSubmit(event)">
+  <form class="form-card" id="noticeForm"
+        th:action="@{/notice/update/{id}(id=${notice.id})}"
+        th:object="${notice}" method="post">
+
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
     <div class="form-header">
       <h1>공지사항 수정</h1>
@@ -41,13 +45,13 @@
       <div class="form-group">
         <label class="form-label">카테고리<span class="req">*</span></label>
         <div class="category-picker">
-          <input type="radio" name="category" id="cat-notice" value="notice" checked>
+          <input type="radio" th:field="*{category}" id="cat-notice" value="notice">
           <label for="cat-notice">공지</label>
-          <input type="radio" name="category" id="cat-event" value="event">
+          <input type="radio" th:field="*{category}" id="cat-event" value="event">
           <label for="cat-event">이벤트</label>
-          <input type="radio" name="category" id="cat-system" value="system">
+          <input type="radio" th:field="*{category}" id="cat-system" value="system">
           <label for="cat-system">시스템</label>
-          <input type="radio" name="category" id="cat-update" value="update">
+          <input type="radio" th:field="*{category}" id="cat-update" value="update">
           <label for="cat-update">업데이트</label>
         </div>
       </div>
@@ -56,148 +60,34 @@
       <div class="form-group">
         <label class="form-label" for="title">제목<span class="req">*</span></label>
         <input type="text" id="title" class="form-input" maxlength="100" required
-               value="끼역띠귿 메타버스 학습 공간 정식 오픈 안내">
-      </div>
-
-      <!-- 지원 언어 -->
-      <div class="form-group">
-        <label class="form-label">지원 언어 <span class="optional">(다국어 뱃지 표시용, 선택)</span></label>
-        <div class="lang-picker">
-          <input type="checkbox" id="lang-ko" value="KO" checked>
-          <label for="lang-ko">한국어</label>
-          <input type="checkbox" id="lang-en" value="EN" checked>
-          <label for="lang-en">English</label>
-          <input type="checkbox" id="lang-vi" value="VI" checked>
-          <label for="lang-vi">Tiếng Việt</label>
-          <input type="checkbox" id="lang-zh" value="ZH">
-          <label for="lang-zh">中文</label>
-        </div>
-      </div>
-
-      <!-- 상단 고정 -->
-      <div class="form-group">
-        <div class="toggle-row">
-          <div>
-            <div class="toggle-row-text">📌 상단 고정</div>
-            <div class="toggle-row-sub">목록 최상단에 고정 노출됩니다</div>
-          </div>
-          <label class="switch">
-            <input type="checkbox" id="pinToggle" checked>
-            <span class="switch-track"></span>
-          </label>
-        </div>
-      </div>
-
-      <!-- 첨부파일 -->
-      <div class="form-group">
-        <label class="form-label">첨부파일 <span class="optional">(선택, 최대 10MB)</span></label>
-        <label class="upload-zone" id="uploadZone" for="fileInput">
-          <div class="up-icon">📎</div>
-          <div class="up-text">클릭하거나 파일을 끌어다 놓으세요</div>
-          <div class="up-sub">PDF, PNG, JPG, DOCX 지원</div>
-          <input type="file" id="fileInput" multiple>
-        </label>
-        <div class="file-list" id="fileList">
-          <div class="file-chip">
-            <span>📄</span>
-            <span class="file-name">오픈안내_공식문서.pdf</span>
-            <span>1.2 MB</span>
-            <span class="file-remove" onclick="this.parentElement.remove()">✕</span>
-          </div>
-          <div class="file-chip">
-            <span>🖼️</span>
-            <span class="file-name">메타버스_맵_미리보기.png</span>
-            <span>840 KB</span>
-            <span class="file-remove" onclick="this.parentElement.remove()">✕</span>
-          </div>
-        </div>
+               th:field="*{title}">
       </div>
 
       <!-- 본문 -->
       <div class="form-group">
         <label class="form-label" for="content">내용<span class="req">*</span></label>
-        <textarea id="content" class="form-textarea" maxlength="3000" required oninput="updateCharCount()">안녕하세요, 끼역띠귿 운영팀입니다. 😊
-
-오랫동안 기다려 주신 여러분께 기쁜 소식을 전합니다.
-2026년 6월 20일(토)부터 메타버스 학습 공간이 정식으로 오픈됩니다!
-
-🎉 오픈 일시: 2026년 6월 20일(토) 오전 10:00 (KST)
-🌐 지원 언어: 한국어 · English · Tiếng Việt
-🗺️ 오픈 구역: 1단계 픽셀 마을 / 2단계 단어 월드 / NPC 퀴즈 존
-
-앞으로도 끼역띠귿은 더욱 재미있고 효과적인 한국어 학습 환경을 만들기 위해 꾸준히 업데이트해 나가겠습니다.
-함께해 주셔서 감사합니다!
-
-끼역띠귿 운영팀 드림</textarea>
+        <textarea id="content" class="form-textarea" maxlength="3000" required
+                  oninput="updateCharCount()" th:field="*{content}"></textarea>
         <div class="char-count"><span id="charCount">0</span> / 3000</div>
       </div>
 
     </div>
 
     <div class="form-actions">
-      <button type="button" class="btn btn-danger" onclick="handleDelete()">삭제</button>
-      <a href="board_notice_view.html" class="btn btn-cancel">취소</a>
+
+      <a th:href="@{/notice/view/{id}(id=${notice.id})}" class="btn btn-cancel">취소</a>
       <button type="submit" class="btn btn-primary">저장하기</button>
     </div>
 
   </form>
+
+
 </div>
 
 <!-- FOOTER -->
 <div th:replace="~{layout/footer :: footer}"></div>
 
-<script>
-  const uploadZone = document.getElementById('uploadZone');
-  const fileInput = document.getElementById('fileInput');
-  const fileList = document.getElementById('fileList');
 
-  fileInput.addEventListener('change', () => {
-    Array.from(fileInput.files).forEach(addFileChip);
-    fileInput.value = '';
-  });
-
-  ['dragover', 'dragenter'].forEach(evt => {
-    uploadZone.addEventListener(evt, (e) => { e.preventDefault(); uploadZone.classList.add('dragover'); });
-  });
-  ['dragleave', 'drop'].forEach(evt => {
-    uploadZone.addEventListener(evt, (e) => { e.preventDefault(); uploadZone.classList.remove('dragover'); });
-  });
-  uploadZone.addEventListener('drop', (e) => {
-    Array.from(e.dataTransfer.files).forEach(addFileChip);
-  });
-
-  function addFileChip(f) {
-    const chip = document.createElement('div');
-    chip.className = 'file-chip';
-    chip.innerHTML = `
-      <span>📄</span>
-      <span class="file-name">${f.name}</span>
-      <span>${(f.size / 1024).toFixed(0)} KB</span>
-      <span class="file-remove" onclick="this.parentElement.remove()">✕</span>
-    `;
-    fileList.appendChild(chip);
-  }
-
-  function updateCharCount() {
-    const content = document.getElementById('content');
-    document.getElementById('charCount').textContent = content.value.length;
-  }
-  updateCharCount();
-
-  function handleDelete() {
-    if (confirm('정말 이 공지사항을 삭제하시겠습니까? 삭제 후에는 복구할 수 없습니다.')) {
-      alert('공지사항이 삭제되었습니다.');
-      window.location.href = 'board_notice_1.html';
-    }
-  }
-
-  function handleSubmit(e) {
-    e.preventDefault();
-    alert('공지사항이 수정되었습니다.');
-    window.location.href = 'board_notice_view.html';
-    return false;
-  }
-</script>
 
 </body>
 </html>
