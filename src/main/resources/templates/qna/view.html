@@ -48,8 +48,19 @@
       <p>아직 답변이 등록되지 않았어요.<br>빠른 시일 내에 답변드릴게요!</p>
     </div>
 
+    <!-- 작성자 전용: 답변 대기 상태일 때만 수정/삭제 가능 -->
+    <div class="qna-owner-actions"
+         th:if="${#authentication.name == qna.author.username and qna.status.name() == 'PENDING'}">
+      <a th:href="@{/qna/{id}/edit(id=${qna.id})}" class="btn-edit">✏️ 수정</a>
+      <form th:action="@{/qna/{id}/delete(id=${qna.id})}" method="post" style="display:inline;">
+        <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+        <button type="submit" class="btn-delete"
+                onclick="return confirm('정말 삭제할까요?')">🗑️ 삭제</button>
+      </form>
+    </div>
+
     <div class="qna-back">
-      <a th:href="@{/siteUser/mypage(tab='posts',subtab='myinquiry')}" class="btn-back">← 목록으로</a>
+      <a th:href="@{/siteUser/mypage(tab='posts',subtab='myinquiry')}" class="btn-back">← 돌아가기</a>
     </div>
   </div>
 </div>

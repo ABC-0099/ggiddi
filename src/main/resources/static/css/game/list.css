@@ -42,23 +42,38 @@
       margin-bottom: 12px; display: inline-block;
       letter-spacing: 1px;
     }
+    .page-header-title-row {
+      display: flex; align-items: center; gap: 12px;
+      margin-bottom: 12px;
+    }
+    .page-header-badge {
+      width: 44px; height: 44px; flex-shrink: 0;
+      display: flex; align-items: center; justify-content: center;
+      background: var(--wood-deep);
+      border: 3px solid var(--gold);
+      border-radius: 8px;
+      box-shadow: 3px 3px 0 0 rgba(61,38,24,.25);
+    }
     .page-header-text h1 {
       font-family: 'Jua', sans-serif;
       font-size: 32px; font-weight: 400;
-      margin-bottom: 12px; color: var(--wood-deep);
+      margin-bottom: 0; color: var(--wood-deep);
       line-height: 1.4;
     }
     .page-header-text p { font-size: 14.5px; color: var(--ink-soft); font-weight: 500; }
 
     .last-game-box {
-      flex-shrink: 0; width: 280px;
+      flex-shrink: 0; width: 320px;
       background: var(--parch-dark);
       border: 3px solid var(--wood);
-      border-radius: 6px;
-      padding: 16px 18px;
+      border-radius: 8px;
+      padding: 22px 18px;
       box-shadow: inset 0 0 0 2px rgba(232,196,104,.3), 4px 4px 0 0 rgba(61,38,24,.15);
+      display: flex; flex-direction: column; align-items: center;
+      text-align: center;
     }
-    .lgb-header { font-family: 'Galmuri11', sans-serif; font-size: 11px; color: var(--wood-deep); margin-bottom: 10px; font-weight: 700; }
+    .lgb-header { font-family: 'Galmuri11', sans-serif; font-size: 14px; color: var(--wood-deep); margin-bottom: 14px; font-weight: 700; }
+    .last-game-box p { font-size: 14.5px !important; line-height: 1.9 !important; }
 
     .filter-bar {
       position: relative; z-index: 1;

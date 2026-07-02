@@ -21,7 +21,14 @@
 <div th:replace="~{layout/navbar :: navbar(currentMenu='community')}"></div>
 
 <div class="page-header">
-    <h1>커뮤니티</h1>
+    <div class="page-header-title-row">
+        <div class="page-header-badge">
+            <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M4 4h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H9l-5 4v-4H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/>
+            </svg>
+        </div>
+        <h1>커뮤니티</h1>
+    </div>
     <p>일상, 문화, 학습 후기를 자유롭게 나눠보세요</p>
 </div>
 
@@ -37,7 +44,10 @@
 <div class="toolbar">
     <div class="search-area">
         <div class="search-wrap">
-            <span>🔍</span>
+            <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <circle cx="11" cy="11" r="7"/>
+                <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+            </svg>
             <input type="text" id="search_kw" placeholder="제목 및 내용 검색" />
         </div>
         <button type="button" id="btn_search" class="search-btn">검색</button>
@@ -47,12 +57,23 @@
             <option value="newest">최신순</option>
             <option value="oldest">등록순</option>
         </select>
-        <a th:href="@{/community/write}" class="write-btn">✏️ 글쓰기</a>
+        <a th:href="@{/community/write}" class="write-btn">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5z"/>
+            </svg>
+            글쓰기
+        </a>
     </div>
 </div>
 
 <div class="post-wrap">
-    <div class="info-box">🔔 커뮤니티 이용 시 욕설·비방·혐오 표현은 삼가 주세요. 타인을 존중하는 건강한 소통 문화를 만들어요.</div>
+    <div class="info-box">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink:0;">
+            <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
+            <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+        커뮤니티 이용 시 욕설·비방·혐오 표현은 삼가 주세요. 타인을 존중하는 건강한 소통 문화를 만들어요.
+    </div>
 
     <div class="post" th:each="post : ${postList.content}">
         <div class="post-top">
@@ -84,17 +105,24 @@
 
         <div class="post-footer">
             <a th:href="@{/community/{id}(id=${post.id})}" class="pf-action">
-                💬 [[${#lists.size(post.comments)}]]
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 4h16a1 1 0 0 1 1 1v11a1 1 0 0 1-1 1H9l-5 4v-4H4a1 1 0 0 1-1-1V5a1 1 0 0 1 1-1z"/>
+                </svg>
+                [[${#lists.size(post.comments)}]]
             </a>
             <span class="pf-action"
-                  th:onclick="|navigator.clipboard.writeText(window.location.origin + '/community/' + ${post.id}).then(function(){ alert('링크가 복사되었습니다! 😊'); })|">
+                  th:onclick="|navigator.clipboard.writeText(window.location.origin + '/community/' + ${post.id}).then(function(){ alert('링크가 복사되었습니다!'); })|">
                 ↗ 공유
             </span>
             <span class="pf-spacer"></span>
             <span class="pf-report"
                   th:attr="data-post-id=${post.id}"
                   onclick="openReportModal(this)">
-                🚩 신고
+                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:3px;">
+                    <path d="M5 21V4"/>
+                    <path d="M5 4h13l-2.5 4L18 12H5"/>
+                </svg>
+                신고
             </span>
         </div>
     </div>
