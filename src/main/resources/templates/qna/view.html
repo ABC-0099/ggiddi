@@ -7,7 +7,7 @@
   <title>끼역띠귿 — 문의 상세</title>
   <link rel="stylesheet" th:href="@{/css/layout/navbar.css}" />
   <link rel="stylesheet" th:href="@{/css/layout/footer.css}" />
-  <link rel="stylesheet" th:href="@{/css/qna/qna.css}" />
+  <link rel="stylesheet" th:href="@{/css/qna/view.css}" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
@@ -41,6 +41,11 @@
         <textarea name="answer" placeholder="답변을 입력하세요" required></textarea>
         <button type="submit" class="btn-submit">답변 등록</button>
       </form>
+    </div>
+
+    <div class="qna-waiting" th:if="${qna.answer == null}" sec:authorize="!hasRole('ADMIN')">
+      <div class="qna-waiting-icon">⏳</div>
+      <p>아직 답변이 등록되지 않았어요.<br>빠른 시일 내에 답변드릴게요!</p>
     </div>
 
     <div class="qna-back">

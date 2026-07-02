@@ -95,3 +95,27 @@ a { text-decoration: none; color: inherit; }
 
 .qna-back { margin-top: 20px; }
 .btn-back { font-size: 13px; color: #9ca3af; }
+
+/* ── 제출 확인 모달 (기존 파일에 누락돼 있던 부분) ── */
+.qna-confirm-overlay {
+    position: fixed; inset: 0; background: rgba(10,31,23,.45);
+    backdrop-filter: blur(2px);
+    display: none; align-items: center; justify-content: center; z-index: 3000;
+}
+.qna-confirm-overlay.active { display: flex; }
+.qna-confirm-card {
+    background: rgba(255,255,255,.96);
+    border-radius: 18px; padding: 38px 32px;
+    text-align: center; width: 320px; max-width: 90vw;
+    box-shadow: 0 16px 44px rgba(10,31,23,.25);
+}
+.qna-confirm-icon { font-size: 42px; margin-bottom: 14px; }
+.qna-confirm-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; color: var(--ink); }
+.qna-confirm-desc { font-size: 13px; color: var(--ink-soft); margin-bottom: 22px; line-height: 1.6; }
+.qna-confirm-btn {
+    width: 100%; padding: 12px; border: none; border-radius: 10px;
+    background: linear-gradient(135deg, var(--mint), var(--navy));
+    color: #fff; font-size: 14px; font-weight: 700; cursor: pointer;
+    font-family: inherit;
+}
+.qna-confirm-btn:hover { filter: brightness(1.06); }

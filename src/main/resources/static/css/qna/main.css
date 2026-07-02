@@ -3,6 +3,9 @@
    민트-네이비 글래스모피즘
    ============================================ */
 
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+
 :root {
   --qna-navy-deep: #123F73;
   --qna-navy:      #185FA5;
