@@ -4,6 +4,7 @@ import com.meta12.SS8911.config.InquiryStatus;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.Setter;
+import com.meta12.SS8911.config.QnaCategory;
 
 import java.time.LocalDateTime;
 
@@ -24,6 +25,10 @@ public class Qna {
     private String answer;
 
     @Enumerated(EnumType.STRING)
+    @Column(nullable = false)
+    private QnaCategory category;
+
+    @Enumerated(EnumType.STRING)
     private InquiryStatus status;
 
     @ManyToOne(fetch = FetchType.LAZY)
@@ -36,5 +41,6 @@ public class Qna {
     public void prePersist() {
         if (this.createdDate == null) this.createdDate = LocalDateTime.now();
         if (this.status == null) this.status = InquiryStatus.PENDING;
+        if (this.category == null) this.category = QnaCategory.ETC;
     }
 }

@@ -33,6 +33,16 @@
       </div>
 
       <div class="field">
+        <label for="category">문의 유형 <span class="required">*</span></label>
+        <select id="category" th:field="*{category}" required>
+          <option value="" disabled selected>유형을 선택해주세요</option>
+          <option th:each="cat : ${T(com.meta12.SS8911.config.QnaCategory).values()}"
+                  th:value="${cat.name()}"
+                  th:text="${cat.description}"></option>
+        </select>
+      </div>
+
+      <div class="field">
         <label for="content">내용 <span class="required">*</span></label>
         <textarea id="content" th:field="*{content}"
                   placeholder="문의 내용을 입력하세요" maxlength="2000" required></textarea>
