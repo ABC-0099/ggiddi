@@ -43,7 +43,41 @@
 
         <!-- 로그인 시: 플로팅 대시보드 -->
         <div class="hero-visual" sec:authorize="isAuthenticated()">
-            <div class="dash-card">
+
+            <!-- 관리자 대시보드 -->
+            <div class="dash-card" sec:authorize="hasRole('ADMIN')">
+                <div class="dash-header">
+                    <div class="dash-avatar" style="background:var(--navy);">관</div>
+                    <div class="dash-user-info">
+                        <div class="dash-name">
+                            <span sec:authentication="name">관리자</span>님, 오늘의 현황이에요 🛠️
+                        </div>
+                        <div class="dash-sub">사이트 운영 현황을 확인하세요</div>
+                    </div>
+                </div>
+
+                <!-- 통계 3개 -->
+                <div class="dash-stats">
+                    <div class="dash-stat">
+                        <div class="dash-stat-num" th:text="${todayNewUsers}">12</div>
+                        <div class="dash-stat-label">오늘 신규 가입</div>
+                    </div>
+                    <div class="dash-stat">
+                        <div class="dash-stat-num" th:text="${pendingReports}">3</div>
+                        <div class="dash-stat-label">미처리 신고</div>
+                    </div>
+                    <div class="dash-stat">
+                        <div class="dash-stat-num" th:text="${pendingQna}">5</div>
+                        <div class="dash-stat-label">답변 대기 문의</div>
+                    </div>
+                </div>
+
+                <!-- 관리자 페이지 이동 버튼 -->
+                <a th:href="@{/admin}" class="dash-btn">🛠️ 관리자 페이지로 이동 →</a>
+            </div>
+
+            <!-- 일반 학습자 대시보드 -->
+            <div class="dash-card" sec:authorize="!hasRole('ADMIN')">
                 <div class="dash-header">
                     <div class="dash-avatar" sec:authentication="name"
                          th:text="${#strings.substring(#authentication.name, 0, 1)}">유</div>

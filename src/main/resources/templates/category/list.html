@@ -12,6 +12,8 @@
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 
 </head>
 <body>
@@ -73,18 +75,52 @@
 
 <!-- 탭 -->
 <div class="filter-bar">
-    <div class="tabs">
-        <button class="tab active">전체</button>
-        <button class="tab">1단계 음절</button>
-        <button class="tab">2단계 단어</button>
-        <button class="tab">3단계 문장</button>
-        <button class="tab">4단계 회화</button>
+    <div class="tabs" id="tabsWrap">
+        <button class="tab active" data-cat-id="all">전체</button>
+        <!--
+          ★ Thymeleaf 실제 적용 시 (컨트롤러에서 model.addAttribute("categories", categoryService.findAll())):
+          <div class="tab-chip" th:each="cat : ${categories}">
+            <button class="tab" th:text="${cat.name}" th:attr="data-cat-id=${cat.id}"></button>
+            <span class="tab-admin" sec:authorize="hasRole('ADMIN')">
+              <button type="button" class="tab-admin-btn tab-edit-btn" th:attr="data-id=${cat.id}">✎</button>
+              <button type="button" class="tab-admin-btn tab-delete-btn" th:attr="data-id=${cat.id},data-name=${cat.name}">✕</button>
+            </span>
+          </div>
+        -->
+        <div class="tab-chip" th:each="cat : ${categories}">
+            <button class="tab" th:text="${cat.name}" th:attr="data-cat-id=${cat.id}">1단계 음절</button>
+            <span class="tab-admin" sec:authorize="hasRole('ADMIN')">
+                <button type="button" class="tab-admin-btn tab-edit-btn" title="카테고리 수정"
+                        th:attr="data-id=${cat.id}, data-name=${cat.name}, data-order=${cat.orderNum}">
+                    <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"/>
+                        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>
+                    </svg>
+                </button>
+                <button type="button" class="tab-admin-btn tab-delete-btn" title="카테고리 삭제"
+                        th:attr="data-id=${cat.id}, data-name=${cat.name}">
+                    <svg viewBox="0 0 24 24" width="11" height="11" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
+            </span>
+        </div>
     </div>
-    <select class="sort-select">
-        <option>순서대로</option>
-        <option>최신순</option>
-        <option>인기순</option>
-    </select>
+    <div style="display:flex; align-items:center; gap:10px;">
+        <select class="sort-select">
+            <option>순서대로</option>
+            <option>최신순</option>
+            <option>인기순</option>
+        </select>
+        <button type="button" id="btnOpenAddCategory" class="btn-add-category" sec:authorize="hasRole('ADMIN')">
+            <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+                <line x1="12" y1="5" x2="12" y2="19"/>
+                <line x1="5" y1="12" x2="19" y2="12"/>
+            </svg>
+            카테고리 추가
+        </button>
+    </div>
 </div>
 
 <!-- 강의 목록 -->
@@ -154,6 +190,13 @@
                th:href="${paidMap.get(category.id)} ? @{/content/view/{id}(id=${content.id})} : @{/category/view/{id}(id=${category.id})}"
                th:classappend="${paidMap.get(category.id)} ? '' : 'locked'"
                class="lc">
+                <button type="button" class="lc-edit-btn" sec:authorize="hasRole('ADMIN')" title="강의 수정"
+                        th:attr="data-id=${content.id}, data-title=${content.title}, data-sequence=${content.sequence}, data-cat-id=${category.id}">
+                    <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 20h9"/>
+                        <path d="M16.5 3.5a2.12 2.12 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z"/>
+                    </svg>
+                </button>
                 <div class="lc-thumb">
                     <div class="lc-thumb-icon">📖</div>
                     <div class="lc-play" th:if="${paidMap.get(category.id)}"><div class="play-btn">▶</div></div>
@@ -187,6 +230,17 @@
             <p th:if="${#lists.isEmpty(contentMap.get(category.id))}" style="padding:20px;color:var(--ink-faint);">
                 아직 등록된 강의가 없어요.
             </p>
+
+            <button type="button" class="lc lc-add-tile" sec:authorize="hasRole('ADMIN')"
+                    th:attr="data-cat-id=${category.id}">
+                <div class="lc-add-icon">
+                    <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <line x1="12" y1="5" x2="12" y2="19"/>
+                        <line x1="5" y1="12" x2="19" y2="12"/>
+                    </svg>
+                </div>
+                <div class="lc-add-text">강의 추가</div>
+            </button>
         </div>
     </div>
 
@@ -195,6 +249,112 @@
 <!-- 푸터 -->
 <div th:replace="~{layout/footer :: footer}"></div>
 
+<!-- 카테고리 삭제 확인 모달 (관리자 전용) -->
+<div class="cat-delete-overlay" id="catDeleteOverlay">
+    <div class="cat-delete-card">
+        <div class="cat-delete-icon">🗑️</div>
+        <div class="cat-delete-title">카테고리를 삭제할까요?</div>
+        <div class="cat-delete-desc" id="catDeleteDesc"></div>
+        <div class="cat-delete-actions">
+            <button type="button" class="btn-cancel" id="catDeleteCancelBtn">취소</button>
+            <button type="button" class="btn-delete-confirm" id="catDeleteConfirmBtn">삭제</button>
+        </div>
+    </div>
+</div>
+
+<!-- 카테고리(탭) 추가/수정 모달 (관리자 전용) -->
+<div class="cat-add-overlay" id="catAddOverlay">
+    <div class="cat-add-card">
+        <div class="cat-add-head">
+            <div class="cat-add-head-left">
+                <span class="cat-add-head-icon">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M12 3l9 5.5-9 5.5-9-5.5L12 3z"/>
+                        <path d="M3 8.5v7L12 21l9-5.5v-7"/>
+                    </svg>
+                </span>
+                <div class="cat-add-title" id="catModalTitle">카테고리 추가</div>
+            </div>
+            <button type="button" class="cat-add-close" id="catAddCloseBtn">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+
+        <form id="categoryAddForm">
+            <input type="hidden" id="catId" name="id" value="" />
+
+            <div class="field">
+                <label for="catName">카테고리명 <span class="required">*</span></label>
+                <input type="text" id="catName" name="name" placeholder="예: 5단계 발음" maxlength="20" required />
+            </div>
+
+            <div class="field">
+                <label for="catOrder">순서 <span class="field-optional">(선택, 비우면 맨 뒤에 추가)</span></label>
+                <input type="number" id="catOrder" name="orderNum" placeholder="예: 5" min="1" />
+            </div>
+
+            <!-- 실시간 탭 미리보기 -->
+            <div class="field">
+                <label>미리보기</label>
+                <div class="cat-tab-preview">
+                    <span class="tab" id="catPreviewTab">카테고리명</span>
+                </div>
+            </div>
+
+            <div class="cat-add-actions">
+                <button type="button" class="btn-cancel" id="catAddCancelBtn">취소</button>
+                <button type="submit" class="btn-submit" id="catSubmitBtn">등록</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 강의 추가/수정 모달 (관리자 전용) -->
+<div class="cat-add-overlay" id="lectureAddOverlay">
+    <div class="cat-add-card">
+        <div class="cat-add-head">
+            <div class="cat-add-head-left">
+                <span class="cat-add-head-icon">
+                    <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M4 5.5c0-.83.67-1.5 1.5-1.5H11a1 1 0 0 1 1 1v14a1 1 0 0 0-1-1H5.5A1.5 1.5 0 0 0 4 19.5v-14z"/>
+                        <path d="M20 5.5c0-.83-.67-1.5-1.5-1.5H13a1 1 0 0 0-1 1v14a1 1 0 0 1 1-1h5.5a1.5 1.5 0 0 1 1.5 1.5v-14z"/>
+                    </svg>
+                </span>
+                <div class="cat-add-title" id="lectureModalTitle">강의 추가</div>
+            </div>
+            <button type="button" class="cat-add-close" id="lectureAddCloseBtn">
+                <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                    <line x1="18" y1="6" x2="6" y2="18"/>
+                    <line x1="6" y1="6" x2="18" y2="18"/>
+                </svg>
+            </button>
+        </div>
+
+        <form id="lectureAddForm">
+            <input type="hidden" id="lecId" name="id" value="" />
+            <input type="hidden" id="lecCatId" name="categoryId" value="" />
+
+            <div class="field">
+                <label for="lecTitle">강의 제목 <span class="required">*</span></label>
+                <input type="text" id="lecTitle" name="title" placeholder="예: 음식 단어" maxlength="60" required />
+            </div>
+
+            <div class="field">
+                <label for="lecSequence">순서 <span class="field-optional">(선택, 비우면 맨 뒤에 추가)</span></label>
+                <input type="number" id="lecSequence" name="sequence" placeholder="예: 3" min="1" />
+            </div>
+
+            <div class="cat-add-actions">
+                <button type="button" class="btn-cancel" id="lectureAddCancelBtn">취소</button>
+                <button type="submit" class="btn-submit" id="lectureSubmitBtn">등록</button>
+            </div>
+        </form>
+    </div>
+</div>
+
 <script>
     document.querySelectorAll('.tab').forEach(tab => {
       tab.addEventListener('click', () => {
@@ -202,6 +362,238 @@
         tab.classList.add('active');
       });
     });
+
+    // ── 관리자: 카테고리 삭제 ──
+    (function () {
+      var overlay = document.getElementById('catDeleteOverlay');
+      var descEl = document.getElementById('catDeleteDesc');
+      var cancelBtn = document.getElementById('catDeleteCancelBtn');
+      var confirmBtn = document.getElementById('catDeleteConfirmBtn');
+      var csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+      var csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+      var targetId = null;
+
+      function bindDeleteButtons() {
+        document.querySelectorAll('.tab-delete-btn').forEach(function (btn) {
+          btn.addEventListener('click', function (e) {
+            e.stopPropagation();
+            targetId = btn.dataset.id;
+            descEl.textContent = '"' + btn.dataset.name + '" 카테고리와 그 안의 강의가 함께 삭제될 수 있어요.';
+            overlay.classList.add('active');
+          });
+        });
+      }
+      bindDeleteButtons();
+
+      cancelBtn.addEventListener('click', function () {
+        targetId = null;
+        overlay.classList.remove('active');
+      });
+
+      confirmBtn.addEventListener('click', function () {
+        if (!targetId) return;
+        var headers = {};
+        if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
+
+        fetch('/category/delete/' + targetId, { method: 'DELETE', headers: headers })
+          .then(function (res) {
+            if (res.ok) {
+              var chip = document.querySelector('.tab-delete-btn[data-id="' + targetId + '"]')?.closest('.tab-chip');
+              if (chip) chip.remove();
+            } else {
+              alert('삭제에 실패했어요. 다시 시도해주세요.');
+            }
+          })
+          .catch(function () {
+            alert('삭제 중 오류가 발생했어요.');
+          })
+          .finally(function () {
+            overlay.classList.remove('active');
+            targetId = null;
+          });
+      });
+    })();
+
+    // ── 관리자: 카테고리 추가/수정 ──
+    (function () {
+      var openBtn = document.getElementById('btnOpenAddCategory');
+      if (!openBtn) return; // 관리자 아니면 버튼 자체가 없음
+
+      var overlay = document.getElementById('catAddOverlay');
+      var closeBtn = document.getElementById('catAddCloseBtn');
+      var cancelBtn = document.getElementById('catAddCancelBtn');
+      var form = document.getElementById('categoryAddForm');
+      var modalTitle = document.getElementById('catModalTitle');
+      var submitBtn = document.getElementById('catSubmitBtn');
+      var csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+      var csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+      var idInput = document.getElementById('catId');
+      var nameInput = document.getElementById('catName');
+      var orderInput = document.getElementById('catOrder');
+      var previewTab = document.getElementById('catPreviewTab');
+
+      function updatePreview() {
+        previewTab.textContent = nameInput.value || '카테고리명';
+      }
+
+      function openForAdd() {
+        form.reset();
+        idInput.value = '';
+        modalTitle.textContent = '카테고리 추가';
+        submitBtn.textContent = '등록';
+        updatePreview();
+        overlay.classList.add('active');
+      }
+
+      function openForEdit(id, name, order) {
+        form.reset();
+        idInput.value = id;
+        nameInput.value = name;
+        orderInput.value = order || '';
+        modalTitle.textContent = '카테고리 수정';
+        submitBtn.textContent = '수정 완료';
+        updatePreview();
+        overlay.classList.add('active');
+      }
+
+      function closeModal() {
+        overlay.classList.remove('active');
+        form.reset();
+        updatePreview();
+      }
+
+      openBtn.addEventListener('click', openForAdd);
+      closeBtn.addEventListener('click', closeModal);
+      cancelBtn.addEventListener('click', closeModal);
+      nameInput.addEventListener('input', updatePreview);
+
+      document.querySelectorAll('.tab-edit-btn').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.stopPropagation();
+          openForEdit(btn.dataset.id, btn.dataset.name, btn.dataset.order);
+        });
+      });
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var isEdit = !!idInput.value;
+        var url = isEdit ? ('/category/sujung/' + idInput.value) : '/category/chuga';
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = isEdit ? '수정 중...' : '등록 중...';
+
+        var body = new URLSearchParams(new FormData(form));
+        var headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+        if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
+
+        fetch(url, { method: 'POST', headers: headers, body: body })
+          .then(function (res) {
+            if (res.ok || res.redirected) {
+              window.location.reload();
+            } else {
+              alert((isEdit ? '수정' : '등록') + '에 실패했어요. 다시 시도해주세요.');
+              submitBtn.disabled = false;
+              submitBtn.textContent = isEdit ? '수정 완료' : '등록';
+            }
+          })
+          .catch(function () {
+            alert('처리 중 오류가 발생했어요.');
+            submitBtn.disabled = false;
+            submitBtn.textContent = isEdit ? '수정 완료' : '등록';
+          });
+      });
+    })();
+
+    // ── 관리자: 강의 추가/수정 ──
+    (function () {
+      var overlay = document.getElementById('lectureAddOverlay');
+      if (!overlay) return;
+
+      var closeBtn = document.getElementById('lectureAddCloseBtn');
+      var cancelBtn = document.getElementById('lectureAddCancelBtn');
+      var form = document.getElementById('lectureAddForm');
+      var modalTitle = document.getElementById('lectureModalTitle');
+      var submitBtn = document.getElementById('lectureSubmitBtn');
+      var csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+      var csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+      var idInput = document.getElementById('lecId');
+      var catIdInput = document.getElementById('lecCatId');
+      var titleInput = document.getElementById('lecTitle');
+      var sequenceInput = document.getElementById('lecSequence');
+
+      function openForAdd(catId) {
+        form.reset();
+        idInput.value = '';
+        catIdInput.value = catId;
+        modalTitle.textContent = '강의 추가';
+        submitBtn.textContent = '등록';
+        overlay.classList.add('active');
+      }
+
+      function openForEdit(id, title, sequence, catId) {
+        form.reset();
+        idInput.value = id;
+        catIdInput.value = catId;
+        titleInput.value = title;
+        sequenceInput.value = sequence || '';
+        modalTitle.textContent = '강의 수정';
+        submitBtn.textContent = '수정 완료';
+        overlay.classList.add('active');
+      }
+
+      function closeModal() {
+        overlay.classList.remove('active');
+        form.reset();
+      }
+
+      document.querySelectorAll('.lc-add-tile').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          openForAdd(btn.dataset.catId);
+        });
+      });
+
+      document.querySelectorAll('.lc-edit-btn').forEach(function (btn) {
+        btn.addEventListener('click', function (e) {
+          e.preventDefault();
+          e.stopPropagation();
+          openForEdit(btn.dataset.id, btn.dataset.title, btn.dataset.sequence, btn.dataset.catId);
+        });
+      });
+
+      closeBtn.addEventListener('click', closeModal);
+      cancelBtn.addEventListener('click', closeModal);
+
+      form.addEventListener('submit', function (e) {
+        e.preventDefault();
+        var isEdit = !!idInput.value;
+        var url = isEdit ? ('/content/sujung/' + idInput.value) : '/content/chuga';
+
+        submitBtn.disabled = true;
+        submitBtn.textContent = isEdit ? '수정 중...' : '등록 중...';
+
+        var body = new URLSearchParams(new FormData(form));
+        var headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
+        if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
+
+        fetch(url, { method: 'POST', headers: headers, body: body })
+          .then(function (res) {
+            if (res.ok || res.redirected) {
+              window.location.reload();
+            } else {
+              alert((isEdit ? '수정' : '등록') + '에 실패했어요. 다시 시도해주세요.');
+              submitBtn.disabled = false;
+              submitBtn.textContent = isEdit ? '수정 완료' : '등록';
+            }
+          })
+          .catch(function () {
+            alert('처리 중 오류가 발생했어요.');
+            submitBtn.disabled = false;
+            submitBtn.textContent = isEdit ? '수정 완료' : '등록';
+          });
+      });
+    })();
 </script>
 
 </body>

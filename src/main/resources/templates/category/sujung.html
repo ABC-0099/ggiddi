@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>카테고리 수정 | 끼역띠귿</title>
+  <link rel="stylesheet" th:href="@{/css/layout/navbar.css}" />
+  <link rel="stylesheet" th:href="@{/css/layout/footer.css}" />
+  <link rel="stylesheet" th:href="@{/css/category/sujung.css}" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
+</head>
+<body>
+
+<div class="bg-orbs"><div class="orb o1"></div><div class="orb o2"></div></div>
+
+<!-- 네브바 -->
+<div th:replace="~{layout/navbar :: navbar(currentMenu='lectures')}"></div>
+
+<div class="page-header">
+  <h1>카테고리 수정</h1>
+  <p>강의 목록 상단 탭에 노출되는 카테고리 정보를 수정해요</p>
+</div>
+
+<div class="cw-container">
+  <div class="cw-card">
+    <form id="categoryForm" th:action="@{/category/sujung/{id}(id=${categoryDTO.id})}" th:object="${categoryDTO}" method="post">
+      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+      <input type="hidden" th:field="*{id}" />
+
+      <div class="field">
+        <label for="name">카테고리명 <span class="required">*</span></label>
+        <input type="text" id="name" th:field="*{name}"
+               placeholder="예: 5단계 발음" maxlength="20" required />
+      </div>
+
+      <div class="field">
+        <label for="orderNum">순서 <span class="field-optional">(선택)</span></label>
+        <input type="number" id="orderNum" th:field="*{orderNum}"
+               placeholder="예: 5" min="1" />
+      </div>
+
+      <div class="field">
+        <label>미리보기</label>
+        <div class="cat-tab-preview">
+          <span class="tab-preview-chip" id="previewChip" th:text="${categoryDTO.name}">카테고리명</span>
+        </div>
+      </div>
+
+      <div class="cw-notice">📌 수정한 내용은 저장 즉시 강의 목록 상단 탭에 반영돼요.</div>
+
+      <div class="cw-actions">
+        <a th:href="@{/category/list}" class="btn-cancel">취소</a>
+        <button type="submit" class="btn-submit">수정 완료</button>
+      </div>
+    </form>
+  </div>
+</div>
+
+<!-- 푸터 -->
+<div th:replace="~{layout/footer :: footer}"></div>
+
+<!-- 수정 확인 모달 -->
+<div class="cw-confirm-overlay" id="cwConfirmOverlay">
+  <div class="cw-confirm-card">
+    <div class="cw-confirm-icon">✅</div>
+    <div class="cw-confirm-title">카테고리가 수정되었어요</div>
+    <div class="cw-confirm-desc">강의 목록 상단 탭에서 바로 확인할 수 있어요.</div>
+    <button type="button" class="cw-confirm-btn" id="cwConfirmBtn">확인</button>
+  </div>
+</div>
+
+<script>
+  var nameInput = document.getElementById('name');
+  var previewChip = document.getElementById('previewChip');
+  nameInput.addEventListener('input', function () {
+    previewChip.textContent = nameInput.value || '카테고리명';
+  });
+
+  document.getElementById('categoryForm').addEventListener('submit', function (e) {
+    e.preventDefault();
+    var form = this;
+    var overlay = document.getElementById('cwConfirmOverlay');
+    overlay.classList.add('active');
+    document.getElementById('cwConfirmBtn').addEventListener('click', function () {
+      form.submit();
+    }, { once: true });
+  });
+</script>
+
+</body>
+</html>

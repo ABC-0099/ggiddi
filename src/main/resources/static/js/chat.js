@@ -10,6 +10,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const viewRoom = document.getElementById('chat-view-room');
     const roomListEl = document.getElementById('chat-room-list');
     const roomNameEl = document.getElementById('chat-room-name');
+    const roomCountBadgeEl = document.getElementById('chat-room-count-badge');
 
     const chatMessages = document.getElementById('chat-messages');
     const chatEmpty = document.getElementById('chat-empty');
@@ -90,7 +91,7 @@ document.addEventListener('DOMContentLoaded', function () {
             card.appendChild(count);
 
             if (!room.full) {
-                card.addEventListener('click', () => enterRoom(room.id, room.name));
+                card.addEventListener('click', () => enterRoom(room.id, room.name, room.currentCount, room.capacity));
             }
 
             roomListEl.appendChild(card);
@@ -98,9 +99,19 @@ document.addEventListener('DOMContentLoaded', function () {
     }
 
     // ───────── 방 입장/퇴장 ─────────
-    function enterRoom(roomId, roomName) {
+    function enterRoom(roomId, roomName, currentCount, capacity) {
         currentRoomId = roomId;
         roomNameEl.textContent = roomName;
+
+        if (roomCountBadgeEl) {
+            if (typeof currentCount === 'number' && typeof capacity === 'number') {
+                roomCountBadgeEl.textContent = currentCount + ' / ' + capacity;
+                roomCountBadgeEl.style.display = 'inline-block';
+                roomCountBadgeEl.classList.toggle('is-full', currentCount >= capacity);
+            } else {
+                roomCountBadgeEl.style.display = 'none';
+            }
+        }
 
         chatMessages.innerHTML = '';
         const emptyEl = document.createElement('div');

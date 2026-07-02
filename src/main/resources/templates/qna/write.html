@@ -23,7 +23,7 @@
 
 <div class="qna-container">
   <div class="qna-card">
-    <form id="qnaForm" th:action="@{/qna/write}" th:object="${qnaDTO}" method="post">
+    <form id="qnaForm" th:action="@{/qna/write}" th:object="${qnaDTO}" method="post" enctype="multipart/form-data">
       <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
       <div class="field">
@@ -33,9 +33,34 @@
       </div>
 
       <div class="field">
+        <label for="category">문의 유형 <span class="required">*</span></label>
+        <select id="category" th:field="*{category}" required>
+          <option value="" th:selected="${qnaDTO.category == null}" disabled>유형을 선택해주세요</option>
+          <option th:each="cat : ${T(com.meta12.SS8911.config.QnaCategory).values()}"
+                  th:value="${cat.name()}"
+                  th:text="${cat.description}"></option>
+        </select>
+      </div>
+
+      <div class="field">
         <label for="content">내용 <span class="required">*</span></label>
         <textarea id="content" th:field="*{content}"
                   placeholder="문의 내용을 입력하세요" maxlength="2000" required></textarea>
+      </div>
+
+      <div class="field">
+        <label for="images">사진 첨부 <span class="field-optional">(선택, 최대 5장)</span></label>
+        <label for="images" class="img-dropzone" id="imgDropzone">
+          <svg viewBox="0 0 24 24" width="26" height="26" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/>
+            <polyline points="17 8 12 3 7 8"/>
+            <line x1="12" y1="3" x2="12" y2="15"/>
+          </svg>
+          <span class="img-dropzone-text">클릭해서 이미지를 선택하거나 여기로 끌어다 놓으세요</span>
+          <span class="img-dropzone-sub">JPG, PNG, GIF · 장당 최대 10MB</span>
+        </label>
+        <input type="file" id="images" name="images" accept="image/*" multiple hidden />
+        <div class="img-preview-grid" id="imgPreviewGrid"></div>
       </div>
 
       <div class="qna-notice">🔒 이 문의는 작성자 본인과 관리자만 볼 수 있어요.</div>
@@ -61,6 +86,73 @@
 </div>
 
 <script>
+  // ── 이미지 첨부: 미리보기 + 드래그앤드롭 + 개별 삭제 ──
+  (function () {
+    var input = document.getElementById('images');
+    var dropzone = document.getElementById('imgDropzone');
+    var grid = document.getElementById('imgPreviewGrid');
+    var MAX = 5;
+
+    function renderPreviews() {
+      grid.innerHTML = '';
+      Array.from(input.files).forEach(function (file, idx) {
+        var reader = new FileReader();
+        reader.onload = function (e) {
+          var item = document.createElement('div');
+          item.className = 'img-preview-item';
+          item.innerHTML =
+            '<img src="' + e.target.result + '" alt="' + file.name + '" />' +
+            '<button type="button" class="img-remove-btn">✕</button>';
+          item.querySelector('.img-remove-btn').addEventListener('click', function () {
+            removeFile(idx);
+          });
+          grid.appendChild(item);
+        };
+        reader.readAsDataURL(file);
+      });
+    }
+
+    function setFiles(fileList) {
+      var dt = new DataTransfer();
+      Array.from(fileList).slice(0, MAX).forEach(function (f) { dt.items.add(f); });
+      if (fileList.length > MAX) {
+        alert('이미지는 최대 ' + MAX + '장까지 첨부할 수 있어요.');
+      }
+      input.files = dt.files;
+      renderPreviews();
+    }
+
+    function removeFile(idx) {
+      var dt = new DataTransfer();
+      Array.from(input.files).forEach(function (f, i) {
+        if (i !== idx) dt.items.add(f);
+      });
+      input.files = dt.files;
+      renderPreviews();
+    }
+
+    input.addEventListener('change', function () {
+      setFiles(input.files);
+    });
+
+    ['dragenter', 'dragover'].forEach(function (evt) {
+      dropzone.addEventListener(evt, function (e) {
+        e.preventDefault();
+        dropzone.classList.add('dragover');
+      });
+    });
+    ['dragleave', 'drop'].forEach(function (evt) {
+      dropzone.addEventListener(evt, function (e) {
+        e.preventDefault();
+        dropzone.classList.remove('dragover');
+      });
+    });
+    dropzone.addEventListener('drop', function (e) {
+      var combined = Array.from(input.files).concat(Array.from(e.dataTransfer.files));
+      setFiles(combined);
+    });
+  })();
+
   document.getElementById('qnaForm').addEventListener('submit', function (e) {
     e.preventDefault();
     var form = this;

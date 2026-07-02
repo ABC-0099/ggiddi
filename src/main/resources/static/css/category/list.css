@@ -1,4 +1,4 @@
- :root {
+:root {
       --mint:       #5DCAA5;
       --mint-dark:  #1D9E75;
       --mint-light: #9FE1CB;
@@ -333,6 +333,7 @@
 
     /* ── 카드 (가로형) ── */
     .lc {
+      position: relative;
       background: rgba(255,255,255,.65);
       backdrop-filter: blur(16px);
       border: 1px solid rgba(255,255,255,.9);
@@ -347,6 +348,36 @@
       min-height: 120px;
     }
     .lc:hover { transform: translateY(-3px); box-shadow: 0 12px 32px rgba(29,158,117,.13); }
+
+    /* 관리자: 강의 카드 수정 아이콘 */
+    .lc-edit-btn {
+      position: absolute; top: 8px; right: 8px; z-index: 5;
+      width: 26px; height: 26px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid rgba(255,255,255,.8); background: rgba(255,255,255,.9);
+      color: var(--ink-soft); cursor: pointer;
+      opacity: 0; transition: opacity .15s, border-color .15s, color .15s, background .15s;
+      box-shadow: 0 2px 6px rgba(0,0,0,.12);
+    }
+    .lc:hover .lc-edit-btn { opacity: 1; }
+    .lc-edit-btn:hover { border-color: var(--mint); color: var(--mint-dark); background: var(--mint-pale); }
+
+    /* 관리자: 강의 추가 타일 */
+    .lc-add-tile {
+      display: flex; flex-direction: column; align-items: center; justify-content: center;
+      gap: 6px; min-height: 120px;
+      border: 1.5px dashed var(--border); border-radius: 16px;
+      background: rgba(255,255,255,.4);
+      color: var(--ink-faint); cursor: pointer;
+      font-family: inherit; transition: all .15s;
+    }
+    .lc-add-tile:hover { border-color: var(--mint); color: var(--mint-dark); background: var(--mint-pale); }
+    .lc-add-icon {
+      width: 34px; height: 34px; border-radius: 50%;
+      border: 1.5px dashed currentColor;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .lc-add-text { font-size: 12.5px; font-weight: 600; }
 
     /* 왼쪽 썸네일 */
     .lc-thumb {
@@ -470,3 +501,149 @@
       .lc-thumb { width: 110px; }
       .lc-title { font-size: 14px; }
     }
+
+    /* ── 관리자: 카테고리 추가 버튼 ── */
+    .btn-add-category {
+      display: flex; align-items: center; gap: 6px;
+      padding: 8px 16px; border-radius: 20px;
+      background: linear-gradient(135deg, var(--mint), var(--navy));
+      color: #fff; font-size: 13px; font-weight: 700;
+      font-family: inherit; cursor: pointer;
+      box-shadow: 0 2px 8px rgba(29,158,117,.2);
+      transition: filter .15s, transform .15s;
+    }
+    .btn-add-category:hover { filter: brightness(1.06); transform: translateY(-1px); }
+
+    /* ── 카테고리 탭 + 관리자 수정/삭제 아이콘 ── */
+    .tab-chip { position: relative; display: inline-flex; align-items: center; }
+    .tab-admin {
+      display: flex; align-items: center; gap: 2px;
+      position: absolute; top: -6px; right: -4px;
+      opacity: 0; transform: translateY(-2px);
+      transition: opacity .15s, transform .15s;
+      pointer-events: none;
+    }
+    .tab-chip:hover .tab-admin { opacity: 1; transform: translateY(0); pointer-events: auto; }
+    .tab-admin-btn {
+      width: 18px; height: 18px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      border: 1px solid var(--border); background: #fff;
+      color: var(--ink-soft); cursor: pointer; transition: all .15s;
+      box-shadow: 0 1px 4px rgba(0,0,0,.1);
+    }
+    .tab-edit-btn:hover { border-color: var(--mint); color: var(--mint-dark); background: var(--mint-pale); }
+    .tab-delete-btn:hover { border-color: #ef4444; color: #ef4444; background: #fef2f2; }
+
+    /* 모달 안 탭 실시간 미리보기 */
+    .cat-tab-preview { padding: 4px 0; }
+
+    /* ── 카테고리 삭제 확인 모달 ── */
+    .cat-delete-overlay {
+      position: fixed; inset: 0; background: rgba(10,31,23,.45);
+      backdrop-filter: blur(2px);
+      display: none; align-items: center; justify-content: center; z-index: 3000;
+    }
+    .cat-delete-overlay.active { display: flex; }
+    .cat-delete-card {
+      background: rgba(255,255,255,.97);
+      border-radius: 18px; padding: 34px 30px;
+      text-align: center; width: 320px; max-width: 90vw;
+      box-shadow: 0 16px 44px rgba(10,31,23,.25);
+    }
+    .cat-delete-icon { font-size: 38px; margin-bottom: 12px; }
+    .cat-delete-title { font-size: 16px; font-weight: 700; margin-bottom: 8px; color: var(--ink); }
+    .cat-delete-desc { font-size: 12.5px; color: var(--ink-soft); line-height: 1.6; margin-bottom: 22px; }
+    .cat-delete-actions { display: flex; gap: 8px; }
+    .cat-delete-actions .btn-cancel {
+      flex: 1; padding: 10px; border-radius: 10px; border: 1.5px solid var(--border);
+      background: #fff; color: var(--ink-soft); font-size: 13.5px; font-weight: 600;
+      font-family: inherit; cursor: pointer;
+    }
+    .btn-delete-confirm {
+      flex: 1; padding: 10px; border-radius: 10px; border: none;
+      background: #ef4444; color: #fff; font-size: 13.5px; font-weight: 700;
+      font-family: inherit; cursor: pointer; transition: filter .15s;
+    }
+    .btn-delete-confirm:hover { filter: brightness(1.08); }
+
+    /* ── 카테고리 추가 모달 ── */
+    .cat-add-overlay {
+      position: fixed; inset: 0; background: rgba(10,31,23,.45);
+      backdrop-filter: blur(2px);
+      display: none; align-items: center; justify-content: center; z-index: 3000;
+    }
+    .cat-add-overlay.active { display: flex; }
+    .cat-add-card {
+      background: rgba(255,255,255,.98);
+      border-radius: 18px; padding: 28px 28px 24px;
+      width: 380px; max-width: 90vw;
+      max-height: 88vh; overflow-y: auto;
+      box-shadow: 0 16px 44px rgba(10,31,23,.25);
+    }
+    .cat-add-head {
+      display: flex; align-items: center; justify-content: space-between;
+      margin-bottom: 18px;
+    }
+    .cat-add-title { font-size: 16px; font-weight: 700; color: var(--ink); }
+    .cat-add-close {
+      width: 26px; height: 26px; border-radius: 8px; border: none;
+      background: transparent; color: var(--ink-faint); cursor: pointer;
+      display: flex; align-items: center; justify-content: center;
+      transition: background .15s;
+    }
+    .cat-add-close:hover { background: rgba(0,0,0,.06); }
+
+    #categoryAddForm .field { margin-bottom: 16px; }
+    #categoryAddForm .field label { display: block; font-size: 13px; font-weight: 600; margin-bottom: 6px; color: var(--ink); }
+    #categoryAddForm .required { color: #ef4444; }
+    #categoryAddForm .field input {
+      width: 100%; border: 1.5px solid var(--border); border-radius: 10px;
+      padding: 10px 12px; font-family: inherit; font-size: 13px; outline: none;
+      transition: border-color .15s;
+    }
+    #categoryAddForm .field input:focus { border-color: var(--mint); }
+    #categoryAddForm .field select {
+      width: 100%; border: 1.5px solid var(--border); border-radius: 10px;
+      padding: 10px 36px 10px 12px; font-family: inherit; font-size: 13px;
+      color: var(--ink); background-color: #fff;
+      outline: none; cursor: pointer; transition: border-color .15s;
+      appearance: none; -webkit-appearance: none; -moz-appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 10 6' fill='none'%3E%3Cpath d='M1 1l4 4 4-4' stroke='%236B7280' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 12px center;
+      background-size: 10px 6px;
+    }
+    #categoryAddForm .field select:focus { border-color: var(--mint); }
+    #categoryAddForm .field select option[value=""] { color: var(--ink-faint); }
+
+    .icon-presets { display: flex; gap: 8px; margin-top: 8px; }
+    .icon-preset-btn {
+      width: 36px; height: 36px; border-radius: 9px;
+      border: 1.5px solid var(--border); background: #fff;
+      font-size: 16px; cursor: pointer; transition: all .15s;
+    }
+    .icon-preset-btn:hover { border-color: var(--mint); }
+    .icon-preset-btn.active { border-color: var(--mint); background: var(--mint-pale); }
+
+    .cat-add-actions { display: flex; justify-content: flex-end; gap: 8px; margin-top: 20px; }
+    .cat-add-actions .btn-cancel {
+      padding: 9px 18px; border-radius: 10px; border: 1.5px solid var(--border);
+      background: #fff; color: var(--ink-soft); font-size: 13px; font-weight: 500;
+      font-family: inherit; cursor: pointer;
+    }
+    .cat-add-actions .btn-submit {
+      padding: 9px 20px; border-radius: 10px; border: none;
+      background: linear-gradient(135deg, var(--mint), var(--navy));
+      color: #fff; font-size: 13px; font-weight: 700; cursor: pointer;
+      font-family: inherit;
+    }
+    .cat-add-actions .btn-submit:disabled { opacity: .6; cursor: default; }
+
+    .cat-add-head-left { display: flex; align-items: center; gap: 8px; }
+    .cat-add-head-icon {
+      width: 26px; height: 26px; border-radius: 8px;
+      background: var(--mint-pale); color: var(--mint-dark);
+      display: flex; align-items: center; justify-content: center;
+    }
+
+    .field-optional { font-weight: 400; color: var(--ink-soft); font-size: 12px; }

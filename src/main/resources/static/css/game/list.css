@@ -267,6 +267,12 @@
     70%  { box-shadow: 0 0 0 6px rgba(159,232,159,0); }
     100% { box-shadow: 0 0 0 0 rgba(159,232,159,0); }
 }
+.quest-chat-room-count-badge {
+    font-size: 10px; font-weight: 700; font-family: 'Galmuri11', sans-serif;
+    padding: 2px 6px; border-radius: 4px; margin-left: 2px;
+    background: rgba(255,255,255,.12); color: var(--gold-light); flex-shrink: 0; white-space: nowrap;
+}
+.quest-chat-room-count-badge.is-full { background: var(--crimson); color: #fff; }
 .quest-chat-back, .quest-chat-close {
     background: none; border: none; color: var(--gold-light);
     font-size: 15px; cursor: pointer;

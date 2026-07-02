@@ -21,10 +21,13 @@
 <nav>
     <a th:href="@{/}" class="logo">끼역띠귿<div class="logo-dot"></div></a>
     <ul class="nav-links">
-        <li><a th:href="@{/}">홈</a></li>
+        <li><a th:href="@{/notices}">공지사항</a></li>
+        <li><a th:href="@{/community}">커뮤니티</a></li>
+        <li><a th:href="@{/event}">이벤트</a></li>
         <li><a th:href="@{/lectures}">강의</a></li>
         <li><a th:href="@{/game}" class="active">게임</a></li>
-        <li><a th:href="@{/community}">커뮤니티</a></li>
+        <li><a th:href="@{/faq/list}">FAQ</a></li>
+        <li><a th:href="@{/qna/write}">1:1 질문하기</a></li>
         <li><a th:href="@{/siteUser/mypage}">마이페이지</a></li>
     </ul>
     <div sec:authorize="isAuthenticated()">
@@ -54,7 +57,16 @@
 
         <!-- 단어 맞추기 -->
         <div style="flex:1 1 320px; max-width:380px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:20px; padding:36px 24px; border:2px solid var(--wood-deep, #7a5230); border-radius:16px; background:rgba(255,255,255,0.55);">
-            <div style="font-size:52px;">📖</div>
+            <div style="width:52px; height:52px; color:var(--wood-deep);">
+                <svg viewBox="0 0 24 24" width="52" height="52" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 5.5c0-.83.67-1.5 1.5-1.5H11a1 1 0 0 1 1 1v14a1 1 0 0 0-1-1H5.5A1.5 1.5 0 0 0 4 19.5v-14z"/>
+                    <path d="M20 5.5c0-.83-.67-1.5-1.5-1.5H13a1 1 0 0 0-1 1v14a1 1 0 0 1 1-1h5.5a1.5 1.5 0 0 1 1.5 1.5v-14z"/>
+                    <line x1="7" y1="8" x2="9.3" y2="8"/>
+                    <line x1="7" y1="11" x2="9.3" y2="11"/>
+                    <line x1="14.7" y1="8" x2="17" y2="8"/>
+                    <line x1="14.7" y1="11" x2="17" y2="11"/>
+                </svg>
+            </div>
             <div>
                 <h2 class="serif-font" style="font-size:19px; font-weight:900; margin-bottom:10px; color:var(--wood-deep);">단어 맞추기</h2>
                 <p style="font-size:13.5px; color:var(--ink-soft); line-height:1.6;">뜻과 발음을 보고<br>알맞은 단어를 맞혀보세요.</p>
@@ -64,7 +76,14 @@
 
         <!-- 액션 게임 -->
         <div style="flex:1 1 320px; max-width:380px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:20px; padding:36px 24px; border:2px solid var(--wood-deep, #7a5230); border-radius:16px; background:rgba(255,255,255,0.55);">
-            <div style="font-size:52px;">🗡️</div>
+            <div style="width:52px; height:52px; color:var(--wood-deep);">
+                <svg viewBox="0 0 24 24" width="52" height="52" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="14.5" y1="9.5" x2="4" y2="20"/>
+                    <path d="M20.5 3.5l-8.5 8.5 2 2 8.5-8.5-2-2z"/>
+                    <line x1="12.5" y1="9" x2="15" y2="11.5"/>
+                    <line x1="3" y1="21" x2="4.5" y2="19.5"/>
+                </svg>
+            </div>
             <div>
                 <h2 class="serif-font" style="font-size:19px; font-weight:900; margin-bottom:10px; color:var(--wood-deep);">액션 게임</h2>
                 <p style="font-size:13.5px; color:var(--ink-soft); line-height:1.6;">몬스터를 물리치며<br>한국어 표현을 익혀보세요.</p>
@@ -89,7 +108,12 @@
             <span class="gw-title" id="gwTitle">게임 실행 중</span>
             <span class="gw-title-badge">PLAYING</span>
         </div>
-        <button class="gw-exit-btn" onclick="exitGame()">✕ 나가기</button>
+        <button class="gw-exit-btn" onclick="exitGame()">
+            <svg class="icon-x" viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:-2px; margin-right:4px;">
+                <line x1="18" y1="6" x2="6" y2="18"/>
+                <line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>나가기
+        </button>
     </div>
     <div class="gw-frame-wrap">
         <div class="gw-frame-placeholder" id="gwPlaceholder">
@@ -149,7 +173,12 @@
         <div class="quest-chat-view" id="chat-view-rooms">
             <div class="quest-chat-head">
                 <div class="quest-chat-title pixel-font">⛺ 모험가의 야영지</div>
-                <button type="button" class="quest-chat-close" onclick="toggleChat()">✕</button>
+                <button type="button" class="quest-chat-close" onclick="toggleChat()">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
             </div>
             <div class="quest-chat-room-list" id="chat-room-list">
                 <div class="quest-chat-loading">야영지를 찾는 중...</div>
@@ -161,8 +190,14 @@
                 <div class="quest-chat-title">
                     <span class="quest-chat-status-dot" id="chat-status-dot"></span>
                     <span id="chat-room-name">야영지</span>
+                    <span class="quest-chat-room-count-badge" id="chat-room-count-badge"></span>
                 </div>
-                <button type="button" class="quest-chat-close" onclick="toggleChat()">✕</button>
+                <button type="button" class="quest-chat-close" onclick="toggleChat()">
+                    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
+                        <line x1="18" y1="6" x2="6" y2="18"/>
+                        <line x1="6" y1="6" x2="18" y2="18"/>
+                    </svg>
+                </button>
             </div>
             <div class="quest-chat-messages" id="chat-messages">
                 <div class="quest-chat-empty" id="chat-empty">아직 모닥불 앞에 아무도 없어요. 먼저 말을 걸어보세요 🔥</div>
@@ -190,7 +225,7 @@
 
             <div class="game-footer-brand">
                 <div class="game-footer-logo pixel-font">끼역띠귿</div>
-                <p class="game-footer-tagline">외국인과 다문화 가족을 위한<br>한국어 학습 플랫폼</p>
+                <p class="game-footer-tagline">외국인 학습자를 위한<br>한국어 학습 플랫폼</p>
                 <div class="game-footer-sns">
                     <a th:href="@{/}" class="game-sns-btn" aria-label="인스타그램">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">

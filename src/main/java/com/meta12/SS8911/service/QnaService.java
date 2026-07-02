@@ -28,6 +28,9 @@ public class QnaService {
         qna.setAuthor(author);
         qna.setStatus(InquiryStatus.PENDING);
         qna.setCreatedDate(LocalDateTime.now());
+
+        qna.setCategory(dto.getCategory());
+
         qnaRepository.save(qna);
     }
 

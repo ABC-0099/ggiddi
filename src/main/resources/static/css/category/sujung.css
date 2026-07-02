@@ -22,11 +22,11 @@ a { text-decoration: none; color: inherit; }
 .page-header h1 { font-size: 26px; font-weight: 700; margin-bottom: 6px; }
 .page-header p { font-size: 14px; color: var(--ink-soft); }
 
-.qna-container {
+.cw-container {
     position: relative; z-index: 1;
     max-width: 700px; margin: 20px auto 80px; padding: 0 20px;
 }
-.qna-card {
+.cw-card {
     background: rgba(255,255,255,.9);
     backdrop-filter: blur(12px);
     border-radius: 16px;
@@ -38,13 +38,12 @@ a { text-decoration: none; color: inherit; }
 .field { margin-bottom: 20px; }
 .field label { display: block; font-size: 13.5px; font-weight: 600; margin-bottom: 8px; }
 .required { color: #ef4444; }
-.field input, .field textarea {
+.field input {
     width: 100%; border: 1.5px solid var(--border); border-radius: 10px;
     padding: 11px 14px; font-family: inherit; font-size: 13.5px; outline: none;
     transition: border-color .15s;
 }
-.field textarea { min-height: 160px; resize: vertical; }
-.field input:focus, .field textarea:focus { border-color: var(--mint); }
+.field input:focus { border-color: var(--mint); }
 
 .field select {
     width: 100%; border: 1.5px solid var(--border); border-radius: 10px;
@@ -58,57 +57,27 @@ a { text-decoration: none; color: inherit; }
     background-size: 10px 6px;
 }
 .field select:focus { border-color: var(--mint); }
-.field select:invalid { color: var(--ink-soft); }
-.field select option { color: var(--ink); }
 .field select option[value=""] { color: var(--ink-soft); }
 
 .field-optional { font-weight: 400; color: var(--ink-soft); font-size: 12px; }
 
-/* ── 이미지 첨부 ── */
-.img-dropzone {
-    display: flex; flex-direction: column; align-items: center; justify-content: center;
-    gap: 6px; text-align: center;
-    border: 1.5px dashed var(--border); border-radius: 12px;
-    padding: 26px 16px; cursor: pointer;
-    color: var(--ink-soft);
-    background: var(--mint-pale);
-    transition: border-color .15s, background .15s;
+/* 탭 미리보기 */
+.cat-tab-preview { padding: 4px 0; }
+.tab-preview-chip {
+    display: inline-block;
+    padding: 8px 18px; border-radius: 20px;
+    font-size: 14px; font-weight: 500;
+    background: var(--mint); color: #fff;
+    box-shadow: 0 2px 8px rgba(29,158,117,.25);
 }
-.img-dropzone:hover,
-.img-dropzone.dragover { border-color: var(--mint); background: #E0F7EF; }
-.img-dropzone svg { color: var(--mint-dark); }
-.img-dropzone-text { font-size: 13px; font-weight: 600; color: var(--ink); }
-.img-dropzone-sub { font-size: 11.5px; color: var(--ink-soft); }
 
-.img-preview-grid {
-    display: grid; grid-template-columns: repeat(auto-fill, minmax(84px, 1fr));
-    gap: 10px; margin-top: 12px;
-}
-.img-preview-item {
-    position: relative; width: 100%; aspect-ratio: 1 / 1;
-    border-radius: 10px; overflow: hidden;
-    border: 1.5px solid var(--border);
-}
-.img-preview-item img {
-    width: 100%; height: 100%; object-fit: cover; display: block;
-}
-.img-remove-btn {
-    position: absolute; top: 4px; right: 4px;
-    width: 20px; height: 20px; border-radius: 50%;
-    border: none; background: rgba(10,31,23,.65); color: #fff;
-    font-size: 11px; line-height: 1; cursor: pointer;
-    display: flex; align-items: center; justify-content: center;
-    transition: background .15s;
-}
-.img-remove-btn:hover { background: rgba(10,31,23,.85); }
-
-.qna-notice {
+.cw-notice {
     font-size: 12.5px; color: var(--ink-soft);
     background: var(--mint-pale); border-radius: 10px;
     padding: 10px 14px; margin-bottom: 24px;
 }
 
-.qna-actions { display: flex; justify-content: flex-end; gap: 8px; }
+.cw-actions { display: flex; justify-content: flex-end; gap: 8px; }
 .btn-cancel {
     padding: 10px 20px; border-radius: 10px; border: 1.5px solid var(--border);
     color: var(--ink-soft); font-size: 13.5px; font-weight: 500;
@@ -120,58 +89,26 @@ a { text-decoration: none; color: inherit; }
     font-family: inherit;
 }
 
-/* 상세보기 */
-.qna-status-badge {
-    display: inline-block; font-size: 11px; font-weight: 700;
-    padding: 3px 12px; border-radius: 20px; margin-bottom: 14px;
-}
-.qna-status-badge.pending { background: #FEF3C7; color: #B45309; }
-.qna-status-badge.answered { background: var(--mint-pale); color: var(--mint-dark); }
-
-.qna-title { font-size: 21px; font-weight: 700; margin-bottom: 8px; }
-.qna-meta { font-size: 12px; color: var(--ink-soft); margin-bottom: 24px; }
-.qna-content {
-    font-size: 14.5px; line-height: 1.8; white-space: pre-wrap;
-    padding-bottom: 24px; border-bottom: 1px solid #f3f4f6; margin-bottom: 24px;
-}
-
-.qna-answer {
-    background: var(--mint-pale); border-radius: 12px;
-    padding: 18px 20px; margin-bottom: 24px;
-}
-.answer-label { font-size: 13px; font-weight: 700; color: var(--mint-dark); margin-bottom: 10px; }
-.answer-content { font-size: 14px; line-height: 1.7; white-space: pre-wrap; margin-bottom: 10px; }
-.answer-date { font-size: 11.5px; color: var(--ink-soft); }
-
-.qna-answer-form textarea {
-    width: 100%; min-height: 100px; border: 1.5px solid var(--border);
-    border-radius: 10px; padding: 12px 14px; font-family: inherit;
-    font-size: 13.5px; resize: vertical; margin-bottom: 10px;
-}
-
-.qna-back { margin-top: 20px; }
-.btn-back { font-size: 13px; color: #9ca3af; }
-
-/* ── 제출 확인 모달 (기존 파일에 누락돼 있던 부분) ── */
-.qna-confirm-overlay {
+/* 등록 확인 모달 */
+.cw-confirm-overlay {
     position: fixed; inset: 0; background: rgba(10,31,23,.45);
     backdrop-filter: blur(2px);
     display: none; align-items: center; justify-content: center; z-index: 3000;
 }
-.qna-confirm-overlay.active { display: flex; }
-.qna-confirm-card {
+.cw-confirm-overlay.active { display: flex; }
+.cw-confirm-card {
     background: rgba(255,255,255,.96);
     border-radius: 18px; padding: 38px 32px;
     text-align: center; width: 320px; max-width: 90vw;
     box-shadow: 0 16px 44px rgba(10,31,23,.25);
 }
-.qna-confirm-icon { font-size: 42px; margin-bottom: 14px; }
-.qna-confirm-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; color: var(--ink); }
-.qna-confirm-desc { font-size: 13px; color: var(--ink-soft); margin-bottom: 22px; line-height: 1.6; }
-.qna-confirm-btn {
+.cw-confirm-icon { font-size: 42px; margin-bottom: 14px; }
+.cw-confirm-title { font-size: 17px; font-weight: 700; margin-bottom: 8px; color: var(--ink); }
+.cw-confirm-desc { font-size: 13px; color: var(--ink-soft); margin-bottom: 22px; line-height: 1.6; }
+.cw-confirm-btn {
     width: 100%; padding: 12px; border: none; border-radius: 10px;
     background: linear-gradient(135deg, var(--mint), var(--navy));
     color: #fff; font-size: 14px; font-weight: 700; cursor: pointer;
     font-family: inherit;
 }
-.qna-confirm-btn:hover { filter: brightness(1.06); }
+.cw-confirm-btn:hover { filter: brightness(1.06); }
