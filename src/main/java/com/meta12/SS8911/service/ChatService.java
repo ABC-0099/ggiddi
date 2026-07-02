@@ -1,7 +1,7 @@
 package com.meta12.SS8911.service;
 
-import com.meta12.SS8911.Dto.ChatMessageViewDTO;
-import com.meta12.SS8911.Dto.ChatRoomViewDTO;
+import com.meta12.SS8911.dto.ChatMessageViewDTO;
+import com.meta12.SS8911.dto.ChatRoomViewDTO;
 import com.meta12.SS8911.entity.ChatMessage;
 import com.meta12.SS8911.entity.ChatRoom;
 import com.meta12.SS8911.entity.SiteUser;

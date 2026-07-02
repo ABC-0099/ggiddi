@@ -35,6 +35,7 @@ public class Content {
     private String thumbFileName;  // 썸네일 저장 파일명 (추가됨)
     private String attachFileName; // 첨부파일 저장 파일명 (추가됨)
 
+    private Integer stage;
 
     @Transient
     private Integer progressPercent;

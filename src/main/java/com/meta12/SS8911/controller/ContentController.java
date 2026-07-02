@@ -34,7 +34,7 @@ public class ContentController {
 
     private final ContentService contentService;
     private final CategoryService categoryService;
-//    private final QuizService quizService;
+    //    private final QuizService quizService;
     private final SiteUserService siteUserService;
 
     private final OrderPayRepository orderPayRepository;
@@ -44,8 +44,14 @@ public class ContentController {
     @GetMapping("/content/chuga/{categoryId}")
     public String chuga(Model model, @PathVariable("categoryId") Long categoryId) {
         Category category = categoryService.view(categoryId);
-        if (category == null) return "redirect:/category/list";
+//        if (category == null) return "redirect:/category/list";
         model.addAttribute("category", category);
+
+        // 폼(th:object="${lectureForm}")이 바인딩할 빈 DTO. categoryId는 미리 채워서 hidden 필드로 내려보냄
+        ContentDTO lectureForm = new ContentDTO();
+        lectureForm.setCategoryId(categoryId);
+        model.addAttribute("lectureForm", lectureForm);
+
         return "content/chuga";
     }
 

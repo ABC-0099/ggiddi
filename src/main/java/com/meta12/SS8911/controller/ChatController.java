@@ -1,7 +1,7 @@
 package com.meta12.SS8911.controller;
 
-import com.meta12.SS8911.Dto.ChatMessageDTO;
-import com.meta12.SS8911.Dto.ChatMessageViewDTO;
+import com.meta12.SS8911.dto.ChatMessageDTO;
+import com.meta12.SS8911.dto.ChatMessageViewDTO;
 import com.meta12.SS8911.service.ChatService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.messaging.handler.annotation.DestinationVariable;

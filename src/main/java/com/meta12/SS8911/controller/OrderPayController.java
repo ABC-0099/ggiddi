@@ -1,6 +1,7 @@
 package com.meta12.SS8911.controller;
 
 import com.meta12.SS8911.dto.OrderPayDTO;
+import com.meta12.SS8911.dto.SubscriptionPlanDTO;
 import com.meta12.SS8911.entity.Category;
 import com.meta12.SS8911.entity.OrderPay;
 import com.meta12.SS8911.entity.SiteUser;
@@ -48,7 +49,68 @@ public class OrderPayController {
         }
 
         model.addAttribute("myAppliedIds", myAppliedIds);
+
+        // 구독 결제 화면(플랜 선택)에 필요한 데이터
+        List<SubscriptionPlanDTO> plans = buildDefaultPlans();
+        model.addAttribute("plans", plans);
+        model.addAttribute("defaultPlan", plans.stream()
+                .filter(SubscriptionPlanDTO::isPopular)
+                .findFirst()
+                .orElse(plans.get(0)));
+
         return "orderPay/list";
+    }
+
+    /**
+     * 월구독 / 연구독 / 평생소장 3개 플랜의 고정 데이터를 만듭니다.
+     * 추후 DB(Category 등)로 옮기고 싶다면 이 메서드만 교체하면 됩니다.
+     */
+    private List<SubscriptionPlanDTO> buildDefaultPlans() {
+        List<SubscriptionPlanDTO> plans = new java.util.ArrayList<>();
+
+        plans.add(new SubscriptionPlanDTO(
+                "월구독", "월 구독", 9900, 9900, 0,
+                "/ 매월 자동 갱신", null, false, "구독 시작하기",
+                List.of("첫 구독 시 7일 무료 체험", "언제든지 해지 가능", "다음 결제일 전 알림 발송"),
+                List.of(
+                        new SubscriptionPlanDTO.Feature("전체 강의 이용", true),
+                        new SubscriptionPlanDTO.Feature("RPG 게임 학습", true),
+                        new SubscriptionPlanDTO.Feature("단계별 퀴즈", true),
+                        new SubscriptionPlanDTO.Feature("커뮤니티 이용", false),
+                        new SubscriptionPlanDTO.Feature("학습 분석 리포트", false),
+                        new SubscriptionPlanDTO.Feature("평생 업데이트", false)
+                )
+        ));
+
+        plans.add(new SubscriptionPlanDTO(
+                "연구독", "연 구독", 89900, 118800, 28900,
+                "/ 매년 자동 갱신", "월 7,492원 · 25% 절약", true, "구독 시작하기",
+                List.of("첫 구독 시 7일 무료 체험", "언제든지 해지 가능", "다음 결제일 전 알림 발송"),
+                List.of(
+                        new SubscriptionPlanDTO.Feature("전체 강의 이용", true),
+                        new SubscriptionPlanDTO.Feature("RPG 게임 학습", true),
+                        new SubscriptionPlanDTO.Feature("단계별 퀴즈", true),
+                        new SubscriptionPlanDTO.Feature("커뮤니티 이용", true),
+                        new SubscriptionPlanDTO.Feature("학습 분석 리포트", true),
+                        new SubscriptionPlanDTO.Feature("평생 업데이트", false)
+                )
+        ));
+
+        plans.add(new SubscriptionPlanDTO(
+                "평생", "평생 소장 ✨", 199000, 199000, 0,
+                "/ 1회 결제 · 영구 이용", "가장 합리적인 선택", false, "결제하기",
+                List.of("한 번만 결제, 영구 이용", "신규 강의 무료 업데이트", "커뮤니티 평생 이용 가능"),
+                List.of(
+                        new SubscriptionPlanDTO.Feature("전체 강의 이용", true),
+                        new SubscriptionPlanDTO.Feature("RPG 게임 학습", true),
+                        new SubscriptionPlanDTO.Feature("단계별 퀴즈", true),
+                        new SubscriptionPlanDTO.Feature("커뮤니티 이용", true),
+                        new SubscriptionPlanDTO.Feature("학습 분석 리포트", true),
+                        new SubscriptionPlanDTO.Feature("평생 업데이트 포함", true)
+                )
+        ));
+
+        return plans;
     }
 
     @GetMapping("/orderPay/view/{id}")
