@@ -34,6 +34,12 @@ public class Content {
 
     private Integer stage;
 
+    private String description;
+    private String keywords;
+    private String status;         // DRAFT / PUBLISHED / SCHEDULED
+    private LocalDateTime publishAt;
+    private boolean free;
+
     @Transient
     private Integer progressPercent;
 

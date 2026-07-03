@@ -195,7 +195,7 @@
 
         <div class="lecture-grid">
             <a th:each="content : ${contentMap.get(category.id)}"
-               th:href="${paidMap.get(category.id)} ? @{/content/view/{id}(id=${content.id})} : @{/category/view/{id}(id=${category.id})}"
+               th:href="@{/content/view/{id}(id=${content.id})}"
                th:classappend="${paidMap.get(category.id)} ? '' : 'locked'"
                class="lc">
                 <button type="button" class="lc-edit-btn" sec:authorize="hasRole('ADMIN')" title="강의 수정"
@@ -239,8 +239,8 @@
                 아직 등록된 강의가 없어요.
             </p>
 
-            <button type="button" class="lc lc-add-tile" sec:authorize="hasRole('ADMIN')"
-                    th:attr="data-cat-id=${category.id}">
+            <a class="lc lc-add-tile" sec:authorize="hasRole('ADMIN')"
+               th:href="@{/content/chuga/{categoryId}(categoryId=${category.id})}">
                 <div class="lc-add-icon">
                     <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
                         <line x1="12" y1="5" x2="12" y2="19"/>
@@ -248,7 +248,7 @@
                     </svg>
                 </div>
                 <div class="lc-add-text">강의 추가</div>
-            </button>
+            </a>
         </div>
     </div>
 
@@ -320,7 +320,7 @@
     </div>
 </div>
 
-<!-- 강의 추가/수정 모달 (관리자 전용) -->
+<!-- 강의 수정 모달 (관리자 전용) -->
 <div class="cat-add-overlay" id="lectureAddOverlay">
     <div class="cat-add-card">
         <div class="cat-add-head">
@@ -331,7 +331,7 @@
                         <path d="M20 5.5c0-.83-.67-1.5-1.5-1.5H13a1 1 0 0 0-1 1v14a1 1 0 0 1 1-1h5.5a1.5 1.5 0 0 1 1.5 1.5v-14z"/>
                     </svg>
                 </span>
-                <div class="cat-add-title" id="lectureModalTitle">강의 추가</div>
+                <div class="cat-add-title" id="lectureModalTitle">강의 수정</div>
             </div>
             <button type="button" class="cat-add-close" id="lectureAddCloseBtn">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round">
@@ -531,15 +531,6 @@
       var titleInput = document.getElementById('lecTitle');
       var sequenceInput = document.getElementById('lecSequence');
 
-      function openForAdd(catId) {
-        form.reset();
-        idInput.value = '';
-        catIdInput.value = catId;
-        modalTitle.textContent = '강의 추가';
-        submitBtn.textContent = '등록';
-        overlay.classList.add('active');
-      }
-
       function openForEdit(id, title, sequence, catId) {
         form.reset();
         idInput.value = id;
@@ -556,12 +547,6 @@
         form.reset();
       }
 
-      document.querySelectorAll('.lc-add-tile').forEach(function (btn) {
-        btn.addEventListener('click', function () {
-          openForAdd(btn.dataset.catId);
-        });
-      });
-
       document.querySelectorAll('.lc-edit-btn').forEach(function (btn) {
         btn.addEventListener('click', function (e) {
           e.preventDefault();
@@ -575,11 +560,10 @@
 
       form.addEventListener('submit', function (e) {
         e.preventDefault();
-        var isEdit = !!idInput.value;
-        var url = isEdit ? ('/content/sujung/' + idInput.value) : '/content/chuga';
+        var url = '/content/sujungProc';
 
         submitBtn.disabled = true;
-        submitBtn.textContent = isEdit ? '수정 중...' : '등록 중...';
+        submitBtn.textContent = '수정 중...';
 
         var body = new URLSearchParams(new FormData(form));
         var headers = { 'Content-Type': 'application/x-www-form-urlencoded' };
@@ -590,15 +574,15 @@
             if (res.ok || res.redirected) {
               window.location.reload();
             } else {
-              alert((isEdit ? '수정' : '등록') + '에 실패했어요. 다시 시도해주세요.');
+              alert('수정에 실패했어요. 다시 시도해주세요.');
               submitBtn.disabled = false;
-              submitBtn.textContent = isEdit ? '수정 완료' : '등록';
+              submitBtn.textContent = '수정 완료';
             }
           })
           .catch(function () {
             alert('처리 중 오류가 발생했어요.');
             submitBtn.disabled = false;
-            submitBtn.textContent = isEdit ? '수정 완료' : '등록';
+            submitBtn.textContent = '수정 완료';
           });
       });
     })();

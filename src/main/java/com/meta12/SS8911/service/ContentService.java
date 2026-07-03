@@ -174,6 +174,13 @@ public class ContentService {
         // 3. 첨부파일 파일명 세팅 (이 부분도 함께 추가해야 안전합니다)
         content.setAttachFileName(contentDTO.getAttachFileName());
 
+        content.setStage(contentDTO.getStage());
+        content.setDescription(contentDTO.getDescription());
+        content.setKeywords(contentDTO.getKeywords());
+        content.setStatus(contentDTO.getStatus());
+        content.setPublishAt(contentDTO.getPublishAt());
+        content.setFree(contentDTO.isFree());
+
 
         if (contentDTO.getAttachFile() != null && !contentDTO.getAttachFile().isEmpty()){
             content.setFileOrigin(contentDTO.getAttachFile().getOriginalFilename());

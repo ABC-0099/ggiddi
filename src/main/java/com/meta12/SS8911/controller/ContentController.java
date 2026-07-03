@@ -44,6 +44,7 @@ public class ContentController {
 
 
 
+
     @GetMapping("/content/chuga/{categoryId}")
     public String chuga(Model model, @PathVariable("categoryId") Long categoryId) {
         Category category = categoryService.view(categoryId);
@@ -61,9 +62,15 @@ public class ContentController {
     @GetMapping("/content/view/{id}")
     public String view(@PathVariable("id") Long id, Model model, Principal principal) {
         // 1. 유저 정보 먼저 가져오기
+        System.out.println("[DEBUG-1] principal = " + (principal == null ? "null" : principal.getName())); // 추가
+
         SiteUser currentUser = null;
         if (principal != null) {
             currentUser = siteUserRepository.findByUsername(principal.getName()).orElse(null);
+        }
+        System.out.println("[DEBUG-2] currentUser = " + currentUser); // 추가
+        if (currentUser != null) {
+            System.out.println("[DEBUG-3] role = " + currentUser.getRole()); // 추가
         }
 
         // 2. 단건 조회는 contentService.view(id)를 사용 (List가 아님!)
@@ -82,13 +89,8 @@ public class ContentController {
                 isPaid = orderPayRepository.existsBySiteUserAndCategory(currentUser, category);
                 hasAccess = isPaid;
             }
-
-//            if (!hasAccess) {
-//                if (teacherRepository.existsByLoginId(principal.getName())) {
-//                    hasAccess = true;
-//                }
-//            }
         }
+        System.out.println("[DEBUG-4] hasAccess = " + hasAccess); // 추가
 
         // 4. 권한 없을 때
         if (!hasAccess) {
