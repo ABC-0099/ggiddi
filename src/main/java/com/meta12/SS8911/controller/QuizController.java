@@ -1,20 +1,15 @@
 package com.meta12.SS8911.controller;
 
 import com.meta12.SS8911.entity.Quiz;
-import com.meta12.SS8911.entity.QuizBox;
-import com.meta12.SS8911.entity.QuizUnit;
-import com.meta12.SS8911.entity.SiteUser;
 import com.meta12.SS8911.service.QuizService;
-import com.meta12.SS8911.service.SiteUserService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
-import org.springframework.web.bind.annotation.*;
-
-import java.security.Principal;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping("/quiz")
@@ -22,58 +17,35 @@ import java.util.Map;
 public class QuizController {
 
     private final QuizService quizService;
-    private final SiteUserService siteUserService;
 
-    // 퀴즈 풀기 화면
-    @GetMapping("/{id}")
-    public String quiz(@PathVariable Long id, Model model, Principal principal) {
-        Quiz quiz = quizService.getQuiz(id);
+    /**
+     * 연습퀴즈 목록. categoryId로 필터링 가능 (배움터 메인 카테고리 카드에서 진입).
+     */
+    @GetMapping
+    public String list(@RequestParam(required = false) Long categoryId,
+                       Model model, Authentication authentication) {
+        model.addAttribute("groupedQuizzes", quizService.getQuizListForUser(authentication.getName(), categoryId));
 
-        // 잠금 여부 체크
-        if (!quiz.isUnlocked()) {
-            return "redirect:/"; // 잠겨있으면 홈으로
-        }
+        int[] stats = quizService.getUserQuizStats(authentication.getName());
+        model.addAttribute("totalPoolCount", quizService.getTotalQuestionPoolCount());
+        model.addAttribute("attemptCount", stats[0]);
+        model.addAttribute("avgRate", stats[1]);
 
-        List<QuizUnit> units = quizService.getUnits(quiz);
-        SiteUser user = siteUserService.getUserByUsername(principal.getName());
-        QuizBox prevResult = quizService.getResult(quiz, user);
-
-        model.addAttribute("quiz", quiz);
-        model.addAttribute("units", units);
-        model.addAttribute("prevResult", prevResult); // 이전 풀이 결과 (있으면)
-        return "quiz/quiz";
+        return "quiz/list";
     }
 
-    // 퀴즈 제출 및 채점
-    @PostMapping("/{id}/submit")
-    public String submit(@PathVariable Long id,
-                         @RequestParam Map<String, String> params,
-                         Principal principal) {
-        SiteUser user = siteUserService.getUserByUsername(principal.getName());
+    /**
+     * 퀴즈 풀이 화면. 실제 문항 데이터는 JS가 /api/quiz/{quizId}/start로 따로 받아감
+     * (매번 랜덤으로 다른 문항이 나와야 해서 페이지 로드 시점에 미리 안 심어둠).
+     */
+    @GetMapping("/play/{quizId}")
+    public String play(@PathVariable Long quizId, Model model, Authentication authentication) {
+        Quiz quiz = quizService.getQuizEntity(quizId);
 
-        // params에서 답안만 추출 (key: "answer_문항id", value: "A"/"B"/"C"/"D")
-        Map<Long, String> answers = new HashMap<>();
-        for (Map.Entry<String, String> entry : params.entrySet()) {
-            if (entry.getKey().startsWith("answer_")) {
-                Long unitId = Long.parseLong(entry.getKey().replace("answer_", ""));
-                answers.put(unitId, entry.getValue());
-            }
-        }
+        model.addAttribute("quizId", quiz.getId());
+        model.addAttribute("quizTitle", quiz.getTitle());
+        model.addAttribute("contentTitle", quiz.getContent().getTitle());
 
-        QuizBox result = quizService.submit(id, answers, user);
-        return "redirect:/quiz/" + id + "/result/" + result.getId();
-    }
-
-    // 퀴즈 결과 화면
-    @GetMapping("/{id}/result/{resultId}")
-    public String result(@PathVariable Long id,
-                         @PathVariable Long resultId,
-                         Model model) {
-        Quiz quiz = quizService.getQuiz(id);
-        List<QuizUnit> units = quizService.getUnits(quiz);
-        model.addAttribute("quiz", quiz);
-        model.addAttribute("units", units);
-        model.addAttribute("resultId", resultId);
-        return "quiz/result";
+        return "quiz/play";
     }
 }

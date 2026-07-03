@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>연습퀴즈 관리 - 끼역띠귿</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <link rel="stylesheet" th:href="@{/css/admin/main.css}">
+  <link rel="stylesheet" th:href="@{/css/admin/admin-quiz.css}">
+</head>
+<body style="display:block; background:var(--gray-50);">
+
+<div class="qa-page">
+  <a th:href="@{/admin}" class="qa-back"><i class="ti ti-arrow-left"></i> 관리자 대시보드로</a>
+
+  <div class="qa-header">
+    <div>
+      <div class="qa-title">연습퀴즈 관리</div>
+      <div class="qa-subtitle">강의(차시)마다 등록된 연습퀴즈 세트를 관리하세요</div>
+    </div>
+    <a th:href="@{/admin/quiz/chuga}" class="btn btn-primary">
+      <i class="ti ti-plus"></i>새 퀴즈 등록
+    </a>
+  </div>
+
+  <div class="card">
+    <table class="data-table">
+      <thead>
+      <tr>
+        <th style="width:40px">#</th>
+        <th>퀴즈 세트</th>
+        <th>소속 강의</th>
+        <th style="text-align:center">문항 수</th>
+        <th style="text-align:center; width:190px">작업</th>
+      </tr>
+      </thead>
+      <tbody>
+      <tr th:each="quiz, iter : ${quizzes}">
+        <td style="color:var(--gray-400)" th:text="${iter.count}">1</td>
+        <td>
+          <div class="content-title-cell">
+            <div class="content-thumb"><i class="ti ti-clipboard-text"></i></div>
+            <div class="content-name" th:text="${quiz.title}">1강 연습퀴즈</div>
+          </div>
+        </td>
+        <td th:text="${quiz.contentTitle}">1강. 한글 자음 기초</td>
+        <td style="text-align:center"
+            th:text="${quiz.questions.size()} + '개 중 ' + (${quiz.questionCount} ?: ${quiz.questions.size()}) + '문항 출제'">40개 중 5문항 출제</td>
+        <td style="text-align:center; white-space:nowrap;">
+          <div style="display:flex; justify-content:center; gap:6px;">
+            <a th:href="@{/admin/quiz/view/{id}(id=${quiz.id})}" class="btn btn-outline btn-sm">
+              <i class="ti ti-eye"></i>보기
+            </a>
+            <a th:href="@{/admin/quiz/sujung/{id}(id=${quiz.id})}" class="btn btn-outline btn-sm">
+              <i class="ti ti-edit"></i>수정
+            </a>
+            <button class="btn btn-danger-outline btn-sm" th:onclick="'deleteQuiz(' + ${quiz.id} + ')'">
+              <i class="ti ti-trash"></i>
+            </button>
+          </div>
+        </td>
+      </tr>
+
+      <!-- 데이터 없을 때 -->
+      <tr th:if="${quizzes == null or #lists.isEmpty(quizzes)}">
+        <td colspan="5" style="text-align:center; color:var(--gray-400); padding:32px;">
+          아직 등록된 연습퀴즈가 없어요. "새 퀴즈 등록"으로 첫 세트를 만들어보세요.
+        </td>
+      </tr>
+      </tbody>
+    </table>
+  </div>
+</div>
+
+<script th:inline="javascript">
+  function getCsrfToken() {
+      const match = document.cookie.match(/(^|;\s*)XSRF-TOKEN=([^;]*)/);
+      return match ? decodeURIComponent(match[2]) : '';
+  }
+
+  function deleteQuiz(id) {
+      if (!confirm('이 퀴즈 세트를 삭제할까요? 문항도 함께 삭제됩니다.')) return;
+
+      fetch('/api/admin/quiz/' + id, {
+          method: 'DELETE',
+          headers: { 'X-XSRF-TOKEN': getCsrfToken() }
+      })
+          .then(res => {
+              if (!res.ok) throw new Error('삭제 실패');
+              location.reload();
+          })
+          .catch(err => {
+              console.error(err);
+              alert('삭제 중 오류가 발생했어요.');
+          });
+  }
+</script>
+
+</body>
+</html>

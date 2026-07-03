@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>연습퀴즈 - 끼역띠귿</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&amp;display=swap"
+        rel="stylesheet" />
+  <link rel="stylesheet" th:href="@{/css/layout/navbar.css}" />
+  <link rel="stylesheet" th:href="@{/css/layout/footer.css}" />
+  <link rel="stylesheet" th:href="@{/css/quiz/list.css}" />
+</head>
+<body>
+
+<div th:replace="~{layout/navbar :: navbar(currentMenu='practiceQuiz')}"></div>
+
+<!-- 히어로 (풀블리드) -->
+<section class="ql-hero">
+  <div class="ql-hero-orbs">
+    <div class="ql-hero-orb o1"></div>
+    <div class="ql-hero-orb o2"></div>
+  </div>
+  <div class="ql-hero-inner">
+    <p class="ql-eyebrow"><span class="ql-eyebrow-dot"></span>연습퀴즈</p>
+    <h1>문제은행에서 뽑은<br /><em>오늘의 문제</em>를 풀어봐요</h1>
+    <p class="ql-hero-sub">강의가 끝나면 가볍게 연습해보세요. 문제는 문제은행에서 매번 랜덤으로 출제돼요.</p>
+
+    <div class="ql-hero-stats">
+      <div class="ql-hero-stat">
+        <div class="ql-hero-stat-num" th:text="${totalPoolCount} ?: '0'">186</div>
+        <div class="ql-hero-stat-label">전체 문제은행</div>
+      </div>
+      <div class="ql-hero-stat">
+        <div class="ql-hero-stat-num" th:text="${avgRate} + '%'">82%</div>
+        <div class="ql-hero-stat-label">내 평균 정답률</div>
+      </div>
+      <div class="ql-hero-stat">
+        <div class="ql-hero-stat-num" th:text="${attemptCount} + '회'">3회</div>
+        <div class="ql-hero-stat-label">퀴즈 응시</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div class="ql-wrap">
+
+  <div th:each="entry, catIter : ${groupedQuizzes}" class="ql-theme-section">
+    <div class="ql-theme-head">
+      <span class="ql-theme-badge" th:text="'테마 ' + (${catIter.index} + 1)">테마 1</span>
+      <h2 class="ql-theme-title" th:text="${entry.key}">케이팝</h2>
+    </div>
+
+    <div class="ql-quiz-grid">
+      <a th:each="quiz : ${entry.value}" th:href="@{/quiz/play/{id}(id=${quiz.id})}" class="ql-quiz-card">
+        <span class="ql-content-badge" th:text="${quiz.contentTitle}">1강. 한글 자음 기초</span>
+        <div class="ql-quiz-title" th:text="${quiz.title}">1강 연습퀴즈</div>
+        <div class="ql-quiz-sub">
+          문제 <b th:text="${quiz.poolCount}">10</b>개 전체 출제
+        </div>
+
+        <div class="ql-quiz-foot">
+          <span class="ql-quiz-score" th:if="${quiz.lastScore != null}" th:text="${quiz.lastScore} + '%'">90%</span>
+          <span class="ql-quiz-score is-none" th:unless="${quiz.lastScore != null}">미응시</span>
+          <span class="ql-quiz-btn" th:text="${quiz.lastScore != null} ? '다시 풀기' : '풀어보기'">풀어보기</span>
+        </div>
+      </a>
+    </div>
+  </div>
+
+  <div class="ql-empty" th:if="${groupedQuizzes == null or #maps.isEmpty(groupedQuizzes)}">
+    아직 등록된 연습퀴즈가 없어요.
+  </div>
+
+</div>
+
+<div th:replace="~{layout/footer :: footer}"></div>
+
+</body>
+</html>

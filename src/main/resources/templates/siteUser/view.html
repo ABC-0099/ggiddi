@@ -75,7 +75,7 @@
           <label for="nationality">국적</label>
           <select id="nationality" name="nationality">
             <option value="">선택 안함</option>
-            <option value="한국" th:selected="${siteUser.nationality == '한국'}">🇰🇷 대한민국</option>
+            <option value="대한민국" th:selected="${siteUser.nationality == '대한민국'}">🇰🇷 대한민국</option>
             <option value="중국" th:selected="${siteUser.nationality == '중국'}">🇨🇳 중국</option>
             <option value="베트남" th:selected="${siteUser.nationality == '베트남'}">🇻🇳 베트남</option>
             <option value="필리핀" th:selected="${siteUser.nationality == '필리핀'}">🇵🇭 필리핀</option>
@@ -97,6 +97,8 @@
           <label for="currentPassword">현재 비밀번호</label>
           <input type="password" id="currentPassword" name="currentPassword" placeholder="현재 비밀번호 입력" />
         </div>
+
+        <span></span>
 
         <div class="field">
           <label for="newPassword">새 비밀번호</label>
