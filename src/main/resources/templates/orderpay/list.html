@@ -9,6 +9,8 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
     <link rel="stylesheet" href="/css/orderpay/list.css" />
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 </head>
 <body>
 
@@ -323,11 +325,51 @@
         alert('약관에 동의해주세요.');
         return;
       }
+
       const tag = selectedPlan.tag || '';
-      const msg = tag === '평생'
-        ? '✅ 평생 소장 결제가 완료되었어요!\n이제 영구적으로 이용하실 수 있어요 🎉'
-        : '✅ 구독이 시작되었어요!\n한국어 학습을 시작해볼까요? 🎮';
-      alert(msg);
+      const total = selectedPlan.price - couponDiscount;
+
+      const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
+      const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+      const payMethodEl = document.querySelector('.pay-method.selected span:nth-child(2)');
+      const payType = payMethodEl ? payMethodEl.textContent.trim() : '신용/체크카드';
+
+      const cardNumberInput = document.querySelector('#card-form input[type="text"]');
+      const cardNumber = cardNumberInput ? cardNumberInput.value : '';
+
+      const payBtn = document.querySelector('.pay-btn');
+      payBtn.disabled = true;
+      payBtn.textContent = '결제 처리 중...';
+
+      const headers = { 'Content-Type': 'application/json' };
+      if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
+
+      fetch('/order/subscribe', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({
+          planName: tag,
+          price: total,
+          payType: payType,
+          cardNumber: cardNumber
+        })
+      })
+        .then(function (res) {
+          if (!res.ok) throw new Error('결제 실패');
+
+          const msg = tag === '평생'
+            ? '✅ 평생 소장 결제가 완료되었어요!\n이제 영구적으로 이용하실 수 있어요 🎉'
+            : '✅ 구독이 시작되었어요!\n한국어 학습을 시작해볼까요? 🎮';
+          alert(msg);
+          window.location.href = '/category/list';
+        })
+        .catch(function () {
+          alert('결제 처리 중 오류가 발생했어요. 다시 시도해주세요.');
+          payBtn.disabled = false;
+          const lbl = payBtn.dataset.label || '구독 시작하기';
+          payBtn.textContent = total.toLocaleString() + '원 ' + lbl;
+        });
     }
 </script>
 

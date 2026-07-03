@@ -1,13 +1,9 @@
 package com.meta12.SS8911.controller;
 
-
 import com.meta12.SS8911.dto.SiteUserDTO;
-
-
 import com.meta12.SS8911.dto.SiteUserEditDTO;
 import com.meta12.SS8911.entity.Comment;
 import com.meta12.SS8911.entity.Community;
-
 import com.meta12.SS8911.entity.Qna;
 import com.meta12.SS8911.entity.SiteUser;
 import com.meta12.SS8911.service.CommentService;
@@ -21,19 +17,15 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 import java.security.Principal;
-import java.util.List;
 
 @Controller
 @RequiredArgsConstructor
@@ -94,27 +86,63 @@ public class SiteUserController {
         return "siteUser/mypage";
     }
 
-    // 정보 수정 처리
+    @GetMapping("/siteUser/edit")
+    public String editForm(Model model, Principal principal) {
+        SiteUser user = siteUserService.getUserByUsername(principal.getName());
+
+        SiteUserEditDTO dto = new SiteUserEditDTO();
+        dto.setName(user.getName());
+        dto.setEmail(user.getEmail());
+        dto.setPhone(user.getPhone());
+        dto.setBirth(user.getBirth());
+        dto.setNationality(user.getNationality());
+
+        System.out.println("siteUser : " + user);
+
+        model.addAttribute("siteUser", user);
+        model.addAttribute("siteUserEditDTO", dto);
+
+        return "siteUser/edit";
+    }
+
+    // 수정 완료: 중복된 editProc 메서드를 하나로 통합
     @PostMapping("/siteUser/editProc")
-    public String editProc(@Valid @ModelAttribute("siteUserEditDTO") SiteUserEditDTO dto,
-                           BindingResult bindingResult,
-                           Principal principal,
-                           Model model) {
+    public String editProc(
+            @Valid @ModelAttribute("siteUserEditDTO") SiteUserEditDTO dto,
+            BindingResult bindingResult,
+            Principal principal,
+            Model model,
+            RedirectAttributes rttr) {
+
         if (bindingResult.hasErrors()) {
+
+            System.out.println("===== Validation Errors =====");
+
+            bindingResult.getFieldErrors().forEach(error -> {
+                System.out.println(
+                        "field = " + error.getField()
+                                + ", rejectedValue = " + error.getRejectedValue()
+                                + ", message = " + error.getDefaultMessage()
+                );
+            });
+
+            SiteUser user = siteUserService.getUserByUsername(principal.getName());
+            model.addAttribute("siteUser", user);
+
             return "siteUser/edit";
         }
 
         try {
-            siteUserService.updateInfo(principal.getName(), dto);
-        } catch (IllegalStateException e) {
-            model.addAttribute("errorMsg", e.getMessage());
-            return "siteUser/edit";
+            siteUserService.editProc(principal.getName(), dto);
+            rttr.addFlashAttribute("successMsg", "회원 정보가 성공적으로 수정되었습니다.");
+        } catch (Exception e) {
+            rttr.addFlashAttribute("errorMsg", e.getMessage());
+            return "redirect:/siteUser/edit";
         }
 
         return "redirect:/siteUser/mypage";
     }
 
-    // 회원 탈퇴 처리
     @PostMapping("/siteUser/withdraw")
     public String withdraw(@RequestParam String currentPassword,
                            Principal principal,
@@ -126,28 +154,7 @@ public class SiteUserController {
             return "redirect:/siteUser/mypage?withdrawError=true";
         }
 
-        // 탈퇴 처리 후 강제 로그아웃
         new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
         return "redirect:/?withdrawn=true";
-    }
-
-    @GetMapping("/siteUser/edit")
-    public String editForm(Model model, Principal principal) {
-        SiteUser user = siteUserService.getUserByUsername(principal.getName());
-
-        // 1. DTO 생성 및 값 세팅 (기존 코드)
-        SiteUserEditDTO dto = new SiteUserEditDTO();
-        dto.setName(user.getName());
-        dto.setEmail(user.getEmail());
-        dto.setPhone(user.getPhone());
-        dto.setBirth(user.getBirth());
-        dto.setNationality(user.getNationality());
-
-        // 2. 템플릿에서 ${siteUser.username}을 사용하므로,
-        // 아래 코드를 추가해야 에러가 사라집니다.
-        model.addAttribute("siteUser", user);
-        model.addAttribute("siteUserEditDTO", dto);
-
-        return "siteUser/edit";
     }
 }

@@ -97,4 +97,32 @@ public class SiteUserService implements UserDetailsService {
 
         siteUserRepository.save(user);
     }
+
+    // SiteUserService.java 파일 내부
+
+    public void editProc(String username, SiteUserEditDTO dto) {
+        // 1. 유저 찾기
+        SiteUser user = siteUserRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalStateException("사용자를 찾을 수 없습니다."));
+
+        // 2. 정보 수정
+        user.setPhone(dto.getPhone());
+        user.setNationality(dto.getNationality());
+
+        // 3. 비밀번호 변경 (필요 시)
+        if (dto.getNewPassword() != null && !dto.getNewPassword().isEmpty()) {
+            // 현재 비밀번호 검증
+            if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
+                throw new IllegalStateException("현재 비밀번호가 일치하지 않습니다.");
+            }
+            // 새 비밀번호 일치 확인
+            if (!dto.getNewPassword().equals(dto.getNewPasswordChk())) {
+                throw new IllegalStateException("새 비밀번호 확인이 일치하지 않습니다.");
+            }
+            user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
+        }
+
+        // 4. 저장
+        siteUserRepository.save(user);
+    }
 }

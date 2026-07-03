@@ -244,6 +244,28 @@ public class OrderPayController {
     }
 
 
+    // 결제 페이지(플랜 선택)에서 "결제하기" 누르면 호출되는 엔드포인트.
+    // 새 주문 생성 + 결제 완료 처리를 한번에 합니다.
+    @PostMapping("/order/subscribe")
+    @ResponseBody
+    public ResponseEntity<String> subscribe(@RequestBody Map<String, Object> params, Principal principal) {
+        if (principal == null) return ResponseEntity.status(403).body("로그인이 필요합니다.");
+
+        try {
+            String planName = String.valueOf(params.get("planName"));
+            String price = String.valueOf(params.get("price"));
+            String payType = String.valueOf(params.get("payType"));
+            String cardNumber = params.get("cardNumber") != null ? String.valueOf(params.get("cardNumber")) : "";
+
+            orderPayService.subscribeAllCategories(principal.getName(), planName, price, payType, cardNumber);
+
+            return ResponseEntity.ok("Success");
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(500).body("결제 처리 중 오류: " + e.getMessage());
+        }
+    }
+
     // OrderPayController.java의 completeOrder 메서드 수정
     @PostMapping("/order/complete")
     @ResponseBody

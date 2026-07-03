@@ -1,41 +1,181 @@
-/* 이벤트 상세 페이지 전체 영역 */
-.event-detail {
-    max-width: 1200px;
-    margin: 50px auto;
-    text-align: center;
-    padding: 20px;
+body {
+    background-color: #f5f6f8;
 }
 
-/* 이벤트 포스터 이미지 */
+.event-detail {
+    width: 1200px;
+    margin: 50px auto;
+}
+
 .event-poster {
     width: 800px;
-    max-width: 100%;
-    height: auto;
-    border-radius: 20px;
-    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
-}
-
-/* 이벤트 설명 영역 */
-.event-content {
-    width: 800px;
-    max-width: 100%;
-    margin: 40px auto;
-    padding: 40px;
-    background-color: white;
+    display: block;
+    margin: 0 auto;
     border-radius: 20px;
     box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+}
 
-    text-align: left;
-    line-height: 2;
-    font-size: 18px;
+.participate-wrap {
+    width: 800px;
+    margin: 20px auto;
+    text-align: right;
+}
+
+.participate-btn {
+    width: 180px;
+    height: 50px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg,#56d0b3,#2f74d0);
+    color: white;
+    font-size: 16px;
+    font-weight: bold;
+    cursor: pointer;
+}
+
+.event-content,
+.comment-section {
+    width: 800px;
+    margin: 30px auto;
+    background: white;
+    border-radius: 20px;
+    padding: 40px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
 }
 
 .event-content h2 {
+    color: #1f5ca8;
     margin-top: 40px;
-    margin-bottom: 15px;
-    font-size: 24px;
 }
 
-.event-content hr {
-    margin: 40px 0;
+.event-content p {
+    line-height: 2;
+    font-size: 17px;
+}
+
+.comment-title {
+    color: #1f5ca8;
+    margin-bottom: 20px;
+}
+
+.comment-item {
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+}
+
+.comment-header {
+    display: flex;
+    justify-content: space-between;
+}
+
+.comment-user {
+    font-weight: bold;
+    color: #1f5ca8;
+}
+
+.comment-date {
+    color: gray;
+}
+
+.comment-content-text {
+    margin-top: 10px;
+}
+
+.comment-write {
+    margin-top: 20px;
+}
+
+.comment-input {
+    width: 100%;
+    height: 100px;
+    padding: 15px;
+    border: 1px solid #ddd;
+    border-radius: 15px;
+    resize: none;
+    box-sizing: border-box;
+}
+
+.comment-btn {
+    margin-top: 15px;
+    float: right;
+    width: 100px;
+    height: 45px;
+    border: none;
+    border-radius: 12px;
+    background-color: #1f5ca8;
+    color: white;
+    cursor: pointer;
+}
+
+.comment-section::after {
+    content: "";
+    display: block;
+    clear: both;
+}
+
+/* 모달 */
+
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+
+    background: rgba(0,0,0,0.4);
+
+    display: none;
+    justify-content: center;
+    align-items: center;
+
+    z-index: 9999;
+}
+
+.event-modal {
+    width: 520px;
+    background: white;
+    border-radius: 25px;
+    padding: 35px;
+}
+
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.close-btn {
+    border: none;
+    background: none;
+    font-size: 30px;
+    cursor: pointer;
+}
+
+.modal-input {
+    width: 100%;
+    padding: 15px;
+    margin: 10px 0 25px 0;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    box-sizing: border-box;
+}
+
+.event-preview {
+    background: #f5f6f8;
+    padding: 15px;
+    border-radius: 12px;
+    margin-top: 10px;
+}
+
+.submit-btn {
+    width: 120px;
+    height: 45px;
+    border: none;
+    border-radius: 12px;
+    background: linear-gradient(135deg,#56d0b3,#2f74d0);
+    color: white;
+    font-weight: bold;
+    cursor: pointer;
+    margin-top: 30px;
+    float: right;
 }

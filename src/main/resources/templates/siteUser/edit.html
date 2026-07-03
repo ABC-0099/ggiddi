@@ -35,27 +35,33 @@
   <div class="alert-error"   th:if="${errorMsg}"   th:text="${errorMsg}"></div>
 
   <div class="edit-card">
-    <form th:action="@{/siteUser/sujungProc}" method="post">
+    <form th:action="@{/siteUser/editProc}"
+          th:object="${siteUserEditDTO}"
+          method="post">
       <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
       <!-- 수정 불가 항목 -->
       <div class="form-section">
         <div class="section-label">수정 불가 항목</div>
+
         <div class="field">
           <label>아이디</label>
           <input type="text" th:value="${siteUser.username}" readonly />
         </div>
+
         <div class="field">
           <label>이름</label>
-          <input type="text" th:value="${siteUser.name}" readonly />
+          <input type="text" th:field="*{name}" readonly />
         </div>
+
         <div class="field">
           <label>이메일</label>
-          <input type="text" th:value="${siteUser.email}" readonly />
+          <input type="email" th:field="*{email}" readonly />
         </div>
+
         <div class="field">
           <label>생년월일</label>
-          <input type="text" th:value="${siteUser.birth}" readonly />
+          <input type="text" th:field="*{birth}" readonly />
         </div>
       </div>
 
@@ -65,28 +71,37 @@
 
         <div class="field">
           <label for="phone">전화번호</label>
-          <input type="tel" id="phone" name="phone"
-                 th:value="${siteUser.phone}"
+          <input type="tel"
+                 id="phone"
+                 th:field="*{phone}"
                  placeholder="010-0000-0000"
                  oninput="formatPhone(this)" />
         </div>
 
         <div class="field">
           <label for="nationality">국적</label>
-          <select id="nationality" name="nationality">
+          <select id="nationality" th:field="*{nationality}">
             <option value="">선택 안함</option>
-            <option value="한국" th:selected="${siteUser.nationality == '한국'}">🇰🇷 대한민국</option>
-            <option value="중국" th:selected="${siteUser.nationality == '중국'}">🇨🇳 중국</option>
-            <option value="베트남" th:selected="${siteUser.nationality == '베트남'}">🇻🇳 베트남</option>
-            <option value="필리핀" th:selected="${siteUser.nationality == '필리핀'}">🇵🇭 필리핀</option>
-            <option value="일본" th:selected="${siteUser.nationality == '일본'}">🇯🇵 일본</option>
-            <option value="미국" th:selected="${siteUser.nationality == '미국'}">🇺🇸 미국</option>
-            <option value="몽골" th:selected="${siteUser.nationality == '몽골'}">🇲🇳 몽골</option>
-            <option value="태국" th:selected="${siteUser.nationality == '태국'}">🇹🇭 태국</option>
-            <option value="인도네시아" th:selected="${siteUser.nationality == '인도네시아'}">🇮🇩 인도네시아</option>
-            <option value="기타" th:selected="${siteUser.nationality == '기타'}">기타</option>
+            <option value="대한민국">🇰🇷 대한민국</option>
+            <option value="중국">🇨🇳 중국</option>
+            <option value="베트남">🇻🇳 베트남</option>
+            <option value="필리핀">🇵🇭 필리핀</option>
+            <option value="일본">🇯🇵 일본</option>
+            <option value="미국">🇺🇸 미국</option>
+            <option value="몽골">🇲🇳 몽골</option>
+            <option value="태국">🇹🇭 태국</option>
+            <option value="인도네시아">🇮🇩 인도네시아</option>
+            <option value="기타">기타</option>
           </select>
         </div>
+      </div>
+
+      <div class="field">
+        <label for="currentPassword">현재 비밀번호</label>
+        <input type="password"
+               id="currentPassword"
+               th:field="*{currentPassword}"
+               placeholder="현재 비밀번호 입력" />
       </div>
 
       <!-- 비밀번호 변경 -->
@@ -94,13 +109,10 @@
         <div class="section-label">비밀번호 변경 <span style="font-size:10px;color:var(--ink-faint);text-transform:none;letter-spacing:0;">(변경 시에만 입력)</span></div>
 
         <div class="field">
-          <label for="currentPassword">현재 비밀번호</label>
-          <input type="password" id="currentPassword" name="currentPassword" placeholder="현재 비밀번호 입력" />
-        </div>
-
-        <div class="field">
           <label for="newPassword">새 비밀번호</label>
-          <input type="password" id="newPassword" name="newPassword"
+          <input type="password"
+                 id="newPassword"
+                 th:field="*{newPassword}"
                  placeholder="8자 이상, 영문+숫자 조합"
                  oninput="checkPwStrength(this.value)" />
           <div class="pw-strength" id="pw-strength" style="display:none;">
@@ -116,7 +128,9 @@
 
         <div class="field">
           <label for="newPasswordChk">새 비밀번호 확인</label>
-          <input type="password" id="newPasswordChk" name="newPasswordChk"
+          <input type="password"
+                 id="newPasswordChk"
+                 th:field="*{newPasswordChk}"
                  placeholder="새 비밀번호 재입력"
                  oninput="checkPwMatch()" />
           <span class="field-hint" id="pw-match-msg"></span>
