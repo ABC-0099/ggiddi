@@ -48,12 +48,7 @@ public class QnaController {
         return "qna/view";
     }
 
-    @PostMapping("/{id}/answer")
-    public String answer(@PathVariable Long id, @RequestParam String answer, Principal principal) {
-        SiteUser admin = siteUserService.getUserByUsername(principal.getName());
-        qnaService.answer(id, answer, admin);
-        return "redirect:/qna/" + id;
-    }
+
 
     // 수정 폼
     @GetMapping("/{id}/edit")

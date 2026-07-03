@@ -61,17 +61,12 @@ public class QnaService {
         return qnaRepository.findAllByOrderByCreatedDateDesc(pageable);
     }
 
-    @Transactional
-    public void answer(Long id, String answerContent, SiteUser admin) {
-        if (admin.getRole() != Role.ADMIN) {
-            throw new RuntimeException("관리자만 답변할 수 있습니다.");
-        }
-        Qna qna = getQna(id);
-        qna.setAnswer(answerContent);
-        qna.setStatus(InquiryStatus.ANSWERED);
-        qna.setAnsweredDate(LocalDateTime.now());
-        qnaRepository.save(qna);
+    // 관리자 마이페이지: 답변대기만 모아보기
+    public Page<Qna> getPendingQnas(Pageable pageable) {
+        return qnaRepository.findByStatusOrderByCreatedDateDesc(InquiryStatus.PENDING, pageable);
     }
+
+    // ※ answer()는 여기서 삭제되었습니다. AnswerService.create()로 이동했어요.
 
     public void checkViewPermission(Qna qna, SiteUser user) {
         boolean isAuthor = qna.getAuthor().getId().equals(user.getId());

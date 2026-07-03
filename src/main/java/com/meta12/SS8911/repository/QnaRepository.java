@@ -1,5 +1,6 @@
 package com.meta12.SS8911.repository;
 
+import com.meta12.SS8911.config.InquiryStatus;
 import com.meta12.SS8911.entity.Qna;
 import com.meta12.SS8911.entity.SiteUser;
 import org.springframework.data.domain.Page;
@@ -11,4 +12,6 @@ public interface QnaRepository extends JpaRepository<Qna, Long> {
     Page<Qna> findByAuthorOrderByCreatedDateDesc(SiteUser author, Pageable pageable);
 
     Page<Qna> findAllByOrderByCreatedDateDesc(Pageable pageable);
+
+    Page<Qna> findByStatusOrderByCreatedDateDesc(InquiryStatus status, Pageable pageable);
 }

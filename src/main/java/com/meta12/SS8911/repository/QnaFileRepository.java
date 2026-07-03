@@ -7,6 +7,8 @@ import org.springframework.data.jpa.repository.JpaRepository;
 import java.util.List;
 
 public interface QnaFileRepository extends JpaRepository<QnaFile, Long> {
+
     List<QnaFile> findByQna(Qna qna);
+
     void deleteByQna(Qna qna);
 }
