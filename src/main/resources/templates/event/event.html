@@ -1,30 +1,51 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ko">
 <head>
     <meta charset="UTF-8">
-    <title>event</title>
+    <title>이벤트</title>
 
-    <link rel="stylesheet" th:href="@{/css/event/event.css}" />
+    <link rel="stylesheet" th:href="@{/css/event/event.css}">
 </head>
 <body>
 
-<div th:replace="~{layout/navbar :: navbar(currentMenu='community')}"></div>
+<div th:replace="~{layout/navbar :: navbar(currentMenu='event')}"></div>
+
 <!-- 배너 -->
 <section class="banner">
-    <div class="banner-left">
-        <img src="images/banner-icon.png" alt="배너 아이콘">
-    </div>
 
-    <div class="banner-content">
-        <h2>한국어로 자기소개 챌린지 !</h2>
+    <div class="banner-slide active">
+        <img th:src="@{/images/banner1.png}" class="banner-image">
 
         <div class="banner-controls">
-            <span class="page">1 / 3</span>
+            <span class="page-number">1 / 3</span>
 
-            <button class="arrow-btn">&lt;</button>
-            <button class="arrow-btn">&gt;</button>
+            <button class="arrow-btn prev-btn">&lt;</button>
+            <button class="arrow-btn next-btn">&gt;</button>
         </div>
     </div>
+
+    <div class="banner-slide">
+        <img th:src="@{/images/banner2.png}" class="banner-image">
+
+        <div class="banner-controls">
+            <span class="page-number">2 / 3</span>
+
+            <button class="arrow-btn prev-btn">&lt;</button>
+            <button class="arrow-btn next-btn">&gt;</button>
+        </div>
+    </div>
+
+    <div class="banner-slide">
+        <img th:src="@{/images/banner3.png}" class="banner-image">
+
+        <div class="banner-controls">
+            <span class="page-number">3 / 3</span>
+
+            <button class="arrow-btn prev-btn">&lt;</button>
+            <button class="arrow-btn next-btn">&gt;</button>
+        </div>
+    </div>
+
 </section>
 
 <!-- 이벤트 -->
@@ -35,7 +56,7 @@
     <div class="event-grid">
 
         <div class="event-card">
-            <img src="images/event1.jpg" alt="">
+            <img th:src="@{/images/event1.jpg}">
             <h3>한국어로 자기소개 챌린지</h3>
             <p>기간 : 2026.06.01 ~ 2026.07.30</p>
             <p>당첨자 발표 : 2026.08.10</p>
@@ -43,7 +64,7 @@
         </div>
 
         <div class="event-card">
-            <img src="images/event2.jpg" alt="">
+            <img th:src="@{/images/event2.jpg}">
             <h3>K - 푸드 챌린지</h3>
             <p>기간 : 2026.06.01 ~ 2026.07.30</p>
             <p>당첨자 발표 : 2026.08.10</p>
@@ -51,7 +72,7 @@
         </div>
 
         <div class="event-card">
-            <img src="images/event3.jpg" alt="">
+            <img th:src="@{/images/event3.jpg}">
             <h3>한국 드라마 명대사 따라하기</h3>
             <p>기간 : 2026.06.01 ~ 2026.07.30</p>
             <p>당첨자 발표 : 2026.08.10</p>
@@ -59,7 +80,7 @@
         </div>
 
         <div class="event-card">
-            <img src="images/event4.jpg" alt="">
+            <img th:src="@{/images/event4.jpg}">
             <h3>나만의 한국어 암기법 공유하기</h3>
             <p>기간 : 2026.05.01 ~ 2026.06.30</p>
             <p>당첨자 발표 : 2026.07.03</p>
@@ -67,7 +88,7 @@
         </div>
 
         <div class="event-card">
-            <img src="images/event5.jpg" alt="">
+            <img th:src="@{/images/event5.jpg}">
             <h3>한국 일상 사진 챌린지</h3>
             <p>기간 : 2026.05.01 ~ 2026.06.30</p>
             <p>당첨자 발표 : 2026.07.03</p>
@@ -75,7 +96,7 @@
         </div>
 
         <div class="event-card">
-            <img src="images/event6.jpg" alt="">
+            <img th:src="@{/images/event6.jpg}">
             <h3>한국에서 유행하는 릴스 챌린지</h3>
             <p>기간 : 2026.05.01 ~ 2026.06.30</p>
             <p>당첨자 발표 : 2026.07.03</p>
@@ -84,10 +105,11 @@
 
     </div>
 
-    <div class="pagination">
-        1
-    </div>
+    <div class="pagination">1</div>
 
 </section>
+
+<script th:src="@{/js/event.js}"></script>
+
 </body>
 </html>

@@ -1,5 +1,4 @@
-
-    :root {
+:root {
       --mint:       #5DCAA5;
       --mint-dark:  #1D9E75;
       --mint-light: #9FE1CB;
@@ -52,7 +51,18 @@
       max-width: 1200px; margin: 0 auto;
       display: flex; align-items: flex-start; justify-content: space-between; gap: 24px;
     }
-    .page-header-text h1 { font-size: 32px; font-weight: 700; letter-spacing: -.5px; margin-bottom: 6px; }
+    .page-header-title-row {
+      display: flex; align-items: center; gap: 10px;
+      margin-bottom: 6px;
+    }
+    .page-header-badge {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 40px; height: 40px; border-radius: 12px;
+      background: linear-gradient(135deg, var(--mint), var(--navy));
+      box-shadow: 0 4px 14px rgba(29,158,117,.25);
+      flex-shrink: 0;
+    }
+    .page-header-text h1 { font-size: 32px; font-weight: 700; letter-spacing: -.5px; margin-bottom: 0; }
     .page-header-text p  { font-size: 15px; color: var(--ink-soft); font-weight: 300; }
 
     .notice-count-box {
@@ -65,6 +75,17 @@
       display: flex; gap: 22px;
       box-shadow: 0 4px 16px rgba(29,158,117,.08);
     }
+    .btn-notice-write {
+      flex-shrink: 0;
+      display: flex; align-items: center; gap: 6px;
+      align-self: center;
+      padding: 12px 18px; border-radius: 12px;
+      background: var(--navy); color: #fff;
+      font-size: 13px; font-weight: 700;
+      box-shadow: 0 4px 14px rgba(24,95,165,.25);
+      transition: background .15s;
+    }
+    .btn-notice-write:hover { background: var(--navy-dark); }
     .ncb-item { text-align: center; }
     .ncb-num { font-size: 18px; font-weight: 700; color: var(--mint-dark); letter-spacing: -.5px; }
     .ncb-label { font-size: 11px; color: var(--ink-faint); margin-top: 2px; }
@@ -108,7 +129,7 @@
       width: 100%;
     }
     .search-box input::placeholder { color: var(--ink-faint); }
-    .search-icon { font-size: 14px; color: var(--ink-faint); flex-shrink: 0; }
+    .search-icon { color: var(--ink-faint); flex-shrink: 0; display: flex; align-items: center; }
 
     /* 게시판 리스트 카드 */
     .board-card {

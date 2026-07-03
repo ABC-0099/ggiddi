@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -22,26 +23,32 @@
 <!-- 헤더 -->
 <div class="page-header">
   <div class="page-header-text">
-    <h1>공지사항</h1>
-    <p>학습에 필요한 새로운 소식과 안내를 가장 먼저 확인해보세요 📢</p>
+    <div class="page-header-title-row">
+      <div class="page-header-badge">
+        <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#ffffff" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/>
+          <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+        </svg>
+      </div>
+      <h1>공지사항</h1>
+    </div>
+    <p>학습에 필요한 새로운 소식과 안내를 가장 먼저 확인해보세요</p>
   </div>
 
-  <div class="notice-count-box">
-    <div class="ncb-item">
-      <div class="ncb-num">42건</div>
-      <div class="ncb-label">전체 공지</div>
-    </div>
-    <div class="ncb-divider"></div>
-    <div class="ncb-item">
-      <div class="ncb-num">3건</div>
-      <div class="ncb-label">신규</div>
-    </div>
-    <div class="ncb-divider"></div>
-    <div class="ncb-item">
-      <div class="ncb-num">2건</div>
-      <div class="ncb-label">고정</div>
-    </div>
-  </div>
+  <!--
+    ★ Thymeleaf: 통계 박스는 컨트롤러에서 totalCount / newCount / pinnedCount를
+    model에 담아 내려줄 준비가 되면 다시 추가하세요.
+    model.addAttribute("totalCount", noticeService.countAll());
+    model.addAttribute("newCount", noticeService.countRecent());
+    model.addAttribute("pinnedCount", noticeService.countPinned());
+  -->
+  <a th:href="@{/notice/chuga}" class="btn-notice-write" sec:authorize="authentication.name == 'admin888'" style="flex-shrink:0; align-self:center;">
+    <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+      <line x1="12" y1="5" x2="12" y2="19"/>
+      <line x1="5" y1="12" x2="19" y2="12"/>
+    </svg>
+    공지 등록
+  </a>
 </div>
 
 <!-- 본문 -->
@@ -56,7 +63,12 @@
       <a class="tab" th:classappend="${category == 'update'} ? 'active'" th:href="@{/notice/list(category='update')}">업데이트</a>
     </div>
     <div class="search-box">
-      <span class="search-icon">🔍</span>
+      <span class="search-icon">
+        <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="11" cy="11" r="7"/>
+          <line x1="21" y1="21" x2="16.65" y2="16.65"/>
+        </svg>
+      </span>
       <input type="text" placeholder="제목으로 검색" />
     </div>
   </div>
@@ -85,6 +97,20 @@
       </div>
       <div class="notice-meta">
         <span class="meta-date" th:text="${#temporals.format(notice.createdAt, 'yyyy.MM.dd')}">2026.01.01</span>
+        <form th:action="@{/notice/delete/{id}(id=${notice.id})}" method="post"
+              sec:authorize="authentication.name == 'admin888'" style="display:inline;">
+          <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+          <button type="submit" class="row-delete-btn" onclick="event.stopPropagation(); return confirm('정말 삭제할까요?')"
+                  style="display:inline-flex; align-items:center; justify-content:center; width:26px; height:26px; border-radius:6px; border:1px solid var(--red-pale, #FCEDEA); background:var(--red-pale, #FCEDEA); color:var(--red, #D85A4A); cursor:pointer;">
+            <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="3 6 5 6 21 6"/>
+              <path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"/>
+              <path d="M10 11v6"/>
+              <path d="M14 11v6"/>
+              <path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/>
+            </svg>
+          </button>
+        </form>
       </div>
     </div>
 
