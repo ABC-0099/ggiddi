@@ -12,22 +12,23 @@
 <!-- 네비게이션 바 -->
 <div th:replace="~{layout/navbar :: navbar(currentMenu='event')}"></div>
 
-<!-- 이벤트 상세 페이지 -->
 <section class="event-detail">
 
     <!-- 이벤트 포스터 -->
-    <img th:src="@{/images/5.png}"
-         alt="한국어로 자기소개하기 이벤트 포스터"
-         class="event-poster">
+    <img th:src="@{/images/5.png}" class="event-poster">
 
     <!-- 이벤트 설명 -->
     <div class="event-content">
 
-        <p>안녕하세요.~! 👋<br>
-            끼역띠귿 요정들이 좋은 소식을 들고 왔어요 ! 🧚✨</p>
+        <p>
+            안녕하세요.~! 👋<br>
+            끼역띠귿 요정들이 좋은 소식을 들고 왔어요 ! 🧚✨
+        </p>
 
-        <p>드디어 기다리던 <strong>'한국어로 자기소개하기 챌린지'</strong>가<br>
-            시작되었는데요 !?</p>
+        <p>
+            드디어 기다리던 <strong>한국어로 자기소개하기 챌린지</strong>가
+            시작되었는데요 !?
+        </p>
 
         <p>
             "안녕하세요. 제 이름은 ...."<br>
@@ -41,7 +42,7 @@
         </p>
 
         <p>
-            무엇이든 좋아요 !<br>
+            무엇이든 좋아요!<br>
             한국어로 여러분들의 이야기를 들려주세요 💖
         </p>
 
@@ -51,8 +52,8 @@
         </p>
 
         <p>
-            실수해도 괜찮아요 !<br>
-            떨려도 괜찮아요 !
+            실수해도 괜찮아요!<br>
+            떨려도 괜찮아요!
         </p>
 
         <p>
@@ -60,28 +61,36 @@
         </p>
 
         <p>
-            많은 참여 부탁드려요 ! 😊
+            많은 참여 부탁드려요! 😊
         </p>
 
         <hr>
 
         <h2>⭕ 참여 방법</h2>
+
         <p>
             한국어로 자기소개 영상 촬영<br>
             끼역띠귿 폼 또는 댓글에 영상 업로드하기
         </p>
 
         <h2>⭕ 제출 형식</h2>
+
         <p>
             10초 ~ 3분 영상<br>
             한국어 사용 필수
         </p>
 
         <h2>⭕ 챌린지 참여 기간</h2>
-        <p>2026년 6월 1일 ~ 7월 30일</p>
+
+        <p>
+            2026년 6월 1일 ~ 7월 30일
+        </p>
 
         <h2>⭕ 당첨자 발표</h2>
-        <p>2026년 8월 10일 오전 9시</p>
+
+        <p>
+            2026년 8월 10일 오전 9시
+        </p>
 
         <h2>🏆 상품 안내</h2>
 
@@ -91,10 +100,125 @@
 
     </div>
 
+    <!-- 참여하기 버튼 -->
+    <div class="participate-wrap">
+        <button class="participate-btn" onclick="openModal()">
+            이벤트 참여하기
+        </button>
+    </div>
+
+    <!-- 댓글 -->
+    <div class="comment-section">
+
+        <h2 class="comment-title">💬 댓글</h2>
+
+        <div class="comment-item">
+            <div class="comment-header">
+                <span class="comment-user">파이리</span>
+                <span class="comment-date">방금 전</span>
+            </div>
+
+            <div class="comment-content-text">
+                너무 좋은 이벤트네요 😊 저도 참여하겠습니다 (-영상첨부-)
+            </div>
+        </div>
+
+        <div class="comment-write">
+
+            <textarea
+                    class="comment-input"
+                    placeholder="댓글을 입력해주세요."
+            ></textarea>
+
+            <button class="comment-btn">
+                등록
+            </button>
+
+        </div>
+
+    </div>
+
 </section>
+
+<!-- 이벤트 참여 모달 -->
+<div class="modal-overlay" id="eventModal">
+
+    <div class="event-modal">
+
+        <div class="modal-header">
+
+            <div class="modal-title">
+                📝 이벤트 참여하기
+            </div>
+
+            <button class="close-btn" onclick="closeModal()">
+                ×
+            </button>
+
+        </div>
+
+        <div class="modal-body">
+
+            <label class="input-label">
+                이름 <span class="required">*</span>
+            </label>
+
+            <input
+                    type="text"
+                    class="modal-input"
+                    placeholder="예: 홍길동"
+            >
+
+            <label class="input-label">
+                영상 첨부하기 <span class="required">*</span>
+            </label>
+
+            <input
+                    type="file"
+                    class="modal-input"
+                    accept="video/*"
+            >
+
+            <label class="input-label">
+                이벤트
+            </label>
+
+            <div class="event-preview">
+                한국어로 자기소개하기 챌린지
+            </div>
+
+        </div>
+
+        <div class="modal-footer">
+            <button class="submit-btn">
+                참여하기
+            </button>
+        </div>
+
+    </div>
+
+</div>
 
 <!-- 푸터 -->
 <div th:replace="~{layout/footer :: footer}"></div>
+
+<script>
+    function openModal() {
+        document.getElementById("eventModal").style.display = "flex";
+    }
+
+    function closeModal() {
+        document.getElementById("eventModal").style.display = "none";
+    }
+
+    window.onclick = function(event) {
+        const modal = document.getElementById("eventModal");
+
+        if (event.target === modal) {
+            modal.style.display = "none";
+        }
+    }
+</script>
 
 </body>
 </html>

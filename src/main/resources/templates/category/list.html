@@ -35,7 +35,6 @@
             </div>
             <h1>강의 목록</h1>
         </div>
-        <!-- ★ Thymeleaf: <p th:text="'단계별로 한국어를 배워봐요. 현재 ' + ${currentStage} + ' 진행 중이에요 🗺️'"></p> -->
         <p>단계별로 한국어를 배워봐요. 현재 2단계 단어 월드 진행 중이에요 🗺️</p>
     </div>
 
@@ -45,7 +44,7 @@
         <!-- 통계 3개 -->
         <div style="display:flex;gap:0;margin-bottom:12px;padding-bottom:12px;border-bottom:1px solid var(--border);">
             <div style="flex:1;text-align:center;">
-                <div style="font-size:16px;font-weight:700;color:var(--mint-dark);letter-spacing:-.5px;">8강</div>
+                <div style="font-size:16px;font-weight:700;color:var(--mint-dark);letter-spacing:-.5px;" th:text="${completedCount} + '강'">8강</div>
                 <div style="font-size:10px;color:var(--ink-faint);margin-top:2px;">완료 강의</div>
             </div>
             <div style="width:1px;background:var(--border);flex-shrink:0;"></div>
@@ -62,39 +61,47 @@
 
         <!-- 마지막 강의 -->
         <div class="llb-header">🕐 마지막으로 본 강의</div>
-        <div class="llb-card">
-            <div class="llb-thumb">📖</div>
-            <div class="llb-info">
-                <span class="llb-stage">2단계 · 단어</span>
-                <div class="llb-title">2-2강 — 음식 단어</div>
+
+        <div th:if="${lastProgress != null}">
+            <div class="llb-card">
+                <div class="llb-thumb">📖</div>
+                <div class="llb-info">
+                    <span class="llb-stage" th:text="${lastProgress.content.category.title}">단계 · 단어</span>
+                    <div class="llb-title" th:text="${lastProgress.content.title}">강의 제목</div>
+                </div>
             </div>
+            <div class="llb-prog-bar">
+                <div class="llb-prog-fill" th:style="'width:' + ${avgProgress} + '%'"></div>
+            </div>
+            <div class="llb-prog-row">
+                <span class="llb-prog-label">전체 진도율</span>
+                <span class="llb-prog-pct" th:text="${avgProgress} + '%'">30%</span>
+            </div>
+            <a th:href="@{/content/view/{id}(id=${lastProgress.content.id})}" class="llb-btn">이어보기 →</a>
         </div>
-        <div class="llb-prog-bar"><div class="llb-prog-fill"></div></div>
-        <div class="llb-prog-row">
-            <span class="llb-prog-label">전체 진도율</span>
-            <span class="llb-prog-pct">30%</span>
+
+        <div th:if="${lastProgress == null}">
+            <div class="llb-card">
+                <div class="llb-thumb">📖</div>
+                <div class="llb-info">
+                    <span class="llb-stage">시작해볼까요?</span>
+                    <div class="llb-title">아직 시청한 강의가 없어요</div>
+                </div>
+            </div>
+            <div class="llb-prog-bar"><div class="llb-prog-fill" style="width:0%"></div></div>
+            <div class="llb-prog-row">
+                <span class="llb-prog-label">전체 진도율</span>
+                <span class="llb-prog-pct">0%</span>
+            </div>
+            <a th:href="@{/category/list}" class="llb-btn">강의 둘러보기 →</a>
         </div>
-        <a th:href="@{/lectures/content}" class="llb-btn">이어보기 →</a>
     </div>
 </div>
-
-<!-- 진행 요약 -->
-
 
 <!-- 탭 -->
 <div class="filter-bar">
     <div class="tabs" id="tabsWrap">
         <button class="tab active" data-cat-id="all">전체</button>
-        <!--
-          ★ Thymeleaf 실제 적용 시 (컨트롤러에서 model.addAttribute("categories", categoryService.findAll())):
-          <div class="tab-chip" th:each="cat : ${categories}">
-            <button class="tab" th:text="${cat.name}" th:attr="data-cat-id=${cat.id}"></button>
-            <span class="tab-admin" sec:authorize="hasRole('ADMIN')">
-              <button type="button" class="tab-admin-btn tab-edit-btn" th:attr="data-id=${cat.id}">✎</button>
-              <button type="button" class="tab-admin-btn tab-delete-btn" th:attr="data-id=${cat.id},data-name=${cat.name}">✕</button>
-            </span>
-          </div>
-        -->
         <div class="tab-chip" th:each="cat : ${categories}">
             <button class="tab" th:text="${cat.name}" th:attr="data-cat-id=${cat.id}">1단계 음절</button>
             <span class="tab-admin" sec:authorize="hasRole('ADMIN')">
@@ -132,58 +139,6 @@
 </div>
 
 <!-- 강의 목록 -->
-<!--
-  ★ Thymeleaf 실제 적용 시:
-  <div class="lecture-wrap">
-    <div class="stage-section" th:each="category : ${categories}">
-      <div class="stage-header">
-        <span th:class="'stage-badge sb-' + ${category.stage}" th:text="${category.stage} + '단계'"></span>
-        <h2 th:text="${category.name}"></h2>
-        <span class="stage-count" th:text="${category.completedCount} + '강 완료'"></span>
-      </div>
-      <div class="lecture-grid">
-        <a th:each="content : ${category.contents}"
-           th:href="@{/lectures/content/{id}(id=${content.id})}"
-           th:classappend="${content.locked} ? 'locked'" class="lc">
-          <div class="lc-thumb">
-            <div class="lc-thumb-icon" th:text="${category.icon}">🔤</div>
-            <div class="lc-play" th:unless="${content.locked}"><div class="play-btn">▶</div></div>
-            <div class="lc-lock" th:if="${content.locked}">🔒</div>
-            <span th:if="${content.progressRate == 100}" class="lc-status ls-done">완료</span>
-            <span th:if="${content.progressRate > 0 and content.progressRate < 100}" class="lc-status ls-ing">진행 중</span>
-            <span th:if="${content.isNew}" class="lc-status ls-new">NEW</span>
-          </div>
-          <div class="lc-body">
-            <div class="lc-top">
-              <span class="lc-num" th:text="${category.stage} + '-' + ${content.orderNum} + '강'"></span>
-              <span class="lc-time-badge" th:text="'⏱ ' + ${content.durationMin} + '분'"></span>
-            </div>
-            <div class="lc-title" th:text="${content.title}"></div>
-            <div class="lc-meta"><span th:text="'👁 ' + ${content.viewCount} + '명 수강'"></span></div>
-            <div class="lc-progress-wrap">
-              <div class="lc-prog-header">
-                <span class="lc-prog-label">진행률</span>
-                <span class="lc-prog-pct" th:text="${content.progressRate} + '%'"></span>
-              </div>
-              <div class="lc-prog-bar">
-                <div class="lc-prog-fill" th:style="'width:' + ${content.progressRate} + '%'"></div>
-              </div>
-            </div>
-          </div>
-        </a>
-      </div>
-    </div>
-  </div>
-
-  ★ Controller:
-  @GetMapping("/lectures")
-  public String lectures(Model model, Principal principal) {
-      List<Category> categories = categoryService.findAllWithContents();
-      model.addAttribute("categories", categories);
-      model.addAttribute("currentMenu", "lectures");
-      return "lectures/lectures";
-  }
--->
 <div class="lecture-wrap">
 
     <div class="stage-section" th:each="category, catStat : ${list}">

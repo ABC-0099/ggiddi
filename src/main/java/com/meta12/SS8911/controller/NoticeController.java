@@ -25,7 +25,7 @@ public class NoticeController {
         return "notice/main"; // notice 폴더 안의 main.html 파일을 연다는 뜻
     }
 
-    // 1. 공지 리스트
+
     @GetMapping("/list")
     public String list(@RequestParam(defaultValue = "0") int page,
                        @RequestParam(required = false) String category,

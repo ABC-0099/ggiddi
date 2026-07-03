@@ -1,15 +1,17 @@
 <!DOCTYPE html>
-<html lang="ko">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
 <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>끼역띠귿 — 2-2강 음식 단어</title>
+    <title th:text="'끼역띠귿 — ' + ${content.title}">끼역띠귿</title>
     <link rel="stylesheet" th:href="@{/css/layout/navbar.css}" />
     <link rel="stylesheet" th:href="@{/css/layout/footer.css}" />
     <link rel="stylesheet" th:href="@{/css/content/view.css}" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
+    <meta name="_csrf" th:content="${_csrf.token}" />
+    <meta name="_csrf_header" th:content="${_csrf.headerName}" />
 
 </head>
 <body>
@@ -22,11 +24,11 @@
 
 <!-- 브레드크럼 -->
 <div class="breadcrumb">
-    <a href="@{/catagory/list.html}">강의 목록</a>
+    <a th:href="@{/category/list}">강의 목록</a>
     <span>›</span>
-    <a href="#">2단계 단어 월드</a>
+    <a th:href="@{/category/view/{id}(id=${content.category.id})}" th:text="${content.category.title}">단계</a>
     <span>›</span>
-    <span style="color:var(--ink);">2-2강 음식 단어</span>
+    <span style="color:var(--ink);" th:text="${content.sequence} + '강 ' + ${content.title}">강의 제목</span>
 </div>
 
 <!-- 메인 -->
@@ -38,8 +40,12 @@
         <!-- 플레이어 -->
         <div class="player-wrap">
             <div class="player-screen">
-                <div class="player-thumb-icon">📖</div>
-                <div class="player-overlay">
+                <video id="videoPlayer"
+                       th:src="@{/content/stream/{id}(id=${content.id})}"
+                       style="width:100%;height:100%;object-fit:contain;background:#000;"
+                       playsinline>
+                </video>
+                <div class="player-overlay" id="playerOverlay">
                     <div class="play-circle">▶</div>
                 </div>
             </div>
@@ -52,7 +58,7 @@
                         <button class="ctrl-btn">⏮</button>
                         <button class="ctrl-btn play">⏸</button>
                         <button class="ctrl-btn">⏭</button>
-                        <span class="time-display">06:08 / 16:20</span>
+                        <span class="time-display">00:00 / 00:00</span>
                     </div>
                     <div class="bar-right">
                         <button class="speed-btn">1.0x</button>
@@ -66,8 +72,8 @@
         <div class="lecture-info">
             <div class="li-top">
                 <div>
-                    <div class="li-badge">2단계 · 단어 월드</div>
-                    <div class="li-title">2-2강 — 음식 단어<br />밥, 물, 고기, 채소</div>
+                    <div class="li-badge" th:text="${content.category.title}">단계 · 단어 월드</div>
+                    <div class="li-title" th:text="${content.sequence} + '강 — ' + ${content.title}">강의 제목</div>
                 </div>
                 <div class="li-actions">
                     <button class="li-btn">🔖 저장</button>
@@ -75,30 +81,18 @@
                 </div>
             </div>
             <div class="li-meta">
-                <span>⏱ 16분 20초</span>
-                <span>👁 510명 수강</span>
-                <span>📅 2025.04.12</span>
-                <span>✅ 진행 중 (38%)</span>
+                <span th:text="'✅ ' + (${content.progressPercent} == 100 ? '완료' : ${content.progressPercent} + '% 진행 중')">진행 상태</span>
             </div>
         </div>
 
         <!-- 강의 설명 -->
         <div class="lecture-desc">
             <div class="desc-title">📖 강의 소개</div>
-            <div class="desc-text">
-                이번 강의에서는 일상에서 자주 쓰는 음식 관련 단어를 배워봐요.<br />
-                밥, 물, 고기, 채소 등 기본 음식 단어부터 식당에서 쓰는 표현까지 익혀봐요.
-                각 단어는 발음, 한자 어원과 함께 설명해드려요.
+            <div class="desc-text" th:text="${content.description}">
+                강의 설명이 여기 표시됩니다.
             </div>
-            <div class="keyword-list">
-                <span class="keyword">밥 (bap)</span>
-                <span class="keyword">물 (mul)</span>
-                <span class="keyword">고기 (gogi)</span>
-                <span class="keyword">채소 (chaeso)</span>
-                <span class="keyword">과일 (gwail)</span>
-                <span class="keyword">음료 (eumryo)</span>
-                <span class="keyword">식당 (sikdang)</span>
-                <span class="keyword">주문 (jumun)</span>
+            <div class="keyword-list" th:if="${content.keywords != null and !content.keywords.isEmpty()}">
+                <span class="keyword" th:each="kw : ${#strings.arraySplit(content.keywords, ',')}" th:text="${#strings.trim(kw)}">키워드</span>
             </div>
         </div>
 
@@ -109,58 +103,32 @@
 
         <!-- 강의 목록 -->
         <div class="sidebar-card">
-            <div class="sidebar-header">2단계 강의 목록 <span>12강</span></div>
-
-            <div class="sl-item">
-                <div class="sl-thumb" style="background:linear-gradient(135deg,#c8f0e2,#b5d4f4);">
-                    📖<div class="sl-done-mark">✓</div>
-                </div>
-                <div class="sl-info">
-                    <div class="sl-num">2-1강</div>
-                    <div class="sl-title">인사말 단어</div>
-                    <div class="sl-time">⏱ 14분 · 완료</div>
-                </div>
+            <div class="sidebar-header">
+                <span th:text="${content.category.title} + ' 강의 목록'">강의 목록</span>
+                <span th:text="${#lists.size(contentList)} + '강'">0강</span>
             </div>
 
-            <div class="sl-item active">
-                <div class="sl-thumb" style="background:linear-gradient(135deg,#b5d4f4,#c8f0e2);">📖</div>
-                <div class="sl-info">
-                    <div class="sl-num">2-2강</div>
-                    <div class="sl-title">음식 단어 — 밥, 물, 고기, 채소</div>
-                    <div class="sl-time">⏱ 16분 · 진행 중 38%</div>
+            <a th:each="c : ${contentList}"
+               th:href="@{/content/view/{id}(id=${c.id})}"
+               th:classappend="${c.id == content.id} ? 'active' : ''"
+               style="text-decoration:none;color:inherit;display:flex;">
+                <div class="sl-item" th:classappend="${c.id == content.id} ? 'active' : ''" style="width:100%;">
+                    <div class="sl-thumb" style="background:linear-gradient(135deg,#c8f0e2,#b5d4f4);">
+                        📖
+                        <div class="sl-done-mark" th:if="${isPaid and c.progressPercent == 100}">✓</div>
+                        <div class="sl-lock" th:unless="${isPaid}">🔒</div>
+                    </div>
+                    <div class="sl-info">
+                        <div class="sl-num" th:text="${c.sequence} + '강'">1강</div>
+                        <div class="sl-title" th:text="${c.title}">강의 제목</div>
+                        <div class="sl-time"
+                             th:if="${isPaid}"
+                             th:text="${c.progressPercent} == 100 ? '완료' : (${c.progressPercent} > 0 ? '진행 중 ' + ${c.progressPercent} + '%' : '미시청')">
+                        </div>
+                        <div class="sl-time" th:unless="${isPaid}">🔒 잠김</div>
+                    </div>
                 </div>
-            </div>
-
-            <div class="sl-item">
-                <div class="sl-thumb" style="background:linear-gradient(135deg,#d4f4ec,#9FE1CB);">📖</div>
-                <div class="sl-info">
-                    <div class="sl-num">2-3강</div>
-                    <div class="sl-title">숫자와 날짜 표현</div>
-                    <div class="sl-time">⏱ 20분</div>
-                </div>
-            </div>
-
-            <div class="sl-item">
-                <div class="sl-thumb" style="background:linear-gradient(135deg,#e0f5ee,#b5d4f4);">
-                    📖<div class="sl-lock">🔒</div>
-                </div>
-                <div class="sl-info">
-                    <div class="sl-num">2-4강</div>
-                    <div class="sl-title">색깔과 모양 단어</div>
-                    <div class="sl-time">⏱ 13분 · 잠김</div>
-                </div>
-            </div>
-
-            <div class="sl-item">
-                <div class="sl-thumb" style="background:linear-gradient(135deg,#c8f0e2,#e0f5ee);">
-                    📖<div class="sl-lock">🔒</div>
-                </div>
-                <div class="sl-info">
-                    <div class="sl-num">2-5강</div>
-                    <div class="sl-title">날씨와 계절 단어</div>
-                    <div class="sl-time">⏱ 17분 · 잠김</div>
-                </div>
-            </div>
+            </a>
 
         </div>
 
@@ -235,7 +203,7 @@
     </div>
 </div>
 <div th:replace="~{layout/footer :: footer}"></div>
-<script>
+<script th:inline="javascript">
     // ── 속도 버튼 ──
     const speeds = ['0.75x','1.0x','1.25x','1.5x','2.0x'];
     let si = 1;
@@ -244,22 +212,26 @@
       this.textContent = speeds[si];
     });
 
-    // ── 영상 진행 시뮬레이션 (실제 연동 시 <video> timeupdate 이벤트로 교체) ──
-    // 현재 진행률 (0~100). 실제 구현에선 video.currentTime / video.duration * 100
-    let videoProgress = 38; // 예: DB에서 불러온 lastWatchedTime 반영값
-    let videoPlaying = false;
-    let videoInterval = null;
-
+    // ── 실제 video 연동 ──
+    const video        = document.getElementById('videoPlayer');
+    const overlay       = document.getElementById('playerOverlay');
     const progressBar   = document.querySelector('.progress-current');
+    const progressTrack = document.querySelector('.progress-track');
     const lockBar       = document.getElementById('quiz-lock-bar');
     const lockPct       = document.getElementById('quiz-lock-pct');
     const lockOverlay   = document.getElementById('quiz-locked-overlay');
     const playBtn       = document.querySelector('.ctrl-btn.play');
     const timeDisplay   = document.querySelector('.time-display');
 
-    const TOTAL_SEC = 16 * 60 + 20; // 16:20 = 980초
+    const contentId  = /*[[${content.id}]]*/ 0;
+    const savedTime  = /*[[${savedTime}]]*/ 0;
+    const csrfToken  = document.querySelector('meta[name="_csrf"]')?.content;
+    const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+    let completedFired = false;
 
     function secToStr(s) {
+      if (!isFinite(s) || s < 0) s = 0;
       const m = Math.floor(s / 60), sec = Math.floor(s % 60);
       return `${String(m).padStart(2,'0')}:${String(sec).padStart(2,'0')}`;
     }
@@ -268,8 +240,7 @@
       progressBar.style.width = pct + '%';
       lockBar.style.width     = pct + '%';
       lockPct.textContent     = Math.round(pct) + '% 시청';
-      const cur = Math.round(TOTAL_SEC * pct / 100);
-      timeDisplay.textContent = `${secToStr(cur)} / ${secToStr(TOTAL_SEC)}`;
+      timeDisplay.textContent = `${secToStr(video.currentTime)} / ${secToStr(video.duration)}`;
     }
 
     function unlockQuiz() {
@@ -278,47 +249,85 @@
       setTimeout(() => { lockOverlay.style.display = 'none'; }, 500);
     }
 
-    function checkUnlock(pct) {
-      if (pct >= 100) unlockQuiz();
-    }
+    // 재생 시작 위치 복원 (이어보기)
+    video.addEventListener('loadedmetadata', function () {
+      if (savedTime > 0 && savedTime < video.duration) {
+        video.currentTime = savedTime;
+      }
+      updateProgressUI(video.duration > 0 ? (video.currentTime / video.duration * 100) : 0);
+    });
 
-    // 초기 UI 반영
-    updateProgressUI(videoProgress);
-    if (videoProgress >= 100) unlockQuiz();
-
-    // 재생/일시정지 토글
     function togglePlay() {
-      videoPlaying = !videoPlaying;
-      playBtn.textContent = videoPlaying ? '⏸' : '▶';
-      playBtn.classList.toggle('play', true);
-
-      if (videoPlaying) {
-        videoInterval = setInterval(() => {
-          if (videoProgress >= 100) {
-            videoProgress = 100;
-            clearInterval(videoInterval);
-            videoPlaying = false;
-            playBtn.textContent = '▶';
-            updateProgressUI(100);
-            unlockQuiz();
-            return;
-          }
-          // 1초마다 1/TOTAL_SEC 진행 (실제 영상은 훨씬 빠르게 테스트하려면 값 조정)
-          videoProgress += (100 / TOTAL_SEC);
-          updateProgressUI(videoProgress);
-        }, 1000);
+      if (video.paused) {
+        video.play();
       } else {
-        clearInterval(videoInterval);
+        video.pause();
       }
     }
 
+    video.addEventListener('play', function () {
+      playBtn.textContent = '⏸';
+      overlay.style.display = 'none';
+    });
+
+    video.addEventListener('pause', function () {
+      playBtn.textContent = '▶';
+      overlay.style.display = 'flex';
+    });
+
+    // 서버에 진행률 저장 (너무 자주 보내지 않도록 3초에 한 번)
+    let lastSent = 0;
+    video.addEventListener('timeupdate', function () {
+      if (!video.duration) return;
+      const pct = (video.currentTime / video.duration) * 100;
+      updateProgressUI(pct);
+      if (pct >= 100) unlockQuiz();
+
+      const now = Date.now();
+      if (now - lastSent > 3000) {
+        lastSent = now;
+        sendProgress(pct, video.currentTime);
+      }
+    });
+
+    video.addEventListener('ended', function () {
+      updateProgressUI(100);
+      unlockQuiz();
+      sendProgress(100, video.duration);
+      if (!completedFired) {
+        completedFired = true;
+        markComplete();
+      }
+    });
+
+    function sendProgress(percentage, time) {
+      const headers = { 'Content-Type': 'application/json' };
+      if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
+
+      fetch('/content/progress/' + contentId, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({ percentage: percentage, lastWatchedTime: time })
+      }).catch(function () { /* 네트워크 오류는 조용히 무시, 다음 timeupdate 때 재시도됨 */ });
+    }
+
+    function markComplete() {
+      const headers = { 'Content-Type': 'application/json' };
+      if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
+
+      fetch('/content/complete/' + contentId, {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({})
+      }).catch(function () {});
+    }
+
     // 진행 바 클릭으로 탐색
-    document.querySelector('.progress-track').addEventListener('click', function(e) {
+    progressTrack.addEventListener('click', function (e) {
+      if (!video.duration) return;
       const rect = this.getBoundingClientRect();
       const pct  = Math.max(0, Math.min(100, (e.clientX - rect.left) / rect.width * 100));
-      videoProgress = pct;
-      updateProgressUI(pct);
-      checkUnlock(pct);
+      video.currentTime = video.duration * (pct / 100);
     });
 
     // 재생 버튼 / 플레이어 화면 클릭
