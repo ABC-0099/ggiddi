@@ -243,6 +243,7 @@ public class ContentService {
         // 3. 값 업데이트
         progress.setPercentage(percent);
         progress.setLastWatchedTime(time);
+        progress.setUpdatedAt(LocalDateTime.now()); // "마지막으로 본 강의" 계산용
 
         // 4. 완료 처리
         if (percent >= 100) {
@@ -255,6 +256,7 @@ public class ContentService {
 
     // ContentService.java
     public double getAverageProgress(SiteUser user) {
+        if (user == null) return 0;
         List<Progress> progressList = progressRepository.findBySiteUser(user);
         if (progressList == null || progressList.isEmpty()) return 0;
 
@@ -263,6 +265,25 @@ public class ContentService {
             total += p.getPercentage();
         }
         return total / progressList.size();
+    }
+
+    // 완료한 강의(차시) 개수 - "완료 강의" 통계용
+    public int getCompletedCount(SiteUser user) {
+        if (user == null) return 0;
+        List<Progress> progressList = progressRepository.findBySiteUser(user);
+        if (progressList == null) return 0;
+
+        int count = 0;
+        for (Progress p : progressList) {
+            if (p.isCompleted()) count++;
+        }
+        return count;
+    }
+
+    // 가장 최근에 시청한 Progress - "마지막으로 본 강의" 박스용
+    public Progress getLastWatchedProgress(SiteUser user) {
+        if (user == null) return null;
+        return progressRepository.findTopBySiteUserOrderByUpdatedAtDesc(user).orElse(null);
     }
 
     // 강좌별 진도율 목록 (라인 차트용)

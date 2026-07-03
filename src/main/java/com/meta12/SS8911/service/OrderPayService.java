@@ -35,6 +35,33 @@ public class OrderPayService {
     private final SiteUserRepository siteUserRepository;
     private final CategoryRepository categoryRepository;
 
+    // 구독 결제: 플랜을 사면 모든 카테고리에 대해 결제 완료(OrderPay) 처리를 해줍니다.
+    // 이미 결제된 카테고리는 중복 생성하지 않습니다.
+    @Transactional
+    public void subscribeAllCategories(String username, String planName, String price, String payType, String cardNumber) {
+        SiteUser user = siteUserRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        List<Category> categories = categoryRepository.findAll();
+
+        for (Category category : categories) {
+            if (orderPayRepository.existsBySiteUserAndCategory(user, category)) {
+                continue; // 이미 결제된 카테고리는 건너뜀
+            }
+
+            OrderPay orderPay = new OrderPay();
+            orderPay.setSiteUser(user);
+            orderPay.setCategory(category);
+            orderPay.setPrice(price);
+            orderPay.setPayType(payType);
+            orderPay.setCardNumber(cardNumber);
+            orderPay.setInstructorName(planName); // 구독 플랜명 기록용
+            orderPay.setPayday(LocalDateTime.now());
+
+            orderPayRepository.save(orderPay);
+        }
+    }
+
     public List<OrderPay> list(String username) {
         SiteUser user = siteUserRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));

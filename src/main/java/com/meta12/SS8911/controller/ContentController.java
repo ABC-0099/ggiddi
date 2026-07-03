@@ -192,6 +192,23 @@ public class ContentController {
         }
     }
 
+    // 플레이어에서 바로 재생(스트리밍)할 때 쓰는 엔드포인트.
+    // downloadFile()은 강제 다운로드용(Content-Disposition: attachment)이라 <video> 태그에서 못 씀.
+    @GetMapping("/content/stream/{id}")
+    public ResponseEntity<Resource> streamFile(@PathVariable("id") Long id) throws MalformedURLException {
+        Content content = contentService.view(id);
+        if (content == null || content.getFileName() == null) {
+            return ResponseEntity.notFound().build();
+        }
+
+        UrlResource resource = new UrlResource("file:C:/meta12/masil/videos/" + content.getFileName());
+
+        return ResponseEntity.ok()
+                .header(HttpHeaders.CONTENT_TYPE, "video/mp4")
+                .header(HttpHeaders.CONTENT_DISPOSITION, "inline")
+                .body(resource);
+    }
+
     @GetMapping("/content/download/{id}")
     public ResponseEntity<Resource> downloadFile(@PathVariable("id") Long id) throws MalformedURLException {
         Content content = contentService.view(id);

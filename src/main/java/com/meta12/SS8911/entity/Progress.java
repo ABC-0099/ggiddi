@@ -30,4 +30,6 @@ public class Progress {
     private Double lastWatchedTime; // 초 단위로 기록
     private Double percentage;      // 0 ~ 100 사이 값
 
+    private LocalDateTime updatedAt; // 마지막으로 시청/업데이트된 시각 ("마지막으로 본 강의"용)
+
 }

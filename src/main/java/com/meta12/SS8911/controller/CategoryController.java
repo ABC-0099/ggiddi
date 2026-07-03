@@ -4,6 +4,7 @@ import com.meta12.SS8911.config.Role;
 import com.meta12.SS8911.dto.CategoryDTO;
 import com.meta12.SS8911.entity.Category;
 import com.meta12.SS8911.entity.Content;
+import com.meta12.SS8911.entity.Progress;
 import com.meta12.SS8911.entity.SiteUser;
 import com.meta12.SS8911.repository.ContentRepository;
 import com.meta12.SS8911.repository.OrderPayRepository;
@@ -12,7 +13,6 @@ import com.meta12.SS8911.repository.SiteUserRepository;
 import com.meta12.SS8911.service.CategoryService;
 import com.meta12.SS8911.service.ContentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.multipart.MultipartFile;
@@ -47,9 +47,14 @@ public class CategoryController {
 
     @GetMapping("/category/list")
     public String list(
-            @AuthenticationPrincipal SiteUser user,
+            Principal principal,
             Model model
-    ) { 
+    ) {
+        SiteUser user = null;
+        if (principal != null) {
+            user = siteUserRepository.findByUsername(principal.getName()).orElse(null);
+        }
+
         List<Category> categoryList = categoryService.findAll();
 
         Map<Long, List<Content>> contentMap = new LinkedHashMap<>();
@@ -72,6 +77,13 @@ public class CategoryController {
         model.addAttribute("list", categoryList);
         model.addAttribute("contentMap", contentMap);
         model.addAttribute("paidMap", paidMap);
+
+        // 상단 통계 박스용 데이터
+        model.addAttribute("completedCount", contentService.getCompletedCount(user));
+        model.addAttribute("avgProgress", (int) Math.round(contentService.getAverageProgress(user)));
+
+        Progress lastProgress = contentService.getLastWatchedProgress(user);
+        model.addAttribute("lastProgress", lastProgress);
 
         return "category/list";
     }

@@ -17,4 +17,5 @@ public interface ProgressRepository extends JpaRepository<Progress, Long> {
     boolean existsBySiteUserAndContent(@Param("siteUser") SiteUser siteUser, @Param("content") Content content);
     Optional<Progress> findBySiteUserAndContent(SiteUser siteUser, Content content);
     List<Progress> findBySiteUser(SiteUser siteUser);
+    Optional<Progress> findTopBySiteUserOrderByUpdatedAtDesc(SiteUser siteUser);
 }
