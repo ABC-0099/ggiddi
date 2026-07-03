@@ -26,4 +26,11 @@ public class SiteUserEditDTO {
 
     @NotBlank(message = "현재 비밀번호를 입력해주세요.")
     private String currentPassword;
+
+    private String newPassword;
+    private String newPasswordChk;
+
+    public String getNewPasswordChk() {
+        return newPasswordChk;
+    }
 }
