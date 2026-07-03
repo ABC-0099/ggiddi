@@ -1,31 +1,26 @@
 <!DOCTYPE html>
 <html lang="ko" xmlns:th="http://www.thymeleaf.org"
-      xmlns:sec="http://www.thymeleaf.org/extras/springsecurity6">
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title th:text="${quizInfo.title} + ' — 끼역띠귿'">퀴즈 풀기 — 끼역띠귿</title>
+  <title th:text="${quizTitle} + ' — 끼역띠귿'">퀴즈 풀기 — 끼역띠귿</title>
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
   <link rel="stylesheet" th:href="@{/css/layout/navbar.css}" />
   <link rel="stylesheet" th:href="@{/css/layout/footer.css}" />
-  <link rel="stylesheet" th:href="@{/css/content/quiz-play.css}" />
+  <link rel="stylesheet" th:href="@{/css/quiz/play.css}" />
 </head>
 <body>
 
 <div class="bg-orbs"><div class="orb o1"></div><div class="orb o2"></div></div>
 
-<!-- 네브바 -->
-<div th:replace="~{layout/navbar :: navbar(currentMenu='quiz')}"></div>
+<div th:replace="~{layout/navbar :: navbar(currentMenu='practiceQuiz')}"></div>
 
-<!-- 퀴즈 데이터 (서버에서 JSON으로 주입) -->
 <script th:inline="javascript">
-  const QUIZ_DATA = /*[[${quizJson}]]*/ [];
-  const QUIZ_TYPE = /*[[${quizInfo.type}]]*/ 'practice'; // 'practice' | 'exam'
-  const QUIZ_ID   = /*[[${quizInfo.id}]]*/ 0;
-  const CSRF_TOKEN = /*[[${_csrf.token}]]*/ '';
-  const CSRF_HEADER = /*[[${_csrf.headerName}]]*/ '';
+  const QUIZ_ID = /*[[${quizId}]]*/ 0;
+  const CSRF_HEADER = 'X-XSRF-TOKEN';
 </script>
 
 <main class="play-wrap">
@@ -36,36 +31,37 @@
       <div class="ph-left">
         <a th:href="@{/quiz}" class="ph-back">← 퀴즈 목록</a>
         <div class="ph-info">
-          <span class="ph-type-badge"
-                th:classappend="${quizInfo.type == 'exam'} ? 'badge-exam' : 'badge-practice'"
-                th:text="${quizInfo.type == 'exam'} ? '모의고사' : '연습 퀴즈'">연습 퀴즈</span>
-          <span class="ph-title" th:text="${quizInfo.title}">퀴즈 제목</span>
+          <span class="ph-type-badge badge-practice">연습 퀴즈</span>
+          <span class="ph-title" th:text="${quizTitle}">퀴즈 제목</span>
         </div>
       </div>
       <div class="ph-right">
-        <!-- 모의고사일 때만 타이머 표시 -->
-        <div class="ph-timer" th:if="${quizInfo.type == 'exam'}" id="timer">
-          <span class="timer-icon">⏱</span>
-          <span id="timer-display">20:00</span>
-        </div>
         <div class="ph-progress-wrap">
-          <span id="progress-text" class="ph-progress-text">1 / 10</span>
+          <span id="progress-text" class="ph-progress-text">- / -</span>
           <div class="ph-progress-track">
-            <div class="ph-progress-bar" id="progress-bar" style="width:10%;"></div>
+            <div class="ph-progress-bar" id="progress-bar" style="width:0%;"></div>
           </div>
         </div>
       </div>
     </div>
   </div>
 
+  <!-- 로딩 -->
+  <div class="play-body" id="loadingArea">
+    <div class="question-card" style="text-align:center; color:var(--ink-faint);">
+      문제를 불러오는 중...
+    </div>
+  </div>
+
   <!-- 퀴즈 본문 -->
-  <div class="play-body">
+  <div class="play-body" id="playBody" style="display:none;">
 
     <!-- 문제 카드 -->
     <div class="question-card" id="question-card">
       <div class="qc-top">
         <span class="qc-num" id="qc-num">Q1</span>
-        <span class="qc-stage" th:text="${quizInfo.stageLabel}">2단계</span>
+        <span class="qc-type-badge" id="qc-type-badge" style="display:none;"></span>
+        <span class="qc-stage" th:text="${contentTitle}">1강</span>
       </div>
       <div class="qc-text" id="qc-text">문제 내용이 여기에 표시됩니다.</div>
 
@@ -77,7 +73,6 @@
 
       <!-- 버튼 -->
       <div class="qc-actions">
-        <button class="qc-btn-skip" id="btn-skip" onclick="skipQuestion()">건너뛰기</button>
         <button class="qc-btn-submit" id="btn-submit" onclick="submitAnswer()" disabled>확인</button>
         <button class="qc-btn-next"  id="btn-next"   onclick="nextQuestion()" style="display:none;">다음 →</button>
       </div>
@@ -92,12 +87,9 @@
       <!-- 문항별 결과 그리드 -->
       <div class="rc-cells" id="rc-cells"></div>
 
-      <!-- 틀린 문제 해설 -->
-      <div class="rc-wrongs" id="rc-wrongs"></div>
-
       <div class="rc-actions">
         <a th:href="@{/quiz}" class="rc-btn-list">← 목록으로</a>
-        <button class="rc-btn-retry" onclick="restartQuiz()">🔄 다시 풀기</button>
+        <button class="rc-btn-retry" onclick="location.reload()">🔄 다시 풀기</button>
       </div>
     </div>
 
@@ -105,41 +97,57 @@
 
 </main>
 
-<!-- 푸터 -->
 <div th:replace="~{layout/footer :: footer}"></div>
 
 <script>
   // ── 상태 ──
-  let questions   = [...QUIZ_DATA];
+  let questions   = [];
   let currentIdx  = 0;
-  let selectedOpt = null;
+  let selectedOpt = null; // 0-based index (화면 표시용)
   let answered    = false;
   let score       = 0;
-  let results     = []; // {correct, question, selected, answer}
+  let results     = []; // {correct}
 
-  // 모의고사 타이머
-  let timerInterval = null;
-  let timeLeft = questions.length * 60; // 문항당 1분
+  function getCsrfToken() {
+    const match = document.cookie.match(/(^|;\s*)XSRF-TOKEN=([^;]*)/);
+    return match ? decodeURIComponent(match[2]) : '';
+  }
 
-  function startTimer() {
-    if (QUIZ_TYPE !== 'exam') return;
-    timerInterval = setInterval(() => {
-      timeLeft--;
-      const m = Math.floor(timeLeft / 60);
-      const s = timeLeft % 60;
-      document.getElementById('timer-display').textContent =
-        String(m).padStart(2,'0') + ':' + String(s).padStart(2,'0');
-      if (timeLeft <= 60) document.getElementById('timer-display').style.color = '#D85A4A';
-      if (timeLeft <= 0) { clearInterval(timerInterval); showResult(); }
-    }, 1000);
+  // ── 퀴즈 시작 (문제은행에서 서버가 랜덤으로 뽑아줌) ──
+  function startQuiz() {
+    fetch('/api/quiz/' + QUIZ_ID + '/start')
+      .then(res => {
+        if (!res.ok) throw new Error('시작 실패');
+        return res.json();
+      })
+      .then(data => {
+        questions = data.questions;
+        document.getElementById('loadingArea').style.display = 'none';
+        document.getElementById('playBody').style.display = '';
+        renderQuestion();
+      })
+      .catch(err => {
+        console.error(err);
+        document.getElementById('loadingArea').innerHTML =
+          '<div class="question-card" style="text-align:center; color:var(--red);">문제를 불러오지 못했어요. 잠금 상태이거나 오류가 발생했어요.</div>';
+      });
   }
 
   // ── 문제 렌더 ──
   function renderQuestion() {
     const q = questions[currentIdx];
-    const letters = ['A','B','C','D','E'];
+    const letters = ['A', 'B', 'C', 'D'];
 
-    document.getElementById('qc-num').textContent  = 'Q' + (currentIdx + 1);
+    document.getElementById('qc-num').textContent = 'Q' + (currentIdx + 1);
+
+    const typeBadge = document.getElementById('qc-type-badge');
+    if (q.questionType) {
+      typeBadge.textContent = q.questionType;
+      typeBadge.style.display = '';
+    } else {
+      typeBadge.style.display = 'none';
+    }
+
     document.getElementById('qc-text').textContent = q.question;
 
     const opts = document.getElementById('qc-options');
@@ -155,62 +163,71 @@
 
     document.getElementById('btn-submit').disabled = true;
     document.getElementById('btn-submit').style.display = '';
-    document.getElementById('btn-next').style.display   = 'none';
-    document.getElementById('btn-skip').style.display   = '';
+    document.getElementById('btn-next').style.display = 'none';
 
-    // 마지막 문제면 "다음" → "결과 보기"
-    if (currentIdx === questions.length - 1)
-      document.getElementById('btn-next').textContent = '결과 보기 →';
-    else
-      document.getElementById('btn-next').textContent = '다음 →';
+    document.getElementById('btn-next').textContent =
+      currentIdx === questions.length - 1 ? '결과 보기 →' : '다음 →';
 
-    // 진행률
     const pct = ((currentIdx + 1) / questions.length) * 100;
     document.getElementById('progress-bar').style.width = pct + '%';
     document.getElementById('progress-text').textContent = (currentIdx + 1) + ' / ' + questions.length;
 
     selectedOpt = null;
-    answered    = false;
+    answered = false;
   }
 
   function selectOpt(el) {
     if (answered) return;
     document.querySelectorAll('.qc-opt').forEach(o => o.classList.remove('selected'));
     el.classList.add('selected');
-    selectedOpt = parseInt(el.dataset.idx);
+    selectedOpt = parseInt(el.dataset.idx, 10);
     document.getElementById('btn-submit').disabled = false;
   }
 
+  // ── 문항 하나 채점 (서버에 물어봄 - 정답은 클라이언트에 안 심어둠) ──
   function submitAnswer() {
     if (selectedOpt === null || answered) return;
     answered = true;
+
     const q = questions[currentIdx];
-    const opts = document.querySelectorAll('.qc-opt');
-    const fb   = document.getElementById('qc-feedback');
-    const correct = selectedOpt === q.answer;
+    const selectedOption = selectedOpt + 1; // 1~4로 변환
 
-    opts[selectedOpt].classList.remove('selected');
-    opts[selectedOpt].classList.add(correct ? 'correct' : 'wrong');
-    opts[q.answer].classList.add('correct');
-
-    fb.textContent  = correct ? q.feedbackCorrect : q.feedbackWrong;
-    fb.className    = 'qc-feedback ' + (correct ? 'fb-correct' : 'fb-wrong');
-    fb.style.display = 'block';
-
-    if (correct) score++;
-    results.push({ correct, question: q.question, selected: q.options[selectedOpt], answer: q.options[q.answer] });
-
-    document.getElementById('btn-submit').style.display = 'none';
-    document.getElementById('btn-next').style.display   = '';
-    document.getElementById('btn-skip').style.display   = 'none';
+    fetch('/api/quiz/question/' + q.id + '/check', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        [CSRF_HEADER]: getCsrfToken()
+      },
+      body: JSON.stringify({ selectedOption })
+    })
+      .then(res => res.json())
+      .then(result => renderFeedback(result))
+      .catch(err => {
+        console.error(err);
+        alert('채점 중 오류가 발생했어요.');
+        answered = false;
+      });
   }
 
-  function skipQuestion() {
-    if (answered) return;
-    results.push({ correct: false, question: questions[currentIdx].question, selected: null, answer: questions[currentIdx].options[questions[currentIdx].answer] });
-    currentIdx++;
-    if (currentIdx >= questions.length) showResult();
-    else renderQuestion();
+  function renderFeedback(result) {
+    const opts = document.querySelectorAll('.qc-opt');
+    const fb = document.getElementById('qc-feedback');
+
+    opts[selectedOpt].classList.remove('selected');
+    opts[selectedOpt].classList.add(result.correct ? 'correct' : 'wrong');
+    if (!result.correct && result.correctAnswer) {
+      opts[result.correctAnswer - 1].classList.add('correct');
+    }
+
+    fb.textContent = result.explanation || (result.correct ? '정답이에요!' : '아쉬워요, 다시 확인해봐요.');
+    fb.className = 'qc-feedback ' + (result.correct ? 'fb-correct' : 'fb-wrong');
+    fb.style.display = 'block';
+
+    if (result.correct) score++;
+    results.push({ correct: result.correct });
+
+    document.getElementById('btn-submit').style.display = 'none';
+    document.getElementById('btn-next').style.display = '';
   }
 
   function nextQuestion() {
@@ -221,12 +238,11 @@
 
   // ── 결과 ──
   function showResult() {
-    if (timerInterval) clearInterval(timerInterval);
     document.getElementById('question-card').style.display = 'none';
-    document.getElementById('result-card').style.display   = '';
+    document.getElementById('result-card').style.display = '';
 
     const total = questions.length;
-    const pct   = Math.round((score / total) * 100);
+    const pct = Math.round((score / total) * 100);
 
     document.getElementById('rc-emoji').textContent = pct >= 80 ? '🎉' : pct >= 60 ? '🙂' : '😅';
     document.getElementById('rc-score').textContent = score + ' / ' + total + '  (' + pct + '점)';
@@ -234,62 +250,26 @@
       pct >= 80 ? '훌륭해요! 실력이 많이 늘었어요.' :
       pct >= 60 ? '잘 하셨어요! 조금만 더 연습해봐요.' : '틀린 문제를 복습하고 다시 도전해보세요!';
 
-    // 문항 그리드
     document.getElementById('rc-cells').innerHTML = results.map((r, i) =>
-      `<div class="rc-cell ${r.correct ? 'ok' : 'no'}">${i+1}</div>`
+      `<div class="rc-cell ${r.correct ? 'ok' : 'no'}">${i + 1}</div>`
     ).join('');
 
-    // 틀린 문제 해설
-    const wrongs = results.filter(r => !r.correct);
-    const wrongsEl = document.getElementById('rc-wrongs');
-    if (wrongs.length === 0) {
-      wrongsEl.innerHTML = '<div class="rc-perfect">🏆 전부 맞혔어요!</div>';
-    } else {
-      wrongsEl.innerHTML = '<div class="rc-wrongs-title">틀린 문제 해설</div>' +
-        wrongs.map((r, i) => `
-          <div class="rc-wrong-item">
-            <div class="rcw-q">${r.question}</div>
-            <div class="rcw-row">
-              <span class="rcw-badge wrong">내 답</span>
-              <span>${r.selected ?? '건너뜀'}</span>
-            </div>
-            <div class="rcw-row">
-              <span class="rcw-badge correct">정답</span>
-              <span>${r.answer}</span>
-            </div>
-          </div>`
-        ).join('');
-    }
-
-    // 서버에 결과 저장
-    saveResult(score, total, pct);
+    saveFinish(score, total);
   }
 
-  function saveResult(score, total, pct) {
-    fetch('/quiz/result/save', {
+  function saveFinish(score, total) {
+    fetch('/api/quiz/' + QUIZ_ID + '/finish', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        [CSRF_HEADER]: CSRF_TOKEN
+        [CSRF_HEADER]: getCsrfToken()
       },
-      body: JSON.stringify({ quizId: QUIZ_ID, type: QUIZ_TYPE, score, total, pct })
+      body: JSON.stringify({ score, total })
     }).catch(e => console.warn('결과 저장 실패:', e));
   }
 
-  function restartQuiz() {
-    // 문제 셔플
-    questions = [...QUIZ_DATA].sort(() => Math.random() - 0.5);
-    currentIdx = 0; score = 0; selectedOpt = null; answered = false; results = [];
-    timeLeft = questions.length * 60;
-    document.getElementById('question-card').style.display = '';
-    document.getElementById('result-card').style.display   = 'none';
-    if (QUIZ_TYPE === 'exam') startTimer();
-    renderQuestion();
-  }
-
   // ── 초기 실행 ──
-  renderQuestion();
-  if (QUIZ_TYPE === 'exam') startTimer();
+  startQuiz();
 </script>
 
 </body>

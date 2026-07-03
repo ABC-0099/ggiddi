@@ -1,0 +1,259 @@
+/* ── 연습퀴즈 목록 (배움터 메인과 톤 통일) ── */
+
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+/* 히어로 (풀블리드 다크 그라디언트) */
+.ql-hero {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background: linear-gradient(135deg, #185FA5 0%, #12447e 45%, #1a8f6f 100%);
+    padding: 64px 24px 48px;
+    text-align: center;
+}
+
+.ql-hero-orbs {
+    position: absolute;
+    inset: 0;
+    overflow: hidden;
+    pointer-events: none;
+}
+
+.ql-hero-orb {
+    position: absolute;
+    border-radius: 50%;
+    filter: blur(90px);
+}
+
+.ql-hero-orb.o1 {
+    width: 420px;
+    height: 420px;
+    top: -140px;
+    left: -90px;
+    background: #9FE1CB;
+    opacity: 0.35;
+}
+
+.ql-hero-orb.o2 {
+    width: 360px;
+    height: 360px;
+    bottom: -120px;
+    right: -60px;
+    background: #5DCAA5;
+    opacity: 0.28;
+}
+
+.ql-hero-inner {
+    position: relative;
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.ql-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #d8f0e6;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-bottom: 20px;
+}
+
+.ql-eyebrow-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #5DCAA5;
+    flex-shrink: 0;
+}
+
+.ql-hero h1 {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 32px;
+    line-height: 1.45;
+    color: #ffffff;
+    margin: 0 0 14px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+}
+
+.ql-hero h1 em {
+    font-style: normal;
+    color: #9FE1CB;
+    border-bottom: 3px solid rgba(159, 225, 203, 0.5);
+    padding-bottom: 2px;
+}
+
+.ql-hero-sub {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 14.5px;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.72);
+    margin: 0 0 28px;
+}
+
+.ql-hero-stats {
+    display: inline-flex;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 16px;
+    padding: 18px 0;
+}
+
+.ql-hero-stat {
+    padding: 0 28px;
+    border-right: 1px solid rgba(255, 255, 255, 0.14);
+}
+.ql-hero-stat:last-child { border-right: none; }
+
+.ql-hero-stat-num {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 21px;
+    font-weight: 900;
+    color: #ffffff;
+    margin-bottom: 4px;
+}
+
+.ql-hero-stat-label {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 11.5px;
+    color: rgba(255, 255, 255, 0.65);
+}
+
+/* 본문 */
+.ql-wrap {
+    max-width: 880px;
+    margin: 0 auto;
+    padding: 48px 24px 96px;
+    font-family: 'Noto Sans KR', sans-serif;
+    background: #F7FAFC;
+}
+
+.ql-theme-section { margin-bottom: 36px; }
+.ql-theme-section:last-child { margin-bottom: 0; }
+
+.ql-theme-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 14px;
+}
+
+.ql-theme-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #185FA5;
+    background: rgba(24, 95, 165, 0.08);
+    padding: 4px 13px;
+    border-radius: 20px;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.ql-theme-title {
+    font-size: 18px;
+    font-weight: 700;
+    color: #12233a;
+    letter-spacing: -0.3px;
+    margin: 0;
+}
+
+/* 퀴즈 카드 그리드 */
+.ql-quiz-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr));
+    gap: 14px;
+}
+
+.ql-quiz-card {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    background: #ffffff;
+    border: 1.5px solid #dce6f0;
+    border-radius: 16px;
+    padding: 20px;
+    transition: border-color 0.15s, transform 0.15s;
+    text-decoration: none;
+}
+.ql-quiz-card:hover {
+    border-color: #5DCAA5;
+    transform: translateY(-3px);
+}
+
+.ql-content-badge {
+    font-size: 11px;
+    font-weight: 700;
+    color: #5DCAA5;
+    background: rgba(93, 202, 165, 0.12);
+    padding: 3px 10px;
+    border-radius: 20px;
+    flex-shrink: 0;
+    white-space: nowrap;
+    width: fit-content;
+}
+
+.ql-quiz-title { font-size: 14.5px; font-weight: 700; color: #12233a; }
+.ql-quiz-sub { font-size: 12px; color: #8fa0b3; }
+.ql-quiz-sub b { color: #185FA5; }
+
+.ql-quiz-foot {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-top: auto;
+    padding-top: 10px;
+    border-top: 1px solid #eef3f8;
+}
+
+.ql-quiz-score {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #185FA5;
+}
+.ql-quiz-score.is-none { color: #b6c2cf; font-weight: 500; }
+
+.ql-quiz-btn {
+    font-size: 12px;
+    font-weight: 700;
+    color: #185FA5;
+    background: rgba(24, 95, 165, 0.08);
+    border-radius: 8px;
+    padding: 6px 14px;
+    text-decoration: none;
+    transition: background 0.15s, color 0.15s;
+}
+.ql-quiz-card:hover .ql-quiz-btn { background: #185FA5; color: #fff; }
+
+.ql-empty {
+    text-align: center;
+    color: #8fa0b3;
+    font-size: 13.5px;
+    padding: 48px 24px;
+    background: #ffffff;
+    border: 1.5px dashed #dce6f0;
+    border-radius: 16px;
+}
+
+/* 모바일 */
+@media (max-width: 640px) {
+    .ql-hero { padding: 48px 20px 36px; }
+    .ql-hero h1 { font-size: 24px; }
+    .ql-hero-stats { flex-wrap: wrap; padding: 14px 0; }
+    .ql-hero-stat { padding: 6px 16px; }
+
+    .ql-wrap { padding: 36px 16px 72px; }
+
+    .ql-quiz-grid { grid-template-columns: 1fr; }
+}

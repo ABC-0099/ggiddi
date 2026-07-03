@@ -27,7 +27,7 @@
 <div class="pl-admin-bar" sec:authorize="hasRole('ADMIN')">
   <span class="pl-admin-bar-label"><i aria-hidden="true">⚙</i> 관리자로 보고 있어요</span>
   <div class="pl-admin-bar-links">
-    <a th:href="@{/admin/practice/quiz}">문제 관리 →</a>
+    <a th:href="@{/admin/quiz}">문제 관리 →</a>
     <a th:href="@{/admin/practice/mock}">모의고사 관리 →</a>
   </div>
 </div>
@@ -42,7 +42,7 @@
       <p class="pl-hero-sub">단원별 연습퀴즈로 감을 잡고, 실전 모의고사로 지금 내 실력을 확인해보세요.</p>
 
       <div class="pl-hero-actions">
-        <a th:href="@{/practice/quiz}" class="pl-hero-btn pl-hero-btn-primary">연습퀴즈 풀기 →</a>
+        <a th:href="@{/quiz}" class="pl-hero-btn pl-hero-btn-primary">연습퀴즈 풀기 →</a>
         <a th:href="@{/practice/mock}" class="pl-hero-btn pl-hero-btn-ghost">모의고사 응시하기</a>
       </div>
 
@@ -68,7 +68,7 @@
       <p class="pl-hero-sub">단원별 연습퀴즈로 감을 잡고, 실전 모의고사로 지금 내 실력을 확인해보세요.</p>
 
       <div class="pl-hero-actions">
-        <a th:href="@{/practice/quiz}" class="pl-hero-btn pl-hero-btn-primary">연습퀴즈 풀기 →</a>
+        <a th:href="@{/quiz}" class="pl-hero-btn pl-hero-btn-primary">연습퀴즈 풀기 →</a>
         <a th:href="@{/practice/mock}" class="pl-hero-btn pl-hero-btn-ghost">모의고사 응시하기</a>
       </div>
     </th:block>
@@ -79,7 +79,7 @@
 
   <!-- 듀얼 카드: 연습퀴즈 vs 실전모의고사 -->
   <section class="pl-modes">
-    <a th:href="@{/practice/quiz}" class="pl-mode-card pl-mode-quiz">
+    <a th:href="@{/quiz}" class="pl-mode-card pl-mode-quiz">
       <span class="pl-mode-tag">가볍게 시작</span>
       <h2>연습퀴즈</h2>
       <p>단원별로 짧게, 부담 없이. 틀려도 바로 다시 도전할 수 있어요.</p>
@@ -103,7 +103,7 @@
 
     <div class="pl-category-grid">
       <a th:each="category : ${categories}"
-         th:href="@{/practice/quiz(categoryId=${category.id})}"
+         th:href="@{/quiz(categoryId=${category.id})}"
          class="pl-category-card">
         <span class="pl-category-name" th:text="${category.name}">케이팝</span>
         <span class="pl-category-count" th:text="${category.quizCount} + '문항'">24문항</span>

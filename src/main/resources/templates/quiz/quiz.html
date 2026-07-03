@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title th:text="${quiz.title} + ' - 끼역띠귿'">연습퀴즈 - 끼역띠귿</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&amp;display=swap"
+        rel="stylesheet" />
+  <link rel="stylesheet" th:href="@{/css/main/mainpage.css}">
+  <link rel="stylesheet" th:href="@{/css/layout/navbar.css}">
+  <link rel="stylesheet" th:href="@{/css/layout/footer.css}">
+  <link rel="stylesheet" th:href="@{/css/quiz/quiz.css}">
+</head>
+<body>
+
+<div th:replace="~{layout/navbar :: navbar(currentMenu='practiceQuiz')}"></div>
+
+<div class="qz-wrap">
+  <a th:href="@{/practice/main}" class="qz-back">← 배움터로</a>
+
+  <div class="qz-title" th:text="${quiz.title}">1강 연습퀴즈</div>
+
+  <div class="qz-prev-banner" th:if="${prevResult != null}">
+    <span>지난번엔 <strong th:text="${prevResult.score}">3</strong>/<strong th:text="${prevResult.total}">4</strong>문항 맞혔어요.</span>
+    <span>다시 풀면 최신 기록으로 갱신돼요</span>
+  </div>
+
+  <!-- 문제 풀이 영역 -->
+  <div id="quizPlayArea">
+    <div class="qz-progress-wrap">
+      <div class="qz-progress-label">
+        <span id="progressText">문제 1 / <span id="totalCount">1</span></span>
+        <span id="answeredCount">0개 답변</span>
+      </div>
+      <div class="qz-progress-track">
+        <div class="qz-progress-fill" id="progressFill" style="width:0%"></div>
+      </div>
+    </div>
+
+    <div class="qz-question-card">
+      <div class="qz-question-text" id="questionText"></div>
+      <div class="qz-options" id="optionsWrap"></div>
+    </div>
+
+    <div class="qz-nav-actions">
+      <button class="qz-btn qz-btn-ghost" id="prevBtn" onclick="goPrev()">이전 문제</button>
+      <button class="qz-btn qz-btn-primary" id="nextBtn" onclick="goNext()">다음 문제</button>
+    </div>
+  </div>
+
+  <!-- 결과 영역 (제출 후 표시) -->
+  <div id="resultArea" style="display:none;"></div>
+</div>
+
+<div th:replace="~{layout/footer :: footer}"></div>
+
+<script th:inline="javascript">
+  /*<![CDATA[*/
+  const quizId = /*[[${quiz.id}]]*/ 0;
+  const questions = /*[[${quiz.questions}]]*/ [];
+  /*]]>*/
+
+  let currentIndex = 0;
+  const selectedAnswers = {}; // { questionId: 1~4 }
+
+  function getCsrfToken() {
+      const match = document.cookie.match(/(^|;\s*)XSRF-TOKEN=([^;]*)/);
+      return match ? decodeURIComponent(match[2]) : '';
+  }
+
+  function renderQuestion() {
+      const q = questions[currentIndex];
+
+      document.getElementById('totalCount').textContent = questions.length;
+      document.getElementById('progressText').innerHTML =
+          '문제 ' + (currentIndex + 1) + ' / <span id="totalCount">' + questions.length + '</span>';
+      document.getElementById('answeredCount').textContent = Object.keys(selectedAnswers).length + '개 답변';
+      document.getElementById('progressFill').style.width =
+          ((currentIndex + 1) / questions.length * 100) + '%';
+
+      document.getElementById('questionText').textContent = q.question;
+
+      const wrap = document.getElementById('optionsWrap');
+      wrap.innerHTML = '';
+
+      q.options.forEach((opt, i) => {
+          const optionNum = i + 1;
+          const btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'qz-option' + (selectedAnswers[q.id] === optionNum ? ' is-selected' : '');
+          btn.innerHTML = `<span class="qz-option-badge">${optionNum}</span><span>${opt}</span>`;
+          btn.onclick = () => selectOption(q.id, optionNum);
+          wrap.appendChild(btn);
+      });
+
+      document.getElementById('prevBtn').disabled = currentIndex === 0;
+      document.getElementById('nextBtn').textContent =
+          currentIndex === questions.length - 1 ? '제출하기' : '다음 문제';
+  }
+
+  function selectOption(questionId, optionNum) {
+      selectedAnswers[questionId] = optionNum;
+      renderQuestion();
+  }
+
+  function goPrev() {
+      if (currentIndex > 0) {
+          currentIndex--;
+          renderQuestion();
+      }
+  }
+
+  function goNext() {
+      const q = questions[currentIndex];
+      if (!selectedAnswers[q.id]) {
+          alert('답을 선택해주세요.');
+          return;
+      }
+
+      if (currentIndex < questions.length - 1) {
+          currentIndex++;
+          renderQuestion();
+      } else {
+          submitQuiz();
+      }
+  }
+
+  function submitQuiz() {
+      const answers = questions.map(q => ({
+          questionId: q.id,
+          selectedOption: selectedAnswers[q.id] || null
+      }));
+
+      fetch('/api/quiz/submit', {
+          method: 'POST',
+          headers: {
+              'Content-Type': 'application/json',
+              'X-XSRF-TOKEN': getCsrfToken()
+          },
+          body: JSON.stringify({ quizId, answers })
+      })
+          .then(res => {
+              if (!res.ok) throw new Error('제출 실패');
+              return res.json();
+          })
+          .then(renderResult)
+          .catch(err => {
+              console.error(err);
+              alert('채점 중 오류가 발생했어요. 다시 시도해주세요.');
+          });
+  }
+
+  function renderResult(result) {
+      document.getElementById('quizPlayArea').style.display = 'none';
+      const area = document.getElementById('resultArea');
+      area.style.display = 'block';
+
+      const pct = Math.round((result.score / result.total) * 100);
+
+      let html = `
+          <div class="qz-result-hero">
+              <div class="qz-result-score">${result.score} / ${result.total}</div>
+              <div class="qz-result-label">정답률 ${pct}%</div>
+          </div>
+      `;
+
+      result.questionResults.forEach((qr, i) => {
+          const q = questions.find(item => item.id === qr.questionId);
+          html += `
+              <div class="qz-result-question ${qr.correct ? 'is-correct' : 'is-wrong'}">
+                  <div class="qz-result-q-head">
+                      <span class="qz-result-badge ${qr.correct ? 'correct' : 'wrong'}">${qr.correct ? '정답' : '오답'}</span>
+                      <span>${i + 1}. ${q ? q.question : ''}</span>
+                  </div>
+                  ${!qr.correct && qr.correctAnswer ? `<div class="qz-result-explanation">정답: ${qr.correctAnswer}번</div>` : ''}
+                  ${qr.explanation ? `<div class="qz-result-explanation">${qr.explanation}</div>` : ''}
+              </div>
+          `;
+      });
+
+      html += `
+          <div class="qz-result-actions">
+              <button class="qz-btn qz-btn-ghost" onclick="location.reload()">다시 풀기</button>
+              <a class="qz-btn qz-btn-primary" style="text-decoration:none; display:flex; align-items:center; justify-content:center;"
+                 href="${/*[[@{/practice/main}]]*/ '/practice/main'}">배움터로 돌아가기</a>
+          </div>
+      `;
+
+      area.innerHTML = html;
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  renderQuestion();
+</script>
+
+</body>
+</html>
