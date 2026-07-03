@@ -246,6 +246,11 @@ html, body {
     font-size: 13.5px;
     color: var(--ink);
     font-weight: 500;
+    box-sizing: border-box;
+    width: 100%;
+    min-height: 41px;
+    display: flex;
+    align-items: center;
 }
 
 .btn-edit-info {
