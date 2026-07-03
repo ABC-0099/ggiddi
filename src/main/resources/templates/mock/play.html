@@ -1,0 +1,292 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title th:text="${examTitle} + ' — 끼역띠귿'">모의고사 — 끼역띠귿</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" th:href="@{/css/layout/navbar.css}" />
+  <link rel="stylesheet" th:href="@{/css/layout/footer.css}" />
+  <link rel="stylesheet" th:href="@{/css/mock/play.css}" />
+</head>
+<body>
+
+<div th:replace="~{layout/navbar :: navbar(currentMenu='practiceMock')}"></div>
+
+<script th:inline="javascript">
+  const EXAM_ID = /*[[${examId}]]*/ 0;
+  const TIME_LIMIT_MIN = /*[[${timeLimitMinutes}]]*/ 30;
+  const CSRF_HEADER = 'X-XSRF-TOKEN';
+</script>
+
+<!-- 상단 헤더 바 -->
+<div class="mp-header">
+  <div class="mp-header-inner">
+    <div class="mp-left">
+      <a th:href="@{/practice/mock}" class="mp-back">← 모의고사 목록</a>
+      <div class="mp-info">
+        <span class="mp-badge" th:text="${categoryName}">케이팝</span>
+        <span class="mp-title" th:text="${examTitle}">1회차 모의고사</span>
+      </div>
+    </div>
+    <div class="mp-right">
+      <div class="mp-timer" id="timerBox">
+        <span>⏱</span>
+        <span id="timerDisplay">30:00</span>
+      </div>
+    </div>
+  </div>
+</div>
+
+<main class="mp-wrap">
+
+  <!-- 로딩 -->
+  <div id="loadingArea">
+    <div class="mp-question-card" style="text-align:center; color:var(--ink-faint, #9CA3AF);">
+      문제를 불러오는 중...
+    </div>
+  </div>
+
+  <!-- 응시 영역 -->
+  <div id="examArea" style="display:none;">
+
+    <!-- 문항 네비게이션 -->
+    <div class="mp-nav-grid" id="navGrid"></div>
+
+    <div class="mp-question-card">
+      <div class="mp-q-top">
+        <span class="mp-q-num" id="qNum">Q1</span>
+        <span class="mp-q-type" id="qType" style="display:none;"></span>
+      </div>
+      <div class="mp-q-text" id="qText"></div>
+      <div class="mp-options" id="qOptions"></div>
+    </div>
+
+    <div class="mp-bottom-actions">
+      <button class="mp-btn mp-btn-ghost" id="prevBtn" onclick="goPrev()">이전 문제</button>
+      <span class="mp-answered-count" id="answeredCount">0 / 0 문항 답변</span>
+      <button class="mp-btn mp-btn-primary" id="nextBtn" onclick="goNext()">다음 문제</button>
+    </div>
+
+    <button class="mp-submit-btn" onclick="confirmSubmit()">제출하고 채점하기</button>
+  </div>
+
+  <!-- 결과 리뷰 영역 -->
+  <div id="resultArea" style="display:none;"></div>
+
+</main>
+
+<div th:replace="~{layout/footer :: footer}"></div>
+
+<script>
+  let questions = [];
+  let currentIdx = 0;
+  const answers = {}; // { questionId: 1~4 }
+  let timerInterval = null;
+  let timeLeftSec = 0;
+  let submitted = false;
+
+  function getCsrfToken() {
+    const match = document.cookie.match(/(^|;\s*)XSRF-TOKEN=([^;]*)/);
+    return match ? decodeURIComponent(match[2]) : '';
+  }
+
+  function startExam() {
+    fetch('/api/mock/' + EXAM_ID + '/start')
+      .then(res => {
+        if (!res.ok) throw new Error('시작 실패');
+        return res.json();
+      })
+      .then(data => {
+        questions = data.questions;
+        timeLeftSec = (data.timeLimitMinutes || TIME_LIMIT_MIN) * 60;
+
+        document.getElementById('loadingArea').style.display = 'none';
+        document.getElementById('examArea').style.display = '';
+
+        renderNavGrid();
+        renderQuestion();
+        startTimer();
+      })
+      .catch(err => {
+        console.error(err);
+        document.getElementById('loadingArea').innerHTML =
+          '<div class="mp-question-card" style="text-align:center; color:#D85A4A;">문제를 불러오지 못했어요.</div>';
+      });
+  }
+
+  function startTimer() {
+    updateTimerDisplay();
+    timerInterval = setInterval(() => {
+      timeLeftSec--;
+      updateTimerDisplay();
+      if (timeLeftSec <= 0) {
+        clearInterval(timerInterval);
+        alert('제한시간이 끝났어요. 지금까지 푼 내용으로 자동 제출할게요.');
+        submitExam();
+      }
+    }, 1000);
+  }
+
+  function updateTimerDisplay() {
+    const m = Math.floor(Math.max(timeLeftSec, 0) / 60);
+    const s = Math.max(timeLeftSec, 0) % 60;
+    const el = document.getElementById('timerDisplay');
+    el.textContent = String(m).padStart(2, '0') + ':' + String(s).padStart(2, '0');
+    if (timeLeftSec <= 60) document.getElementById('timerBox').classList.add('is-urgent');
+  }
+
+  function renderNavGrid() {
+    const grid = document.getElementById('navGrid');
+    grid.innerHTML = questions.map((q, i) =>
+      `<button type="button" class="mp-nav-dot" id="nav-${i}" onclick="goTo(${i})">${i + 1}</button>`
+    ).join('');
+  }
+
+  function updateNavGrid() {
+    questions.forEach((q, i) => {
+      const dot = document.getElementById('nav-' + i);
+      dot.classList.toggle('is-current', i === currentIdx);
+      dot.classList.toggle('is-answered', answers[q.id] !== undefined);
+    });
+  }
+
+  function renderQuestion() {
+    const q = questions[currentIdx];
+
+    document.getElementById('qNum').textContent = 'Q' + (currentIdx + 1);
+
+    const typeEl = document.getElementById('qType');
+    if (q.questionType) {
+      typeEl.textContent = q.questionType;
+      typeEl.style.display = '';
+    } else {
+      typeEl.style.display = 'none';
+    }
+
+    document.getElementById('qText').textContent = q.question;
+
+    const wrap = document.getElementById('qOptions');
+    wrap.innerHTML = q.options.map((opt, i) => {
+      const num = i + 1;
+      const selected = answers[q.id] === num;
+      return `<button type="button" class="mp-option ${selected ? 'is-selected' : ''}" onclick="selectOption(${q.id}, ${num})">
+                <span class="mp-option-badge">${num}</span><span>${opt}</span>
+              </button>`;
+    }).join('');
+
+    document.getElementById('prevBtn').disabled = currentIdx === 0;
+    document.getElementById('nextBtn').disabled = currentIdx === questions.length - 1;
+
+    const answeredCount = Object.keys(answers).length;
+    document.getElementById('answeredCount').textContent = answeredCount + ' / ' + questions.length + ' 문항 답변';
+
+    updateNavGrid();
+  }
+
+  function selectOption(questionId, num) {
+    answers[questionId] = num;
+    renderQuestion();
+  }
+
+  function goPrev() { if (currentIdx > 0) { currentIdx--; renderQuestion(); } }
+  function goNext() { if (currentIdx < questions.length - 1) { currentIdx++; renderQuestion(); } }
+  function goTo(idx) { currentIdx = idx; renderQuestion(); }
+
+  function confirmSubmit() {
+    const answeredCount = Object.keys(answers).length;
+    const total = questions.length;
+    let msg = '제출하면 다시 풀 수 없어요. 제출할까요?';
+    if (answeredCount < total) {
+      msg = (total - answeredCount) + '문항이 아직 안 풀렸어요. 그래도 제출할까요?';
+    }
+    if (confirm(msg)) submitExam();
+  }
+
+  function submitExam() {
+    if (submitted) return;
+    submitted = true;
+    if (timerInterval) clearInterval(timerInterval);
+
+    const answerList = questions.map(q => ({
+      questionId: q.id,
+      selectedOption: answers[q.id] || null
+    }));
+
+    fetch('/api/mock/' + EXAM_ID + '/submit', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        [CSRF_HEADER]: getCsrfToken()
+      },
+      body: JSON.stringify({ examId: EXAM_ID, answers: answerList })
+    })
+      .then(res => res.json())
+      .then(renderResult)
+      .catch(err => {
+        console.error(err);
+        alert('채점 중 오류가 발생했어요.');
+        submitted = false;
+      });
+  }
+
+  function renderResult(result) {
+    document.getElementById('examArea').style.display = 'none';
+    document.getElementById('timerBox').style.display = 'none';
+
+    const area = document.getElementById('resultArea');
+    area.style.display = 'block';
+
+    const pct = result.total > 0 ? Math.round((result.score / result.total) * 100) : 0;
+
+    let html = `
+      <div class="mp-result-hero">
+        <div class="mp-result-score">${result.score} / ${result.total}</div>
+        <div class="mp-result-label">정답률 ${pct}%</div>
+      </div>
+    `;
+
+    result.questionResults.forEach((qr, i) => {
+      const letters = ['A', 'B', 'C', 'D'];
+      html += `
+        <div class="mp-review-card ${qr.correct ? 'is-correct' : 'is-wrong'}">
+          <div class="mp-review-head">
+            <span class="mp-review-badge ${qr.correct ? 'correct' : 'wrong'}">${qr.correct ? '정답' : '오답'}</span>
+            <span>${i + 1}. ${qr.question}</span>
+          </div>
+          <div class="mp-review-options">
+            ${qr.options.map((opt, idx) => {
+              const num = idx + 1;
+              let cls = '';
+              if (num === qr.correctAnswer) cls = 'is-answer';
+              else if (num === qr.selectedOption && !qr.correct) cls = 'is-my-wrong';
+              return `<div class="mp-review-option ${cls}">
+                        <span>${letters[idx]}</span><span>${opt}</span>
+                        ${num === qr.selectedOption ? '<span class="mp-my-tag">내 답</span>' : ''}
+                      </div>`;
+            }).join('')}
+          </div>
+          ${qr.explanation ? `<div class="mp-review-explanation">${qr.explanation}</div>` : ''}
+        </div>
+      `;
+    });
+
+    html += `
+      <div class="mp-result-actions">
+        <a href="${/*[[@{/practice/mock}]]*/ '/practice/mock'}" class="mp-btn mp-btn-ghost" style="text-decoration:none; display:flex; align-items:center; justify-content:center;">← 목록으로</a>
+        <button class="mp-btn mp-btn-primary" onclick="location.reload()">🔄 다시 응시하기</button>
+      </div>
+    `;
+
+    area.innerHTML = html;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  startExam();
+</script>
+
+</body>
+</html>

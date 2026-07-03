@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>모의고사 수정 - 끼역띠귿</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <link rel="stylesheet" th:href="@{/css/admin/main.css}">
+  <link rel="stylesheet" th:href="@{/css/admin/admin-quiz.css}">
+</head>
+<body style="display:block; background:var(--gray-50);">
+
+<div class="qa-page">
+  <a th:href="@{/admin/mock}" class="qa-back"><i class="ti ti-arrow-left"></i> 모의고사 목록으로</a>
+
+  <div class="qa-header">
+    <div>
+      <div class="qa-title">회차 수정</div>
+      <div class="qa-subtitle" th:text="${exam.title}">1회차 모의고사</div>
+    </div>
+  </div>
+
+  <div class="qa-form-card">
+    <div class="qa-field">
+      <label class="qa-label">테마</label>
+      <select class="qa-select" id="categoryId">
+        <option th:each="category : ${categories}"
+                th:value="${category.id}"
+                th:text="${category.title}"
+                th:selected="${category.id == exam.categoryId}">케이팝</option>
+      </select>
+    </div>
+    <div class="qa-field">
+      <label class="qa-label">회차 제목</label>
+      <input type="text" class="qa-input" id="examTitle" th:value="${exam.title}">
+    </div>
+    <div class="qa-field">
+      <label class="qa-label">회차 번호</label>
+      <input type="number" class="qa-input" id="round" min="1" th:value="${exam.round}">
+    </div>
+    <div class="qa-field">
+      <label class="qa-label">제한시간(분)</label>
+      <input type="number" class="qa-input" id="timeLimitMinutes" min="1" th:value="${exam.timeLimitMinutes}">
+    </div>
+  </div>
+
+  <div class="qa-form-card qa-bulk-card">
+    <div class="qa-field">
+      <label class="qa-label">엑셀/메모장에서 붙여넣기로 문제 추가 (선택)</label>
+      <p class="qa-hint" style="margin-top:0; margin-bottom:8px;">
+        두 형식 중 편한 걸로 붙여넣으면 자동으로 인식해요.<br>
+        <strong>① 문서 형식</strong>: <code>Q1. [유형] 문제 ... ① 보기1 ② 보기2 ③ 보기3 ④ 보기4 ... 정답: ② ... 해설: ...</code><br>
+        <strong>② 엑셀 형식</strong>: 유형·문제·보기1~4·정답번호(1~4)·해설 순서로 <strong>탭(Tab)</strong> 구분<br>
+        기존 문항 아래에 추가로 붙어요.
+      </p>
+      <textarea class="qa-textarea" id="bulkInput" rows="8" placeholder="여기에 붙여넣으세요"></textarea>
+      <button type="button" class="btn btn-outline" style="margin-top:8px;" onclick="bulkAddQuestions()">
+        <i class="ti ti-arrow-down"></i> 붙여넣은 내용으로 문제 카드 추가
+      </button>
+    </div>
+  </div>
+
+  <div class="qa-question-list" id="questionList"></div>
+
+  <button type="button" class="qa-add-question" onclick="addQuestion()">
+    <i class="ti ti-plus"></i> 문제 추가
+  </button>
+
+  <div class="qa-form-actions" style="margin-top:20px;">
+    <a th:href="@{/admin/mock}" class="btn btn-outline">취소</a>
+    <button type="button" class="btn btn-primary" onclick="submitExam()">
+      <i class="ti ti-check"></i>저장하기
+    </button>
+  </div>
+</div>
+
+<script th:inline="javascript">
+  const QUESTION_TYPES = ['종합 대화형', '어휘', '문법', '표현', '발음', '문화'];
+
+  /*<![CDATA[*/
+  const existingQuestions = /*[[${exam.questions}]]*/ [];
+  const examId = /*[[${exam.id}]]*/ 0;
+  /*]]>*/
+
+  let questionCount = 0;
+
+  function parseTsvFormat(raw) {
+      const lines = raw.split('\n').map(l => l.trim()).filter(l => l !== '');
+      const parsed = [];
+      let skipped = 0;
+
+      lines.forEach(line => {
+          const cols = line.split('\t');
+          if (cols.length < 7) { skipped++; return; }
+
+          const [questionTypeRaw, questionRaw, o1, o2, o3, o4, answerRaw, explanationRaw] = cols;
+          const question = (questionRaw || '').trim().replace(/\\n/g, '\n');
+          const answer = parseInt((answerRaw || '').trim(), 10);
+
+          if (!question || !o1 || !o2 || !o3 || !o4 || !answer || answer < 1 || answer > 4) {
+              skipped++;
+              return;
+          }
+
+          parsed.push({
+              questionType: (questionTypeRaw || '').trim(),
+              question: question,
+              option1: (o1 || '').trim(),
+              option2: (o2 || '').trim(),
+              option3: (o3 || '').trim(),
+              option4: (o4 || '').trim(),
+              answer: answer,
+              explanation: (explanationRaw || '').trim()
+          });
+      });
+
+      return { parsed, skipped };
+  }
+
+  function parseNaturalFormat(raw) {
+      const circleMap = { '①': 1, '②': 2, '③': 3, '④': 4 };
+      const blocks = raw.split(/\n(?=Q\d+\.)/).map(b => b.trim()).filter(Boolean);
+      const parsed = [];
+      let skipped = 0;
+
+      blocks.forEach(block => {
+          const headerMatch = block.match(/^Q\d+\.\s*(?:\[([^\]]+)\])?\s*([\s\S]*?)\n①\s*(.+)\n②\s*(.+)\n③\s*(.+)\n④\s*(.+)/);
+          if (!headerMatch) { skipped++; return; }
+
+          const [, questionType, questionText, o1, o2, o3, o4] = headerMatch;
+
+          const answerMatch = block.match(/정답\s*[:：]\s*([①②③④])/);
+          if (!answerMatch) { skipped++; return; }
+          const answer = circleMap[answerMatch[1]];
+
+          const explMatch = block.match(/해설\s*[:：]\s*([\s\S]*)/);
+          const explanation = explMatch ? explMatch[1].trim() : '';
+
+          const question = questionText.trim();
+          if (!question || !answer) { skipped++; return; }
+
+          parsed.push({
+              questionType: (questionType || '').trim(),
+              question: question,
+              option1: o1.trim(),
+              option2: o2.trim(),
+              option3: o3.trim(),
+              option4: o4.trim(),
+              answer: answer,
+              explanation: explanation
+          });
+      });
+
+      return { parsed, skipped };
+  }
+
+  function bulkAddQuestions() {
+      const raw = document.getElementById('bulkInput').value;
+
+      if (!raw.trim()) {
+          alert('붙여넣은 내용이 없어요.');
+          return;
+      }
+
+      const isNaturalFormat = /^\s*Q\d+\./m.test(raw);
+      const { parsed, skipped } = isNaturalFormat ? parseNaturalFormat(raw) : parseTsvFormat(raw);
+
+      parsed.forEach(q => addQuestion(q));
+
+      document.getElementById('bulkInput').value = '';
+
+      let msg = parsed.length + '개 문제가 추가됐어요.';
+      if (skipped > 0) msg += ' (' + skipped + '개는 형식이 안 맞아서 건너뛰었어요)';
+      alert(msg);
+  }
+
+  function addQuestion(prefill) {
+      questionCount++;
+      const idx = questionCount;
+
+      const card = document.createElement('div');
+      card.className = 'qa-question-card';
+      card.id = 'question-' + idx;
+
+      const answer = prefill ? prefill.answer : null;
+
+      card.innerHTML = `
+          <div class="qa-question-head">
+              <span class="qa-question-num">문제 ${idx}</span>
+              <button type="button" class="qa-question-remove" onclick="removeQuestion(${idx})">
+                  <i class="ti ti-trash"></i> 삭제
+              </button>
+          </div>
+          <div class="qa-field">
+              <label class="qa-label">문제 유형</label>
+              <select class="qa-select question-type">
+                  ${QUESTION_TYPES.map(t => `<option value="${t}" ${prefill && prefill.questionType === t ? 'selected' : ''}>${t}</option>`).join('')}
+              </select>
+          </div>
+          <div class="qa-field">
+              <label class="qa-label">문제 내용</label>
+              <textarea class="qa-textarea question-text" placeholder="문제를 입력하세요">${prefill ? prefill.question : ''}</textarea>
+          </div>
+          <div class="qa-field">
+              <label class="qa-label">보기 (정답에 체크)</label>
+              ${[1, 2, 3, 4].map(n => `
+                  <div class="qa-option-row">
+                      <span class="qa-option-num">${n}</span>
+                      <input type="radio" name="answer-${idx}" class="qa-option-radio" value="${n}" ${answer === n ? 'checked' : ''}>
+                      <input type="text" class="qa-option-input option-${n}" placeholder="보기 ${n}" value="${prefill ? prefill['option' + n] : ''}">
+                  </div>
+              `).join('')}
+          </div>
+          <div class="qa-field qa-explanation-wrap">
+              <label class="qa-label">해설 (선택)</label>
+              <textarea class="qa-textarea question-explanation" placeholder="정답 해설을 입력하세요">${prefill && prefill.explanation ? prefill.explanation : ''}</textarea>
+          </div>
+      `;
+
+      document.getElementById('questionList').appendChild(card);
+  }
+
+  function removeQuestion(idx) {
+      const el = document.getElementById('question-' + idx);
+      if (el) el.remove();
+  }
+
+  function collectQuestions() {
+      const cards = document.querySelectorAll('.qa-question-card');
+      const questions = [];
+
+      cards.forEach(card => {
+          const question = card.querySelector('.question-text').value.trim();
+          const questionType = card.querySelector('.question-type').value;
+          const option1 = card.querySelector('.option-1').value.trim();
+          const option2 = card.querySelector('.option-2').value.trim();
+          const option3 = card.querySelector('.option-3').value.trim();
+          const option4 = card.querySelector('.option-4').value.trim();
+          const explanation = card.querySelector('.question-explanation').value.trim();
+          const checkedRadio = card.querySelector('input[type=radio]:checked');
+          const answer = checkedRadio ? parseInt(checkedRadio.value, 10) : null;
+
+          questions.push({ question, questionType, option1, option2, option3, option4, answer, explanation });
+      });
+
+      return questions;
+  }
+
+  function validate(categoryId, title, round, timeLimitMinutes, questions) {
+      if (!categoryId) { alert('테마를 선택해주세요.'); return false; }
+      if (!title) { alert('회차 제목을 입력해주세요.'); return false; }
+      if (!round) { alert('회차 번호를 입력해주세요.'); return false; }
+      if (!timeLimitMinutes) { alert('제한시간을 입력해주세요.'); return false; }
+      if (questions.length === 0) { alert('문제를 1개 이상 추가해주세요.'); return false; }
+
+      for (let i = 0; i < questions.length; i++) {
+          const q = questions[i];
+          if (!q.question || !q.option1 || !q.option2 || !q.option3 || !q.option4) {
+              alert(`문제 ${i + 1}: 문제와 보기 4개를 모두 입력해주세요.`);
+              return false;
+          }
+          if (!q.answer) {
+              alert(`문제 ${i + 1}: 정답을 체크해주세요.`);
+              return false;
+          }
+      }
+      return true;
+  }
+
+  function getCsrfToken() {
+      const match = document.cookie.match(/(^|;\s*)XSRF-TOKEN=([^;]*)/);
+      return match ? decodeURIComponent(match[2]) : '';
+  }
+
+  function submitExam() {
+      const categoryId = document.getElementById('categoryId').value;
+      const title = document.getElementById('examTitle').value.trim();
+      const round = document.getElementById('round').value;
+      const timeLimitMinutes = document.getElementById('timeLimitMinutes').value;
+      const questions = collectQuestions();
+
+      if (!validate(categoryId, title, round, timeLimitMinutes, questions)) return;
+
+      fetch('/api/admin/mock/' + examId, {
+          method: 'PUT',
+          headers: {
+              'Content-Type': 'application/json',
+              'X-XSRF-TOKEN': getCsrfToken()
+          },
+          body: JSON.stringify({
+              categoryId: Number(categoryId),
+              title,
+              round: Number(round),
+              timeLimitMinutes: Number(timeLimitMinutes),
+              questions
+          })
+      })
+          .then(res => {
+              if (!res.ok) throw new Error('수정 실패');
+              return res.json();
+          })
+          .then(() => {
+              location.href = /*[[@{/admin/mock}]]*/ '/admin/mock';
+          })
+          .catch(err => {
+              console.error(err);
+              alert('수정 중 오류가 발생했어요.');
+          });
+  }
+
+  if (existingQuestions && existingQuestions.length > 0) {
+      existingQuestions.forEach(q => addQuestion(q));
+  } else {
+      addQuestion();
+  }
+</script>
+
+</body>
+</html>

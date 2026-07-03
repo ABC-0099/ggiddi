@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>모의고사 관리 - 끼역띠귿</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" th:href="@{/css/admin/main.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/admin-quiz.css}">
+</head>
+<body style="display:block; background:var(--gray-50);">
+
+<div class="qa-page">
+    <a th:href="@{/admin}" class="qa-back"><i class="ti ti-arrow-left"></i> 관리자 대시보드로</a>
+
+    <div class="qa-header">
+        <div>
+            <div class="qa-title">모의고사 관리</div>
+            <div class="qa-subtitle">테마별 회차(1회차, 2회차...)로 모의고사를 관리하세요</div>
+        </div>
+        <a th:href="@{/admin/mock/chuga}" class="btn btn-primary">
+            <i class="ti ti-plus"></i>새 회차 등록
+        </a>
+    </div>
+
+    <div class="card">
+        <table class="data-table">
+            <thead>
+            <tr>
+                <th style="width:40px">#</th>
+                <th>회차</th>
+                <th>테마</th>
+                <th style="text-align:center">문항 수</th>
+                <th style="text-align:center">제한시간</th>
+                <th style="text-align:center; width:190px">작업</th>
+            </tr>
+            </thead>
+            <tbody>
+            <tr th:each="exam, iter : ${exams}">
+                <td style="color:var(--gray-400)" th:text="${iter.count}">1</td>
+                <td>
+                    <div class="content-title-cell">
+                        <div class="content-thumb"><i class="ti ti-clipboard-list"></i></div>
+                        <div class="content-name" th:text="${exam.round} + '회차 - ' + ${exam.title}">1회차 - 1회차 모의고사</div>
+                    </div>
+                </td>
+                <td th:text="${exam.categoryName}">케이팝</td>
+                <td style="text-align:center" th:text="${exam.questions.size()} + '문항'">20문항</td>
+                <td style="text-align:center" th:text="${exam.timeLimitMinutes} + '분'">30분</td>
+                <td style="text-align:center; white-space:nowrap;">
+                    <div style="display:flex; justify-content:center; gap:6px;">
+                        <a th:href="@{/admin/mock/view/{id}(id=${exam.id})}" class="btn btn-outline btn-sm">
+                            <i class="ti ti-eye"></i>보기
+                        </a>
+                        <a th:href="@{/admin/mock/sujung/{id}(id=${exam.id})}" class="btn btn-outline btn-sm">
+                            <i class="ti ti-edit"></i>수정
+                        </a>
+                        <button class="btn btn-danger-outline btn-sm" th:onclick="'deleteExam(' + ${exam.id} + ')'">
+                            <i class="ti ti-trash"></i>
+                        </button>
+                    </div>
+                </td>
+            </tr>
+
+            <tr th:if="${exams == null or #lists.isEmpty(exams)}">
+                <td colspan="6" style="text-align:center; color:var(--gray-400); padding:32px;">
+                    아직 등록된 모의고사가 없어요. "새 회차 등록"으로 첫 회차를 만들어보세요.
+                </td>
+            </tr>
+            </tbody>
+        </table>
+    </div>
+</div>
+
+<script>
+    function getCsrfToken() {
+        const match = document.cookie.match(/(^|;\s*)XSRF-TOKEN=([^;]*)/);
+        return match ? decodeURIComponent(match[2]) : '';
+    }
+
+    function deleteExam(id) {
+        if (!confirm('이 모의고사 회차를 삭제할까요? 문항도 함께 삭제됩니다.')) return;
+
+        fetch('/api/admin/mock/' + id, {
+            method: 'DELETE',
+            headers: { 'X-XSRF-TOKEN': getCsrfToken() }
+        })
+            .then(res => {
+                if (!res.ok) throw new Error('삭제 실패');
+                location.reload();
+            })
+            .catch(err => {
+                console.error(err);
+                alert('삭제 중 오류가 발생했어요.');
+            });
+    }
+</script>
+
+</body>
+</html>

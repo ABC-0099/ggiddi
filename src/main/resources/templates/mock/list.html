@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>실전 모의고사 - 끼역띠귿</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&amp;display=swap"
+          rel="stylesheet" />
+    <link rel="stylesheet" th:href="@{/css/layout/navbar.css}" />
+    <link rel="stylesheet" th:href="@{/css/layout/footer.css}" />
+    <link rel="stylesheet" th:href="@{/css/mock/list.css}" />
+</head>
+<body>
+
+<div th:replace="~{layout/navbar :: navbar(currentMenu='practiceMock')}"></div>
+
+<!-- 히어로 (풀블리드) -->
+<section class="mk-hero">
+    <div class="mk-hero-orbs">
+        <div class="mk-hero-orb o1"></div>
+        <div class="mk-hero-orb o2"></div>
+    </div>
+    <div class="mk-hero-inner">
+        <p class="mk-eyebrow"><span class="mk-eyebrow-dot"></span>실전 모의고사</p>
+        <h1>시간 제한 안에서<br /><em>진짜 실력</em>을 확인해요</h1>
+        <p class="mk-hero-sub">테마별로 준비된 회차를 실전처럼 풀어보세요. 제한시간 안에 다 풀고 제출하면 바로 결과를 볼 수 있어요.</p>
+
+        <div class="mk-hero-stats">
+            <div class="mk-hero-stat">
+                <div class="mk-hero-stat-num" th:text="${totalPoolCount} ?: '0'">120</div>
+                <div class="mk-hero-stat-label">전체 문제은행</div>
+            </div>
+            <div class="mk-hero-stat">
+                <div class="mk-hero-stat-num" th:text="${avgRate} + '%'">78%</div>
+                <div class="mk-hero-stat-label">내 평균 정답률</div>
+            </div>
+            <div class="mk-hero-stat">
+                <div class="mk-hero-stat-num" th:text="${attemptCount} + '회'">2회</div>
+                <div class="mk-hero-stat-label">응시 횟수</div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div class="mk-wrap">
+
+    <div th:each="entry, catIter : ${groupedExams}" class="mk-theme-section">
+        <div class="mk-theme-head">
+            <span class="mk-theme-badge" th:text="'테마 ' + (${catIter.index} + 1)">테마 1</span>
+            <h2 class="mk-theme-title" th:text="${entry.key}">케이팝</h2>
+        </div>
+
+        <div class="mk-exam-grid">
+            <a th:each="exam : ${entry.value}" th:href="@{/practice/mock/play/{id}(id=${exam.id})}" class="mk-exam-card">
+                <div class="mk-exam-top">
+                    <span class="mk-round-badge" th:text="${exam.round} + '회차'">1회차</span>
+                    <span class="mk-timer-badge">⏱ <span th:text="${exam.timeLimitMinutes}">30</span>분</span>
+                </div>
+
+                <div class="mk-exam-title" th:text="${exam.title}">1회차 모의고사</div>
+                <div class="mk-exam-sub">문제 <b th:text="${exam.poolCount}">20</b>문항</div>
+
+                <div class="mk-exam-foot">
+                    <span class="mk-exam-score" th:if="${exam.lastScore != null}" th:text="${exam.lastScore} + '%'">85%</span>
+                    <span class="mk-exam-score is-none" th:unless="${exam.lastScore != null}">미응시</span>
+                    <span class="mk-exam-btn" th:text="${exam.attemptCount > 0} ? '다시 응시하기' : '응시하기'">응시하기</span>
+                </div>
+            </a>
+        </div>
+    </div>
+
+    <div class="mk-empty" th:if="${groupedExams == null or #maps.isEmpty(groupedExams)}">
+        아직 등록된 모의고사가 없어요.
+    </div>
+
+</div>
+
+<div th:replace="~{layout/footer :: footer}"></div>
+
+</body>
+</html>
