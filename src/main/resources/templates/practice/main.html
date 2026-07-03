@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>배움터 - 끼역띠귿</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&amp;display=swap"
+        rel="stylesheet" />
+  <link rel="stylesheet" th:href="@{/css/main/mainpage.css}">
+  <link rel="stylesheet" th:href="@{/css/layout/navbar.css}">
+  <link rel="stylesheet" th:href="@{/css/layout/footer.css}">
+  <link rel="stylesheet" th:href="@{/css/practice/main.css}">
+</head>
+<body>
+
+<div class="bg-orbs">
+  <div class="orb o1"></div>
+  <div class="orb o2"></div>
+</div>
+
+<div th:replace="~{layout/navbar :: navbar(currentMenu='practiceQuiz')}"></div>
+
+<div class="pl-admin-bar" sec:authorize="hasRole('ADMIN')">
+  <span class="pl-admin-bar-label"><i aria-hidden="true">⚙</i> 관리자로 보고 있어요</span>
+  <div class="pl-admin-bar-links">
+    <a th:href="@{/admin/practice/quiz}">문제 관리 →</a>
+    <a th:href="@{/admin/practice/mock}">모의고사 관리 →</a>
+  </div>
+</div>
+
+<!-- 히어로 (풀블리드) -->
+<section class="pl-hero">
+  <div class="pl-hero-grid"></div>
+  <div class="pl-hero-inner">
+    <th:block sec:authorize="isAuthenticated()">
+      <p class="pl-eyebrow"><span class="pl-eyebrow-dot"></span>배움터</p>
+      <h1><span sec:authentication="name">유니</span>님의<br /><em>실력 다지기</em> 여정</h1>
+      <p class="pl-hero-sub">단원별 연습퀴즈로 감을 잡고, 실전 모의고사로 지금 내 실력을 확인해보세요.</p>
+
+      <div class="pl-hero-actions">
+        <a th:href="@{/practice/quiz}" class="pl-hero-btn pl-hero-btn-primary">연습퀴즈 풀기 →</a>
+        <a th:href="@{/practice/mock}" class="pl-hero-btn pl-hero-btn-ghost">모의고사 응시하기</a>
+      </div>
+
+      <div class="pl-hero-stats">
+        <div class="pl-hero-stat">
+          <div class="pl-hero-stat-num" th:text="${completedQuizCount} ?: '12'">12</div>
+          <div class="pl-hero-stat-label">완료 퀴즈</div>
+        </div>
+        <div class="pl-hero-stat">
+          <div class="pl-hero-stat-num" th:text="${avgAccuracy} ?: '78%'">78%</div>
+          <div class="pl-hero-stat-label">평균 정답률</div>
+        </div>
+        <div class="pl-hero-stat">
+          <div class="pl-hero-stat-num" th:text="${lastMockScore} ?: '84점'">84점</div>
+          <div class="pl-hero-stat-label">최근 모의고사</div>
+        </div>
+      </div>
+    </th:block>
+
+    <th:block sec:authorize="isAnonymous()">
+      <p class="pl-eyebrow"><span class="pl-eyebrow-dot"></span>배움터</p>
+      <h1>가볍게 다지고,<br /><em>진짜 실력</em>으로 확인해요</h1>
+      <p class="pl-hero-sub">단원별 연습퀴즈로 감을 잡고, 실전 모의고사로 지금 내 실력을 확인해보세요.</p>
+
+      <div class="pl-hero-actions">
+        <a th:href="@{/practice/quiz}" class="pl-hero-btn pl-hero-btn-primary">연습퀴즈 풀기 →</a>
+        <a th:href="@{/practice/mock}" class="pl-hero-btn pl-hero-btn-ghost">모의고사 응시하기</a>
+      </div>
+    </th:block>
+  </div>
+</section>
+
+<div class="pl-wrap">
+
+  <!-- 듀얼 카드: 연습퀴즈 vs 실전모의고사 -->
+  <section class="pl-modes">
+    <a th:href="@{/practice/quiz}" class="pl-mode-card pl-mode-quiz">
+      <span class="pl-mode-tag">가볍게 시작</span>
+      <h2>연습퀴즈</h2>
+      <p>단원별로 짧게, 부담 없이. 틀려도 바로 다시 도전할 수 있어요.</p>
+      <span class="pl-mode-cta">단원 고르러 가기 <i aria-hidden="true">→</i></span>
+    </a>
+
+    <a th:href="@{/practice/mock}" class="pl-mode-card pl-mode-mock">
+      <span class="pl-mode-tag">실전 감각</span>
+      <h2>실전 모의고사</h2>
+      <p>시간 제한 안에서 전 범위를 풀어보고, 지금 내 위치를 정확히 확인해요.</p>
+      <span class="pl-mode-cta">모의고사 응시하기 <i aria-hidden="true">→</i></span>
+    </a>
+  </section>
+
+  <!-- 연습퀴즈 카테고리 -->
+  <section class="pl-section">
+    <div class="pl-section-head">
+      <p class="pl-section-tag">연습퀴즈</p>
+      <h2>어떤 단원부터 풀어볼까요</h2>
+    </div>
+
+    <div class="pl-category-grid">
+      <a th:each="category : ${categories}"
+         th:href="@{/practice/quiz(categoryId=${category.id})}"
+         class="pl-category-card">
+        <span class="pl-category-name" th:text="${category.name}">케이팝</span>
+        <span class="pl-category-count" th:text="${category.quizCount} + '문항'">24문항</span>
+      </a>
+
+      <!-- categories가 비어있을 때 보여줄 기본 카드 (미리보기용) -->
+      <div class="pl-category-card" th:if="${categories == null or #lists.isEmpty(categories)}">
+        <span class="pl-category-name">케이팝</span>
+        <span class="pl-category-count">24문항</span>
+      </div>
+      <div class="pl-category-card" th:if="${categories == null or #lists.isEmpty(categories)}">
+        <span class="pl-category-name">드라마 명대사</span>
+        <span class="pl-category-count">18문항</span>
+      </div>
+      <div class="pl-category-card" th:if="${categories == null or #lists.isEmpty(categories)}">
+        <span class="pl-category-name">일상 회화</span>
+        <span class="pl-category-count">32문항</span>
+      </div>
+      <div class="pl-category-card" th:if="${categories == null or #lists.isEmpty(categories)}">
+        <span class="pl-category-name">심화</span>
+        <span class="pl-category-count">15문항</span>
+      </div>
+    </div>
+  </section>
+
+  <!-- 실전 모의고사 응시 이력 -->
+  <section class="pl-section" sec:authorize="isAuthenticated()">
+    <div class="pl-section-head">
+      <p class="pl-section-tag">실전 모의고사</p>
+      <h2>최근 응시 이력</h2>
+    </div>
+
+    <div class="pl-history-list">
+      <div class="pl-history-row" th:each="exam : ${recentExams}">
+        <div class="pl-history-main">
+          <span class="pl-history-title" th:text="${exam.title}">2026년 6월 모의고사</span>
+          <span class="pl-history-date" th:text="${exam.date}">2026.06.28</span>
+        </div>
+        <div class="pl-history-score" th:text="${exam.score} + '점'">84점</div>
+      </div>
+
+      <div class="pl-history-empty" th:if="${recentExams == null or #lists.isEmpty(recentExams)}">
+        아직 응시한 모의고사가 없어요. 첫 실전을 시작해보세요.
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div th:replace="~{layout/footer :: footer}"></div>
+
+</body>
+</html>

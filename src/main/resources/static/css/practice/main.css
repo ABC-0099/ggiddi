@@ -1,0 +1,449 @@
+/* ── 배움터 (연습퀴즈 / 실전모의고사) ── */
+
+.pl-admin-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 10px;
+    background: #12233a;
+    padding: 10px 24px;
+}
+
+.pl-admin-bar-label {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #9FE1CB;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.pl-admin-bar-links {
+    display: flex;
+    gap: 18px;
+}
+
+.pl-admin-bar-links a {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: rgba(255, 255, 255, 0.85);
+    text-decoration: none;
+}
+
+.pl-admin-bar-links a:hover {
+    color: #9FE1CB;
+}
+
+.pl-wrap {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 64px 24px 96px;
+}
+
+/* ── 히어로 (풀블리드 다크 그라디언트) ── */
+.pl-hero {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background: linear-gradient(135deg, #185FA5 0%, #12447e 45%, #1a8f6f 100%);
+    padding: 72px 24px 56px;
+    text-align: center;
+}
+
+.pl-hero-grid {
+    position: absolute;
+    inset: 0;
+    background-image:
+        linear-gradient(rgba(255, 255, 255, 0.07) 1px, transparent 1px),
+        linear-gradient(90deg, rgba(255, 255, 255, 0.07) 1px, transparent 1px);
+    background-size: 40px 40px;
+    mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 40%, transparent 100%);
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 30%, #000 40%, transparent 100%);
+}
+
+.pl-hero-inner {
+    position: relative;
+    max-width: 640px;
+    margin: 0 auto;
+}
+
+.pl-eyebrow {
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13px;
+    font-weight: 700;
+    color: #d8f0e6;
+    background: rgba(255, 255, 255, 0.1);
+    border: 1px solid rgba(255, 255, 255, 0.16);
+    padding: 6px 16px;
+    border-radius: 20px;
+    margin-bottom: 22px;
+}
+
+.pl-eyebrow-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #5DCAA5;
+    flex-shrink: 0;
+}
+
+.pl-hero h1 {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 36px;
+    line-height: 1.45;
+    color: #ffffff;
+    margin: 0 0 16px;
+    font-weight: 900;
+    letter-spacing: -0.5px;
+}
+
+.pl-hero h1 em {
+    font-style: normal;
+    color: #9FE1CB;
+    border-bottom: 3px solid rgba(159, 225, 203, 0.5);
+    padding-bottom: 2px;
+}
+
+.pl-hero-sub {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 15px;
+    line-height: 1.7;
+    color: rgba(255, 255, 255, 0.72);
+    margin: 0 0 30px;
+}
+
+.pl-hero-actions {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+    margin-bottom: 44px;
+}
+
+.pl-hero-btn {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 14px;
+    font-weight: 700;
+    text-decoration: none;
+    padding: 13px 26px;
+    border-radius: 10px;
+    transition: transform 0.15s ease, background 0.15s ease;
+}
+
+.pl-hero-btn-primary {
+    background: #9FE1CB;
+    color: #0d5a41;
+}
+
+.pl-hero-btn-primary:hover {
+    background: #b6ecd9;
+    transform: translateY(-2px);
+}
+
+.pl-hero-btn-ghost {
+    background: transparent;
+    color: #ffffff;
+    border: 1.5px solid rgba(255, 255, 255, 0.35);
+}
+
+.pl-hero-btn-ghost:hover {
+    background: rgba(255, 255, 255, 0.08);
+    transform: translateY(-2px);
+}
+
+.pl-hero-stats {
+    display: inline-flex;
+    gap: 0;
+    background: rgba(255, 255, 255, 0.08);
+    backdrop-filter: blur(14px);
+    -webkit-backdrop-filter: blur(14px);
+    border: 1px solid rgba(255, 255, 255, 0.14);
+    border-radius: 16px;
+    padding: 20px 0;
+}
+
+.pl-hero-stat {
+    padding: 0 30px;
+    border-right: 1px solid rgba(255, 255, 255, 0.14);
+}
+
+.pl-hero-stat:last-child {
+    border-right: none;
+}
+
+.pl-hero-stat-num {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 22px;
+    font-weight: 900;
+    color: #ffffff;
+    margin-bottom: 4px;
+}
+
+.pl-hero-stat-label {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 12px;
+    color: rgba(255, 255, 255, 0.65);
+}
+
+/* ── 듀얼 모드 카드 (시그니처 요소) ──
+   연습퀴즈: 밝고 둥글고 살짝 기운 카드 = 가벼움
+   실전모의고사: 짙고 각지고 곧은 카드 = 무게감/긴장감
+*/
+.pl-modes {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 28px;
+    margin-bottom: 88px;
+}
+
+.pl-mode-card {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    padding: 36px 32px;
+    text-decoration: none;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.pl-mode-card h2 {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 700;
+    font-size: 20px;
+    margin: 4px 0 2px;
+}
+
+.pl-mode-card p {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13.5px;
+    line-height: 1.6;
+    margin: 0;
+}
+
+.pl-mode-tag {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 11.5px;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    width: fit-content;
+    padding: 4px 12px;
+    border-radius: 20px;
+}
+
+.pl-mode-cta {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13.5px;
+    font-weight: 700;
+    margin-top: 14px;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}
+
+.pl-mode-cta i {
+    font-style: normal;
+    transition: transform 0.15s ease;
+}
+
+.pl-mode-card:hover .pl-mode-cta i {
+    transform: translateX(4px);
+}
+
+/* 연습퀴즈: 라이트 민트 글래스, 둥근 코너, 살짝 왼쪽으로 기울어짐 */
+.pl-mode-quiz {
+    background: rgba(159, 225, 203, 0.28);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1.5px solid rgba(93, 202, 165, 0.4);
+    border-radius: 28px;
+    transform: rotate(-0.6deg);
+}
+
+.pl-mode-quiz .pl-mode-tag {
+    background: rgba(93, 202, 165, 0.35);
+    color: #0d5a41;
+}
+
+.pl-mode-quiz h2 { color: #0d5a41; }
+.pl-mode-quiz p { color: #2c6350; }
+.pl-mode-quiz .pl-mode-cta { color: #0d5a41; }
+
+.pl-mode-quiz:hover {
+    transform: rotate(-0.6deg) translateY(-4px);
+    box-shadow: 0 16px 36px rgba(93, 202, 165, 0.28);
+}
+
+/* 실전모의고사: 짙은 네이비 글래스, 각진 코너, 곧게 */
+.pl-mode-mock {
+    background: linear-gradient(160deg, rgba(24, 95, 165, 0.94), rgba(15, 63, 115, 0.94));
+    border: 1.5px solid rgba(24, 95, 165, 0.5);
+    border-radius: 12px;
+    box-shadow: 0 20px 40px rgba(12, 42, 74, 0.22);
+}
+
+.pl-mode-mock .pl-mode-tag {
+    background: rgba(255, 255, 255, 0.16);
+    color: #9FE1CB;
+}
+
+.pl-mode-mock h2 { color: #ffffff; }
+.pl-mode-mock p { color: rgba(255, 255, 255, 0.78); }
+.pl-mode-mock .pl-mode-cta { color: #9FE1CB; }
+
+.pl-mode-mock:hover {
+    transform: translateY(-4px);
+    box-shadow: 0 24px 48px rgba(12, 42, 74, 0.32);
+}
+
+/* 섹션 공통 */
+.pl-section {
+    margin-bottom: 64px;
+}
+
+.pl-section-head {
+    margin-bottom: 24px;
+}
+
+.pl-section-tag {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #5DCAA5;
+    margin: 0 0 6px;
+}
+
+.pl-section-head h2 {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 700;
+    font-size: 22px;
+    color: #12233a;
+    margin: 0;
+}
+
+/* 연습퀴즈 카테고리 그리드 */
+.pl-category-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+}
+
+.pl-category-card {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 22px 20px;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1.5px solid #dce6f0;
+    border-radius: 16px;
+    text-decoration: none;
+    transition: border-color 0.15s, transform 0.15s;
+}
+
+a.pl-category-card:hover {
+    border-color: #5DCAA5;
+    transform: translateY(-3px);
+}
+
+.pl-category-name {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 700;
+    font-size: 15px;
+    color: #12233a;
+}
+
+.pl-category-count {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 12.5px;
+    color: #8fa0b3;
+}
+
+/* 실전모의고사 응시 이력 */
+.pl-history-list {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.pl-history-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 16px 22px;
+    background: rgba(255, 255, 255, 0.6);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1.5px solid #dce6f0;
+    border-radius: 12px;
+}
+
+.pl-history-main {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+}
+
+.pl-history-title {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-weight: 700;
+    font-size: 14px;
+    color: #12233a;
+}
+
+.pl-history-date {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 12px;
+    color: #8fa0b3;
+}
+
+.pl-history-score {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 20px;
+    font-weight: 900;
+    color: #185FA5;
+}
+
+.pl-history-empty {
+    font-family: 'Noto Sans KR', sans-serif;
+    font-size: 13.5px;
+    color: #8fa0b3;
+    padding: 28px 22px;
+    text-align: center;
+    background: rgba(255, 255, 255, 0.4);
+    border: 1.5px dashed #dce6f0;
+    border-radius: 12px;
+}
+
+/* 모바일 */
+@media (max-width: 768px) {
+    .pl-hero { padding: 52px 20px 40px; }
+    .pl-hero h1 { font-size: 26px; }
+    .pl-hero-actions { flex-direction: column; align-items: stretch; }
+    .pl-hero-stats { flex-wrap: wrap; padding: 16px 0; }
+    .pl-hero-stat { padding: 8px 18px; }
+
+    .pl-wrap { padding: 40px 18px 72px; }
+
+    .pl-modes {
+        grid-template-columns: 1fr;
+        gap: 18px;
+        margin-bottom: 56px;
+    }
+
+    .pl-mode-quiz { transform: none; }
+    .pl-mode-quiz:hover { transform: translateY(-3px); }
+
+    .pl-category-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+
+    .pl-history-row {
+        padding: 14px 16px;
+    }
+}

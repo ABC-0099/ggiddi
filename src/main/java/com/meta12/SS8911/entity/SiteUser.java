@@ -26,9 +26,16 @@ public class SiteUser {
     @Enumerated(EnumType.STRING)
     private Role role;
 
-    // 연속 출석 관련 필드
-    private int streakDays;              // 연속 출석일수
-    private LocalDateTime lastLoginDate; // 마지막 로그인 시각
+    private int streakDays;
+    private LocalDateTime lastLoginDate;
+    private LocalDateTime joinDate;
 
-    private LocalDateTime joinDate;      // 가입일
+    // ★ 추가: 탈퇴 관련 필드
+    private boolean withdrawn;
+    private LocalDateTime withdrawnDate;
+
+    // ★ 추가: 화면에 표시할 이름 (탈퇴 회원이면 "탈퇴한 회원"으로 표시)
+    public String getDisplayName() {
+        return withdrawn ? "탈퇴한 회원" : username;
+    }
 }
