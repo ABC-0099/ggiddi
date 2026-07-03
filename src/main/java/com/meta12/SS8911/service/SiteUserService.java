@@ -1,6 +1,7 @@
 package com.meta12.SS8911.service;
 
 import com.meta12.SS8911.dto.SiteUserDTO;
+import com.meta12.SS8911.dto.SiteUserEditDTO;
 import com.meta12.SS8911.config.Role;
 import com.meta12.SS8911.entity.SiteUser;
 import com.meta12.SS8911.exception.DataNotFoundException;
@@ -21,7 +22,6 @@ public class SiteUserService implements UserDetailsService {
 
     @Transactional
     public void chugaProc(SiteUserDTO dto) {
-        // [추가] 가입 전 중복 아이디 체크
         if (siteUserRepository.existsByUsername(dto.getUsername())) {
             throw new IllegalStateException("이미 존재하는 아이디입니다.");
         }
@@ -35,8 +35,8 @@ public class SiteUserService implements UserDetailsService {
         user.setEmail(dto.getEmail());
         user.setNationality(dto.getNationality());
 
-        user.setRole(Role.USER); // 가입 시 기본 권한 USER 부여
-        user.setJoinDate(LocalDateTime.now()); // 가입일 저장
+        user.setRole(Role.USER);
+        user.setJoinDate(LocalDateTime.now());
 
         siteUserRepository.save(user);
     }
@@ -46,10 +46,12 @@ public class SiteUserService implements UserDetailsService {
         SiteUser siteUser = siteUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
 
+        // ★ 탈퇴한 계정은 로그인 자체를 막음 (Spring Security가 자동으로 걸러줌)
         return User.builder()
                 .username(siteUser.getUsername())
                 .password(siteUser.getPassword())
                 .roles(siteUser.getRole().name())
+                .disabled(siteUser.isWithdrawn())
                 .build();
     }
 
@@ -61,5 +63,38 @@ public class SiteUserService implements UserDetailsService {
     public SiteUser getUserByUsername(String username) {
         return siteUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
+    }
+
+    // ★ 회원정보 수정
+    @Transactional
+    public void updateInfo(String username, SiteUserEditDTO dto) {
+        SiteUser user = getUserByUsername(username);
+
+        if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
+            throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
+        }
+
+        user.setName(dto.getName());
+        user.setEmail(dto.getEmail());
+        user.setPhone(dto.getPhone());
+        user.setBirth(dto.getBirth());
+        user.setNationality(dto.getNationality());
+
+        siteUserRepository.save(user);
+    }
+
+    // ★ 회원 탈퇴 (소프트 삭제)
+    @Transactional
+    public void withdraw(String username, String currentPassword) {
+        SiteUser user = getUserByUsername(username);
+
+        if (!passwordEncoder.matches(currentPassword, user.getPassword())) {
+            throw new IllegalStateException("비밀번호가 일치하지 않습니다.");
+        }
+
+        user.setWithdrawn(true);
+        user.setWithdrawnDate(LocalDateTime.now());
+
+        siteUserRepository.save(user);
     }
 }
