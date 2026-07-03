@@ -97,6 +97,8 @@ public class SiteUserController {
         dto.setBirth(user.getBirth());
         dto.setNationality(user.getNationality());
 
+        System.out.println("siteUser : " + user);
+
         model.addAttribute("siteUser", user);
         model.addAttribute("siteUserEditDTO", dto);
 
@@ -105,12 +107,28 @@ public class SiteUserController {
 
     // 수정 완료: 중복된 editProc 메서드를 하나로 통합
     @PostMapping("/siteUser/editProc")
-    public String editProc(@Valid @ModelAttribute("siteUserEditDTO") SiteUserEditDTO dto,
-                           BindingResult bindingResult,
-                           Principal principal,
-                           RedirectAttributes rttr) {
+    public String editProc(
+            @Valid @ModelAttribute("siteUserEditDTO") SiteUserEditDTO dto,
+            BindingResult bindingResult,
+            Principal principal,
+            Model model,
+            RedirectAttributes rttr) {
 
         if (bindingResult.hasErrors()) {
+
+            System.out.println("===== Validation Errors =====");
+
+            bindingResult.getFieldErrors().forEach(error -> {
+                System.out.println(
+                        "field = " + error.getField()
+                                + ", rejectedValue = " + error.getRejectedValue()
+                                + ", message = " + error.getDefaultMessage()
+                );
+            });
+
+            SiteUser user = siteUserService.getUserByUsername(principal.getName());
+            model.addAttribute("siteUser", user);
+
             return "siteUser/edit";
         }
 
@@ -121,6 +139,7 @@ public class SiteUserController {
             rttr.addFlashAttribute("errorMsg", e.getMessage());
             return "redirect:/siteUser/edit";
         }
+
         return "redirect:/siteUser/mypage";
     }
 
