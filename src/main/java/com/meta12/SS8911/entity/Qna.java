@@ -23,9 +23,6 @@ public class Qna {
     @Column(columnDefinition = "TEXT")
     private String content;
 
-    @Column(columnDefinition = "TEXT")
-    private String answer;
-
     @Enumerated(EnumType.STRING)
     @Column(nullable = false)
     private QnaCategory category;
@@ -37,7 +34,6 @@ public class Qna {
     private SiteUser author;
 
     private LocalDateTime createdDate;
-    private LocalDateTime answeredDate;
 
     @PrePersist
     public void prePersist() {
@@ -48,4 +44,8 @@ public class Qna {
 
     @OneToMany(mappedBy = "qna", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
     private List<QnaFile> files = new ArrayList<>();
+
+    // 질문 하나에 답변 여러 개 가능
+    @OneToMany(mappedBy = "qna", fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval = true)
+    private List<Answer> answers = new ArrayList<>();
 }
