@@ -1,0 +1,41 @@
+/* 이벤트 상세 페이지 전체 영역 */
+.event-detail {
+    max-width: 1200px;
+    margin: 50px auto;
+    text-align: center;
+    padding: 20px;
+}
+
+/* 이벤트 포스터 이미지 */
+.event-poster {
+    width: 800px;
+    max-width: 100%;
+    height: auto;
+    border-radius: 20px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.1);
+}
+
+/* 이벤트 설명 영역 */
+.event-content {
+    width: 800px;
+    max-width: 100%;
+    margin: 40px auto;
+    padding: 40px;
+    background-color: white;
+    border-radius: 20px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+
+    text-align: left;
+    line-height: 2;
+    font-size: 18px;
+}
+
+.event-content h2 {
+    margin-top: 40px;
+    margin-bottom: 15px;
+    font-size: 24px;
+}
+
+.event-content hr {
+    margin: 40px 0;
+}

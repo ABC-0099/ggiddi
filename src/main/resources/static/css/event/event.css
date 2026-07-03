@@ -204,3 +204,12 @@ body{
     font-size: 18px;
     font-weight: bold;
 }
+
+.event-link {
+    text-decoration: none;
+    color: inherit;
+}
+
+.event-card {
+    cursor: pointer;
+}
