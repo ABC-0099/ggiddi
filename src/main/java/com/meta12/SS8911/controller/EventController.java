@@ -25,5 +25,13 @@ public class EventController {
         return "event/event";
     }
 
+    @GetMapping("/{id}")
+    public String eventDetail(@PathVariable Long id, Model model) {
+
+        model.addAttribute("eventId", id);
+
+        return "event/eventDetail";
+    }
+
 
 }

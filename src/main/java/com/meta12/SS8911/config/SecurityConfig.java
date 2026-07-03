@@ -7,6 +7,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
+import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 
 @Configuration
 @EnableWebSecurity
@@ -59,6 +60,11 @@ public class SecurityConfig {
                 .csrf(csrf -> csrf
                         // WebSocket 핸드셰이크는 STOMP 프레임 자체로 인증되므로 CSRF 토큰 검사에서 제외
                         .ignoringRequestMatchers("/ws/chat/**")
+                        // ★ 세션 대신 쿠키(XSRF-TOKEN)에 CSRF 토큰 저장
+                        //   → 큰 페이지 렌더링 중간에 응답이 커밋된 후 세션을 새로 만들려다
+                        //     발생하는 IllegalStateException("Cannot create a session after
+                        //     the response has been committed") 를 근본적으로 방지
+                        .csrfTokenRepository(CookieCsrfTokenRepository.withHttpOnlyFalse())
                 )
                 .headers(headers -> headers
                         // ★ 기본값 DENY는 iframe(유니티 게임 창)을 전부 막으므로 같은 출처는 허용하도록 변경
