@@ -644,3 +644,39 @@ html, body {
 .heat-day.active {
     background-color: #00E396; /* 출석 색상 */
 }
+
+/* 사이드바 내 월간 출석부 달력 전용 스타일 */
+.calendar-wrapper {
+    width: 100%;             /* 사이드바 너비 100% */
+    box-sizing: border-box;  /* 중요: 패딩을 너비 계산에 포함 */
+    margin-top: 15px;
+    padding: 15px;           /* 내부 여백 */
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #eef2f5;
+}
+
+#calendarGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr); /* 7열 균등 배치 */
+    gap: 5px;                /* 사각형 간 간격 */
+    width: 100%;             /* 그리드 너비 100% */
+    box-sizing: border-box;
+}
+
+.calendar-day {
+    aspect-ratio: 1 / 1;     /* 1:1 정사각형 유지 */
+    background-color: #ebedf0;
+    border-radius: 4px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    width: 100%;             /* 그리드 셀에 꽉 차게 */
+    box-sizing: border-box;
+}
+
+.calendar-day.active {
+    background-color: #00E396;
+    color: white;
+}
