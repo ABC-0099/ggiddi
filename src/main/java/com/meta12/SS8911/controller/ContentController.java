@@ -5,12 +5,14 @@ import com.meta12.SS8911.config.Role;
 import com.meta12.SS8911.entity.Category;
 import com.meta12.SS8911.entity.Content;
 import com.meta12.SS8911.entity.Progress;
+import com.meta12.SS8911.entity.Quiz;
 import com.meta12.SS8911.entity.SiteUser;
 import com.meta12.SS8911.repository.OrderPayRepository;
 import com.meta12.SS8911.repository.ProgressRepository;
 import com.meta12.SS8911.repository.SiteUserRepository;
 import com.meta12.SS8911.service.CategoryService;
 import com.meta12.SS8911.service.ContentService;
+import com.meta12.SS8911.service.QuizService;
 import com.meta12.SS8911.service.SiteUserService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.core.io.Resource;
@@ -35,7 +37,7 @@ public class ContentController {
 
     private final ContentService contentService;
     private final CategoryService categoryService;
-    //    private final QuizService quizService;
+    private final QuizService quizService;
     private final SiteUserService siteUserService;
 
     private final OrderPayRepository orderPayRepository;
@@ -109,8 +111,18 @@ public class ContentController {
         model.addAttribute("savedTime", (progress != null) ? progress.getLastWatchedTime() : 0);
         model.addAttribute("content", content);
         model.addAttribute("contentList", contentService.list(category.getId(), currentUser));
-//        model.addAttribute("quizList", quizService.getQuizByLectureId(id));
         model.addAttribute("isPaid", true);
+
+        // ── 영상 완료 후 임베드 퀴즈 ──
+        Quiz quiz = quizService.getQuizEntityForContent(id);
+        if (quiz != null) {
+            model.addAttribute("quizId", quiz.getId());
+            model.addAttribute("quizTitle", quiz.getTitle());
+            boolean quizUnlocked = quizService.isUnlocked(quiz, principal.getName());
+            model.addAttribute("quizUnlocked", quizUnlocked);
+        } else {
+            model.addAttribute("quizId", null);
+        }
 
         return "content/view";
     }

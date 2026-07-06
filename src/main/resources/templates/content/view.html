@@ -133,42 +133,36 @@
         </div>
 
         <!-- 퀴즈 (컴팩트) -->
-        <div class="sidebar-card" style="position:relative;" id="quiz-card">
+        <div class="sidebar-card" style="position:relative;" id="quiz-card" th:if="${quizId != null}">
             <!-- 잠금 오버레이 -->
-            <div class="quiz-locked-overlay" id="quiz-locked-overlay">
+            <div class="quiz-locked-overlay" id="quiz-locked-overlay" th:style="${quizUnlocked} ? 'display:none;' : ''">
                 <div class="quiz-lock-icon">🔒</div>
                 <div class="quiz-lock-title">강의를 완료하면 퀴즈가 열려요!</div>
                 <div class="quiz-lock-desc">영상을 끝까지 시청하고<br/>실력을 확인해보세요 ✨</div>
                 <div class="quiz-lock-bar-wrap" style="margin-top:4px;">
-                    <div class="quiz-lock-bar" id="quiz-lock-bar" style="width:38%;"></div>
+                    <div class="quiz-lock-bar" id="quiz-lock-bar" th:style="'width:' + ${content.progressPercent} + '%;'"></div>
                 </div>
-                <div style="font-size:11px;color:var(--ink-faint);margin-top:2px;" id="quiz-lock-pct">38% 시청</div>
+                <div style="font-size:11px;color:var(--ink-faint);margin-top:2px;" id="quiz-lock-pct" th:text="${content.progressPercent} + '% 시청'">0% 시청</div>
             </div>
 
             <div class="sidebar-header">
-                📋 퀴즈 <span id="quiz-count">1 / 4</span>
+                📋 퀴즈 <span id="quiz-count">불러오는 중…</span>
             </div>
 
             <div style="padding:16px;">
 
                 <!-- 진행 바 -->
                 <div style="height:4px;background:var(--border);border-radius:2px;overflow:hidden;margin-bottom:14px;">
-                    <div id="qp-fill" style="height:100%;width:25%;background:linear-gradient(90deg,var(--mint-dark),var(--mint));border-radius:2px;transition:width .3s;"></div>
+                    <div id="qp-fill" style="height:100%;width:0%;background:linear-gradient(90deg,var(--mint-dark),var(--mint));border-radius:2px;transition:width .3s;"></div>
                 </div>
 
                 <!-- 문제 -->
                 <div id="quiz-main">
                     <div id="quiz-question" style="font-size:13px;font-weight:700;color:var(--ink);line-height:1.55;margin-bottom:12px;">
-                        <span style="display:inline-block;background:var(--mint);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;margin-right:5px;vertical-align:middle;">Q1</span>
-                        "밥"의 뜻으로 올바른 것은?
+                        퀴즈를 준비하고 있어요…
                     </div>
 
-                    <div id="quiz-options" style="display:flex;flex-direction:column;gap:7px;margin-bottom:12px;">
-                        <div class="cq-opt" onclick="selectOption(this,0)"><span class="cq-letter">A</span><span>물</span></div>
-                        <div class="cq-opt" onclick="selectOption(this,1)"><span class="cq-letter">B</span><span>밥 (쌀로 만든 음식)</span></div>
-                        <div class="cq-opt" onclick="selectOption(this,2)"><span class="cq-letter">C</span><span>고기</span></div>
-                        <div class="cq-opt" onclick="selectOption(this,3)"><span class="cq-letter">D</span><span>채소</span></div>
-                    </div>
+                    <div id="quiz-options" style="display:flex;flex-direction:column;gap:7px;margin-bottom:12px;"></div>
 
                     <div id="quiz-feedback" style="display:none;font-size:12px;padding:9px 12px;border-radius:8px;margin-bottom:10px;line-height:1.55;"></div>
 
@@ -225,6 +219,8 @@
 
     const contentId  = /*[[${content.id}]]*/ 0;
     const savedTime  = /*[[${savedTime}]]*/ 0;
+    const quizId     = /*[[${quizId}]]*/ null;
+    const quizUnlockedInitial = /*[[${quizUnlocked}]]*/ false;
     const csrfToken  = document.querySelector('meta[name="_csrf"]')?.content;
     const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
 
@@ -238,15 +234,21 @@
 
     function updateProgressUI(pct) {
       progressBar.style.width = pct + '%';
-      lockBar.style.width     = pct + '%';
-      lockPct.textContent     = Math.round(pct) + '% 시청';
+      if (lockBar) lockBar.style.width = pct + '%';
+      if (lockPct) lockPct.textContent = Math.round(pct) + '% 시청';
       timeDisplay.textContent = `${secToStr(video.currentTime)} / ${secToStr(video.duration)}`;
     }
 
+    let quizLoaded = false;
+
     function unlockQuiz() {
-      lockOverlay.style.transition = 'opacity .5s';
-      lockOverlay.style.opacity = '0';
-      setTimeout(() => { lockOverlay.style.display = 'none'; }, 500);
+      if (!quizId) return;
+      if (lockOverlay) {
+        lockOverlay.style.transition = 'opacity .5s';
+        lockOverlay.style.opacity = '0';
+        setTimeout(() => { lockOverlay.style.display = 'none'; }, 500);
+      }
+      if (!quizLoaded) loadQuiz();
     }
 
     // 재생 시작 위치 복원 (이어보기)
@@ -335,59 +337,62 @@
     playBtn.addEventListener('click', function(e) { e.stopPropagation(); togglePlay(); });
 
 
-    // ── 퀴즈 ──
-    const quizData = [
-      {
-        q: '"밥"의 뜻으로 올바른 것은?',
-        options: ['물', '밥 (쌀로 만든 음식)', '고기', '채소'],
-        answer: 1,
-        fc: '✅ 정답! 밥(bap)은 쌀로 만든 한국의 주식이에요.',
-        fw: '❌ 틀렸어요. 정답은 "밥 (쌀로 만든 음식)"이에요.'
-      },
-      {
-        q: '"물 주세요"를 한국어로 올바르게 표현한 것은?',
-        options: ['밥 주세요', '고기 주세요', '물 주세요 (mul juseyo)', '채소 주세요'],
-        answer: 2,
-        fc: '✅ 정답! "물 주세요 (mul juseyo)"는 식당에서 자주 써요.',
-        fw: '❌ 틀렸어요. "물 주세요 (mul juseyo)"가 정답이에요.'
-      },
-      {
-        q: '"고기 (gogi)"의 종류가 아닌 것은?',
-        options: ['소고기 (sogogi)', '돼지고기 (dwaejigogi)', '채소고기 (chaesogogi)', '닭고기 (dakgogi)'],
-        answer: 2,
-        fc: '✅ 정답! 채소고기는 없는 표현이에요.',
-        fw: '❌ 틀렸어요. "채소고기"는 존재하지 않는 표현이에요.'
-      },
-      {
-        q: '"채소 (chaeso)"와 같은 의미로 쓰이는 단어는?',
-        options: ['고기', '야채', '과일', '음료'],
-        answer: 1,
-        fc: '✅ 정답! 채소와 야채는 같은 뜻으로 사용돼요.',
-        fw: '❌ 틀렸어요. 채소는 "야채"라고도 해요.'
-      },
-    ];
+    // ── 퀴즈 (실제 /api/quiz 연동) ──
+    let quizQuestions = [];
+    let currentQ = 0, selectedOptIdx = null, score = 0, answered = false;
 
-    let currentQ = 0, selectedOpt = null, score = 0, answered = false;
+    function apiHeaders(json) {
+      const h = {};
+      if (json) h['Content-Type'] = 'application/json';
+      if (csrfHeader && csrfToken) h[csrfHeader] = csrfToken;
+      return h;
+    }
 
-    document.getElementById('quiz-options').addEventListener('click', function(e) {
+    function loadQuiz() {
+      if (!quizId || quizLoaded) return;
+      quizLoaded = true;
+      document.getElementById('quiz-question').textContent = '퀴즈를 불러오는 중…';
+
+      fetch('/api/quiz/' + quizId + '/start-embedded', { headers: apiHeaders(false) })
+        .then(res => res.json())
+        .then(data => {
+          quizQuestions = data.questions || [];
+          currentQ = 0; score = 0;
+          if (quizQuestions.length === 0) {
+            document.getElementById('quiz-question').textContent = '등록된 문항이 없어요.';
+            return;
+          }
+          renderQuestion();
+        })
+        .catch(() => {
+          document.getElementById('quiz-question').textContent = '퀴즈를 불러오지 못했어요. 새로고침해주세요.';
+        });
+    }
+
+    // 이미 영상을 완료한 상태로 페이지에 들어온 경우 바로 로드
+    if (quizId && quizUnlockedInitial) {
+      loadQuiz();
+    }
+
+    document.addEventListener('click', function (e) {
       const opt = e.target.closest('.cq-opt');
       if (!opt || answered) return;
       document.querySelectorAll('#quiz-options .cq-opt').forEach(o => o.classList.remove('selected'));
       opt.classList.add('selected');
-      selectedOpt = parseInt(opt.dataset.idx);
+      selectedOptIdx = parseInt(opt.dataset.idx, 10);
       const btn = document.getElementById('qbtn-submit');
-      btn.disabled = false;
-      btn.style.opacity = '1';
+      if (btn) { btn.disabled = false; btn.style.opacity = '1'; }
     });
 
     function renderQuestion() {
-      const q = quizData[currentQ];
-      const letters = ['A','B','C','D'];
+      const q = quizQuestions[currentQ];
+      const letters = ['A', 'B', 'C', 'D'];
+      const options = q.options || [];
 
       document.getElementById('quiz-question').innerHTML =
-        `<span style="display:inline-block;background:var(--mint);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;margin-right:5px;vertical-align:middle;">Q${currentQ+1}</span>${q.q}`;
+        `<span style="display:inline-block;background:var(--mint);color:#fff;font-size:10px;font-weight:700;padding:1px 7px;border-radius:20px;margin-right:5px;vertical-align:middle;">Q${currentQ + 1}</span>${q.question}`;
 
-      document.getElementById('quiz-options').innerHTML = q.options.map((o, i) =>
+      document.getElementById('quiz-options').innerHTML = options.map((o, i) =>
         `<div class="cq-opt" data-idx="${i}"><span class="cq-letter">${letters[i]}</span><span>${o}</span></div>`
       ).join('');
 
@@ -400,62 +405,90 @@
       document.getElementById('qbtn-next').style.display = 'none';
       document.getElementById('qbtn-next').textContent = '다음 →';
       document.querySelector('[onclick="skipQuestion()"]').style.display = '';
-      document.getElementById('quiz-count').textContent = `${currentQ+1} / ${quizData.length}`;
-      document.getElementById('qp-fill').style.width = `${((currentQ+1)/quizData.length)*100}%`;
+      document.getElementById('quiz-count').textContent = `${currentQ + 1} / ${quizQuestions.length}`;
+      document.getElementById('qp-fill').style.width = `${((currentQ + 1) / quizQuestions.length) * 100}%`;
 
-      selectedOpt = null; answered = false;
+      selectedOptIdx = null; answered = false;
     }
 
     function submitAnswer() {
-      if (selectedOpt === null || answered) return;
+      if (selectedOptIdx === null || answered) return;
       answered = true;
-      const q = quizData[currentQ];
+      const q = quizQuestions[currentQ];
       const opts = document.querySelectorAll('#quiz-options .cq-opt');
       const fb = document.getElementById('quiz-feedback');
 
-      if (selectedOpt === q.answer) {
-        opts[selectedOpt].classList.remove('selected'); opts[selectedOpt].classList.add('correct');
-        opts[selectedOpt].querySelector('.cq-letter').style.background = 'var(--mint-dark)';
-        opts[selectedOpt].querySelector('.cq-letter').style.color = '#fff';
-        fb.style.background = 'var(--mint-pale)'; fb.style.color = 'var(--mint-dark)';
-        fb.style.border = '1px solid rgba(93,202,165,.3)'; fb.textContent = q.fc; score++;
-      } else {
-        opts[selectedOpt].classList.remove('selected'); opts[selectedOpt].classList.add('wrong');
-        opts[selectedOpt].querySelector('.cq-letter').style.background = '#EF4444';
-        opts[selectedOpt].querySelector('.cq-letter').style.color = '#fff';
-        opts[q.answer].classList.add('correct');
-        opts[q.answer].querySelector('.cq-letter').style.background = 'var(--mint-dark)';
-        opts[q.answer].querySelector('.cq-letter').style.color = '#fff';
-        fb.style.background = '#FEF2F2'; fb.style.color = '#EF4444';
-        fb.style.border = '1px solid rgba(239,68,68,.2)'; fb.textContent = q.fw;
-      }
+      // 서버가 정답 여부/해설을 판정 (문항에는 정답이 안 내려오므로 서버 응답 기준으로 표시)
+      fetch('/api/quiz/question/' + q.id + '/check', {
+        method: 'POST',
+        headers: apiHeaders(true),
+        body: JSON.stringify({ selectedOption: selectedOptIdx + 1 }) // option1~4 → 1~4
+      })
+        .then(res => res.json())
+        .then(result => {
+          if (result.correct) {
+            opts[selectedOptIdx].classList.remove('selected'); opts[selectedOptIdx].classList.add('correct');
+            opts[selectedOptIdx].querySelector('.cq-letter').style.background = 'var(--mint-dark)';
+            opts[selectedOptIdx].querySelector('.cq-letter').style.color = '#fff';
+            fb.style.background = 'var(--mint-pale)'; fb.style.color = 'var(--mint-dark)';
+            fb.style.border = '1px solid rgba(93,202,165,.3)';
+            fb.textContent = '✅ 정답이에요! ' + (result.explanation || '');
+            score++;
+          } else {
+            const correctIdx = (result.correctAnswer || 1) - 1;
+            opts[selectedOptIdx].classList.remove('selected'); opts[selectedOptIdx].classList.add('wrong');
+            opts[selectedOptIdx].querySelector('.cq-letter').style.background = '#EF4444';
+            opts[selectedOptIdx].querySelector('.cq-letter').style.color = '#fff';
+            if (opts[correctIdx]) {
+              opts[correctIdx].classList.add('correct');
+              opts[correctIdx].querySelector('.cq-letter').style.background = 'var(--mint-dark)';
+              opts[correctIdx].querySelector('.cq-letter').style.color = '#fff';
+            }
+            fb.style.background = '#FEF2F2'; fb.style.color = '#EF4444';
+            fb.style.border = '1px solid rgba(239,68,68,.2)';
+            fb.textContent = '❌ 아쉬워요. ' + (result.explanation || '');
+          }
 
-      fb.style.display = 'block';
-      document.getElementById('qbtn-submit').style.display = 'none';
-      document.getElementById('qbtn-next').style.display = '';
-      document.querySelector('[onclick="skipQuestion()"]').style.display = 'none';
-      document.getElementById('quiz-score-badge').textContent = `${score}점`;
-      if (currentQ === quizData.length - 1) document.getElementById('qbtn-next').textContent = '결과 보기 →';
+          fb.style.display = 'block';
+          document.getElementById('qbtn-submit').style.display = 'none';
+          document.getElementById('qbtn-next').style.display = '';
+          document.querySelector('[onclick="skipQuestion()"]').style.display = 'none';
+          document.getElementById('quiz-score-badge').textContent = `${score}점`;
+          if (currentQ === quizQuestions.length - 1) document.getElementById('qbtn-next').textContent = '결과 보기 →';
+        })
+        .catch(() => {
+          fb.style.display = 'block';
+          fb.textContent = '채점 중 오류가 발생했어요. 다시 시도해주세요.';
+          answered = false;
+        });
     }
 
     function nextQuestion() {
       currentQ++;
-      if (currentQ >= quizData.length) showResult();
+      if (currentQ >= quizQuestions.length) finishQuiz();
       else renderQuestion();
     }
 
     function skipQuestion() {
       if (answered) return;
       currentQ++;
-      if (currentQ >= quizData.length) showResult();
+      if (currentQ >= quizQuestions.length) finishQuiz();
       else renderQuestion();
+    }
+
+    function finishQuiz() {
+      fetch('/api/quiz/' + quizId + '/finish', {
+        method: 'POST',
+        headers: apiHeaders(true),
+        body: JSON.stringify({ score: score, total: quizQuestions.length })
+      }).finally(showResult);
     }
 
     function showResult() {
       document.getElementById('quiz-main').style.display = 'none';
       document.getElementById('quiz-result').style.display = 'block';
-      const pct = Math.round((score / quizData.length) * 100);
-      document.getElementById('result-score').textContent = `${score} / ${quizData.length}`;
+      const pct = Math.round((score / quizQuestions.length) * 100);
+      document.getElementById('result-score').textContent = `${score} / ${quizQuestions.length}`;
       document.getElementById('result-emoji').textContent = pct >= 75 ? '🎉' : pct >= 50 ? '🙂' : '😅';
       document.getElementById('result-label').textContent =
         pct >= 75 ? '훌륭해요! 다음 강의로 넘어가볼까요?' :
@@ -465,11 +498,12 @@
     }
 
     function resetQuiz() {
-      currentQ = 0; score = 0; selectedOpt = null; answered = false;
+      quizLoaded = false;
+      currentQ = 0; score = 0; selectedOptIdx = null; answered = false;
       document.getElementById('quiz-main').style.display = 'block';
       document.getElementById('quiz-result').style.display = 'none';
       document.getElementById('quiz-score-badge').textContent = '0점';
-      renderQuestion();
+      loadQuiz();
     }
 
 </script>
