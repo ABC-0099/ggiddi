@@ -6,7 +6,6 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDateTime;
-import java.util.List;
 
 @Getter
 @Setter
@@ -28,6 +27,7 @@ public class ContentDTO {
     private String fileName;
     private String thumbFileName;
     private String attachFileName;      // 기존 필드 그대로 유지
+    private String attachFileOrigin;    // 첨부파일 원본 파일명 (표시용)
 
     // ── 신규 필드 ──
     private Integer stage;
@@ -40,9 +40,6 @@ public class ContentDTO {
     private boolean free;
     private String videoOriginalName;
 
-    // 다중 첨부파일 (신규 기능)
-    private List<MultipartFile> newAttachFiles;
-    private List<Long> deleteAttachIds;
-
     private boolean deleteVideo;
+    private boolean deleteAttach;
 }

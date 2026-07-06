@@ -164,42 +164,35 @@
                             <span class="card-badge-opt">선택</span>
                         </div>
 
-                        <!-- 기존 첨부파일 목록 -->
-                        <div th:if="${lectureForm.existingAttachFiles != null and !lectureForm.existingAttachFiles.isEmpty()}">
-                            <div class="existing-label" style="margin-bottom:8px;">
+                        <!-- 기존 첨부파일 -->
+                        <div class="existing-video" id="existing-attach-wrap"
+                             th:if="${lectureForm.attachFileName != null and !lectureForm.attachFileName.isEmpty()}">
+                            <div class="existing-label">
                                 <span class="existing-badge">현재 첨부파일</span>
+                                <button type="button" class="change-file-btn" onclick="toggleReupload('attach')">
+                                    🔄 파일 교체
+                                </button>
                             </div>
-                            <ul class="attach-list" id="existing-attach-list">
-                                <li class="attach-item" th:each="file : ${lectureForm.existingAttachFiles}">
-                                    <span class="attach-icon">📄</span>
-                                    <span class="attach-name" th:text="${file.originalName}"></span>
-                                    <span class="attach-size" th:text="${#numbers.formatDecimal(file.size / 1048576.0, 1, 1)} + ' MB'"></span>
-                                    <button type="button" class="attach-remove"
-                                            th:onclick="'deleteExistingAttach(this, ' + ${file.id} + ')'"
-                                            title="삭제">✕</button>
-                                    <input type="hidden" name="deleteAttachIds" th:value="${file.id}"
-                                           th:id="'del-attach-' + ${file.id}" disabled />
-                                </li>
-                            </ul>
-                            <div style="height:12px;"></div>
+                            <div class="existing-info" th:text="${lectureForm.attachFileOrigin}"></div>
+                            <!-- 교체/삭제 시 기존 첨부파일 삭제 플래그 -->
+                            <input type="hidden" name="deleteAttach" id="delete-attach-flag" value="false" />
                         </div>
 
-                        <!-- 새 첨부파일 추가 -->
-                        <div class="existing-label" style="margin-bottom:8px;">
-                            <span class="existing-badge" style="background:var(--navy-light);color:var(--navy);">파일 추가</span>
-                        </div>
-                        <div class="upload-zone attach-zone" id="attach-zone">
-                            <input type="file" id="attachFiles" name="attachFiles"
-                                   multiple
-                                   accept=".pdf,.ppt,.pptx,.doc,.docx,.hwp,.zip,.jpg,.png"
-                                   class="upload-input" />
-                            <div class="upload-placeholder" id="attach-placeholder">
-                                <div class="upload-icon" style="font-size:28px;">📄</div>
-                                <div class="upload-text">파일을 드래그하거나 클릭해서 추가</div>
-                                <div class="upload-sub">PDF, PPT, HWP, 이미지, ZIP · 파일당 최대 100MB · 최대 5개</div>
+                        <!-- 첨부파일 재업로드 존 (기존 파일 없으면 기본 표시) -->
+                        <div id="attach-reupload-wrap"
+                             th:style="${lectureForm.attachFileName == null or lectureForm.attachFileName.isEmpty()} ? '' : 'display:none;'">
+                            <div class="upload-zone attach-zone" id="attach-zone">
+                                <input type="file" id="attachFile" name="attachFile"
+                                       accept=".pdf,.ppt,.pptx,.doc,.docx,.hwp,.zip,.jpg,.png"
+                                       class="upload-input" />
+                                <div class="upload-placeholder" id="attach-placeholder">
+                                    <div class="upload-icon" style="font-size:28px;">📄</div>
+                                    <div class="upload-text">파일을 드래그하거나 클릭해서 업로드</div>
+                                    <div class="upload-sub">PDF, PPT, HWP, 이미지, ZIP · 최대 100MB</div>
+                                </div>
                             </div>
+                            <ul class="attach-list" id="attach-list"></ul>
                         </div>
-                        <ul class="attach-list" id="attach-list"></ul>
                     </section>
 
                 </div>
@@ -233,8 +226,8 @@
                             <label class="field-label">무료 공개 여부</label>
                             <div class="toggle-row">
                                 <label class="toggle">
-                                    <input type="checkbox" name="isFree" th:field="*{isFree}" id="isFree" />
-                                    <span class="toggle-slider"></span>
+                                    <input type="checkbox" name="free" th:field="*{free}" id="free" />
+                                    <span class="toggle-slider" id="free-slider"></span>
                                 </label>
                                 <span class="toggle-label" id="free-label">유료</span>
                             </div>
@@ -392,16 +385,20 @@
       });
     }
 
-    // ── 영상 교체 토글 ──
-    function toggleReupload() {
-      const wrap = document.getElementById('video-reupload-wrap');
-      const flag = document.getElementById('delete-video-flag');
-      const btn  = document.querySelector('.change-file-btn');
+    // ── 영상/첨부파일 교체 토글 (공용) ──
+    function toggleReupload(type) {
+      const wrap = document.getElementById(type + '-reupload-wrap');
+      const flag = document.getElementById('delete-' + type + '-flag');
+      const btn  = event.target.closest('.change-file-btn');
       const isHidden = wrap.style.display === 'none';
       wrap.style.display = isHidden ? '' : 'none';
       if (flag) flag.value = isHidden ? 'true' : 'false';
-      if (btn) btn.textContent = isHidden ? '✕ 교체 취소' : '🔄 영상 교체';
-      if (!isHidden) { videoFile = null; updateSummary(); }
+      if (btn) btn.textContent = isHidden ? '✕ 교체 취소' : (type === 'video' ? '🔄 영상 교체' : '🔄 파일 교체');
+      if (!isHidden) {
+        if (type === 'video') { videoFile = null; }
+        if (type === 'attach') { attachFile = null; renderAttachPreview(); }
+        updateSummary();
+      }
     }
 
     // ── 영상 업로드 ──
@@ -437,40 +434,8 @@
       updateSummary();
     }
 
-    // ── 기존 첨부파일 삭제 표시 ──
-    function deleteExistingAttach(btn, fileId) {
-      const li = btn.closest('.attach-item');
-      const hidden = document.getElementById('del-attach-' + fileId);
-      if (li.classList.contains('marked-delete')) {
-        li.classList.remove('marked-delete');
-        btn.textContent = '✕';
-        if (hidden) hidden.disabled = true;
-      } else {
-        li.classList.add('marked-delete');
-        btn.textContent = '↩ 취소';
-        if (hidden) hidden.disabled = false;
-      }
-      updateSummary();
-    }
-
-    // ── 새 첨부파일 ──
-    const MAX_ATTACH = 5;
-    let attachFiles = [];
-
-    bindDrop('attach-zone', 'attachFiles', files => {
-      const remaining = MAX_ATTACH - attachFiles.length;
-      const toAdd = Array.from(files).slice(0, remaining);
-      if (files.length > remaining) alert('첨부파일은 최대 ' + MAX_ATTACH + '개까지 가능해요.');
-      attachFiles = [...attachFiles, ...toAdd];
-      renderAttachList();
-      updateSummary();
-    });
-
-    function removeAttach(idx) {
-      attachFiles.splice(idx, 1);
-      renderAttachList();
-      updateSummary();
-    }
+    // ── 첨부파일 (단일 파일, 교체 방식) ──
+    let attachFile = null;
 
     function fileIcon(name) {
       const ext = name.split('.').pop().toLowerCase();
@@ -478,19 +443,33 @@
       return map[ext] || '📄';
     }
 
-    function renderAttachList() {
+    function renderAttachPreview() {
       const list = document.getElementById('attach-list');
-      const placeholder = document.getElementById('attach-placeholder');
-      if (placeholder) placeholder.style.display = attachFiles.length ? 'none' : '';
-      list.innerHTML = attachFiles.map((f, i) =>
+      if (!list) return;
+      list.innerHTML = attachFile ?
         '<li class="attach-item">' +
-        '<span class="attach-icon">' + fileIcon(f.name) + '</span>' +
-        '<span class="attach-name">' + f.name + '</span>' +
-        '<span class="attach-size">' + (f.size/(1024*1024)).toFixed(1) + ' MB</span>' +
-        '<button type="button" class="attach-remove" onclick="removeAttach(' + i + ')">✕</button>' +
-        '</li>'
-      ).join('');
+        '<span class="attach-icon">' + fileIcon(attachFile.name) + '</span>' +
+        '<span class="attach-name">' + attachFile.name + '</span>' +
+        '<span class="attach-size">' + (attachFile.size/(1024*1024)).toFixed(1) + ' MB</span>' +
+        '<button type="button" class="attach-remove" onclick="removeAttachFile()">✕</button>' +
+        '</li>' : '';
     }
+
+    function removeAttachFile() {
+      attachFile = null;
+      const inp = document.getElementById('attachFile');
+      if (inp) inp.value = '';
+      renderAttachPreview();
+      updateSummary();
+    }
+
+    bindDrop('attach-zone', 'attachFile', files => {
+      const f = files[0];
+      if (!f) return;
+      attachFile = f;
+      renderAttachPreview();
+      updateSummary();
+    });
 
     // ── 공개 상태 ──
     const statusSelect  = document.getElementById('status');
@@ -504,12 +483,15 @@
     if (statusSelect.value === 'SCHEDULED') scheduleField.style.display = '';
 
     // ── 무료 토글 ──
-    const freeToggle = document.getElementById('isFree');
+    const freeToggle = document.getElementById('free');
     const freeLabel  = document.getElementById('free-label');
-    freeLabel.textContent = freeToggle.checked ? '무료' : '유료';
-    freeToggle.addEventListener('change', () => {
+    const freeSlider = document.getElementById('free-slider');
+    function syncFreeToggle() {
+      freeSlider.classList.toggle('is-checked', freeToggle.checked);
       freeLabel.textContent = freeToggle.checked ? '무료' : '유료';
-    });
+    }
+    freeToggle.addEventListener('change', syncFreeToggle);
+    syncFreeToggle(); // 서버에서 내려온 초기값 반영
 
     // ── 등록 요약 ──
     const stageNames = { '':'—', '1':'1단계 K-POP', '2':'2단계 드라마', '3':'3단계 일상회화', '4':'4단계 고급' };
@@ -527,9 +509,12 @@
         videoFile ? (videoFile.name.slice(0,18) + (videoFile.name.length>18?'…':'')) :
         keepExisting ? '기존 영상 유지' : '미선택';
 
-      const existCount = document.querySelectorAll('#existing-attach-list .attach-item:not(.marked-delete)').length;
+      const existingAttachWrap = document.getElementById('existing-attach-wrap');
+      const deleteAttachFlag   = document.getElementById('delete-attach-flag');
+      const keepExistingAttach = existingAttachWrap && (!deleteAttachFlag || deleteAttachFlag.value !== 'true');
       document.getElementById('summary-attach').textContent =
-        '기존 ' + existCount + '개 + 새 ' + attachFiles.length + '개';
+        attachFile ? (attachFile.name.slice(0,18) + (attachFile.name.length>18?'…':'')) :
+        keepExistingAttach ? '기존 파일 유지' : '없음';
 
       document.getElementById('summary-status').textContent =
         statusLabels[statusSelect.value] || '임시저장';
@@ -573,15 +558,6 @@
     // ESC 키로 모달 닫기
     document.addEventListener('keydown', e => {
       if (e.key === 'Escape') document.getElementById('delete-modal').classList.remove('active');
-    });
-
-    // ── 폼 제출 전 첨부파일 동기화 ──
-    document.getElementById('upload-form').addEventListener('submit', function() {
-      if (attachFiles.length > 0) {
-        const dt = new DataTransfer();
-        attachFiles.forEach(f => dt.items.add(f));
-        document.getElementById('attachFiles').files = dt.files;
-      }
     });
 </script>
 

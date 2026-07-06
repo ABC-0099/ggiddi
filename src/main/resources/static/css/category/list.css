@@ -461,6 +461,9 @@
     .ls-done { background: var(--mint); color: #fff; }
     .ls-ing  { background: var(--navy); color: #fff; }
     .ls-new  { background: var(--white); color: var(--mint-dark); border: 1px solid var(--mint-light); }
+    .ls-draft     { background: var(--ink-faint); color: #fff; }
+    .ls-scheduled { background: #F5A524; color: #fff; }
+    .ls-free      { background: var(--mint-light); color: var(--mint-dark); }
 
     /* 오른쪽 콘텐츠 */
     .lc-body {
@@ -529,6 +532,8 @@
     /* 잠김 카드 */
     .lc.locked { opacity: .55; cursor: default; }
     .lc.locked:hover { transform: none; box-shadow: 0 4px 16px rgba(29,158,117,.06); }
+    /* 아직 공개 전(임시/예약) — 결제해도 못 들어가므로 클릭 자체를 막음 */
+    .lc.unavailable { pointer-events: none; }
 
     /* 반응형 */
     @media (max-width: 900px) {

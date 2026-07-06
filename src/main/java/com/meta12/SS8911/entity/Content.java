@@ -25,7 +25,8 @@ public class Content {
     private LocalDateTime createdDate;
 
 
-    private String fileOrigin;
+    private String fileOrigin;      // 영상 원본 파일명
+    private String attachFileOrigin; // 첨부파일 원본 파일명 (fileOrigin과 분리)
 
     // --- DB에 저장될 파일명들을 따로 관리 (덮어쓰기 방지) ---
     private String fileName;       // 영상 저장 파일명

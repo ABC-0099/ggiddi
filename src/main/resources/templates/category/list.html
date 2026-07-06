@@ -115,7 +115,8 @@
                 <span class="llb-prog-label">전체 진도율</span>
                 <span class="llb-prog-pct">0%</span>
             </div>
-            <a th:href="@{/category/list}" class="llb-btn">강의 둘러보기 →</a>
+            <a th:if="${!paidMap.containsValue(true)}" th:href="@{/orderPay/list}" class="llb-btn">결제하러 가기 →</a>
+            <a th:if="${paidMap.containsValue(true)}" href="#lecture-wrap" class="llb-btn">강의 보러가기 →</a>
         </div>
     </div>
 </div>
@@ -155,7 +156,7 @@
 </div>
 
 <!-- 강의 목록 -->
-<div class="lecture-wrap">
+<div class="lecture-wrap" id="lecture-wrap">
 
     <div class="stage-section" th:each="category, catStat : ${list}">
         <div class="stage-header">
@@ -166,8 +167,13 @@
 
         <div class="lecture-grid">
             <a th:each="content : ${contentMap.get(category.id)}"
-               th:href="@{/content/view/{id}(id=${content.id})}"
-               th:classappend="${paidMap.get(category.id)} ? '' : 'locked'"
+               th:with="isAdmin=${#authorization.expression('hasRole(''ADMIN'')')},
+                        isPublished=(${content.status} == 'PUBLISHED'),
+                        payOrFree=(${paidMap.get(category.id)} or ${content.free}),
+                        unlocked=(${isAdmin} or (${isPublished} and ${payOrFree})),
+                        needsPayment=(!${isAdmin} and ${isPublished} and !${payOrFree})"
+               th:href="${unlocked} ? @{/content/view/{id}(id=${content.id})} : (${needsPayment} ? @{/orderPay/list(categoryId=${category.id})} : '#')"
+               th:classappend="${unlocked} ? '' : (${needsPayment} ? 'locked' : 'locked unavailable')"
                class="lc">
                 <button type="button" class="lc-edit-btn" sec:authorize="hasRole('ADMIN')" title="강의 수정"
                         th:attr="data-id=${content.id}, data-title=${content.title}, data-sequence=${content.sequence}, data-cat-id=${category.id}">
@@ -178,10 +184,16 @@
                 </button>
                 <div class="lc-thumb">
                     <div class="lc-thumb-icon">📖</div>
-                    <div class="lc-play" th:if="${paidMap.get(category.id)}"><div class="play-btn">▶</div></div>
-                    <div class="lc-lock" th:unless="${paidMap.get(category.id)}">🔒</div>
-                    <span th:if="${paidMap.get(category.id)} and ${content.progressPercent} == 100" class="lc-status ls-done">완료</span>
-                    <span th:if="${paidMap.get(category.id)} and ${content.progressPercent} > 0 and ${content.progressPercent} < 100" class="lc-status ls-ing">진행 중</span>
+                    <div class="lc-play" th:if="${unlocked}"><div class="play-btn">▶</div></div>
+                    <div class="lc-lock" th:unless="${unlocked}">🔒</div>
+
+                    <!-- 공개 상태 뱃지: 임시저장 / 예약공개가 완료·진행중 뱃지보다 우선 -->
+                    <span th:if="${content.status == 'DRAFT'}" class="lc-status ls-draft">임시</span>
+                    <span th:if="${content.status == 'SCHEDULED'}" class="lc-status ls-scheduled"
+                          th:text="${#temporals.format(content.publishAt, 'MM.dd HH:mm')} + ' 공개'">예약</span>
+                    <span th:if="${content.status == 'PUBLISHED' and unlocked and content.progressPercent == 100}" class="lc-status ls-done">완료</span>
+                    <span th:if="${content.status == 'PUBLISHED' and unlocked and content.progressPercent > 0 and content.progressPercent < 100}" class="lc-status ls-ing">진행 중</span>
+                    <span th:if="${content.status == 'PUBLISHED' and content.free and !paidMap.get(category.id) and content.progressPercent == 0}" class="lc-status ls-free">무료 공개</span>
                 </div>
                 <div class="lc-body">
                     <div class="lc-top">
@@ -192,14 +204,14 @@
                         <div class="lc-prog-header">
                             <span class="lc-prog-label">진행률</span>
                             <span class="lc-prog-pct"
-                                  th:classappend="${!paidMap.get(category.id)} ? 'none' : (${content.progressPercent} == 100 ? 'done' : (${content.progressPercent} > 0 ? 'ing' : 'none'))"
-                                  th:text="${!paidMap.get(category.id)} ? '🔒 잠김' : (${content.progressPercent} == 100 ? '100% 완료 ✓' : ${content.progressPercent} + '%')">
+                                  th:classappend="${unlocked} ? (${content.progressPercent} == 100 ? 'done' : (${content.progressPercent} > 0 ? 'ing' : 'none')) : 'none'"
+                                  th:text="${unlocked} ? (${content.progressPercent} == 100 ? '100% 완료 ✓' : ${content.progressPercent} + '%') : (${needsPayment} ? '🔒 잠김' : '🔒 준비중')">
                             </span>
                         </div>
                         <div class="lc-prog-bar">
                             <div class="lc-prog-fill"
-                                 th:classappend="${paidMap.get(category.id)} and ${content.progressPercent} > 0 and ${content.progressPercent} < 100 ? 'ing'"
-                                 th:style="'width:' + (${paidMap.get(category.id)} ? ${content.progressPercent} : 0) + '%'">
+                                 th:classappend="${unlocked} and ${content.progressPercent} > 0 and ${content.progressPercent} < 100 ? 'ing'"
+                                 th:style="'width:' + (${unlocked} ? ${content.progressPercent} : 0) + '%'">
                             </div>
                         </div>
                     </div>

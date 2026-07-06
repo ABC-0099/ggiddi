@@ -430,6 +430,10 @@ body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: va
 
 .toggle input:checked + .toggle-slider { background: var(--mint-dark); }
 .toggle input:checked + .toggle-slider::before { transform: translateX(20px); }
+/* Thymeleaf th:field가 checkbox 뒤에 hidden input(_free)을 자동 삽입해서
+   위 sibling 선택자가 깨지는 경우를 대비한 클래스 기반 폴백 */
+.toggle-slider.is-checked { background: var(--mint-dark); }
+.toggle-slider.is-checked::before { transform: translateX(20px); }
 
 .toggle-label {
   font-size: 13px;

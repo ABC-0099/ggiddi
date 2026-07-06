@@ -127,6 +127,58 @@ a { text-decoration: none; color: inherit; }
     margin-bottom: 32px;
 }
 
+.view-content-wrap {
+    margin-bottom: 32px;
+}
+
+/* ── 게시글 번역 (list.css와 동일 패턴) ── */
+.pf-translate-wrap { position: relative; display: inline-flex; margin-top: 12px; }
+.pf-action.pf-translate-toggle {
+    font-size: 14px;
+    color: #6b7280;
+    cursor: pointer;
+    transition: color 0.18s;
+}
+.pf-action.pf-translate-toggle:hover { color: var(--mint-dark); }
+.pf-translate-menu {
+    position: absolute;
+    display: none;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(10,31,23,.12);
+    padding: 6px;
+    z-index: 50;
+    min-width: 120px;
+    margin-top: 6px;
+}
+.pf-translate-menu.open { display: flex; }
+.pf-translate-menu button {
+    border: none;
+    background: none;
+    text-align: left;
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-size: 12.5px;
+    color: var(--ink);
+    cursor: pointer;
+    font-family: inherit;
+}
+.pf-translate-menu button:hover { background: var(--mint-pale); color: var(--mint-dark); }
+
+.view-content-translated {
+    font-size: 15px;
+    color: var(--ink-soft);
+    line-height: 1.8;
+    white-space: pre-wrap;
+    background: var(--mint-pale);
+    border: 1px dashed var(--mint-light);
+    border-radius: 10px;
+    padding: 14px 16px;
+    margin-top: 10px;
+}
+
 /* 첨부 이미지 */
 .view-images { margin-bottom: 32px; }
 .view-image-grid {

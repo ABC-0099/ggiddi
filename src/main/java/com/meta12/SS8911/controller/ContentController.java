@@ -146,6 +146,7 @@ public class ContentController {
         lectureForm.setFileName(content.getFileName());
         lectureForm.setThumbFileName(content.getThumbFileName());
         lectureForm.setAttachFileName(content.getAttachFileName());
+        lectureForm.setAttachFileOrigin(content.getAttachFileOrigin());
         lectureForm.setVideoOriginalName(content.getFileOrigin());
         lectureForm.setVideoUrl(content.getFileName() != null ? "/content/stream/" + content.getId() : null);
 
@@ -161,12 +162,6 @@ public class ContentController {
         return "content/sakje";
     }
 
-//    @PostMapping("/content/chugaProc")
-//    public String chugaProc(ContentDTO contentDTO) {
-//        contentService.chugaProc(contentDTO);
-//        return "redirect:/category/view/" + contentDTO.getCategoryId();
-//    }
-
     @PostMapping("/content/chugaProc")
     public String chugaProc(ContentDTO contentDTO, BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -175,19 +170,19 @@ public class ContentController {
             return "redirect:/content/chuga/" + contentDTO.getCategoryId();
         }
         contentService.chugaProc(contentDTO);
-        return "redirect:/category/view/" + contentDTO.getCategoryId();
+        return "redirect:/category/list";
     }
 
     @PostMapping("/content/sujungProc")
     public String sujungProc(ContentDTO contentDTO) {
         contentService.sujungProc(contentDTO);
-        return "redirect:/category/view/" + contentDTO.getCategoryId();
+        return "redirect:/category/list";
     }
 
     @PostMapping("/content/sakjeProc")
     public String sakjeProc(ContentDTO contentDTO) {
         contentService.sakjeProc(contentDTO);
-        return "redirect:/category/view/" + contentDTO.getCategoryId();
+        return "redirect:/category/list";
     }
 
     @PostMapping("/content/complete/{id}")

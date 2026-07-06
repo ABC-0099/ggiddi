@@ -109,11 +109,20 @@ public class ContentService {
         content.setSequence(contentDTO.getSequence());
         content.setVideoUrl(contentDTO.getVideoUrl());
 
+        // 그동안 누락되어 저장 안 되던 필드들
+        content.setStage(contentDTO.getStage());
+        content.setDescription(contentDTO.getDescription());
+        content.setKeywords(contentDTO.getKeywords());
+        content.setStatus(contentDTO.getStatus());
+        content.setPublishAt(contentDTO.getPublishAt());
+        content.setFree(contentDTO.isFree());
+
         // 영상 파일
         if (contentDTO.getVideoFile() != null && !contentDTO.getVideoFile().isEmpty()) {
             String saveFileName = System.currentTimeMillis() + "_VIDEO_" + contentDTO.getVideoFile().getOriginalFilename();
             saveFile(contentDTO.getVideoFile(), uploadPath, saveFileName); // ← uploadPath
             content.setFileName(saveFileName);
+            content.setFileOrigin(contentDTO.getVideoFile().getOriginalFilename());
         }
 
         // 썸네일 파일
@@ -123,12 +132,15 @@ public class ContentService {
             content.setThumbFileName(saveFileName);
         }
 
-        // 첨부 파일
+        // 첨부 파일: 새 파일이 들어오면 교체, 삭제 체크면 비우고, 둘 다 아니면 기존 유지
         if (contentDTO.getAttachFile() != null && !contentDTO.getAttachFile().isEmpty()) {
             String saveFileName = System.currentTimeMillis() + "_FILE_" + contentDTO.getAttachFile().getOriginalFilename();
             saveFile(contentDTO.getAttachFile(), uploadPath, saveFileName); // ← uploadPath
             content.setAttachFileName(saveFileName);
-            content.setFileOrigin(contentDTO.getAttachFile().getOriginalFilename());
+            content.setAttachFileOrigin(contentDTO.getAttachFile().getOriginalFilename());
+        } else if (contentDTO.isDeleteAttach()) {
+            content.setAttachFileName(null);
+            content.setAttachFileOrigin(null);
         }
     }
 
@@ -181,9 +193,14 @@ public class ContentService {
         content.setPublishAt(contentDTO.getPublishAt());
         content.setFree(contentDTO.isFree());
 
+        // 영상 원본 파일명
+        if (contentDTO.getVideoFile() != null && !contentDTO.getVideoFile().isEmpty()) {
+            content.setFileOrigin(contentDTO.getVideoFile().getOriginalFilename());
+        }
 
+        // 첨부파일 원본 파일명 (영상용 fileOrigin과 분리)
         if (contentDTO.getAttachFile() != null && !contentDTO.getAttachFile().isEmpty()){
-            content.setFileOrigin(contentDTO.getAttachFile().getOriginalFilename());
+            content.setAttachFileOrigin(contentDTO.getAttachFile().getOriginalFilename());
         }
         return content;
     }

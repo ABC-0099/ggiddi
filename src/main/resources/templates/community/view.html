@@ -4,6 +4,8 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="_csrf" th:attr="content=${_csrf.token}" />
+  <meta name="_csrf_header" th:attr="content=${_csrf.headerName}" />
   <title>끼역띠귿 — 커뮤니티</title>
   <link rel="stylesheet" th:href="@{/css/layout/navbar.css}" />
   <link rel="stylesheet" th:href="@{/css/layout/footer.css}" />
@@ -36,7 +38,28 @@
     </div>
 
     <!-- 본문 -->
-    <div class="view-content" th:text="${post.content}">내용</div>
+    <div class="view-content-wrap"
+         th:attr="data-post-title=${post.title}, data-post-content=${post.content}">
+      <div class="view-content" th:text="${post.content}">내용</div>
+
+      <!-- 번역 결과 표시 영역 -->
+      <div class="view-content-translated" style="display:none;"></div>
+
+      <span class="pf-translate-wrap">
+        <span class="pf-action pf-translate-toggle" onclick="toggleTranslateMenu(event, this)">
+          🌐 번역
+        </span>
+        <div class="pf-translate-menu">
+          <button type="button" onclick="requestTranslateView(event, this, 'en')">English</button>
+          <button type="button" onclick="requestTranslateView(event, this, 'zh')">中文</button>
+          <button type="button" onclick="requestTranslateView(event, this, 'ja')">日本語</button>
+          <button type="button" onclick="requestTranslateView(event, this, 'vi')">Tiếng Việt</button>
+          <button type="button" onclick="requestTranslateView(event, this, 'tl')">Filipino</button>
+          <button type="button" onclick="requestTranslateView(event, this, 'id')">Bahasa Indonesia</button>
+          <button type="button" onclick="requestTranslateView(event, this, 'th')">ไทย</button>
+        </div>
+      </span>
+    </div>
 
     <!-- 첨부 사진 -->
     <div class="view-images" th:if="${!#lists.isEmpty(post.files) and post.files.?[fileType == 'IMAGE'].size() > 0}">
@@ -233,6 +256,62 @@
     commentTextarea.addEventListener('input', () => {
       charCount.textContent = commentTextarea.value.length + ' / 500';
     });
+  }
+</script>
+
+<!-- ==================== 게시글 본문 번역 (community list.html과 동일 방식) ==================== -->
+<script th:inline="javascript">
+  const csrfTokenV  = document.querySelector('meta[name="_csrf"]')?.content;
+  const csrfHeaderV = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+  function closeAllTranslateMenus(exceptMenu) {
+    document.querySelectorAll('.pf-translate-menu.open').forEach(menu => {
+      if (menu !== exceptMenu) {
+        menu.classList.remove('open');
+      }
+    });
+  }
+
+  function toggleTranslateMenu(evt, btnEl) {
+    evt.stopPropagation();
+    const menu = btnEl.nextElementSibling; // .pf-translate-menu
+    const isOpen = menu.classList.contains('open');
+    closeAllTranslateMenus(menu);
+    menu.classList.toggle('open', !isOpen);
+  }
+
+  document.addEventListener('click', () => closeAllTranslateMenus(null));
+
+  function requestTranslateView(evt, btnEl, targetLang) {
+    evt.stopPropagation();
+
+    const wrapEl = btnEl.closest('.view-content-wrap');
+    const title = wrapEl.dataset.postTitle || '';
+    const content = wrapEl.dataset.postContent || '';
+    const text = title + '\n' + content;
+
+    const translatedBox = wrapEl.querySelector('.view-content-translated');
+    const menu = btnEl.closest('.pf-translate-menu');
+
+    translatedBox.style.display = 'block';
+    translatedBox.textContent = '번역 중…';
+    menu.classList.remove('open');
+
+    const headers = { 'Content-Type': 'application/json' };
+    if (csrfHeaderV && csrfTokenV) headers[csrfHeaderV] = csrfTokenV;
+
+    fetch('/api/translate', {
+      method: 'POST',
+      headers: headers,
+      body: JSON.stringify({ text: text, targetLang: targetLang })
+    })
+      .then(res => res.json())
+      .then(data => {
+        translatedBox.textContent = data.translatedText;
+      })
+      .catch(() => {
+        translatedBox.textContent = '번역에 실패했어요. 잠시 후 다시 시도해주세요.';
+      });
   }
 </script>
 </body>
