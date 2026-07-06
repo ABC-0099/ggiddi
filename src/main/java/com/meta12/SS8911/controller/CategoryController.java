@@ -206,7 +206,7 @@ public class CategoryController {
         }
 
         categoryService.sujungProc(categoryDTO);
-        return "redirect:/category/view/" + categoryDTO.getId();
+        return "redirect:/category/list";
     }
 
     @PostMapping("/category/sakjeProc")

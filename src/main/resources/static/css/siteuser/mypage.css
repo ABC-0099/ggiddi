@@ -46,7 +46,19 @@ html, body {
     top: 90px;
     align-self: flex-start;
     max-height: calc(100vh - 110px);
-    overflow-y: auto;
+
+    /* 여기서 스크롤을 완전히 제어합니다 */
+    overflow-y: auto;    /* 세로 스크롤은 유지 */
+    overflow-x: hidden !important; /* 가로 스크롤 강제 삭제 */
+
+    /* 스크롤바 안 보이게 하기 */
+    -ms-overflow-style: none; /* IE, Edge */
+    scrollbar-width: none;    /* Firefox */
+}
+
+/* 크롬, 사파리 */
+.mypage-sidebar::-webkit-scrollbar {
+    display: none;
 }
 
 .profile-card {
@@ -578,27 +590,87 @@ html, body {
 .journal-compare-diff.up { color: var(--mint-dark); }
 .journal-compare-diff.down { color: #EF4444; }
 
-.journal-heatmap-wrap {
-    background: #f9fafb;
-    border-radius: 14px;
-    padding: 18px 20px;
+/* 사이드바 내 월간 출석부 달력 전용 스타일 */
+.calendar-wrapper {
+    width: 100%;
+    box-sizing: border-box;
+    margin-top: 15px;
+    padding: 15px;
+    background: #fff;
+    border-radius: 12px;
+    border: 1px solid #eef2f5;
 }
-.journal-heatmap-title {
-    font-size: 13px;
-    font-weight: 600;
-    color: var(--ink);
-    margin-bottom: 12px;
-}
-.journal-heatmap-grid {
+
+/* 요일 헤더 (가로 정렬) */
+.calendar-days-header {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
+    text-align: center;
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--ink-soft);
+    margin-bottom: 6px;
 }
-.journal-heatmap-day {
-    aspect-ratio: 1;
-    border-radius: 6px;
-    background: #e5e7eb;
+
+.calendar-days-header .wd-sun {
+    color: #EF4444;
 }
-.journal-heatmap-day.attended {
-    background: var(--mint);
+
+.calendar-days-header .wd-sat {
+    color: #3B82F6;
+}
+
+/* 날짜 그리드 */
+#calendarGrid {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 5px;
+    width: 100%;
+    box-sizing: border-box;
+}
+
+.calendar-day {
+    aspect-ratio: 1 / 1;
+    background: var(--mint-pale);
+    border-radius: 8px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11px;
+    font-weight: 500;
+    width: 100%;
+    box-sizing: border-box;
+    color: var(--ink);
+    transition: transform .12s, box-shadow .12s;
+}
+
+.calendar-day:hover {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 6px rgba(29, 158, 117, 0.15);
+}
+
+.calendar-day.empty {
+    background: transparent;
+    box-shadow: none;
+}
+
+/* 날짜 칸 일/토 색상 (7열 그리드 기준 1번째=일, 7번째=토) */
+#calendarGrid .calendar-day:nth-child(7n+1) {
+    color: #EF4444;
+}
+
+#calendarGrid .calendar-day:nth-child(7n) {
+    color: #3B82F6;
+}
+
+/* ★ 출석한 날이 일/토여도 흰색 글자가 이기도록, 명시적으로 한 번 더 지정 */
+.calendar-day.active {
+    background: linear-gradient(135deg, var(--mint), var(--mint-dark));
+    font-weight: 700;
+    box-shadow: 0 2px 8px rgba(29, 158, 117, 0.3);
+}
+
+#calendarGrid .calendar-day.active:nth-child(7n+1),
+#calendarGrid .calendar-day.active:nth-child(7n) {
+    color: #fff;
 }

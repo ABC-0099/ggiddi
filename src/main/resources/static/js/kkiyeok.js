@@ -35,10 +35,70 @@ function kkAdd(text, isUser) {
     if (isUser) {
         div.innerHTML = `<div><div class="kk-bubble">${kkEsc(text)}</div><div class="kk-time">${kkTime()}</div></div>`;
     } else {
-        div.innerHTML = `<div class="kk-row-ava">🐸</div><div><div class="kk-bubble">${kkEsc(text).replace(/\n/g, '<br>')}</div><div class="kk-time">${kkTime()}</div></div>`;
+        div.innerHTML = `<div class="kk-row-ava">🐸</div><div>
+            <div class="kk-bubble">${kkEsc(text).replace(/\n/g, '<br>')}</div>
+            <div class="kk-time">${kkTime()}</div>
+            <div class="kk-translate-wrap">
+                <button type="button" class="kk-translate-toggle" onclick="kkToggleTranslateMenu(event, this)">🌐 번역</button>
+                <div class="kk-translate-menu">
+                    <button type="button" onclick="kkRequestTranslate(event, this, 'en')">English</button>
+                    <button type="button" onclick="kkRequestTranslate(event, this, 'zh')">中文</button>
+                    <button type="button" onclick="kkRequestTranslate(event, this, 'ja')">日本語</button>
+                    <button type="button" onclick="kkRequestTranslate(event, this, 'vi')">Tiếng Việt</button>
+                </div>
+            </div>
+            <div class="kk-translated" style="display:none;"></div>
+        </div>`;
+        div.dataset.rawText = text; // 번역 요청 시 원문 그대로 사용 (이스케이프 전 텍스트)
     }
     kkBody.appendChild(div);
     kkBody.scrollTop = kkBody.scrollHeight;
+}
+
+// ── 끼역이 답변 번역 ──
+function kkCloseAllTranslateMenus(exceptMenu) {
+    document.querySelectorAll('.kk-translate-menu.open').forEach(menu => {
+        if (menu !== exceptMenu) menu.classList.remove('open');
+    });
+}
+
+function kkToggleTranslateMenu(evt, btnEl) {
+    evt.stopPropagation();
+    const menu = btnEl.nextElementSibling;
+    const isOpen = menu.classList.contains('open');
+    kkCloseAllTranslateMenus(menu);
+    menu.classList.toggle('open', !isOpen);
+}
+
+document.addEventListener('click', () => kkCloseAllTranslateMenus(null));
+
+function kkRequestTranslate(evt, btnEl, targetLang) {
+    evt.stopPropagation();
+
+    const row = btnEl.closest('.kk-row');
+    const text = row.dataset.rawText || '';
+    const translatedBox = row.querySelector('.kk-translated');
+    const menu = btnEl.closest('.kk-translate-menu');
+
+    translatedBox.style.display = 'block';
+    translatedBox.textContent = '번역 중…';
+    menu.classList.remove('open');
+
+    const h = { 'Content-Type': 'application/json' };
+    if (kkCsrfH && kkCsrf) h[kkCsrfH] = kkCsrf;
+
+    fetch('/api/translate', {
+        method: 'POST',
+        headers: h,
+        body: JSON.stringify({ text: text, targetLang: targetLang })
+    })
+        .then(res => res.json())
+        .then(data => {
+            translatedBox.textContent = data.translatedText;
+        })
+        .catch(() => {
+            translatedBox.textContent = '번역에 실패했어요.';
+        });
 }
 
 async function kkSend() {

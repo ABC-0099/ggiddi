@@ -82,6 +82,34 @@
       text-transform: uppercase; margin-bottom: 10px;
     }
 
+    /* 관리자 카테고리 관리 패널 (통계 박스 자리 대신) */
+    .admin-category-box {
+      flex-shrink: 0;
+      background: rgba(255,255,255,.68);
+      backdrop-filter: blur(20px);
+      border: 1px solid rgba(255,255,255,.9);
+      border-radius: 14px;
+      padding: 16px;
+      width: 280px;
+      box-shadow: 0 4px 16px rgba(29,158,117,.08);
+      display: flex; flex-direction: column; gap: 10px;
+    }
+    .acb-header {
+      font-size: 11px; font-weight: 600;
+      color: var(--ink-faint); letter-spacing: .05em;
+      text-transform: uppercase;
+    }
+    .acb-add-btn { justify-content: center; width: 100%; }
+    .admin-category-box .cat-manage-select {
+      display: flex; gap: 6px;
+    }
+    .admin-category-box .cat-manage-select select {
+      flex: 1; min-width: 0;
+    }
+    .admin-category-box .btn-manage-category {
+      flex-shrink: 0;
+    }
+
     .llb-card {
       display: flex; align-items: center; gap: 10px;
       margin-bottom: 10px;
@@ -524,6 +552,27 @@
       transition: filter .15s, transform .15s;
     }
     .btn-add-category:hover { filter: brightness(1.06); transform: translateY(-1px); }
+
+    /* ── 관리자: 카테고리 수정/삭제 드롭다운 ── */
+    .cat-manage-select {
+      display: flex; align-items: center; gap: 6px;
+    }
+    .cat-manage-select select {
+      padding: 7px 10px; border-radius: 10px;
+      border: 1px solid var(--border); background: #fff;
+      font-size: 13px; font-family: inherit; color: var(--ink-soft);
+      cursor: pointer;
+    }
+    .btn-manage-category {
+      padding: 7px 14px; border-radius: 10px;
+      font-size: 13px; font-weight: 600; font-family: inherit;
+      border: 1px solid var(--border); background: #fff;
+      color: var(--ink-soft); cursor: pointer;
+      transition: all .15s; text-decoration: none;
+      display: inline-flex; align-items: center;
+    }
+    .btn-manage-category:hover { border-color: var(--mint); color: var(--mint-dark); background: var(--mint-pale); }
+    .btn-manage-delete:hover { border-color: #ef4444; color: #ef4444; background: #fef2f2; }
 
     /* ── 카테고리 탭 + 관리자 수정/삭제 아이콘 ── */
     .tab-chip { position: relative; display: inline-flex; align-items: center; }

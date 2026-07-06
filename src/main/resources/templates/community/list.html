@@ -75,7 +75,9 @@
         커뮤니티 이용 시 욕설·비방·혐오 표현은 삼가 주세요. 타인을 존중하는 건강한 소통 문화를 만들어요.
     </div>
 
-    <div class="post" th:each="post : ${postList.content}">
+    <div class="post"
+         th:each="post : ${postList.content}"
+         th:attr="data-post-title=${post.title}, data-post-content=${post.content}">
         <div class="post-top">
             <div class="post-avatar" th:text="${#strings.substring(post.author.username, 0, 1)}">리</div>
             <div>
@@ -103,6 +105,9 @@
             </div>
         </a>
 
+        <!-- 번역 결과 표시 영역 -->
+        <div class="post-translated" style="display:none;"></div>
+
         <div class="post-footer">
             <a th:href="@{/community/{id}(id=${post.id})}" class="pf-action">
                 <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
@@ -113,6 +118,17 @@
             <span class="pf-action"
                   th:onclick="|navigator.clipboard.writeText(window.location.origin + '/community/' + ${post.id}).then(function(){ alert('링크가 복사되었습니다!'); })|">
                 ↗ 공유
+            </span>
+            <span class="pf-translate-wrap">
+                <span class="pf-action pf-translate-toggle" onclick="toggleTranslateMenu(event, this)">
+                    🌐 번역
+                </span>
+                <div class="pf-translate-menu">
+                    <button type="button" onclick="requestTranslate(event, this, 'en')">English</button>
+                    <button type="button" onclick="requestTranslate(event, this, 'zh')">中文</button>
+                    <button type="button" onclick="requestTranslate(event, this, 'ja')">日本語</button>
+                    <button type="button" onclick="requestTranslate(event, this, 'vi')">Tiếng Việt</button>
+                </div>
             </span>
             <span class="pf-spacer"></span>
             <span class="pf-report"
@@ -244,6 +260,60 @@
 </div>
 
 <script th:src="@{/js/kkiyeok.js}"></script>
+
+<!-- ==================== 커뮤니티 게시글 번역 ==================== -->
+<script th:inline="javascript">
+    const csrfTokenC  = document.querySelector('meta[name="_csrf"]')?.content;
+    const csrfHeaderC = document.querySelector('meta[name="_csrf_header"]')?.content;
+
+    function closeAllTranslateMenus(exceptMenu) {
+        document.querySelectorAll('.pf-translate-menu.open').forEach(menu => {
+            if (menu !== exceptMenu) menu.classList.remove('open');
+        });
+    }
+
+    function toggleTranslateMenu(evt, btnEl) {
+        evt.stopPropagation();
+        const menu = btnEl.nextElementSibling; // .pf-translate-menu
+        const isOpen = menu.classList.contains('open');
+        closeAllTranslateMenus(menu);
+        menu.classList.toggle('open', !isOpen);
+    }
+
+    document.addEventListener('click', () => closeAllTranslateMenus(null));
+
+    function requestTranslate(evt, btnEl, targetLang) {
+        evt.stopPropagation();
+
+        const postEl = btnEl.closest('.post');
+        const title = postEl.dataset.postTitle || '';
+        const content = postEl.dataset.postContent || '';
+        const text = title + '\n' + content;
+
+        const translatedBox = postEl.querySelector('.post-translated');
+        const menu = btnEl.closest('.pf-translate-menu');
+
+        translatedBox.style.display = 'block';
+        translatedBox.textContent = '번역 중…';
+        menu.classList.remove('open');
+
+        const headers = { 'Content-Type': 'application/json' };
+        if (csrfHeaderC && csrfTokenC) headers[csrfHeaderC] = csrfTokenC;
+
+        fetch('/api/translate', {
+            method: 'POST',
+            headers: headers,
+            body: JSON.stringify({ text: text, targetLang: targetLang })
+        })
+            .then(res => res.json())
+            .then(data => {
+                translatedBox.textContent = data.translatedText;
+            })
+            .catch(() => {
+                translatedBox.textContent = '번역에 실패했어요. 잠시 후 다시 시도해주세요.';
+            });
+    }
+</script>
 
 <div th:replace="~{layout/footer :: footer}"></div>
 <script th:src="@{/js/community.js}"></script>

@@ -80,7 +80,18 @@ public class CategoryService {
     }
 
     public void sujungProc(CategoryDTO categoryDTO){
-        Category category = createEntity(categoryDTO);
+        Category category = categoryRepository.findById(categoryDTO.getId())
+                .orElseThrow(() -> new IllegalArgumentException("카테고리를 찾을 수 없습니다. id=" + categoryDTO.getId()));
+
+        category.setTitle(categoryDTO.getTitle());
+        category.setInstructor(categoryDTO.getInstructor());
+        category.setDescription(categoryDTO.getDescription());
+        category.setFileName(categoryDTO.getFileName());
+
+        if (categoryDTO.getAttachFile() != null && !categoryDTO.getAttachFile().isEmpty()) {
+            category.setFileOrigin(categoryDTO.getAttachFile().getOriginalFilename());
+        }
+
         categoryRepository.save(category);
     }
 
