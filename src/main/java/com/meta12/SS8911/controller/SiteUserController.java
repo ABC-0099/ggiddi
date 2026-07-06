@@ -1,15 +1,14 @@
 package com.meta12.SS8911.controller;
 
+import com.meta12.SS8911.dto.AttendanceDTO;
 import com.meta12.SS8911.dto.SiteUserDTO;
 import com.meta12.SS8911.dto.SiteUserEditDTO;
 import com.meta12.SS8911.entity.Comment;
 import com.meta12.SS8911.entity.Community;
 import com.meta12.SS8911.entity.Qna;
 import com.meta12.SS8911.entity.SiteUser;
-import com.meta12.SS8911.service.CommentService;
-import com.meta12.SS8911.service.CommunityService;
-import com.meta12.SS8911.service.QnaService;
-import com.meta12.SS8911.service.SiteUserService;
+import com.meta12.SS8911.service.*;
+import com.meta12.SS8911.service.AttendanceService; // 이 줄이 있는지 확인하세요
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
@@ -24,6 +23,11 @@ import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
+
+import java.util.List;
 
 import java.security.Principal;
 
@@ -34,6 +38,7 @@ public class SiteUserController {
     private final CommunityService communityService;
     private final CommentService commentService;
     private final QnaService qnaService;
+    private final AttendanceService attendanceService;
 
     @GetMapping("/siteUser/chuga")
     public String chugaForm(SiteUserDTO siteUserDTO) {
@@ -157,5 +162,16 @@ public class SiteUserController {
 
         new SecurityContextLogoutHandler().logout(request, response, SecurityContextHolder.getContext().getAuthentication());
         return "redirect:/?withdrawn=true";
+    }
+
+    @GetMapping("/api/attendance")
+    @ResponseBody
+    public List<AttendanceDTO> getAttendance(
+            @RequestParam("year") int year,
+            @RequestParam("month") int month,
+            Principal principal) {
+
+        // 1. 위에서 주입받은 객체인 attendanceService를 사용하세요!
+        return attendanceService.getMonthlyData(principal.getName(), year, month);
     }
 }
