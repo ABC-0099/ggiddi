@@ -42,4 +42,10 @@ public class SiteUser {
     public String getDisplayName() {
         return withdrawn ? "탈퇴한 회원" : username;
     }
+
+    @ManyToOne
+    private SiteUser siteUser;
+
+    private LocalDateTime studyDate; // 학습 날짜
+    private int studyCount; // 학습 횟수 또는 시간
 }

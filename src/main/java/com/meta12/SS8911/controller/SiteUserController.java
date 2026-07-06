@@ -83,6 +83,7 @@ public class SiteUserController {
         model.addAttribute("myPosts", myPosts);
         model.addAttribute("myComments", myComments);
         model.addAttribute("myInquiries", myInquiries);
+        model.addAttribute("heatmapData", siteUserService.getHeatmapData(user));
         return "siteUser/mypage";
     }
 

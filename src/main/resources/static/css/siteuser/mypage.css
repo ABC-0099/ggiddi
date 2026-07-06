@@ -46,7 +46,19 @@ html, body {
     top: 90px;
     align-self: flex-start;
     max-height: calc(100vh - 110px);
-    overflow-y: auto;
+
+    /* 여기서 스크롤을 완전히 제어합니다 */
+    overflow-y: auto;    /* 세로 스크롤은 유지 */
+    overflow-x: hidden !important; /* 가로 스크롤 강제 삭제 */
+
+    /* 스크롤바 안 보이게 하기 */
+    -ms-overflow-style: none; /* IE, Edge */
+    scrollbar-width: none;    /* Firefox */
+}
+
+/* 크롬, 사파리 */
+.mypage-sidebar::-webkit-scrollbar {
+    display: none;
 }
 
 .profile-card {
@@ -582,23 +594,53 @@ html, body {
     background: #f9fafb;
     border-radius: 14px;
     padding: 18px 20px;
+    overflow: hidden; /* 부모 영역도 스크롤 방지 */
 }
+
 .journal-heatmap-title {
     font-size: 13px;
     font-weight: 600;
     color: var(--ink);
     margin-bottom: 12px;
 }
+
+/* 사이드바 안에서 튀어나오지 않게 하는 핵심 코드 */
 .journal-heatmap-grid {
     display: grid;
-    grid-template-columns: repeat(7, 1fr);
-    gap: 6px;
+    grid-template-columns: repeat(7, 1fr); /* 7개의 사각형을 동일한 비율로 배치 */
+    gap: 4px; /* 간격을 살짝 줄임 */
+    width: 100%;
+    box-sizing: border-box; /* 패딩과 보더를 너비 계산에 포함 */
 }
+
 .journal-heatmap-day {
-    aspect-ratio: 1;
-    border-radius: 6px;
-    background: #e5e7eb;
+    aspect-ratio: 1 / 1;
+    border-radius: 4px;
+    background: #e5e7eb; /* 기본 색상 */
+    width: 100%; /* 부모 그리드 셀에 꽉 차게 함 */
 }
+
 .journal-heatmap-day.attended {
-    background: var(--mint);
+    background: var(--mint); /* 출석 시 색상 */
+}
+
+/* 기존 레이아웃을 보호하기 위한 전용 클래스 */
+.heatmap-container {
+    display: flex;
+    gap: 8px;
+    padding: 10px;
+    background: #f9fafb;
+    border-radius: 8px;
+    justify-content: center;
+}
+
+.heat-day {
+    width: 20px;
+    height: 20px;
+    border-radius: 4px;
+    background-color: #ebedf0; /* 미출석 색상 */
+}
+
+.heat-day.active {
+    background-color: #00E396; /* 출석 색상 */
 }

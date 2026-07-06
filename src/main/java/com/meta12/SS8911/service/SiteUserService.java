@@ -4,8 +4,10 @@ import com.meta12.SS8911.dto.SiteUserDTO;
 import com.meta12.SS8911.dto.SiteUserEditDTO;
 import com.meta12.SS8911.config.Role;
 import com.meta12.SS8911.entity.SiteUser;
+import com.meta12.SS8911.entity.StudyRecord;
 import com.meta12.SS8911.exception.DataNotFoundException;
 import com.meta12.SS8911.repository.SiteUserRepository;
+import com.meta12.SS8911.repository.StudyRecordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -13,12 +15,16 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.LocalDateTime;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
 public class SiteUserService implements UserDetailsService {
     private final SiteUserRepository siteUserRepository;
     private final PasswordEncoder passwordEncoder;
+    private final StudyRecordRepository studyRecordRepository;
 
     @Transactional
     public void chugaProc(SiteUserDTO dto) {
@@ -46,7 +52,6 @@ public class SiteUserService implements UserDetailsService {
         SiteUser siteUser = siteUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
 
-        // ★ 탈퇴한 계정은 로그인 자체를 막음 (Spring Security가 자동으로 걸러줌)
         return User.builder()
                 .username(siteUser.getUsername())
                 .password(siteUser.getPassword())
@@ -65,7 +70,6 @@ public class SiteUserService implements UserDetailsService {
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
     }
 
-    // ★ 회원정보 수정
     @Transactional
     public void updateInfo(String username, SiteUserEditDTO dto) {
         SiteUser user = getUserByUsername(username);
@@ -83,7 +87,6 @@ public class SiteUserService implements UserDetailsService {
         siteUserRepository.save(user);
     }
 
-    // ★ 회원 탈퇴 (소프트 삭제)
     @Transactional
     public void withdraw(String username, String currentPassword) {
         SiteUser user = getUserByUsername(username);
@@ -98,31 +101,36 @@ public class SiteUserService implements UserDetailsService {
         siteUserRepository.save(user);
     }
 
-    // SiteUserService.java 파일 내부
-
+    @Transactional
     public void editProc(String username, SiteUserEditDTO dto) {
-        // 1. 유저 찾기
         SiteUser user = siteUserRepository.findByUsername(username)
                 .orElseThrow(() -> new IllegalStateException("사용자를 찾을 수 없습니다."));
 
-        // 2. 정보 수정
         user.setPhone(dto.getPhone());
         user.setNationality(dto.getNationality());
 
-        // 3. 비밀번호 변경 (필요 시)
         if (dto.getNewPassword() != null && !dto.getNewPassword().isEmpty()) {
-            // 현재 비밀번호 검증
             if (!passwordEncoder.matches(dto.getCurrentPassword(), user.getPassword())) {
                 throw new IllegalStateException("현재 비밀번호가 일치하지 않습니다.");
             }
-            // 새 비밀번호 일치 확인
             if (!dto.getNewPassword().equals(dto.getNewPasswordChk())) {
                 throw new IllegalStateException("새 비밀번호 확인이 일치하지 않습니다.");
             }
             user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         }
 
-        // 4. 저장
         siteUserRepository.save(user);
+    }
+
+    public List<Map<String, String>> getHeatmapData(SiteUser user) {
+        LocalDateTime start = LocalDateTime.now().minusDays(30);
+        LocalDateTime end = LocalDateTime.now();
+
+        List<StudyRecord> records = studyRecordRepository.findBySiteUserAndStudyDateBetween(user, start, end);
+
+        return records.stream().map(r -> Map.of(
+                "date", r.getStudyDate().toLocalDate().toString(),
+                "count", "1"
+        )).collect(Collectors.toList());
     }
 }
