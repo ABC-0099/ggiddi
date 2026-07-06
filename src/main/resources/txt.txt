@@ -6,4 +6,11 @@ show databases;
 exit
 
 
+.\gradlew.bat --no-build-cache --rerun-tasks compileJava
+
+.\gradlew.bat bootRun
+
+
+
+
 http://localhost:8911/
