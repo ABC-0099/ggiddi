@@ -210,7 +210,16 @@
             <span class="ddigeud-avatar">🦉</span>
             <span>띠귿이</span>
         </div>
-        <button id="ddigeudCloseBtn" class="ddigeud-close-btn" aria-label="닫기">✕</button>
+        <div class="ddigeud-header-right">
+            <select id="ddigeudLangSelect" class="ddigeud-lang-select" aria-label="번역 언어 선택">
+                <option value="">번역 안 함</option>
+                <option value="en">English</option>
+                <option value="zh">中文</option>
+                <option value="ja">日本語</option>
+                <option value="vi">Tiếng Việt</option>
+            </select>
+            <button id="ddigeudCloseBtn" class="ddigeud-close-btn" aria-label="닫기">✕</button>
+        </div>
     </div>
 
     <div id="ddigeudMessages" class="ddigeud-messages">
@@ -568,11 +577,63 @@
         speakBtn.setAttribute('aria-label', '음성으로 듣기');
         speakBtn.addEventListener('click', () => speakDdigeud(text, speakBtn));
         div.appendChild(speakBtn);
+
+        const translateBtn = document.createElement('button');
+        translateBtn.className = 'ddigeud-translate-btn';
+        translateBtn.textContent = '🌐';
+        translateBtn.setAttribute('aria-label', '번역 보기');
+
+        const translatedDiv = document.createElement('div');
+        translatedDiv.className = 'ddigeud-translated';
+        translatedDiv.style.display = 'none';
+
+        translateBtn.addEventListener('click', () => translateDdigeud(text, translateBtn, translatedDiv));
+        div.appendChild(translateBtn);
+        div.appendChild(translatedDiv);
       }
 
       ddigeudMessages.appendChild(div);
       ddigeudMessages.scrollTop = ddigeudMessages.scrollHeight;
       return div;
+    }
+
+    // ── 띠귿이 번역 (구글 번역 API) ──
+    function translateDdigeud(text, btnEl, targetDiv) {
+      const langSelect = document.getElementById('ddigeudLangSelect');
+      const targetLang = langSelect.value;
+
+      if (!targetLang) {
+        alert('상단에서 번역할 언어를 먼저 선택해주세요.');
+        return;
+      }
+
+      // 이미 번역이 열려있으면 토글로 닫기만
+      if (targetDiv.style.display !== 'none' && targetDiv.dataset.lang === targetLang) {
+        targetDiv.style.display = 'none';
+        return;
+      }
+
+      btnEl.disabled = true;
+      targetDiv.style.display = 'block';
+      targetDiv.textContent = '번역 중…';
+
+      const headers = { 'Content-Type': 'application/json' };
+      if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
+
+      fetch('/api/translate', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({ text: text, targetLang: targetLang })
+      })
+        .then(res => res.json())
+        .then(data => {
+          targetDiv.textContent = data.translatedText;
+          targetDiv.dataset.lang = targetLang;
+        })
+        .catch(() => {
+          targetDiv.textContent = '번역에 실패했어요.';
+        })
+        .finally(() => { btnEl.disabled = false; });
     }
 
     // ── 띠귿이 TTS (브라우저 내장 SpeechSynthesis) ──
