@@ -221,6 +221,7 @@
 
     <div class="ddigeud-input-row">
         <input id="ddigeudInput" type="text" class="ddigeud-input" placeholder="강의 내용에 대해 물어보세요…" />
+        <button id="ddigeudMicBtn" class="ddigeud-mic-btn" aria-label="음성으로 질문하기">🎤</button>
         <button id="ddigeudSendBtn" class="ddigeud-send-btn" aria-label="전송">↑</button>
     </div>
 </div>
@@ -594,6 +595,50 @@
       }
 
       window.speechSynthesis.speak(utter);
+    }
+
+    // ── 띠귿이 STT (브라우저 내장 SpeechRecognition) ──
+    const ddigeudMicBtn = document.getElementById('ddigeudMicBtn');
+    const SpeechRecognitionCtor = window.SpeechRecognition || window.webkitSpeechRecognition;
+    let ddigeudRecognition = null;
+    let ddigeudListening = false;
+
+    if (SpeechRecognitionCtor) {
+      ddigeudRecognition = new SpeechRecognitionCtor();
+      ddigeudRecognition.lang = 'ko-KR';
+      ddigeudRecognition.interimResults = false;
+      ddigeudRecognition.maxAlternatives = 1;
+
+      ddigeudRecognition.onstart = () => {
+        ddigeudListening = true;
+        ddigeudMicBtn.classList.add('listening');
+      };
+
+      ddigeudRecognition.onresult = (e) => {
+        const transcript = e.results[0][0].transcript;
+        ddigeudInput.value = transcript;
+      };
+
+      ddigeudRecognition.onerror = () => {
+        ddigeudListening = false;
+        ddigeudMicBtn.classList.remove('listening');
+      };
+
+      ddigeudRecognition.onend = () => {
+        ddigeudListening = false;
+        ddigeudMicBtn.classList.remove('listening');
+      };
+
+      ddigeudMicBtn.addEventListener('click', () => {
+        if (ddigeudListening) {
+          ddigeudRecognition.stop();
+        } else {
+          window.speechSynthesis.cancel(); // 띠귿이 말하는 중이면 멈추고 듣기 시작
+          ddigeudRecognition.start();
+        }
+      });
+    } else {
+      ddigeudMicBtn.style.display = 'none'; // 미지원 브라우저는 마이크 버튼 숨김
     }
 
     function sendToDdigeud() {
