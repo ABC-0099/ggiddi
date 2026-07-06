@@ -7,6 +7,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import java.util.List;
 import java.util.stream.Collectors;
+import com.meta12.SS8911.entity.SiteUser;
+import java.time.LocalDate;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
@@ -22,5 +25,22 @@ public class AttendanceService {
         return entities.stream()
                 .map(a -> new AttendanceDTO(a.getDate().toString()))
                 .collect(Collectors.toList());
+    }
+
+    @Transactional
+    public void checkAttendance(SiteUser user) {
+
+        LocalDate today = LocalDate.now();
+
+        // 오늘 이미 출석했는지 확인
+        if (attendanceRepository.existsBySiteUserAndDate(user, today)) {
+            return;
+        }
+
+        Attendance attendance = new Attendance();
+        attendance.setSiteUser(user);
+        attendance.setDate(today);
+
+        attendanceRepository.save(attendance);
     }
 }
