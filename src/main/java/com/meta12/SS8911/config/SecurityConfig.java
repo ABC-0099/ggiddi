@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.security.crypto.password.PasswordEncoder;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityCustomizer;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
@@ -16,6 +17,25 @@ public class SecurityConfig {
 
     // ★ SiteUserService 주입 없음 → 순환참조 없음
     // Spring Security가 UserDetailsService 구현체(SiteUserService)를 자동으로 찾아서 씀
+
+    // ★★★ 핵심 수정: 정적 리소스는 Security 필터체인 자체를 안 타게 함
+    //   permitAll()은 "인증"만 건너뛸 뿐, CsrfFilter 등 다른 필터는 여전히 실행됨.
+    //   CsrfTokenRequestAttributeHandler(비-Xor)는 요청마다 토큰을 즉시(eager) resolve해서
+    //   쿠키를 새로 저장하는데, 페이지 로드시 css/js/font/favicon이 동시다발적으로
+    //   요청되면서 서로 다른 랜덤 토큰을 발급받아 쿠키를 덮어써버림 → 폼에 찍힌 _csrf 값과
+    //   실제 쿠키 값이 달라져서 로그인 폼 제출 시 403(CSRF 불일치)이 나는 문제의 근본 원인.
+    //   web.ignoring()으로 아예 필터체인 밖으로 빼면 이 레이스 컨디션이 사라짐.
+    @Bean
+    public WebSecurityCustomizer webSecurityCustomizer() {
+        return (web) -> web.ignoring().requestMatchers(
+                "/css/**",
+                "/js/**",
+                "/images/**",
+                "/fonts/**",
+                "/favicon.ico",
+                "/games/**"
+        );
+    }
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
@@ -41,6 +61,8 @@ public class SecurityConfig {
                                 "/fonts/**",
                                 "/ws/chat/**",
                                 "/api/chat/**",
+                                "/error",            // ★ 에러 페이지가 인증 필요 경로로 잡히면서 CSRF 토큰이 새로 갈아치워지는 문제 방지
+                                "/favicon.ico",       // ★ 파비콘 요청도 인증 체크에서 제외
                                 "/.well-known/**"   // ★ 크롬 devtools 자동 요청 무시용
                         ).permitAll()
                         // ★ 연습퀴즈 풀이/제출은 로그인 필요 (QuizService가 로그인 유저 기준으로 채점·잠금체크함)

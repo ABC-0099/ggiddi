@@ -47,6 +47,15 @@ public class QuizService {
     }
 
     /**
+     * 강의 시청 페이지(content/view)에서 이 강의(Content)에 연결된 퀴즈를 찾을 때 사용.
+     * 퀴즈가 아직 등록 안 된 강의도 있을 수 있어서 null-safe.
+     */
+    @Transactional(readOnly = true)
+    public Quiz getQuizEntityForContent(Long contentId) {
+        return quizRepository.findFirstByContentIdOrderByIdAsc(contentId).orElse(null);
+    }
+
+    /**
      * 잠금 여부 판단 - 두 조건을 모두 만족해야 열림.
      * 1) 이 차시(Content) 영상을 끝까지 봤는지 (Progress.completed)
      * 2) 이전 차시 퀴즈를 완료(한 번이라도 풀이)했는지 - 카테고리 내 첫 차시면 통과

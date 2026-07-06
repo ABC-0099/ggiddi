@@ -25,6 +25,14 @@ public class QuizApiController {
     }
 
     /**
+     * 영상 시청 완료 후 강의 페이지에 임베드되는 퀴즈 - 문제은행에서 questionCount만큼만 랜덤 추출.
+     */
+    @GetMapping("/{quizId}/start-embedded")
+    public QuizStartDTO startEmbedded(@PathVariable Long quizId, Authentication authentication) {
+        return quizService.startQuizRandom(quizId);
+    }
+
+    /**
      * 문항 하나 채점 - 고르는 즉시 정답/오답 + 해설 반환.
      */
     @PostMapping("/question/{questionId}/check")
