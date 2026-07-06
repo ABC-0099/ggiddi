@@ -68,6 +68,13 @@
     margin-top: 3px;
     opacity: 0.85;
   }
+  .sidebar-logo a {
+    transition: opacity 0.15s;
+  }
+  .sidebar-logo a:hover {
+    opacity: 0.85;
+    cursor: pointer;
+  }
 
   .sidebar-nav {
     flex: 1;
