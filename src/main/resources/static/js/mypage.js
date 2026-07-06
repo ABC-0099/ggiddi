@@ -35,8 +35,12 @@ document.addEventListener('DOMContentLoaded', function () {
     });
 
     // 2. 출석 달력 로직 (새로 추가/교체)
-    const now = new Date();
-    fetchAndRenderHeatmap(now.getFullYear(), now.getMonth());
+    window.currentViewDate = new Date();
+
+    fetchAndRenderHeatmap(
+        window.currentViewDate.getFullYear(),
+        window.currentViewDate.getMonth()
+    );
 });
 
 async function fetchAndRenderHeatmap(year, month) {
@@ -61,19 +65,51 @@ function renderCalendar(year, month, attendanceSet) {
     const lastDay = new Date(year, month + 1, 0).getDate();
     const firstDay = new Date(year, month, 1).getDay();
 
-    for (let i = 0; i < firstDay; i++) grid.appendChild(document.createElement('div'));
-
-    for (let i = 1; i <= lastDay; i++) {
-        const dayBox = document.createElement('div');
-        dayBox.className = 'calendar-day';
-        dayBox.innerText = i;
-
-        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
-        if (attendanceSet.has(dateStr)) {
-            dayBox.classList.add('active');
-        }
-        grid.appendChild(dayBox);
+    for (let i = 0; i < firstDay; i++) {
+        const empty = document.createElement('div');
+        empty.className = 'calendar-day empty';
+        grid.appendChild(empty);
     }
+
+for (let i = 1; i <= lastDay; i++) {
+
+    const dayBox = document.createElement('div');
+    dayBox.className = 'calendar-day';
+    dayBox.innerText = i;
+
+    // 해당 날짜 객체
+    const currentDate = new Date(year, month, i);
+
+    // 일요일 / 토요일
+    if (currentDate.getDay() === 0) {
+        dayBox.classList.add('sun');
+    }
+
+    if (currentDate.getDay() === 6) {
+        dayBox.classList.add('sat');
+    }
+
+    // 오늘 표시
+    const today = new Date();
+
+    if (
+        today.getFullYear() === year &&
+        today.getMonth() === month &&
+        today.getDate() === i
+    ) {
+        dayBox.classList.add('today');
+    }
+
+    // 출석 여부
+    const dateStr =
+        `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+
+    if (attendanceSet.has(dateStr)) {
+        dayBox.classList.add('active');
+    }
+
+    grid.appendChild(dayBox);
+}
 }
 
 // 3. 버튼 이벤트 연결 (HTML 버튼에 onclick="changeMonth(-1)" 등이 연결되어 있어야 함)

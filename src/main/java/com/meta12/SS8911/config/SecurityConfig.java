@@ -11,8 +11,11 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
 
+import lombok.RequiredArgsConstructor;
+
 @Configuration
 @EnableWebSecurity
+@RequiredArgsConstructor
 public class SecurityConfig {
 
     // ★ SiteUserService 주입 없음 → 순환참조 없음
@@ -25,6 +28,9 @@ public class SecurityConfig {
     //   요청되면서 서로 다른 랜덤 토큰을 발급받아 쿠키를 덮어써버림 → 폼에 찍힌 _csrf 값과
     //   실제 쿠키 값이 달라져서 로그인 폼 제출 시 403(CSRF 불일치)이 나는 문제의 근본 원인.
     //   web.ignoring()으로 아예 필터체인 밖으로 빼면 이 레이스 컨디션이 사라짐.
+
+    private final LoginSuccessHandler loginSuccessHandler;
+
     @Bean
     public WebSecurityCustomizer webSecurityCustomizer() {
         return (web) -> web.ignoring().requestMatchers(
@@ -86,7 +92,7 @@ public class SecurityConfig {
                 .formLogin(form -> form
                         .loginPage("/siteUser/login")
                         .loginProcessingUrl("/siteUser/login")
-                        .defaultSuccessUrl("/", true)
+                        .successHandler(loginSuccessHandler)
                         .failureUrl("/siteUser/login?error")
                         .permitAll()
                 )

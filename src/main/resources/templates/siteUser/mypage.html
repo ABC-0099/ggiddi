@@ -35,19 +35,35 @@
                 <span th:text="${subscription.planName}">구독</span> · D-<span th:text="${subscription.remainingDays}">0</span>
             </div>
 
-                <div class="calendar-wrapper">
-                    <div class="calendar-header">
-                        <button onclick="changeMonth(-1)">◀</button>
-                        <span id="monthTitle"></span>
-                        <button onclick="changeMonth(1)">▶</button>
-                    </div>
+            <!-- 여기부터 추가 -->
+            <div class="calendar-wrapper">
 
-                    <div class="calendar-days-header">
-                        <div class="wd-sun">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div class="wd-sat">토</div>
-                    </div>
+                <div class="calendar-header">
+                    <button type="button" class="calendar-btn" onclick="changeMonth(-1)">
+                        &lsaquo;
+                    </button>
 
-                    <div id="calendarGrid" class="calendar-grid"></div>
+                    <div id="monthTitle" class="calendar-title"></div>
+
+                    <button type="button" class="calendar-btn" onclick="changeMonth(1)">
+                        &rsaquo;
+                    </button>
                 </div>
+
+                <div class="calendar-days-header">
+                    <div class="wd-sun">일</div>
+                    <div>월</div>
+                    <div>화</div>
+                    <div>수</div>
+                    <div>목</div>
+                    <div>금</div>
+                    <div class="wd-sat">토</div>
+                </div>
+
+                <div id="calendarGrid" class="calendar-grid"></div>
+
+            </div>
+            <!-- 여기까지 추가 -->
 
         </div>
 

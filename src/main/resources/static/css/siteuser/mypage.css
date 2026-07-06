@@ -590,15 +590,127 @@ html, body {
 .journal-compare-diff.up { color: var(--mint-dark); }
 .journal-compare-diff.down { color: #EF4444; }
 
+/* ==========================
+   Calendar Header
+========================== */
+
+.calendar-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:14px;
+}
+
+.calendar-title{
+    flex:1;
+    text-align:center;
+
+    font-size:16px;
+    font-weight:700;
+    color:var(--ink);
+
+    letter-spacing:-0.3px;
+}
+
+.calendar-btn{
+
+    width:30px;
+    height:30px;
+
+    border:none;
+    border-radius:9px;
+
+    background:#F4F7F9;
+
+    color:var(--ink);
+
+    font-size:18px;
+    font-weight:700;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    cursor:pointer;
+
+    transition:.18s;
+}
+
+.calendar-btn:hover{
+
+    background:var(--mint-pale);
+
+    color:var(--mint-dark);
+
+    transform:translateY(-1px);
+}
+
+.calendar-btn:active{
+
+    transform:scale(.95);
+
+}
+
+.calendar-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:12px;
+    height:32px;
+}
+
+.calendar-header button{
+    width:28px;
+    height:28px;
+
+    border:none;
+    border-radius:8px;
+
+    background:#f3f6f8;
+    color:var(--ink);
+
+    cursor:pointer;
+
+    display:flex;
+    align-items:center;
+    justify-content:center;
+
+    font-size:13px;
+    font-weight:700;
+
+    transition:.2s;
+}
+
+.calendar-header button:hover{
+    background:var(--mint-pale);
+    color:var(--mint-dark);
+}
+
+<button>&lsaquo;</button>
+<button>&rsaquo;</button>
+
+#monthTitle{
+    flex:1;
+    text-align:center;
+
+    font-size:16px;
+    font-weight:700;
+    color:var(--ink);
+}
+
 /* 사이드바 내 월간 출석부 달력 전용 스타일 */
-.calendar-wrapper {
-    width: 100%;
-    box-sizing: border-box;
-    margin-top: 15px;
-    padding: 15px;
-    background: #fff;
-    border-radius: 12px;
-    border: 1px solid #eef2f5;
+.calendar-wrapper{
+
+    margin-top:18px;
+
+    padding:16px 14px;
+
+    background:#fff;
+
+    border-radius:14px;
+
+    border:1px solid #edf2f7;
+
 }
 
 /* 요일 헤더 (가로 정렬) */
@@ -629,48 +741,74 @@ html, body {
     box-sizing: border-box;
 }
 
-.calendar-day {
-    aspect-ratio: 1 / 1;
-    background: var(--mint-pale);
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 11px;
-    font-weight: 500;
-    width: 100%;
-    box-sizing: border-box;
-    color: var(--ink);
-    transition: transform .12s, box-shadow .12s;
+.calendar-day{
+
+    background:#F6FBF8;
+
+    color:#55606E;
+
+    border-radius:8px;
+
+    transition:.2s;
+
 }
+
+.calendar-day:hover{
+
+    transform:translateY(-1px);
+
+    background:#DFF7ED;
+
+}
+
 
 .calendar-day:hover {
     transform: translateY(-1px);
     box-shadow: 0 2px 6px rgba(29, 158, 117, 0.15);
 }
 
-.calendar-day.empty {
-    background: transparent;
-    box-shadow: none;
+.calendar-day.empty{
+
+    background:transparent;
+
+    box-shadow:none;
+
+    cursor:default;
+
 }
 
-/* 날짜 칸 일/토 색상 (7열 그리드 기준 1번째=일, 7번째=토) */
-#calendarGrid .calendar-day:nth-child(7n+1) {
-    color: #EF4444;
+.calendar-day.active{
+
+    background:#35C88A;
+
+    color:#fff;
+
+    font-weight:700;
+
+    box-shadow:0 4px 10px rgba(53,200,138,.25);
+
 }
 
-#calendarGrid .calendar-day:nth-child(7n) {
-    color: #3B82F6;
+.calendar-day.today{
+
+    border:2px solid var(--navy);
+
 }
 
-/* ★ 출석한 날이 일/토여도 흰색 글자가 이기도록, 명시적으로 한 번 더 지정 */
-.calendar-day.active {
-    background: linear-gradient(135deg, var(--mint), var(--mint-dark));
-    font-weight: 700;
-    box-shadow: 0 2px 8px rgba(29, 158, 117, 0.3);
+.calendar-day.sun{
+
+    color:#EF4444;
+
 }
 
-#calendarGrid .calendar-day.active:nth-child(7n+1),
-#calendarGrid .calendar-day.active:nth-child(7n) {
-    color: #fff;
+.calendar-day.sat{
+
+    color:#3B82F6;
+
+
+.calendar-day.active.sun,
+.calendar-day.active.sat{
+
+    color:#fff;
+
 }

@@ -8,18 +8,21 @@ import java.time.LocalDate; // 날짜만 저장하는 것이 가장 관리하기
 @Entity
 @Getter
 @Setter
-
+@Table(
+        uniqueConstraints = {
+                @UniqueConstraint(columnNames = {"user_id", "date"})
+        }
+)
 public class Attendance {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // 출석한 날짜
+    @Column(nullable = false)
     private LocalDate date;
 
-    // 누가 출석했는지 (사용자와 연결)
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "user_id")
+    @JoinColumn(name = "user_id", nullable = false)
     private SiteUser siteUser;
 }

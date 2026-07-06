@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.web.authentication.AuthenticationSuccessHandler;
 import org.springframework.stereotype.Component;
+import com.meta12.SS8911.service.AttendanceService;
 
 import java.io.IOException;
 import java.time.Duration;
@@ -19,11 +20,13 @@ import java.time.LocalDateTime;
 public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final SiteUserRepository siteUserRepository;
+    private final AttendanceService attendanceService;
 
     @Override
     public void onAuthenticationSuccess(HttpServletRequest request,
                                         HttpServletResponse response,
-                                        Authentication authentication) throws IOException, ServletException {
+                                        Authentication authentication)
+            throws IOException, ServletException {
 
         String username = authentication.getName();
         SiteUser user = siteUserRepository.findByUsername(username)
@@ -45,6 +48,9 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
 
         user.setLastLoginDate(now);
         siteUserRepository.save(user);
+
+        // 출석 저장
+        attendanceService.checkAttendance(user);
 
         response.sendRedirect("/");
     }
