@@ -39,6 +39,13 @@ public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+
+        // ★ eager resolve 끄기: 요청마다 CSRF 토큰을 즉시 재계산해서 쿠키(XSRF-TOKEN)를
+        //   갈아치우는 레이스 컨디션을 방지. 실제로 값이 필요할 때(Thymeleaf가 _csrf.token을
+        //   렌더링할 때)만 지연 계산하도록 함 → 폼의 _csrf 값과 쿠키 값이 어긋나는 문제 해결.
+        CsrfTokenRequestAttributeHandler requestHandler = new CsrfTokenRequestAttributeHandler();
+        requestHandler.setCsrfRequestAttributeName(null);
+
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(
@@ -98,7 +105,7 @@ public class SecurityConfig {
                         //   있을 것으로 기대함. 근데 JS는 쿠키(XSRF-TOKEN)의 원본 값을 그대로
                         //   헤더에 실어 보내므로, 마스킹 없이 원본 그대로 비교하는 핸들러로 명시.
                         //   (이거 안 하면 CookieCsrfTokenRepository + JS fetch 조합에서 403 남)
-                        .csrfTokenRequestHandler(new CsrfTokenRequestAttributeHandler())
+                        .csrfTokenRequestHandler(requestHandler)
                 )
                 .headers(headers -> headers
                         // ★ 기본값 DENY는 iframe(유니티 게임 창)을 전부 막으므로 같은 출처는 허용하도록 변경
