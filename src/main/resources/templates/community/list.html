@@ -271,7 +271,10 @@
 
     function closeAllTranslateMenus(exceptMenu) {
         document.querySelectorAll('.pf-translate-menu.open').forEach(menu => {
-            if (menu !== exceptMenu) menu.classList.remove('open');
+            if (menu !== exceptMenu) {
+                menu.classList.remove('open');
+                menu.closest('.post')?.classList.remove('translate-open');
+            }
         });
     }
 
@@ -281,6 +284,7 @@
         const isOpen = menu.classList.contains('open');
         closeAllTranslateMenus(menu);
         menu.classList.toggle('open', !isOpen);
+        btnEl.closest('.post')?.classList.toggle('translate-open', !isOpen);
     }
 
     document.addEventListener('click', () => closeAllTranslateMenus(null));
@@ -299,6 +303,7 @@
         translatedBox.style.display = 'block';
         translatedBox.textContent = '번역 중…';
         menu.classList.remove('open');
+        postEl.classList.remove('translate-open');
 
         const headers = { 'Content-Type': 'application/json' };
         if (csrfHeaderC && csrfTokenC) headers[csrfHeaderC] = csrfTokenC;

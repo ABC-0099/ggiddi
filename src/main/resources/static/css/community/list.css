@@ -133,6 +133,7 @@ nav {
     display: flex; flex-direction: column; gap: 14px;
 }
 .post {
+    position: relative;
     background: rgba(255,255,255,.65);
     backdrop-filter: blur(16px);
     border: 1px solid rgba(255,255,255,.9);
@@ -142,6 +143,7 @@ nav {
     transition: transform .15s, box-shadow .15s;
     box-shadow: 0 4px 16px rgba(29,158,117,.05);
 }
+.post.translate-open { z-index: 30; }
 .post:hover { transform: translateY(-2px); box-shadow: 0 10px 28px rgba(29,158,117,.1); }
 .post-top { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 .post-avatar {
