@@ -76,7 +76,9 @@ public class SecurityConfig {
                                 "/api/chat/**",
                                 "/error",            // ★ 에러 페이지가 인증 필요 경로로 잡히면서 CSRF 토큰이 새로 갈아치워지는 문제 방지
                                 "/favicon.ico",       // ★ 파비콘 요청도 인증 체크에서 제외
-                                "/.well-known/**"   // ★ 크롬 devtools 자동 요청 무시용
+                                "/.well-known/**",   // ★ 크롬 devtools 자동 요청 무시용
+                                "/api/ai-tutor/**",   // ★ 띠귿이 AI 튜터봇 - 강의 시청 중 누구나 질문 가능
+                                "/api/translate/**"   // ★ 띠귿이 답변 번역 - 로그인 여부 상관없이 사용 가능
                         ).permitAll()
                         // ★ 연습퀴즈 풀이/제출은 로그인 필요 (QuizService가 로그인 유저 기준으로 채점·잠금체크함)
                         .requestMatchers("/quiz/**", "/api/quiz/**").authenticated()

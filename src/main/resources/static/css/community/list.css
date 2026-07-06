@@ -218,6 +218,47 @@ nav {
 .pf-report { cursor: pointer; transition: color .15s; }
 .pf-report:hover { color: #C24A2C; }
 
+/* ── 게시글 번역 ── */
+.pf-translate-wrap { position: relative; display: inline-flex; }
+.pf-translate-menu {
+    position: absolute;
+    display: none;
+    flex-direction: column;
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    box-shadow: 0 8px 24px rgba(10,31,23,.12);
+    padding: 6px;
+    z-index: 50;
+    min-width: 120px;
+    margin-top: 6px;
+}
+.pf-translate-menu.open { display: flex; }
+.pf-translate-menu button {
+    border: none;
+    background: none;
+    text-align: left;
+    padding: 7px 10px;
+    border-radius: 6px;
+    font-size: 12.5px;
+    color: var(--ink);
+    cursor: pointer;
+    font-family: inherit;
+}
+.pf-translate-menu button:hover { background: var(--mint-pale); color: var(--mint-dark); }
+
+.post-translated {
+    background: var(--mint-pale);
+    border: 1px dashed var(--mint-light);
+    border-radius: 10px;
+    padding: 10px 14px;
+    margin-bottom: 12px;
+    font-size: 13px;
+    color: var(--ink-soft);
+    line-height: 1.65;
+    white-space: pre-line;
+}
+
 /* 안내 박스 */
 .info-box {
     background: rgba(255,255,255,.55);
@@ -435,6 +476,34 @@ nav {
     margin-top: 3px; padding: 0 4px;
 }
 .kk-row.user .kk-time { text-align: right; }
+
+/* 끼역이 답변 번역 */
+.kk-translate-wrap { position: relative; display: inline-block; margin-top: 4px; padding: 0 4px; }
+.kk-translate-toggle {
+    border: none; background: none; cursor: pointer;
+    font-size: 11px; color: var(--ink-faint); padding: 2px 4px;
+    font-family: inherit; opacity: .75;
+}
+.kk-translate-toggle:hover { opacity: 1; color: var(--mint-dark); }
+.kk-translate-menu {
+    position: absolute; display: none; flex-direction: column;
+    background: var(--white); border: 1px solid var(--border);
+    border-radius: 10px; box-shadow: 0 8px 24px rgba(10,31,23,.12);
+    padding: 6px; z-index: 50; min-width: 120px; margin-top: 4px;
+}
+.kk-translate-menu.open { display: flex; }
+.kk-translate-menu button {
+    border: none; background: none; text-align: left;
+    padding: 7px 10px; border-radius: 6px; font-size: 12px;
+    color: var(--ink); cursor: pointer; font-family: inherit;
+}
+.kk-translate-menu button:hover { background: var(--mint-pale); color: var(--mint-dark); }
+.kk-translated {
+    margin: 4px 4px 0; padding: 8px 12px;
+    background: var(--mint-pale); border: 1px dashed var(--mint-light);
+    border-radius: 10px; font-size: 12.5px; color: var(--ink-soft);
+    line-height: 1.6; white-space: pre-line; max-width: 240px;
+}
 
 /* 타이핑 */
 .kk-typing {
