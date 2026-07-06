@@ -395,6 +395,16 @@ nav {
   display: flex; align-items: center; justify-content: center;
   font-size: 13px; font-weight: 700; color: var(--gold-light); cursor: pointer;
 }
+.nav-user-box { display: flex; align-items: center; gap: 12px; }
+.nav-logout-btn {
+  background: none; border: none; cursor: pointer;
+  font-family: 'Galmuri11', sans-serif;
+  font-size: 11px; font-weight: 700;
+  color: rgba(232,196,104,.55);
+  padding: 6px 10px; border-radius: 6px;
+  transition: color .15s, background .15s;
+}
+.nav-logout-btn:hover { color: var(--gold-light); background: rgba(232,196,104,.08); }
 
 /* ── 게임 전용 FOOTER ── */
 .game-footer {

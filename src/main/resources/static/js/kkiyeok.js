@@ -45,6 +45,9 @@ function kkAdd(text, isUser) {
                     <button type="button" onclick="kkRequestTranslate(event, this, 'zh')">中文</button>
                     <button type="button" onclick="kkRequestTranslate(event, this, 'ja')">日本語</button>
                     <button type="button" onclick="kkRequestTranslate(event, this, 'vi')">Tiếng Việt</button>
+                    <button type="button" onclick="kkRequestTranslate(event, this, 'tl')">Filipino</button>
+                    <button type="button" onclick="kkRequestTranslate(event, this, 'id')">Bahasa Indonesia</button>
+                    <button type="button" onclick="kkRequestTranslate(event, this, 'th')">ไทย</button>
                 </div>
             </div>
             <div class="kk-translated" style="display:none;"></div>

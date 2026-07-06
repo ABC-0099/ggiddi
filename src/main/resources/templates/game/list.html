@@ -30,8 +30,11 @@
         <li><a th:href="@{/qna/write}">1:1 질문하기</a></li>
         <li><a th:href="@{/siteUser/mypage}">마이페이지</a></li>
     </ul>
-    <div sec:authorize="isAuthenticated()">
+    <div sec:authorize="isAuthenticated()" class="nav-user-box">
         <div class="avatar" sec:authentication="name" th:text="${#strings.substring(#authentication.name,0,1)}">유</div>
+        <form th:action="@{/logout}" method="post" style="margin:0;">
+            <button type="submit" class="nav-logout-btn">로그아웃</button>
+        </form>
     </div>
     <div sec:authorize="isAnonymous()">
         <a th:href="@{/siteUser/login}" class="avatar" style="font-size:11px; text-decoration:none;">로그인</a>
@@ -148,10 +151,12 @@
         var placeholder = document.getElementById('gwPlaceholder');
         var frame = document.getElementById('unityFrame');
         if (gamePath) {
-          // 실제 유니티 빌드가 있으면 iframe으로 로드
+          // 실제 유니티 빌드가 있으면 iframe으로 로드 (로그인 유저ID를 쿼리스트링으로 전달)
+          var userId = document.body.getAttribute('data-current-user');
+          var finalPath = userId ? (gamePath + '?userId=' + encodeURIComponent(userId)) : gamePath;
           placeholder.style.display = 'none';
           frame.style.display = 'block';
-          frame.src = gamePath;
+          frame.src = finalPath;
         } else {
           // 경로가 없으면 안내 placeholder만 표시
           document.getElementById('gwPlaceholderTitle').textContent = gameName + ' 화면 위치';

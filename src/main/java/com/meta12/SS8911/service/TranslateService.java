@@ -17,7 +17,10 @@ public class TranslateService {
             "en", "English",
             "zh", "Chinese (Simplified)",
             "ja", "Japanese",
-            "vi", "Vietnamese"
+            "vi", "Vietnamese",
+            "tl", "Filipino (Tagalog)",
+            "id", "Indonesian",
+            "th", "Thai"
     );
 
     private static final String SYSTEM_PROMPT = """
