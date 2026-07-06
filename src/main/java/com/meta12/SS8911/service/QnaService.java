@@ -66,6 +66,11 @@ public class QnaService {
         return qnaRepository.findByStatusOrderByCreatedDateDesc(InquiryStatus.PENDING, pageable);
     }
 
+    // 게시판 관리 탭 배지: 미답변 개수
+    public long countPending() {
+        return qnaRepository.countByStatus(InquiryStatus.PENDING);
+    }
+
     // ※ answer()는 여기서 삭제되었습니다. AnswerService.create()로 이동했어요.
 
     public void checkViewPermission(Qna qna, SiteUser user) {
@@ -111,6 +116,23 @@ public class QnaService {
     public void delete(Long id, SiteUser user) {
         Qna qna = getQna(id);
         checkEditDeletePermission(qna, user);
+
+        List<QnaFile> files = qnaFileRepository.findByQna(qna);
+        for (QnaFile f : files) {
+            deletePhysicalFile(f.getSavedPath());
+        }
+        qnaFileRepository.deleteByQna(qna);
+
+        qnaRepository.delete(qna);
+    }
+
+    // 게시판 관리: 관리자는 작성자/답변상태 상관없이 삭제 가능 (신고글 등 처리용)
+    @Transactional
+    public void adminDelete(Long id, SiteUser admin) {
+        if (admin.getRole() != Role.ADMIN) {
+            throw new RuntimeException("관리자만 삭제할 수 있습니다.");
+        }
+        Qna qna = getQna(id);
 
         List<QnaFile> files = qnaFileRepository.findByQna(qna);
         for (QnaFile f : files) {
