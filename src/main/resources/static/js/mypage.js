@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // 1. 기존 메뉴 클릭 이벤트 로직
     const menuItems = document.querySelectorAll('.menu-item');
     const subtabItems = document.querySelectorAll('.subtab-item');
     const subtabPanels = document.querySelectorAll('.subtab-panel');
@@ -33,47 +34,54 @@ document.addEventListener('DOMContentLoaded', function () {
         });
     });
 
-    // ★ URL 쿼리파라미터로 페이지네이션 클릭 후에도 탭 유지
-    const params = new URLSearchParams(window.location.search);
-    const tab = params.get('tab');
-    const subtab = params.get('subtab');
-
-    if (tab) {
-        activateMenu(tab);
-        if (subtab) activateSubtab(subtab);
-        const target = document.getElementById('panel-' + tab);
-        if (target) target.scrollIntoView({ behavior: 'auto', block: 'start' });
-    }
-
-    <script th:inline="javascript">
-        window.onload = function() {
-            var rawData = /*[[${heatmapData}]]*/ [];
-            var grid = document.getElementById('calendarGrid');
-
-            // 데이터 정렬 (날짜별 확인용)
-            var attendanceMap = new Set(rawData.map(r => r.date));
-
-            // 30일치 날짜 생성 (캘린더 형태)
-            for (let i = 1; i <= 30; i++) {
-                let dayBox = document.createElement('div');
-                dayBox.style.aspectRatio = "1 / 1";
-                dayBox.style.borderRadius = "4px";
-                dayBox.style.display = "flex";
-                dayBox.style.alignItems = "center";
-                dayBox.style.justifyContent = "center";
-                dayBox.style.fontSize = "10px";
-
-                // 오늘 날짜와 비교하여 출석 여부 판단 (여기선 예시로 처리)
-                let dateStr = "2026-07-" + (i < 10 ? '0' + i : i);
-                if(attendanceMap.has(dateStr)) {
-                    dayBox.style.backgroundColor = "#00E396"; // 출석 시 초록색
-                    dayBox.style.color = "white";
-                } else {
-                    dayBox.style.backgroundColor = "#f3f4f6"; // 미출석 시 회색
-                }
-                dayBox.innerText = i;
-                grid.appendChild(dayBox);
-            }
-        };
-    </script>
+    // 2. 출석 달력 로직 (새로 추가/교체)
+    const now = new Date();
+    fetchAndRenderHeatmap(now.getFullYear(), now.getMonth());
 });
+
+async function fetchAndRenderHeatmap(year, month) {
+    try {
+        const response = await fetch(`/api/attendance?year=${year}&month=${month + 1}`);
+        const attendanceList = await response.json();
+        const attendanceSet = new Set(attendanceList.map(a => a.date));
+        renderCalendar(year, month, attendanceSet);
+    } catch (e) {
+        console.error("데이터 로딩 실패:", e);
+    }
+}
+
+function renderCalendar(year, month, attendanceSet) {
+    const grid = document.getElementById('calendarGrid');
+    const title = document.getElementById('monthTitle');
+    if (!grid) return;
+
+    grid.innerHTML = '';
+    if (title) title.innerText = `${year}년 ${month + 1}월`;
+
+    const lastDay = new Date(year, month + 1, 0).getDate();
+    const firstDay = new Date(year, month, 1).getDay();
+
+    for (let i = 0; i < firstDay; i++) grid.appendChild(document.createElement('div'));
+
+    for (let i = 1; i <= lastDay; i++) {
+        const dayBox = document.createElement('div');
+        dayBox.className = 'calendar-day';
+        dayBox.innerText = i;
+
+        const dateStr = `${year}-${String(month + 1).padStart(2, '0')}-${String(i).padStart(2, '0')}`;
+        if (attendanceSet.has(dateStr)) {
+            dayBox.classList.add('active');
+        }
+        grid.appendChild(dayBox);
+    }
+}
+
+// 3. 버튼 이벤트 연결 (HTML 버튼에 onclick="changeMonth(-1)" 등이 연결되어 있어야 함)
+window.changeMonth = function(delta) {
+    // 여기서 날짜를 관리할 전역 변수가 필요할 수 있습니다
+    if (typeof window.currentViewDate === 'undefined') {
+        window.currentViewDate = new Date();
+    }
+    window.currentViewDate.setMonth(window.currentViewDate.getMonth() + delta);
+    fetchAndRenderHeatmap(window.currentViewDate.getFullYear(), window.currentViewDate.getMonth());
+};
