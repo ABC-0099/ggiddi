@@ -196,6 +196,35 @@
 
     </div>
 </div>
+
+<!-- 띠귿이 AI 튜터 플로팅 버튼 -->
+<button id="ddigeudToggleBtn" class="ddigeud-toggle-btn" aria-label="AI 튜터 띠귿이 열기">
+    <span class="ddigeud-toggle-emoji">🦉</span>
+    <span class="ddigeud-toggle-label">띠귿이</span>
+</button>
+
+<!-- 띠귿이 AI 튜터 패널 -->
+<div id="ddigeudPanel" class="ddigeud-panel">
+    <div class="ddigeud-header">
+        <div class="ddigeud-header-title">
+            <span class="ddigeud-avatar">🦉</span>
+            <span>띠귿이</span>
+        </div>
+        <button id="ddigeudCloseBtn" class="ddigeud-close-btn" aria-label="닫기">✕</button>
+    </div>
+
+    <div id="ddigeudMessages" class="ddigeud-messages">
+        <div class="ddigeud-msg ddigeud-msg-bot">
+            안녕하세요, 저는 띠귿이예요. 이 강의 내용에 대해 궁금한 점을 물어보세요.
+        </div>
+    </div>
+
+    <div class="ddigeud-input-row">
+        <input id="ddigeudInput" type="text" class="ddigeud-input" placeholder="강의 내용에 대해 물어보세요…" />
+        <button id="ddigeudSendBtn" class="ddigeud-send-btn" aria-label="전송">↑</button>
+    </div>
+</div>
+
 <div th:replace="~{layout/footer :: footer}"></div>
 <script th:inline="javascript">
     // ── 속도 버튼 ──
@@ -505,6 +534,107 @@
       document.getElementById('quiz-score-badge').textContent = '0점';
       loadQuiz();
     }
+
+    // ── 띠귿이 AI 튜터 ──
+    const ddigeudToggleBtn = document.getElementById('ddigeudToggleBtn');
+    const ddigeudPanel      = document.getElementById('ddigeudPanel');
+    const ddigeudCloseBtn   = document.getElementById('ddigeudCloseBtn');
+    const ddigeudMessages   = document.getElementById('ddigeudMessages');
+    const ddigeudInput      = document.getElementById('ddigeudInput');
+    const ddigeudSendBtn    = document.getElementById('ddigeudSendBtn');
+
+    const lectureTitleForTutor   = /*[[${content.sequence} + '강 ' + ${content.title}]]*/ '';
+    const lectureContentForTutor = /*[[${content.description}]]*/ '';
+
+    ddigeudToggleBtn.addEventListener('click', () => {
+      ddigeudPanel.classList.toggle('open');
+      if (ddigeudPanel.classList.contains('open')) ddigeudInput.focus();
+    });
+    ddigeudCloseBtn.addEventListener('click', () => ddigeudPanel.classList.remove('open'));
+
+    function appendDdigeudMsg(text, type) {
+      const div = document.createElement('div');
+      div.className = 'ddigeud-msg ddigeud-msg-' + type;
+
+      const textSpan = document.createElement('span');
+      textSpan.textContent = text;
+      div.appendChild(textSpan);
+
+      if (type === 'bot') {
+        const speakBtn = document.createElement('button');
+        speakBtn.className = 'ddigeud-speak-btn';
+        speakBtn.textContent = '🔊';
+        speakBtn.setAttribute('aria-label', '음성으로 듣기');
+        speakBtn.addEventListener('click', () => speakDdigeud(text, speakBtn));
+        div.appendChild(speakBtn);
+      }
+
+      ddigeudMessages.appendChild(div);
+      ddigeudMessages.scrollTop = ddigeudMessages.scrollHeight;
+      return div;
+    }
+
+    // ── 띠귿이 TTS (브라우저 내장 SpeechSynthesis) ──
+    function speakDdigeud(text, btnEl) {
+      if (!('speechSynthesis' in window)) {
+        alert('이 브라우저는 음성 읽기를 지원하지 않아요.');
+        return;
+      }
+      window.speechSynthesis.cancel(); // 겹쳐 재생 방지
+
+      const utter = new SpeechSynthesisUtterance(text);
+      utter.lang = 'ko-KR';
+      utter.rate = 1.0;
+      utter.pitch = 1.0;
+
+      if (btnEl) {
+        utter.onstart = () => { btnEl.classList.add('speaking'); };
+        utter.onend   = () => { btnEl.classList.remove('speaking'); };
+        utter.onerror = () => { btnEl.classList.remove('speaking'); };
+      }
+
+      window.speechSynthesis.speak(utter);
+    }
+
+    function sendToDdigeud() {
+      const question = ddigeudInput.value.trim();
+      if (!question) return;
+
+      appendDdigeudMsg(question, 'user');
+      ddigeudInput.value = '';
+      ddigeudSendBtn.disabled = true;
+
+      const loadingMsg = appendDdigeudMsg('생각하고 있어요…', 'loading');
+
+      const headers = { 'Content-Type': 'application/json' };
+      if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
+
+      fetch('/api/ai-tutor', {
+        method: 'POST',
+        headers: headers,
+        body: JSON.stringify({
+          question: question,
+          lectureTitle: lectureTitleForTutor,
+          lectureContent: lectureContentForTutor,
+          videoTimestamp: Math.floor(video.currentTime || 0)
+        })
+      })
+        .then(res => res.json())
+        .then(data => {
+          loadingMsg.remove();
+          appendDdigeudMsg(data.reply, 'bot');
+        })
+        .catch(() => {
+          loadingMsg.remove();
+          appendDdigeudMsg('답변을 가져오지 못했어요. 다시 시도해주세요.', 'bot');
+        })
+        .finally(() => { ddigeudSendBtn.disabled = false; });
+    }
+
+    ddigeudSendBtn.addEventListener('click', sendToDdigeud);
+    ddigeudInput.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter') sendToDdigeud();
+    });
 
 </script>
 
