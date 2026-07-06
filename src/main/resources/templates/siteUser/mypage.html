@@ -35,9 +35,9 @@
                 <span th:text="${subscription.planName}">구독</span> · D-<span th:text="${subscription.remainingDays}">0</span>
             </div>
 
-            <div class="calendar-wrapper" style="width: 100%; margin-top: 15px; padding: 15px; background: #fff; border-radius: 12px; border: 1px solid #eef2f5;">
-                <div style="font-weight: 700; margin-bottom: 10px; font-size: 14px;">📅 월간 출석부</div>
-                <div id="calendarGrid" style="display: grid; grid-template-columns: repeat(7, 1fr); gap: 5px;">
+            <div class="calendar-wrapper" style="width: 100%; box-sizing: border-box; margin-top: 15px; padding: 10px; background: #fff; border-radius: 12px; border: 1px solid #eef2f5;">
+                <div style="font-weight: 700; margin-bottom: 8px; font-size: 13px;">📅 월간 출석부</div>
+                <div id="calendarGrid">
                 </div>
             </div>
 
@@ -416,6 +416,75 @@
     function closeWithdrawModal() {
         document.getElementById('withdrawOverlay').style.display = 'none';
     }
+</script>
+<script>
+    // 1. 기존에 가지고 계시던 모달 관련 코드
+    function openWithdrawModal() {
+        document.getElementById('withdrawOverlay').style.display = 'flex';
+    }
+    function closeWithdrawModal() {
+        document.getElementById('withdrawOverlay').style.display = 'none';
+    }
+
+    // 2. 제가 드린 메뉴 및 히트맵 렌더링 코드 (이어서 붙여넣기)
+    document.addEventListener('DOMContentLoaded', function () {
+        const menuItems = document.querySelectorAll('.menu-item');
+        const subtabItems = document.querySelectorAll('.subtab-item');
+        const subtabPanels = document.querySelectorAll('.subtab-panel');
+
+        function activateMenu(tab) {
+            menuItems.forEach(m => m.classList.remove('active'));
+            const menuBtn = document.querySelector(`.menu-item[data-tab="${tab}"]`);
+            if (menuBtn) menuBtn.classList.add('active');
+        }
+
+        function activateSubtab(sub) {
+            subtabItems.forEach(s => s.classList.remove('active'));
+            subtabPanels.forEach(p => p.classList.remove('active'));
+            const subBtn = document.querySelector(`.subtab-item[data-subtab="${sub}"]`);
+            const subPanel = document.getElementById('subtab-' + sub);
+            if (subBtn) subBtn.classList.add('active');
+            if (subPanel) subPanel.classList.add('active');
+        }
+
+        function renderHeatmap() {
+            const rawData = /*[[${heatmapData}]]*/ [];
+            const grid = document.getElementById('calendarGrid');
+            if (!grid) return;
+
+            const attendanceMap = new Set(rawData.map(r => r.date));
+
+            for (let i = 1; i <= 30; i++) {
+                let dayBox = document.createElement('div');
+                dayBox.className = 'calendar-day';
+
+                let dateStr = "2026-07-" + (i < 10 ? '0' + i : i);
+                if(attendanceMap.has(dateStr)) {
+                    dayBox.classList.add('active');
+                }
+
+                dayBox.innerText = i;
+                grid.appendChild(dayBox);
+            }
+        }
+
+        renderHeatmap();
+
+        menuItems.forEach(item => {
+            item.addEventListener('click', function () {
+                const tab = this.getAttribute('data-tab');
+                activateMenu(tab);
+                const target = document.getElementById('panel-' + tab);
+                if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            });
+        });
+
+        subtabItems.forEach(item => {
+            item.addEventListener('click', function () {
+                activateSubtab(this.getAttribute('data-subtab'));
+            });
+        });
+    });
 </script>
 </body>
 </html>
