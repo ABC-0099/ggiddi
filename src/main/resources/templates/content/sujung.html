@@ -22,7 +22,7 @@
     <!-- 페이지 헤더 -->
     <div class="page-header">
         <div class="page-header-inner">
-            <a th:href="@{/admin/lectures}" class="back-btn">← 강의 목록으로</a>
+            <a th:href="@{/category/view/{id}(id=${lectureForm.categoryId})}" class="back-btn">← 강의 목록으로</a>
             <div class="page-title-row">
                 <h1 class="page-title">강의 수정</h1>
                 <span class="page-badge">관리자</span>
@@ -34,10 +34,11 @@
 
     <!-- 폼 -->
     <div class="form-container">
-        <form th:action="@{/admin/lectures/edit}" method="post" enctype="multipart/form-data"
+        <form th:action="@{/content/sujungProc}" method="post" enctype="multipart/form-data"
               th:object="${lectureForm}" id="upload-form">
             <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
             <input type="hidden" name="id" th:field="*{id}" />
+            <input type="hidden" name="categoryId" th:field="*{categoryId}" />
 
             <div class="form-grid">
 
@@ -72,9 +73,9 @@
                                 </select>
                             </div>
                             <div class="field-group">
-                                <label class="field-label" for="lectureOrder">강의 순서 <span class="req">*</span></label>
-                                <input class="field-input" type="number" id="lectureOrder" name="lectureOrder"
-                                       th:field="*{lectureOrder}"
+                                <label class="field-label" for="sequence">강의 순서 <span class="req">*</span></label>
+                                <input class="field-input" type="number" id="sequence" name="sequence"
+                                       th:field="*{sequence}"
                                        placeholder="예: 2" min="1" required />
                             </div>
                         </div>
@@ -331,9 +332,10 @@
 </div>
 
 <!-- 삭제 폼 (JS로 submit) -->
-<form id="delete-form" th:action="@{/admin/lectures/delete}" method="post" style="display:none;">
+<form id="delete-form" th:action="@{/content/sakjeProc}" method="post" style="display:none;">
     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
     <input type="hidden" name="id" th:value="${lectureForm.id}" />
+    <input type="hidden" name="categoryId" th:value="${lectureForm.categoryId}" />
 </form>
 
 <!-- 푸터 -->

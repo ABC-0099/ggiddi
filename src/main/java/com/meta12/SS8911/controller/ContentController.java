@@ -127,14 +127,29 @@ public class ContentController {
         return "content/view";
     }
 
-    // [수정/삭제/기타 Proc 메서드들은 기존과 동일합니다]
-    // ... (이후 chuga, sujung, sakje 관련 메서드 유지)
-
     @GetMapping("/content/sujung/{id}")
     public String sujung(Model model, @PathVariable("id") Long id) {
         Content content = contentService.view(id);
         if (content == null) return "redirect:/";
-        model.addAttribute("content", content);
+
+        ContentDTO lectureForm = new ContentDTO();
+        lectureForm.setId(content.getId());
+        lectureForm.setTitle(content.getTitle());
+        lectureForm.setSequence(content.getSequence());
+        lectureForm.setCategoryId(content.getCategory() != null ? content.getCategory().getId() : null);
+        lectureForm.setStage(content.getStage());
+        lectureForm.setDescription(content.getDescription());
+        lectureForm.setKeywords(content.getKeywords());
+        lectureForm.setStatus(content.getStatus());
+        lectureForm.setPublishAt(content.getPublishAt());
+        lectureForm.setFree(content.isFree());
+        lectureForm.setFileName(content.getFileName());
+        lectureForm.setThumbFileName(content.getThumbFileName());
+        lectureForm.setAttachFileName(content.getAttachFileName());
+        lectureForm.setVideoOriginalName(content.getFileOrigin());
+        lectureForm.setVideoUrl(content.getFileName() != null ? "/content/stream/" + content.getId() : null);
+
+        model.addAttribute("lectureForm", lectureForm);
         return "content/sujung";
     }
 
