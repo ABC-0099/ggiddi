@@ -37,4 +37,5 @@ public class AdminController {
         qnaService.adminDelete(id, admin);
         return "redirect:/admin?panel=board&tab=qna";
     }
+
 }

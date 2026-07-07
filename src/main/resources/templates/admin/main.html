@@ -1001,9 +1001,11 @@
                     <div class="section-title">이벤트 관리</div>
                     <div class="section-subtitle">진행 중인 이벤트와 참여 현황을 관리하세요</div>
                 </div>
-                <div class="section-actions">
-                    <button class="btn btn-primary"><i class="ti ti-plus"></i>새 이벤트 등록</button>
-                </div>
+                <button class="btn btn-primary"
+                        onclick="switchPanel('event-create', null)">
+                    <i class="ti ti-plus"></i>
+                    새 이벤트 등록
+                </button>
             </div>
 
             <!-- KPI -->
@@ -1160,6 +1162,176 @@
             </div>
         </div>
 
+        <div class="panel" id="panel-event-create">
+
+            <div class="section-header">
+                <div>
+                    <div class="section-title">이벤트 등록</div>
+                    <div class="section-subtitle">새로운 이벤트를 등록합니다.</div>
+                </div>
+
+                <div class="section-actions">
+                    <button class="btn btn-outline"
+                            onclick="switchPanel('event', document.querySelector('[onclick*=event]'))">
+                        목록으로
+                    </button>
+                </div>
+            </div>
+
+            <div class="card">
+                <!-- 이벤트 등록 폼 -->
+                <div class="card">
+
+                    <div class="card-head">
+                        <div class="card-title">
+                            <i class="ti ti-calendar-plus"></i>
+                            이벤트 정보
+                        </div>
+                    </div>
+
+                    <div class="event-form">
+
+                        <!-- 이벤트 제목 -->
+                        <div class="form-group">
+                            <label>이벤트 제목 <span class="required">*</span></label>
+                            <input type="text"
+                                   class="form-input"
+                                   placeholder="이벤트 제목을 입력하세요.">
+                        </div>
+
+                        <!-- 이벤트 내용 -->
+                        <div class="form-group">
+                            <label>이벤트 내용 <span class="required">*</span></label>
+                            <textarea class="form-textarea"
+                                      rows="8"
+                                      placeholder="이벤트 내용을 입력하세요."></textarea>
+                        </div>
+
+                        <!-- 이벤트 기간 -->
+                        <div class="form-group">
+                            <label>이벤트 기간</label>
+
+                            <div class="form-row">
+
+                                <input type="date" class="form-input">
+
+                                <input type="date" class="form-input">
+
+                            </div>
+
+                        </div>
+
+                        <!-- 이벤트 상태 -->
+                        <div class="form-group">
+
+                            <label>이벤트 상태</label>
+
+                            <select class="form-input">
+                                <option>진행 예정</option>
+                                <option>진행 중</option>
+                                <option>종료</option>
+                            </select>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+
+
+
+                <!-- 이벤트 포스터 -->
+                <div class="card">
+
+                    <div class="card-head">
+                        <div class="card-title">
+                            <i class="ti ti-photo"></i>
+                            이벤트 포스터
+                        </div>
+                    </div>
+
+                    <div class="poster-upload">
+
+                        <i class="ti ti-photo-plus upload-icon"></i>
+
+                        <h3>포스터 업로드</h3>
+
+                        <p>이벤트 상세 페이지에 표시될 포스터를 업로드하세요.</p>
+
+                        <button class="btn btn-outline">
+                            <i class="ti ti-upload"></i>
+                            파일 선택
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+
+
+
+                <!-- 이벤트 썸네일 -->
+                <div class="card">
+
+                    <div class="card-head">
+                        <div class="card-title">
+                            <i class="ti ti-photo"></i>
+                            이벤트 썸네일
+                        </div>
+                    </div>
+
+                    <div class="poster-upload">
+
+                        <i class="ti ti-photo-plus upload-icon"></i>
+
+                        <h3>썸네일 업로드</h3>
+
+                        <p>이벤트 목록에 표시될 썸네일 이미지를 업로드하세요.</p>
+
+                        <button class="btn btn-outline">
+                            <i class="ti ti-upload"></i>
+                            파일 선택
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+
+
+
+                <!-- 등록 -->
+                <div class="card">
+
+                    <div class="card-head">
+                        <div class="card-title">
+                            <i class="ti ti-device-floppy"></i>
+                            등록
+                        </div>
+                    </div>
+
+                    <div class="event-btn-wrap">
+
+                        <button class="btn btn-outline"
+                                onclick="switchPanel('event', null)">
+                            취소
+                        </button>
+
+                        <button class="btn btn-primary">
+                            <i class="ti ti-device-floppy"></i>
+                            이벤트 등록
+                        </button>
+
+                    </div>
+
+                </div>
+            </div>
+
+        </div>
 
     </div><!-- /content -->
 </div><!-- /main -->

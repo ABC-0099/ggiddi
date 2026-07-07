@@ -656,3 +656,138 @@
     .chart-row { grid-template-columns: 1fr; }
     .pay-kpi { grid-template-columns: repeat(2, 1fr); }
   }
+
+  /* ===========================
+     이벤트 등록
+  =========================== */
+
+  .event-form{
+      display:flex;
+      flex-direction:column;
+      gap:24px;
+      padding:24px 20px;
+  }
+
+  .form-row{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:20px;
+      align-items:center;
+  }
+
+  .form-group{
+      display:flex;
+      flex-direction:column;
+      gap:12px;
+  }
+
+  .form-group label{
+      font-size:15px;
+      font-weight:700;
+      color:#374151;
+  }
+
+  .required{
+      color:#ef4444;
+  }
+
+  .form-input,
+  .form-textarea{
+      width:100%;
+      padding:13px 15px;
+      border:1px solid #dbe3ef;
+      border-radius:10px;
+      font-size:14px;
+      background:#fff;
+      transition:all .2s ease;
+      box-sizing:border-box;
+  }
+
+  .form-input:focus,
+  .form-textarea:focus{
+      border-color:#185FA5;
+      outline:none;
+      box-shadow:0 0 0 3px rgba(24,95,165,.12);
+  }
+
+  .form-textarea{
+      resize:vertical;
+      min-height:220px;
+      font-family:inherit;
+      line-height:1.6;
+  }
+
+  .poster-upload{
+      border:2px dashed #d5dce8;
+      border-radius:14px;
+      padding:60px 20px;
+      text-align:center;
+      background:#fafcff;
+      transition:.25s;
+  }
+
+  .poster-upload:hover{
+      border-color:#185FA5;
+      background:#f5f9ff;
+  }
+
+  .upload-icon{
+      font-size:52px;
+      color:#185FA5;
+      margin-bottom:16px;
+  }
+
+  .poster-upload h3{
+      margin:12px 0 8px;
+      font-size:20px;
+      font-weight:700;
+      color:#1f2937;
+  }
+
+  .poster-upload p{
+      color:#6b7280;
+      margin-bottom:24px;
+      font-size:14px;
+  }
+
+  .event-btn-wrap{
+      display:flex;
+      justify-content:flex-end;
+      gap:12px;
+      padding:20px;
+  }
+
+  .card{
+      margin-bottom:24px;
+  }
+
+  .card-head{
+      padding:20px 20px 15px;
+      margin-bottom:5px;
+      border-bottom:1px solid #edf2f7;
+  }
+
+  .card-title{
+      font-size:18px;
+      font-weight:700;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      color:#1f2937;
+  }
+
+  .card-title i{
+      color:#185FA5;
+  }
+
+  @media (max-width:768px){
+
+      .form-row{
+          grid-template-columns:1fr;
+      }
+
+      .event-btn-wrap{
+          flex-direction:column;
+      }
+
+  }
