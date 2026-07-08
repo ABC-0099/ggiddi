@@ -121,7 +121,7 @@ public class AdminController {
     // ==========================================
     @GetMapping("/board")
     public String board(Model model,
-                        @RequestParam(value = "category", defaultValue = "notice") String category,
+                        @RequestParam(value = "category", defaultValue = "all") String category,
                         @RequestParam(value = "kw", defaultValue = "") String kw) {
 
         model.addAttribute("activeMenu", "board");

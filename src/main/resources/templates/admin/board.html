@@ -27,6 +27,7 @@
         <div class="card">
             <div style="padding: 24px 24px 0;">
                 <div class="board-menu-tabs">
+                    <a th:href="@{/admin/board(category='all')}" class="board-tab" th:classappend="${currentCategory == 'all'} ? 'active'">전체</a>
                     <a th:href="@{/admin/board(category='account')}" class="board-tab" th:classappend="${currentCategory == 'account'} ? 'active'">계정/로그인</a>
                     <a th:href="@{/admin/board(category='payment')}" class="board-tab" th:classappend="${currentCategory == 'payment'} ? 'active'">결제/환불</a>
                     <a th:href="@{/admin/board(category='content')}" class="board-tab" th:classappend="${currentCategory == 'content'} ? 'active'">학습 콘텐츠</a>
