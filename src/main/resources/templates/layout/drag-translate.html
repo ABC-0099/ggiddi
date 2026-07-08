@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  ================================
+  사용법 (다른 페이지에서 삽입, footer 근처에 한 줄 추가):
+  <div th:replace="~{layout/drag-translate :: dragTranslate}"></div>
+
+  텍스트를 드래그하면 선택 영역 근처에 "번역" 버튼이 뜨고,
+  클릭하면 /api/translate 호출해서 팝업으로 번역 결과를 보여줌.
+  타깃 언어는 우측 하단 지구본 버튼으로 바꿀 수 있고 localStorage에 기억됨.
+  ================================
+-->
+
+<div th:fragment="dragTranslate">
+  <link th:href="@{/css/layout/drag-translate.css}" rel="stylesheet" />
+
+  <!-- 드래그 시 뜨는 작은 "번역" 트리거 버튼 -->
+  <button id="dtTriggerBtn" class="dt-trigger-btn" type="button">
+    <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+      <path d="M4 5h9M8 3v2M11 5c-.3 3-2 6-5 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+      <path d="M6 12l3-1.5M13 21l4-9 4 9M14.5 18h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+    </svg>
+    번역
+  </button>
+
+  <!-- 번역 결과 팝업 -->
+  <div id="dtPopup" class="dt-popup" hidden>
+    <div class="dt-popup-header">
+      <span class="dt-popup-title">번역</span>
+      <button id="dtCloseBtn" class="dt-close-btn" type="button" aria-label="닫기">×</button>
+    </div>
+    <div id="dtOriginal" class="dt-original"></div>
+    <div id="dtResult" class="dt-result">
+      <span class="dt-loading">번역 중...</span>
+    </div>
+  </div>
+
+  <!-- 우측 하단 고정 언어 선택 버튼 -->
+  <div id="dtLangWidget" class="dt-lang-widget">
+    <button id="dtLangToggle" class="dt-lang-toggle" type="button" title="번역 언어 설정">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M3 12h18M12 3c2.5 2.5 4 5.8 4 9s-1.5 6.5-4 9c-2.5-2.5-4-5.8-4-9s1.5-6.5 4-9z" stroke="currentColor" stroke-width="1.6"/>
+      </svg>
+    </button>
+    <ul id="dtLangMenu" class="dt-lang-menu" hidden>
+      <li data-lang="en">English</li>
+      <li data-lang="zh">中文</li>
+      <li data-lang="ja">日本語</li>
+      <li data-lang="vi">Tiếng Việt</li>
+      <li data-lang="tl">Filipino</li>
+      <li data-lang="id">Bahasa Indonesia</li>
+      <li data-lang="th">ไทย</li>
+    </ul>
+  </div>
+
+  <script th:inline="javascript">
+    (function () {
+      const STORAGE_KEY = 'kkyd_translate_lang';
+      const LANG_LABELS = {
+        en: 'English', zh: '中文', ja: '日本語', vi: 'Tiếng Việt',
+        tl: 'Filipino', id: 'Bahasa Indonesia', th: 'ไทย'
+      };
+
+      const triggerBtn = document.getElementById('dtTriggerBtn');
+      const popup = document.getElementById('dtPopup');
+      const originalEl = document.getElementById('dtOriginal');
+      const resultEl = document.getElementById('dtResult');
+      const closeBtn = document.getElementById('dtCloseBtn');
+      const langToggle = document.getElementById('dtLangToggle');
+      const langMenu = document.getElementById('dtLangMenu');
+
+      let currentSelectionText = '';
+      let currentRange = null;
+
+      function getTargetLang() {
+        return localStorage.getItem(STORAGE_KEY) || 'en';
+      }
+
+      function setTargetLang(lang) {
+        localStorage.setItem(STORAGE_KEY, lang);
+        langMenu.querySelectorAll('li').forEach(li => {
+          li.classList.toggle('active', li.dataset.lang === lang);
+        });
+      }
+
+      function getCsrfHeaders() {
+        const tokenMeta = document.querySelector('meta[name="_csrf"]');
+        const headerMeta = document.querySelector('meta[name="_csrf_header"]');
+        const headers = { 'Content-Type': 'application/json' };
+        if (tokenMeta && headerMeta) {
+          headers[headerMeta.content] = tokenMeta.content;
+        }
+        return headers;
+      }
+
+      function isIgnoredTarget(el) {
+        return !!el.closest('input, textarea, select, [contenteditable="true"], .dt-popup, .dt-trigger-btn, .dt-lang-widget');
+      }
+
+      function hideTrigger() {
+        triggerBtn.style.display = 'none';
+      }
+
+      function hidePopup() {
+        popup.hidden = true;
+      }
+
+      document.addEventListener('mouseup', (e) => {
+        if (isIgnoredTarget(e.target)) return;
+
+        const selection = window.getSelection();
+        const text = selection ? selection.toString().trim() : '';
+
+        if (!text || text.length < 1 || text.length > 300) {
+          hideTrigger();
+          return;
+        }
+
+        currentSelectionText = text;
+        currentRange = selection.getRangeAt(0).cloneRange();
+
+        const rect = currentRange.getBoundingClientRect();
+        triggerBtn.style.display = 'flex';
+        triggerBtn.style.top = `${window.scrollY + rect.bottom + 6}px`;
+        triggerBtn.style.left = `${window.scrollX + rect.left}px`;
+      });
+
+      // 다른 곳 클릭하면 트리거 버튼 숨김 (팝업/버튼 자체 클릭은 예외)
+      document.addEventListener('mousedown', (e) => {
+        if (!e.target.closest('.dt-trigger-btn')) {
+          hideTrigger();
+        }
+      });
+
+      triggerBtn.addEventListener('click', async () => {
+        if (!currentSelectionText) return;
+
+        const rect = currentRange.getBoundingClientRect();
+        popup.hidden = false;
+        popup.style.top = `${window.scrollY + rect.bottom + 10}px`;
+        popup.style.left = `${window.scrollX + rect.left}px`;
+
+        originalEl.textContent = currentSelectionText;
+        resultEl.innerHTML = '<span class="dt-loading">번역 중...</span>';
+        hideTrigger();
+
+        try {
+          const res = await fetch('/api/translate', {
+            method: 'POST',
+            headers: getCsrfHeaders(),
+            body: JSON.stringify({
+              text: currentSelectionText,
+              targetLang: getTargetLang()
+            })
+          });
+
+          if (!res.ok) throw new Error('translate failed');
+
+          const data = await res.json();
+          resultEl.textContent = data.translatedText || '번역 결과가 없어요.';
+        } catch (err) {
+          resultEl.textContent = '번역에 실패했어요. 잠시 후 다시 시도해주세요.';
+        }
+      });
+
+      closeBtn.addEventListener('click', hidePopup);
+
+      langToggle.addEventListener('click', (e) => {
+        e.stopPropagation();
+        langMenu.hidden = !langMenu.hidden;
+      });
+
+      langMenu.querySelectorAll('li').forEach(li => {
+        li.addEventListener('click', () => {
+          setTargetLang(li.dataset.lang);
+          langMenu.hidden = true;
+        });
+      });
+
+      document.addEventListener('click', (e) => {
+        if (!e.target.closest('.dt-lang-widget')) {
+          langMenu.hidden = true;
+        }
+      });
+
+      // 초기 언어 표시 동기화
+      setTargetLang(getTargetLang());
+    })();
+  </script>
+</div>
+
+</body>
+</html>

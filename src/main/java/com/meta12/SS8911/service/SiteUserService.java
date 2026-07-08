@@ -9,6 +9,10 @@ import com.meta12.SS8911.exception.DataNotFoundException;
 import com.meta12.SS8911.repository.SiteUserRepository;
 import com.meta12.SS8911.repository.StudyRecordRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -25,6 +29,10 @@ public class SiteUserService implements UserDetailsService {
     private final SiteUserRepository siteUserRepository;
     private final PasswordEncoder passwordEncoder;
     private final StudyRecordRepository studyRecordRepository;
+
+    public List<SiteUser> getAllUsers() {
+        return siteUserRepository.findAll();
+    }
 
     @Transactional
     public void chugaProc(SiteUserDTO dto) {

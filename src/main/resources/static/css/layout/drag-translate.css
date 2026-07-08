@@ -1,0 +1,121 @@
+.dt-trigger-btn {
+  position: absolute;
+  display: none;
+  align-items: center;
+  gap: 4px;
+  z-index: 2000;
+  background: #185FA5;
+  color: #fff;
+  border: none;
+  border-radius: 999px;
+  padding: 6px 12px;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  box-shadow: 0 4px 12px rgba(24, 95, 165, 0.35);
+}
+.dt-trigger-btn svg {
+  width: 14px;
+  height: 14px;
+}
+.dt-trigger-btn:hover {
+  background: #124a82;
+}
+
+.dt-popup {
+  position: absolute;
+  z-index: 2001;
+  width: 280px;
+  max-width: 90vw;
+  background: #fff;
+  border-radius: 14px;
+  box-shadow: 0 10px 30px rgba(0,0,0,0.18);
+  border: 1px solid #9FE1CB;
+  overflow: hidden;
+  font-size: 14px;
+}
+.dt-popup-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: #185FA5;
+  color: #fff;
+  padding: 8px 12px;
+}
+.dt-popup-title {
+  font-weight: 700;
+  font-size: 13px;
+}
+.dt-close-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 18px;
+  line-height: 1;
+  cursor: pointer;
+  padding: 0 2px;
+}
+.dt-original {
+  padding: 10px 12px 4px;
+  color: #666;
+  font-size: 12.5px;
+  border-bottom: 1px dashed #eee;
+}
+.dt-result {
+  padding: 10px 12px 14px;
+  color: #1a1a1a;
+  line-height: 1.5;
+  white-space: pre-wrap;
+}
+.dt-loading {
+  color: #5DCAA5;
+  font-size: 13px;
+}
+
+.dt-lang-widget {
+  position: fixed;
+  right: 20px;
+  bottom: 20px;
+  z-index: 1900;
+}
+.dt-lang-toggle {
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  background: #5DCAA5;
+  color: #fff;
+  border: none;
+  box-shadow: 0 4px 14px rgba(93, 202, 165, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+}
+.dt-lang-toggle svg {
+  width: 22px;
+  height: 22px;
+}
+.dt-lang-menu {
+  position: absolute;
+  bottom: 54px;
+  right: 0;
+  background: #fff;
+  border-radius: 10px;
+  box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+  list-style: none;
+  margin: 0;
+  padding: 6px 0;
+  width: 160px;
+}
+.dt-lang-menu li {
+  padding: 8px 14px;
+  font-size: 13.5px;
+  cursor: pointer;
+}
+.dt-lang-menu li:hover {
+  background: #f2fbf8;
+}
+.dt-lang-menu li.active {
+  color: #185FA5;
+  font-weight: 700;
+}

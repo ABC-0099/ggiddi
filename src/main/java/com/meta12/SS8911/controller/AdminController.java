@@ -36,6 +36,7 @@ public class AdminController {
         // 브라우저 새로고침 시에도 기존에 보던 탭(패널)이 그대로 열려있도록 전달
         model.addAttribute("currentPanel", panel);
         model.addAttribute("currentCategory", category);
+        model.addAttribute("users", siteUserService.getAllUsers());
         model.addAttribute("kw", kw);
 
         // ==========================================
@@ -66,6 +67,7 @@ public class AdminController {
         }
         model.addAttribute("contents", wrappedContentList);
         model.addAttribute("totalContentCount", wrappedContentList.size());
+        model.addAttribute("users", siteUserService.getAllUsers());
 
         // ==========================================
         // 3. 이벤트 가짜 데이터들 (유지)
@@ -134,27 +136,151 @@ public class AdminController {
 
     // ── 가짜/DTO 내부 클래스 구조들 (유지) ──
     public static class QnaWrapper {
-        private final Long id; private final String title; private final String content; private final AuthorMock author; private final String createdDate; private final String status;
-        public QnaWrapper(Long id, String title, String content, String username, String createdDate, String status) { this.id = id; this.title = title; this.content = content; this.author = new AuthorMock(username); this.createdDate = createdDate; this.status = status; }
-        public Long getId() { return id; } public String getTitle() { return title; } public String getContent() { return content; } public AuthorMock getAuthor() { return author; } public String getCreatedDate() { return createdDate; } public String getStatus() { return status; }
-    }
-    public static class AuthorMock { private final String username; public AuthorMock(String username) { this.username = username; } public String getUsername() { return username; } }
-    public static class AdminContentDto {
-        private final Long id; private final String title; private final String step; private final int lectureCount; private final String createdDate; private final String status;
-        public AdminContentDto(Long id, String title, String step, int lectureCount, String createdDate, String status) { this.id = id; this.title = title; this.step = step; this.lectureCount = lectureCount; this.createdDate = createdDate; this.status = status; }
-        public Long getId() { return id; } public String getTitle() { return title; } public String getStep() { return step; } public int getLectureCount() { return lectureCount; } public String getCreatedDate() { return createdDate; } public String getStatus() { return status; }
-    }
-    public static class EventMock {
-        private final String title; private final String startDate; private final String endDate; private final int participantCount; private final String createdDate; private final String status;
-        public EventMock(String title, String startDate, String endDate, int participantCount, String createdDate, String status) { this.title = title; this.startDate = startDate; this.endDate = endDate; this.participantCount = participantCount; this.createdDate = createdDate; this.status = status; }
-        public String getTitle() { return title; } public String getStartDate() { return startDate; } public String getEndDate() { return endDate; } public int getParticipantCount() { return participantCount; } public String getCreatedDate() { return createdDate; } public String getStatus() { return status; }
+        private final Long id;
+        private final String title;
+        private final String content;
+        private final AuthorMock author;
+        private final String createdDate;
+        private final String status;
+
+        public QnaWrapper(Long id, String title, String content, String username, String createdDate, String status) {
+            this.id = id;
+            this.title = title;
+            this.content = content;
+            this.author = new AuthorMock(username);
+            this.createdDate = createdDate;
+            this.status = status;
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public String getContent() {
+            return content;
+        }
+
+        public AuthorMock getAuthor() {
+            return author;
+        }
+
+        public String getCreatedDate() {
+            return createdDate;
+        }
+
+        public String getStatus() {
+            return status;
+        }
     }
 
+    public static class AuthorMock {
+        private final String username;
+
+        public AuthorMock(String username) {
+            this.username = username;
+        }
+
+        public String getUsername() {
+            return username;
+        }
+    }
+
+    public static class AdminContentDto {
+        private final Long id;
+        private final String title;
+        private final String step;
+        private final int lectureCount;
+        private final String createdDate;
+        private final String status;
+
+        public AdminContentDto(Long id, String title, String step, int lectureCount, String createdDate, String status) {
+            this.id = id;
+            this.title = title;
+            this.step = step;
+            this.lectureCount = lectureCount;
+            this.createdDate = createdDate;
+            this.status = status;
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public String getStep() {
+            return step;
+        }
+
+        public int getLectureCount() {
+            return lectureCount;
+        }
+
+        public String getCreatedDate() {
+            return createdDate;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+    }
+
+    public static class EventMock {
+        private final String title;
+        private final String startDate;
+        private final String endDate;
+        private final int participantCount;
+        private final String createdDate;
+        private final String status;
+
+        public EventMock(String title, String startDate, String endDate, int participantCount, String createdDate, String status) {
+            this.title = title;
+            this.startDate = startDate;
+            this.endDate = endDate;
+            this.participantCount = participantCount;
+            this.createdDate = createdDate;
+            this.status = status;
+        }
+
+        public String getTitle() {
+            return title;
+        }
+
+        public String getStartDate() {
+            return startDate;
+        }
+
+        public String getEndDate() {
+            return endDate;
+        }
+
+        public int getParticipantCount() {
+            return participantCount;
+        }
+
+        public String getCreatedDate() {
+            return createdDate;
+        }
+
+        public String getStatus() {
+            return status;
+        }
+    }
+
+
     @PostMapping("/admin/event/create")
-    public String createEvent(Event event){
+    public String createEvent(Event event) {
 
         eventService.create(event);
 
         return "redirect:/admin?panel=event";
     }
+
+
 }

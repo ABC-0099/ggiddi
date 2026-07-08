@@ -222,10 +222,48 @@
 
         <div class="panel" id="panel-members">
             <div class="section-header">
-                <div class="section-title">회원 관리</div>
+                <div>
+                    <div class="section-title">회원 관리</div>
+                    <div class="section-subtitle"
+                         th:text="|전체 ${#lists.size(users)}명|">
+                        전체 0명
+                    </div>
+                </div>
             </div>
-            <div class="card" style="padding: 50px 0; text-align: center; color: var(--gray-400);">
-                현재 연동된 회원 데이터가 없습니다. (SiteUser 백엔드 작업 진행 필요)
+
+            <div class="card">
+                <table class="data-table">
+                    <thead>
+                    <tr>
+                        <th>번호</th>
+                        <th>아이디</th>
+                        <th>이름</th>
+                        <th>이메일</th>
+                        <th>권한</th>
+                        <th>가입일</th>
+                    </tr>
+                    </thead>
+
+                    <tbody>
+
+                    <tr th:if="${#lists.isEmpty(users)}">
+                        <td colspan="6"
+                            style="text-align:center;padding:40px;">
+                            등록된 회원이 없습니다.
+                        </td>
+                    </tr>
+
+                    <tr th:each="user, stat : ${users}">
+                        <td th:text="${stat.count}"></td>
+                        <td th:text="${user.username}"></td>
+                        <td th:text="${user.name}"></td>
+                        <td th:text="${user.email}"></td>
+                        <td th:text="${user.role}"></td>
+                        <td th:text="${user.joinDate}"></td>
+                    </tr>
+
+                    </tbody>
+                </table>
             </div>
         </div>
 
@@ -236,6 +274,8 @@
                     <div class="section-subtitle" th:text="|답변 대기 중인 문의: ${pendingQnaCount}건|">0건</div>
                 </div>
             </div>
+
+            <div class="card">
 
             <div class="board-menu-tabs">
                 <a th:href="@{/admin(panel='board', category='account')}" class="board-tab" th:classappend="${currentCategory == 'account'} ? 'active'">계정/로그인</a>
