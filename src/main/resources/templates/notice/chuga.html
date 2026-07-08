@@ -10,34 +10,6 @@
   <link rel="stylesheet" th:href="@{/css/layout/footer.css}" />
   <link rel="stylesheet" th:href="@{/css/notice/form.css}" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
-
-  <style>
-    /* view.css의 post-card 톤을 재사용하는 최소한의 폼 전용 스타일 */
-    .form-group { margin-bottom: 20px; }
-    .form-label { display: block; margin-bottom: 8px; font-weight: 500; }
-    .form-input,
-    .form-select,
-    .form-textarea {
-      width: 100%;
-      box-sizing: border-box;
-      padding: 12px 14px;
-      border: 1px solid rgba(0,0,0,0.15);
-      border-radius: 10px;
-      font-family: inherit;
-      font-size: 15px;
-    }
-    .form-textarea { min-height: 260px; resize: vertical; white-space: pre-wrap; }
-    .form-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 24px; }
-    .btn-submit, .btn-cancel {
-      padding: 10px 22px;
-      border-radius: 10px;
-      border: none;
-      cursor: pointer;
-      font-size: 15px;
-    }
-    .btn-submit { background: #4b6bfb; color: #fff; }
-    .btn-cancel { background: #eee; color: #333; text-decoration: none; display: inline-flex; align-items: center; }
-  </style>
 </head>
 <body>
 
@@ -46,8 +18,7 @@
 <!-- NAV -->
 <div th:replace="~{layout/navbar :: navbar(currentMenu='quiz')}"></div>
 
-<!-- 본문 -->
-<div class="view-wrap">
+<div class="form-wrap">
 
   <!-- 뒤로가기 -->
   <a th:href="@{/notice/list}" class="back-btn">
@@ -57,18 +28,22 @@
     공지사항 목록
   </a>
 
-  <div class="post-card">
+  <form class="form-card" id="noticeForm"
+        th:action="@{/notice/save}"
+        th:object="${noticeDTO}" method="post">
 
-    <div class="post-header">
-      <h1 class="post-title">공지사항 작성</h1>
+    <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
+
+    <div class="form-header">
+      <h1>공지사항 작성</h1>
+      <p>새로운 공지사항을 등록합니다.</p>
     </div>
 
-    <form th:action="@{/notice/save}" th:object="${noticeDTO}" method="post">
+    <div class="form-body">
 
-      <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
-
+      <!-- 카테고리 -->
       <div class="form-group">
-        <label class="form-label" for="category">카테고리</label>
+        <label class="form-label" for="category">카테고리<span class="req">*</span></label>
         <select class="form-select" id="category" th:field="*{category}">
           <option value="notice">공지</option>
           <option value="event">이벤트</option>
@@ -77,24 +52,26 @@
         </select>
       </div>
 
+      <!-- 제목 -->
       <div class="form-group">
-        <label class="form-label" for="title">제목</label>
+        <label class="form-label" for="title">제목<span class="req">*</span></label>
         <input class="form-input" type="text" id="title" th:field="*{title}" placeholder="제목을 입력하세요" required />
       </div>
 
+      <!-- 본문 -->
       <div class="form-group">
-        <label class="form-label" for="content">내용</label>
+        <label class="form-label" for="content">내용<span class="req">*</span></label>
         <textarea class="form-textarea" id="content" th:field="*{content}" placeholder="내용을 입력하세요" required></textarea>
       </div>
 
-      <div class="form-actions">
-        <a th:href="@{/notice/list}" class="btn-cancel">취소</a>
-        <button type="submit" class="btn-submit">등록</button>
-      </div>
+    </div>
 
-    </form>
+    <div class="form-actions">
+      <a th:href="@{/notice/list}" class="btn btn-cancel">취소</a>
+      <button type="submit" class="btn btn-primary">등록</button>
+    </div>
 
-  </div>
+  </form>
 
 </div>
 
