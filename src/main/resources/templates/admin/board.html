@@ -151,50 +151,49 @@
             </table>
 
 
-            <!-- ===========================
-                 페이지네이션
-                 =========================== -->
+            <!-- 페이지네이션 -->
             <div class="pagination" th:if="${qnas.totalPages > 0}">
 
-
-                <!-- 이전 -->
+                <!-- 이전 페이지 그룹 -->
                 <a class="page-btn"
-                   th:if="${qnas.hasPrevious()}"
+                   th:if="${qnas.number > 0}"
                    th:href="@{/admin/board(
-                        page=${qnas.number - 1},
-                        category=${currentCategory},
-                        kw=${kw}
-                   )}">
-                    이전
+            page=${qnas.number - 1},
+            category=${currentCategory},
+            kw=${kw}
+       )}">
+                    &lt;
                 </a>
 
 
-                <!-- 페이지 번호 -->
-                <span th:if="${qnas.totalPages > 0}"
-                      th:each="pageNum : ${#numbers.sequence(0, qnas.totalPages - 1)}">
+                <!-- 페이지 번호 (5개 단위) -->
+                <span th:each="pageNum : ${#numbers.sequence(
+        (qnas.number / 5) * 5,
+        T(java.lang.Math).min((qnas.number / 5) * 5 + 4, qnas.totalPages - 1)
+    )}">
 
-                    <a class="page-btn"
-                       th:href="@{/admin/board(
-                            page=${pageNum},
-                            category=${currentCategory},
-                            kw=${kw}
-                       )}"
-                       th:text="${pageNum + 1}"
-                       th:classappend="${pageNum == qnas.number} ? 'active'">
-                    </a>
+        <a class="page-btn"
+           th:href="@{/admin/board(
+                page=${pageNum},
+                category=${currentCategory},
+                kw=${kw}
+           )}"
+           th:text="${pageNum + 1}"
+           th:classappend="${pageNum == qnas.number} ? 'active'">
+        </a>
 
-                </span>
+    </span>
 
 
-                <!-- 다음 -->
+                <!-- 다음 페이지 그룹 -->
                 <a class="page-btn"
-                   th:if="${qnas.hasNext()}"
+                   th:if="${qnas.number < qnas.totalPages - 1}"
                    th:href="@{/admin/board(
-                        page=${qnas.number + 1},
-                        category=${currentCategory},
-                        kw=${kw}
-                   )}">
-                    다음
+            page=${qnas.number + 1},
+            category=${currentCategory},
+            kw=${kw}
+       )}">
+                    &gt;
                 </a>
 
             </div>

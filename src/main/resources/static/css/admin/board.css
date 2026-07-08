@@ -61,21 +61,28 @@
 .pagination {
     display: flex;
     justify-content: center;
-    gap: 8px;
+    align-items: center;
+    gap: 6px;
     padding: 25px 0;
 }
 
 .page-btn {
+    width: 34px;
+    height: 34px;
     display: flex;
-    align-items: center;
     justify-content: center;
-    min-width: 36px;
-    height: 36px;
+    align-items: center;
+
     border: 1px solid #ddd;
     border-radius: 8px;
-    color: #555;
+
+    color: #666;
     text-decoration: none;
     font-size: 14px;
+}
+
+.page-btn:hover {
+    background: #f8f8f8;
 }
 
 .page-btn.active {
