@@ -791,3 +791,10 @@
       }
 
   }
+  .upload-file-name{
+      margin-top:12px;
+      font-size:14px;
+      color:#666;
+      font-weight:500;
+      word-break:break-all;
+  }

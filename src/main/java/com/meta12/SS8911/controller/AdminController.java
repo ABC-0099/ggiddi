@@ -1,8 +1,10 @@
 package com.meta12.SS8911.controller;
 
 import com.meta12.SS8911.entity.AdminContent;
+import com.meta12.SS8911.entity.Event;
 import com.meta12.SS8911.entity.Qna;
 import com.meta12.SS8911.service.AdminContentService;
+import com.meta12.SS8911.service.EventService;
 import com.meta12.SS8911.service.QnaService;
 import com.meta12.SS8911.service.SiteUserService;
 import lombok.RequiredArgsConstructor;
@@ -23,6 +25,7 @@ public class AdminController {
     private final QnaService qnaService;
     private final SiteUserService siteUserService;
     private final AdminContentService adminContentService; // 💡 필드 단일화로 주입 충돌 방지
+    private final EventService eventService;
 
     @GetMapping("/admin")
     public String adminDashboard(Model model,
@@ -78,6 +81,8 @@ public class AdminController {
         eventList.add(new EventMock("신규가입 웰컴 이벤트", "2026.06.01", "상시", 241, "2026.05.28", "ONGOING"));
         eventList.add(new EventMock("추석맞이 K-문화 퀴즈전", "2026.09.20", "2026.09.27", 0, "2026.06.30", "UPCOMING"));
         model.addAttribute("events", eventList);
+
+        model.addAttribute("events", eventService.findAll());
 
         return "admin/dashboard";
     }
@@ -143,5 +148,13 @@ public class AdminController {
         private final String title; private final String startDate; private final String endDate; private final int participantCount; private final String createdDate; private final String status;
         public EventMock(String title, String startDate, String endDate, int participantCount, String createdDate, String status) { this.title = title; this.startDate = startDate; this.endDate = endDate; this.participantCount = participantCount; this.createdDate = createdDate; this.status = status; }
         public String getTitle() { return title; } public String getStartDate() { return startDate; } public String getEndDate() { return endDate; } public int getParticipantCount() { return participantCount; } public String getCreatedDate() { return createdDate; } public String getStatus() { return status; }
+    }
+
+    @PostMapping("/admin/event/create")
+    public String createEvent(Event event){
+
+        eventService.create(event);
+
+        return "redirect:/admin?panel=event";
     }
 }
