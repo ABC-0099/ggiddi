@@ -6,6 +6,29 @@
     <title>끼역띠귿 - 관리자 대시보드</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     <link rel="stylesheet" th:href="@{/css/admin/dashboard.css}">
+    <style>
+        /* ── 게시판 및 콘텐츠 관리 추가 고도화 디자인 스타일 패치 ── */
+        .board-menu-tabs { display: flex; gap: 8px; margin-bottom: 20px; border-bottom: 1px solid #e2e8f0; padding-bottom: 0; }
+        .board-tab { padding: 10px 20px; font-size: 14px; font-weight: 600; color: #64748b; text-decoration: none; border-bottom: 2px solid transparent; cursor: pointer; transition: all 0.2s; }
+        .board-tab:hover { color: #185FA5; }
+        .board-tab.active { color: #185FA5; border-bottom: 2px solid #185FA5; background: #f8fafc; border-radius: 6px 6px 0 0; }
+
+        .search-form-wrap { display: flex; gap: 8px; margin-bottom: 20px; width: 100%; }
+        .search-box-container { position: relative; flex: 1; display: flex; align-items: center; }
+        .search-box-container .ti-search { position: absolute; left: 14px; color: #94a3b8; font-size: 16px; }
+        .search-box-container .search-input { width: 100%; padding: 12px 12px 12px 40px; border: 1px solid #e2e8f0; border-radius: 8px; font-size: 14px; outline: none; }
+        .search-box-container .search-input:focus { border-color: #185FA5; box-shadow: 0 0 0 3px rgba(24,95,165,0.1); }
+        .btn-search-submit { background: #185FA5; color: white; border: none; padding: 0 20px; border-radius: 8px; font-weight: 600; font-size: 14px; display: flex; align-items: center; gap: 6px; cursor: pointer; white-space: nowrap; }
+        .btn-search-submit:hover { background: #12487e; }
+
+        /* 💡 수정/삭제 액션 단추 스타일 매칭 */
+        .action-buttons-cell { display: flex; gap: 6px; align-items: center; }
+        .btn-action-icon { background: none; border: none; padding: 4px; border-radius: 4px; cursor: pointer; display: inline-flex; align-items: center; font-size: 16px; transition: background 0.2s; }
+        .btn-action-edit { color: #185FA5; }
+        .btn-action-edit:hover { background: rgba(24,95,165,0.08); }
+        .btn-action-delete { color: #ef4444; }
+        .btn-action-delete:hover { background: rgba(239,68,68,0.08); }
+    </style>
 </head>
 <body>
 
@@ -19,36 +42,36 @@
 
     <nav class="sidebar-nav">
         <div class="nav-section-label">메인</div>
-        <a class="nav-item active" href="#" onclick="switchPanel('stats', this); return false;">
+        <a class="nav-item active" href="#" id="menu-stats" onclick="switchPanel('stats', this); return false;">
             <i class="ti ti-layout-dashboard"></i>
             통계 대시보드
         </a>
 
         <div class="nav-section-label">관리</div>
-        <a class="nav-item" href="#" onclick="switchPanel('content', this); return false;">
+        <a class="nav-item" href="#" id="menu-content" onclick="switchPanel('content', this); return false;">
             <i class="ti ti-video"></i>
             콘텐츠 관리
         </a>
-        <a class="nav-item" href="#" onclick="switchPanel('members', this); return false;">
+        <a class="nav-item" href="#" id="menu-members" onclick="switchPanel('members', this); return false;">
             <i class="ti ti-users"></i>
             회원 관리
         </a>
-        <a class="nav-item" href="#" onclick="switchPanel('board', this); return false;">
+        <a class="nav-item" href="#" id="menu-board" onclick="switchPanel('board', this); return false;">
             <i class="ti ti-message-circle"></i>
             게시판 관리
-            <span class="nav-badge" th:if="${pendingQnaCount > 0}" th:text="${pendingQnaCount}">3</span>
+            <span class="nav-badge" th:if="${pendingQnaCount > 0}" th:text="${pendingQnaCount}">0</span>
         </a>
-        <a class="nav-item" href="#" onclick="switchPanel('event', this); return false;">
+        <a class="nav-item" href="#" id="menu-event" onclick="switchPanel('event', this); return false;">
             <i class="ti ti-calendar-event"></i>
             이벤트 관리
         </a>
-        <a class="nav-item" href="#" onclick="switchPanel('payment', this); return false;">
+        <a class="nav-item" href="#" id="menu-payment" onclick="switchPanel('payment', this); return false;">
             <i class="ti ti-credit-card"></i>
             결제/수강 관리
         </a>
 
         <div class="nav-section-label">설정</div>
-        <a class="nav-item" href="#">
+        <a class="nav-item" href="#" id="menu-settings" onclick="switchPanel('settings', this); return false;">
             <i class="ti ti-settings"></i>
             사이트 설정
         </a>
@@ -77,7 +100,7 @@
         <div class="topbar-right">
             <button class="topbar-btn">
                 <i class="ti ti-calendar"></i>
-                2025년 6월
+                2026년 7월
             </button>
             <button class="topbar-btn">
                 <i class="ti ti-download"></i>
@@ -86,7 +109,7 @@
             <div class="topbar-divider"></div>
             <button class="notif-btn">
                 <i class="ti ti-bell"></i>
-                <div class="notif-dot"></div>
+                <div class="notif-dot" th:if="${pendingQnaCount > 0}"></div>
             </button>
         </div>
     </header>
@@ -97,10 +120,7 @@
             <div class="section-header">
                 <div>
                     <div class="section-title">통계 대시보드</div>
-                    <div class="section-subtitle">2025년 6월 23일 기준</div>
-                </div>
-                <div class="section-actions">
-                    <button class="btn btn-outline"><i class="ti ti-refresh"></i>새로고침</button>
+                    <div class="section-subtitle">실시간 백엔드 데이터 연동</div>
                 </div>
             </div>
 
@@ -108,163 +128,31 @@
                 <div class="kpi-card">
                     <div class="kpi-icon kpi-icon-navy"><i class="ti ti-users"></i></div>
                     <div class="kpi-label">전체 회원</div>
-                    <div class="kpi-value">1,248</div>
-                    <div class="kpi-change up"><i class="ti ti-trending-up"></i> 12.4% 지난달 대비</div>
+                    <div class="kpi-value">0</div>
                     <div class="kpi-accent accent-navy"></div>
                 </div>
                 <div class="kpi-card">
                     <div class="kpi-icon kpi-icon-mint"><i class="ti ti-cash"></i></div>
                     <div class="kpi-label">이번 달 매출</div>
-                    <div class="kpi-value">₩3.2M</div>
-                    <div class="kpi-change up"><i class="ti ti-trending-up"></i> 8.7% 지난달 대비</div>
+                    <div class="kpi-value">₩0</div>
                     <div class="kpi-accent accent-mint"></div>
-                </div>
-                <div class="kpi-card">
-                    <div class="kpi-icon kpi-icon-amber"><i class="ti ti-player-play"></i></div>
-                    <div class="kpi-label">수강 완료</div>
-                    <div class="kpi-value">847</div>
-                    <div class="kpi-change up"><i class="ti ti-trending-up"></i> 5.1% 지난달 대비</div>
-                    <div class="kpi-accent accent-amber"></div>
                 </div>
                 <div class="kpi-card">
                     <div class="kpi-icon kpi-icon-coral"><i class="ti ti-video"></i></div>
                     <div class="kpi-label">전체 콘텐츠</div>
-                    <div class="kpi-value">96</div>
-                    <div class="kpi-change up"><i class="ti ti-trending-up"></i> 4개 이번 달 추가</div>
+                    <div class="kpi-value" th:text="${totalContentCount}">0</div>
                     <div class="kpi-accent accent-coral"></div>
                 </div>
             </div>
 
-            <div class="chart-row">
-                <div class="card">
-                    <div class="card-head">
-                        <div>
-                            <div class="card-title">월별 신규 회원 추이</div>
-                            <div class="card-subtitle">최근 6개월</div>
-                        </div>
-                        <span class="badge badge-info">누적 1,248명</span>
-                    </div>
-                    <div class="card-body">
-                        <div class="bar-chart-wrap">
-                            <div class="bar-group">
-                                <div class="bar-fill" style="height:55px; background:var(--mint-light);"></div>
-                                <span class="bar-lbl">1월</span>
-                            </div>
-                            <div class="bar-group">
-                                <div class="bar-fill" style="height:72px; background:var(--mint-light);"></div>
-                                <span class="bar-lbl">2월</span>
-                            </div>
-                            <div class="bar-group">
-                                <div class="bar-fill" style="height:60px; background:var(--mint-light);"></div>
-                                <span class="bar-lbl">3월</span>
-                            </div>
-                            <div class="bar-group">
-                                <div class="bar-fill" style="height:88px; background:var(--mint-mid);"></div>
-                                <span class="bar-lbl">4월</span>
-                            </div>
-                            <div class="bar-group">
-                                <div class="bar-fill" style="height:78px; background:var(--mint-mid);"></div>
-                                <span class="bar-lbl">5월</span>
-                            </div>
-                            <div class="bar-group">
-                                <div class="bar-fill" style="height:120px; background:var(--navy);"></div>
-                                <span class="bar-lbl">6월</span>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <div class="card-head">
-                        <div>
-                            <div class="card-title">구독 플랜 비율</div>
-                            <div class="card-subtitle">전체 회원 기준</div>
-                        </div>
-                    </div>
-                    <div class="card-body">
-                        <div class="donut-section">
-                            <svg width="90" height="90" viewBox="0 0 90 90" aria-hidden="true">
-                                <circle cx="45" cy="45" r="34" fill="none" stroke="#E6F1FB" stroke-width="16"/>
-                                <circle cx="45" cy="45" r="34" fill="none" stroke="#185FA5" stroke-width="16"
-                                        stroke-dasharray="85.2 128.0" stroke-dashoffset="0" transform="rotate(-90 45 45)"/>
-                                <circle cx="45" cy="45" r="34" fill="none" stroke="#5DCAA5" stroke-width="16"
-                                        stroke-dasharray="51.2 162.0" stroke-dashoffset="-85.2" transform="rotate(-90 45 45)"/>
-                                <circle cx="45" cy="45" r="34" fill="none" stroke="#9FE1CB" stroke-width="16"
-                                        stroke-dasharray="29.6 183.6" stroke-dashoffset="-136.4" transform="rotate(-90 45 45)"/>
-                            </svg>
-                            <div class="legend-list">
-                                <div class="legend-item">
-                                    <div class="legend-dot" style="background:var(--navy)"></div>
-                                    월 구독 <span class="legend-pct">40%</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-dot" style="background:var(--mint-mid)"></div>
-                                    연 구독 <span class="legend-pct">26%</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-dot" style="background:var(--mint-light)"></div>
-                                    영구 구매 <span class="legend-pct">15%</span>
-                                </div>
-                                <div class="legend-item">
-                                    <div class="legend-dot" style="background:var(--navy-bg)"></div>
-                                    무료 <span class="legend-pct">19%</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="card">
-                <div class="card-head">
-                    <div class="card-title">최근 결제 내역</div>
-                    <a href="#" onclick="switchPanel('payment', document.querySelector('[onclick*=&quot;payment&quot;]')); return false;"
-                       style="font-size:12px; color:var(--navy); text-decoration:none;">전체 보기 →</a>
-                </div>
-                <table class="data-table">
-                    <thead>
-                    <tr>
-                        <th>회원명</th>
-                        <th>플랜</th>
-                        <th>결제 금액</th>
-                        <th>결제 일시</th>
-                        <th>상태</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    <tr>
-                        <td>김민준</td>
-                        <td><span class="badge badge-info">연 구독</span></td>
-                        <td>₩99,000</td>
-                        <td>2025.06.23 14:22</td>
-                        <td><span class="badge badge-success">완료</span></td>
-                    </tr>
-                    <tr>
-                        <td>Sarah Kim</td>
-                        <td><span class="badge badge-gray">월 구독</span></td>
-                        <td>₩9,900</td>
-                        <td>2025.06.23 11:05</td>
-                        <td><span class="badge badge-success">완료</span></td>
-                    </tr>
-                    <tr>
-                        <td>이수진</td>
-                        <td><span class="badge badge-pending">영구 구매</span></td>
-                        <td>₩199,900</td>
-                        <td>2025.06.23 09:48</td>
-                        <td><span class="badge badge-success">완료</span></td>
-                    </tr>
-                    <tr>
-                        <td>Wang Lei</td>
-                        <td><span class="badge badge-gray">월 구독</span></td>
-                        <td>₩9,900</td>
-                        <td>2025.06.22 20:13</td>
-                        <td><span class="badge badge-pending">대기</span></td>
-                    </tr>
-                    </tbody>
-                </table>
+            <div style="padding: 40px; text-align: center; color: var(--gray-400); background: #fff; margin-top: 20px; border-radius: 8px;">
+                대시보드 통계 및 차트 기능은 회원/결제 테이블 데이터 연동 시 구현됩니다.
             </div>
         </div>
 
+        <!-- ════════════════════════════════════════════════════════════
+             PANEL: 콘텐츠 관리 (⭐ 수정 및 삭제 관리 아이콘 셋 기능 추가 반영)
+        ════════════════════════════════════════════════════════════ -->
         <div class="panel" id="panel-content">
             <div class="section-header">
                 <div>
@@ -274,30 +162,6 @@
                 <div class="section-actions">
                     <button class="btn btn-primary" onclick="openContentModal()"><i class="ti ti-plus"></i>콘텐츠 추가</button>
                 </div>
-            </div>
-
-            <div class="filter-bar">
-                <div class="search-wrap">
-                    <i class="ti ti-search"></i>
-                    <input type="text" class="search-input" placeholder="콘텐츠 제목 검색...">
-                </div>
-                <select class="filter-select">
-                    <option>전체 단계</option>
-                    <option>음절</option>
-                    <option>단어</option>
-                    <option>문장</option>
-                    <option>일상회화</option>
-                </select>
-                <select class="filter-select">
-                    <option>전체 상태</option>
-                    <option>공개</option>
-                    <option>비공개</option>
-                </select>
-                <select class="filter-select">
-                    <option>최신 등록순</option>
-                    <option>오래된순</option>
-                    <option>제목순</option>
-                </select>
             </div>
 
             <div class="card">
@@ -310,22 +174,21 @@
                         <th>강의 수</th>
                         <th>등록일</th>
                         <th>상태</th>
-                        <th style="width:110px; text-align:center">작업</th>
+                        <th style="width:80px; text-align:center;">관리</th>
                     </tr>
                     </thead>
                     <tbody>
                     <tr th:if="${#lists.isEmpty(contents)}">
                         <td colspan="7" style="text-align: center; color: var(--gray-400); padding: 50px 0;">
-                            현재 등록된 콘텐츠가 없습니다. 오른쪽 상단 '콘텐츠 추가'를 통해 데이터를 추가해 보세요!
+                            등록된 콘텐츠가 없습니다. '콘텐츠 추가' 버튼을 눌러 첫 데이터를 진짜로 등록해 보세요!
                         </td>
                     </tr>
-
                     <tr th:each="content, loop : ${contents}">
                         <td style="color:var(--gray-400)" th:text="${loop.count}">1</td>
                         <td>
                             <div class="content-title-cell">
                                 <div class="content-thumb"><i class="ti ti-video"></i></div>
-                                <div class="content-name" th:text="${content.title}">한글 자음 기초 익히기</div>
+                                <div class="content-name" th:text="${content.title}">제목</div>
                             </div>
                         </td>
                         <td>
@@ -333,232 +196,128 @@
                                   th:classappend="${content.step == '음절' ? 'stage-1' : (content.step == '단어' ? 'stage-2' : (content.step == '문장' ? 'stage-3' : 'stage-4'))}"
                                   th:text="${content.step}">음절</span>
                         </td>
-                        <td th:text="|${content.lectureCount}강|">8강</td>
+                        <td th:text="|${content.lectureCount}강|">0강</td>
                         <td th:text="${content.createdDate}">2026-07-08</td>
                         <td>
                             <span class="badge" th:classappend="${content.status == '공개' ? 'badge-success' : 'badge-gray'}" th:text="${content.status}">공개</span>
                         </td>
-                        <td style="text-align:center">
-                            <button class="btn btn-outline btn-sm"><i class="ti ti-edit"></i>수정</button>
-                            <button class="btn btn-danger-outline btn-sm"><i class="ti ti-trash"></i></button>
+                        <!-- 💡 수정 및 삭제 동적 호출 단추 바인딩 구역 -->
+                        <td style="text-align:center;">
+                            <div class="action-buttons-cell">
+                                <button class="btn-action-icon btn-action-edit" title="수정"
+                                        th:onclick="openContentUpdateModal([[${content.id}]], [[${content.title}]], [[${content.step}]], [[${content.lectureCount}]], [[${content.status}]])">
+                                    <i class="ti ti-edit"></i>
+                                </button>
+                                <a th:href="@{|/admin/content/delete/${content.id}|}" class="btn-action-icon btn-action-delete" title="삭제"
+                                   onclick="return confirm('이 콘텐츠를 정말 삭제하시겠습니까? 관련 데이터가 함께 제거됩니다.');">
+                                    <i class="ti ti-trash"></i>
+                                </a>
+                            </div>
                         </td>
                     </tr>
                     </tbody>
                 </table>
-                <div class="pagination">
-                    <span class="pagination-info" th:text="|전체 ${totalContentCount}개 중 1–${contents.size()} 표시|">전체 0개 중 0 표시</span>
-                    <div class="pagination-btns">
-                        <button class="page-btn"><i class="ti ti-chevron-left" style="font-size:12px"></i></button>
-                        <button class="page-btn active">1</button>
-                        <button class="page-btn"><i class="ti ti-chevron-right" style="font-size:12px"></i></button>
-                    </div>
-                </div>
             </div>
         </div>
 
         <div class="panel" id="panel-members">
             <div class="section-header">
+                <div class="section-title">회원 관리</div>
+            </div>
+            <div class="card" style="padding: 50px 0; text-align: center; color: var(--gray-400);">
+                현재 연동된 회원 데이터가 없습니다. (SiteUser 백엔드 작업 진행 필요)
+            </div>
+        </div>
+
+        <div class="panel" id="panel-board">
+            <div class="section-header">
                 <div>
-                    <div class="section-title">회원 관리</div>
-                    <div class="section-subtitle">전체 1,248명</div>
-                </div>
-                <div class="section-actions">
-                    <button class="btn btn-outline"><i class="ti ti-download"></i>CSV 내보내기</button>
+                    <div class="section-title">게시판 관리 (Q&A)</div>
+                    <div class="section-subtitle" th:text="|답변 대기 중인 문의: ${pendingQnaCount}건|">0건</div>
                 </div>
             </div>
 
-            <div class="member-kpi">
-                <div class="member-kpi-card">
-                    <div class="member-kpi-val" style="color:var(--gray-800)">1,248</div>
-                    <div class="member-kpi-lbl">전체 회원</div>
-                </div>
-                <div class="member-kpi-card">
-                    <div class="member-kpi-val" style="color:var(--navy)">1,043</div>
-                    <div class="member-kpi-lbl">유료 구독 중</div>
-                </div>
-                <div class="member-kpi-card">
-                    <div class="member-kpi-val" style="color:var(--coral)">205</div>
-                    <div class="member-kpi-lbl">무료 / 비활성</div>
-                </div>
+            <div class="board-menu-tabs">
+                <a th:href="@{/admin(panel='board', category='account')}" class="board-tab" th:classappend="${currentCategory == 'account'} ? 'active'">계정/로그인</a>
+                <a th:href="@{/admin(panel='board', category='payment')}" class="board-tab" th:classappend="${currentCategory == 'payment'} ? 'active'">결제/환불</a>
+                <a th:href="@{/admin(panel='board', category='content')}" class="board-tab" th:classappend="${currentCategory == 'content'} ? 'active'">학습 콘텐츠</a>
+                <a th:href="@{/admin(panel='board', category='community')}" class="board-tab" th:classappend="${currentCategory == 'community'} ? 'active'">커뮤니티/신고</a>
+                <a th:href="@{/admin(panel='board', category='bug')}" class="board-tab" th:classappend="${currentCategory == 'bug'} ? 'active'">오류 신고</a>
             </div>
 
-            <div class="filter-bar">
-                <div class="search-wrap">
+            <form th:action="@{/admin}" method="get" class="search-form-wrap">
+                <input type="hidden" name="panel" value="board">
+                <input type="hidden" name="category" th:value="${currentCategory}">
+
+                <div class="search-box-container">
                     <i class="ti ti-search"></i>
-                    <input type="text" class="search-input" placeholder="이름 또는 이메일 검색...">
+                    <input type="text" name="kw" class="search-input" th:value="${kw}" placeholder="검색어를 입력해 주세요...">
                 </div>
-                <select class="filter-select">
-                    <option>전체 플랜</option>
-                    <option>월 구독</option>
-                    <option>연 구독</option>
-                    <option>영구 구매</option>
-                    <option>무료</option>
-                </select>
-                <select class="filter-select">
-                    <option>가입일 최신순</option>
-                    <option>가입일 오래된순</option>
-                    <option>이름순</option>
-                </select>
-            </div>
+                <button type="submit" class="btn-search-submit">
+                    <i class="ti ti-search"></i>
+                    검색하기
+                </button>
+            </form>
 
             <div class="card">
                 <table class="data-table">
                     <thead>
                     <tr>
-                        <th>회원</th>
-                        <th>플랜</th>
-                        <th>수강 현황</th>
-                        <th>가입일</th>
+                        <th>번호</th>
+                        <th>제목</th>
+                        <th>작성자</th>
+                        <th>등록일</th>
                         <th>상태</th>
-                        <th style="text-align:center; width:110px">작업</th>
                     </tr>
                     </thead>
                     <tbody>
-                    <tr>
-                        <td>
-                            <div class="member-cell">
-                                <div class="member-avatar" style="background:var(--navy-bg); color:var(--navy)">김</div>
-                                <div class="member-name-wrap">
-                                    <div class="name">김민준</div>
-                                    <div class="email">minjun@email.com</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="badge badge-info">연 구독</span></td>
-                        <td>3강좌 · 완료 2</td>
-                        <td>2024.01.15</td>
-                        <td><span class="badge badge-success">활성</span></td>
-                        <td style="text-align:center">
-                            <button class="btn btn-outline btn-sm">상세</button>
-                            <button class="btn btn-danger-outline btn-sm">정지</button>
+                    <tr th:if="${#lists.isEmpty(qnas.content)}">
+                        <td colspan="5" style="text-align: center; color: var(--gray-400); padding: 50px 0;">
+                            해당 카테고리 내역 중 조건에 일치하는 Q&A 데이터가 존재하지 않습니다.
                         </td>
                     </tr>
-                    <tr>
+                    <tr th:each="qna : ${qnas.content}">
+                        <td th:text="${qna.id}">1</td>
+                        <td th:text="${qna.title}">문의 제목</td>
+                        <td th:text="${qna.author != null ? qna.author.username : '알 수 없음'}">작성자</td>
+                        <td th:text="${qna.createdDate}">작성일</td>
                         <td>
-                            <div class="member-cell">
-                                <div class="member-avatar" style="background:var(--mint-bg); color:var(--green)">S</div>
-                                <div class="member-name-wrap">
-                                    <div class="name">Sarah Kim</div>
-                                    <div class="email">sarah.k@gmail.com</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="badge badge-gray">월 구독</span></td>
-                        <td>1강좌 · 수강중</td>
-                        <td>2024.02.08</td>
-                        <td><span class="badge badge-success">활성</span></td>
-                        <td style="text-align:center">
-                            <button class="btn btn-outline btn-sm">상세</button>
-                            <button class="btn btn-danger-outline btn-sm">정지</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="member-cell">
-                                <div class="member-avatar" style="background:var(--amber-bg); color:#854F0B">이</div>
-                                <div class="member-name-wrap">
-                                    <div class="name">이수진</div>
-                                    <div class="email">sujin.lee@naver.com</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="badge badge-pending">영구 구매</span></td>
-                        <td>5강좌 · 완료 4</td>
-                        <td>2024.03.22</td>
-                        <td><span class="badge badge-success">활성</span></td>
-                        <td style="text-align:center">
-                            <button class="btn btn-outline btn-sm">상세</button>
-                            <button class="btn btn-danger-outline btn-sm">정지</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="member-cell">
-                                <div class="member-avatar" style="background:var(--mint-bg); color:var(--green)">W</div>
-                                <div class="member-name-wrap">
-                                    <div class="name">Wang Lei</div>
-                                    <div class="email">wanglei88@qq.com</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="badge badge-gray">무료</span></td>
-                        <td>0강좌</td>
-                        <td>2024.05.03</td>
-                        <td><span class="badge badge-gray">비활성</span></td>
-                        <td style="text-align:center">
-                            <button class="btn btn-outline btn-sm">상세</button>
-                            <button class="btn btn-danger-outline btn-sm">정지</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="member-cell">
-                                <div class="member-avatar" style="background:var(--navy-bg); color:var(--navy)">박</div>
-                                <div class="member-name-wrap">
-                                    <div class="name">박지호</div>
-                                    <div class="email">jiho.park@kakao.com</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="badge badge-gray">월 구독</span></td>
-                        <td>2강좌 · 수강중</td>
-                        <td>2024.05.19</td>
-                        <td><span class="badge badge-success">활성</span></td>
-                        <td style="text-align:center">
-                            <button class="btn btn-outline btn-sm">상세</button>
-                            <button class="btn btn-danger-outline btn-sm">정지</button>
-                        </td>
-                    </tr>
-                    <tr>
-                        <td>
-                            <div class="member-cell">
-                                <div class="member-avatar" style="background:var(--mint-bg); color:var(--green)">A</div>
-                                <div class="member-name-wrap">
-                                    <div class="name">Aiko Tanaka</div>
-                                    <div class="email">aiko.t@yahoo.jp</div>
-                                </div>
-                            </div>
-                        </td>
-                        <td><span class="badge badge-info">연 구독</span></td>
-                        <td>2강좌 · 완료 1</td>
-                        <td>2024.06.01</td>
-                        <td><span class="badge badge-success">활성</span></td>
-                        <td style="text-align:center">
-                            <button class="btn btn-outline btn-sm">상세</button>
-                            <button class="btn btn-danger-outline btn-sm">정지</button>
+                            <span class="badge" th:classappend="${qna.status == 'COMPLETED' ? 'badge-success' : 'badge-pending'}" th:text="${qna.status}">상태</span>
                         </td>
                     </tr>
                     </tbody>
                 </table>
-                <div class="pagination">
-                    <span class="pagination-info">전체 1,248명 중 1–6 표시</span>
-                    <div class="pagination-btns">
-                        <button class="page-btn"><i class="ti ti-chevron-left" style="font-size:12px"></i></button>
-                        <button class="page-btn active">1</button>
-                        <button class="page-btn">2</button>
-                        <button class="page-btn">3</button>
-                        <button class="page-btn"><i class="ti ti-chevron-right" style="font-size:12px"></i></button>
-                    </div>
-                </div>
             </div>
+        </div>
+
+        <div class="panel" id="panel-event">
+            <div class="section-header"><div class="section-title">이벤트 관리</div></div>
+            <div class="card" style="padding: 40px; text-align: center; color: var(--gray-400);">백엔드 연동 전 단계입니다.</div>
+        </div>
+        <div class="panel" id="panel-payment">
+            <div class="section-header"><div class="section-title">결제/수강 관리</div></div>
+            <div class="card" style="padding: 40px; text-align: center; color: var(--gray-400);">백엔드 연동 전 단계입니다.</div>
+        </div>
+        <div class="panel" id="panel-settings">
+            <div class="section-header"><div class="section-title">사이트 설정</div></div>
+            <div class="card" style="padding: 40px; text-align: center; color: var(--gray-400);">시스템 기본 설정 구역입니다.</div>
         </div>
 
     </div>
 </div>
 
+<!-- ── 1. [기존 유지] 새 콘텐츠 등록 모달 구역 ── -->
 <div id="contentCreateModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
     <div class="modal-content" style="background: #fff; padding: 24px; border-radius: 8px; width: 400px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
             <h3 style="margin: 0; font-size: 18px; color: #185FA5; font-family: sans-serif;">새 콘텐츠 등록</h3>
             <i class="ti ti-x" onclick="closeContentModal()" style="cursor: pointer; font-size: 20px; color: #94a3b8;"></i>
         </div>
-
         <form th:action="@{/admin/content/create}" method="post" style="display: flex; flex-direction: column; gap: 16px;">
             <div style="display: flex; flex-direction: column; gap: 6px;">
                 <label style="font-size: 13px; font-weight: 600; color: #334155;">콘텐츠 제목</label>
                 <input type="text" name="title" placeholder="예: 초급 회화 필수 표현" required style="padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px;">
             </div>
-
             <div style="display: flex; flex-direction: column; gap: 6px;">
                 <label style="font-size: 13px; font-weight: 600; color: #334155;">학습 단계</label>
                 <select name="step" style="padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; background: #fff;">
@@ -568,12 +327,10 @@
                     <option value="일상회화">일상회화</option>
                 </select>
             </div>
-
             <div style="display: flex; flex-direction: column; gap: 6px;">
                 <label style="font-size: 13px; font-weight: 600; color: #334155;">강의 수</label>
                 <input type="number" name="lectureCount" min="0" placeholder="숫자만 입력" required style="padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px;">
             </div>
-
             <div style="display: flex; flex-direction: column; gap: 6px;">
                 <label style="font-size: 13px; font-weight: 600; color: #334155;">공개 상태</label>
                 <select name="status" style="padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; background: #fff;">
@@ -581,7 +338,6 @@
                     <option value="비공개">비공개</option>
                 </select>
             </div>
-
             <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
                 <button type="button" class="btn btn-outline" onclick="closeContentModal()">취소</button>
                 <button type="submit" class="btn btn-primary">저장하기</button>
@@ -590,12 +346,97 @@
     </div>
 </div>
 
-<script>
-    function openContentModal() {
-        document.getElementById('contentCreateModal').style.display = 'flex';
+<!-- ── 2. [💡 신규 구현] 기존 데이터를 채워 넣을 콘텐츠 수정 전용 팝업 모달창 구역 ── -->
+<div id="contentUpdateModal" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.5); z-index: 9999; justify-content: center; align-items: center;">
+    <div class="modal-content" style="background: #fff; padding: 24px; border-radius: 8px; width: 400px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+            <h3 style="margin: 0; font-size: 18px; color: #185FA5; font-family: sans-serif;">콘텐츠 설정 수정</h3>
+            <i class="ti ti-x" onclick="closeContentUpdateModal()" style="cursor: pointer; font-size: 20px; color: #94a3b8;"></i>
+        </div>
+        <!-- 자바스크립트를 통해 th:action 경로가 동적으로 맵핑됩니다. -->
+        <form id="contentUpdateForm" method="post" style="display: flex; flex-direction: column; gap: 16px;">
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label style="font-size: 13px; font-weight: 600; color: #334155;">콘텐츠 제목</label>
+                <input type="text" id="update-title" name="title" required style="padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px;">
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label style="font-size: 13px; font-weight: 600; color: #334155;">학습 단계</label>
+                <select id="update-step" name="step" style="padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; background: #fff;">
+                    <option value="음절">음절</option>
+                    <option value="단어">단어</option>
+                    <option value="문장">문장</option>
+                    <option value="일상회화">일상회화</option>
+                </select>
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label style="font-size: 13px; font-weight: 600; color: #334155;">강의 수</label>
+                <input type="number" id="update-lectureCount" name="lectureCount" min="0" required style="padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px;">
+            </div>
+            <div style="display: flex; flex-direction: column; gap: 6px;">
+                <label style="font-size: 13px; font-weight: 600; color: #334155;">공개 상태</label>
+                <select id="update-status" name="status" style="padding: 10px; border: 1px solid #e2e8f0; border-radius: 6px; font-size: 14px; background: #fff;">
+                    <option value="공개">공개</option>
+                    <option value="비공개">비공개</option>
+                </select>
+            </div>
+            <div style="display: flex; justify-content: flex-end; gap: 10px; margin-top: 10px;">
+                <button type="button" class="btn btn-outline" onclick="closeContentUpdateModal()">취소</button>
+                <button type="submit" class="btn btn-primary">변경사항 저장</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script th:inline="javascript">
+    /*<![CDATA[*/
+    let currentPanelName = /*[[${currentPanel}]]*/ 'stats';
+    /*]]>*/
+
+    document.addEventListener("DOMContentLoaded", function() {
+        if (!currentPanelName) currentPanelName = 'stats';
+        const targetMenuElement = document.getElementById('menu-' + currentPanelName);
+        switchPanel(currentPanelName, targetMenuElement);
+    });
+
+    function switchPanel(panelName, element) {
+        const panels = document.querySelectorAll('.panel');
+        panels.forEach(panel => panel.classList.remove('active'));
+
+        const targetPanel = document.getElementById('panel-' + panelName);
+        if (targetPanel) {
+            targetPanel.classList.add('active');
+        }
+
+        const navItems = document.querySelectorAll('.nav-item');
+        navItems.forEach(item => item.classList.remove('active'));
+
+        if (element) {
+            element.classList.add('active');
+            document.getElementById('breadcrumb-current').innerText = element.innerText.trim().split('\n')[0];
+        }
     }
-    function closeContentModal() {
-        document.getElementById('contentCreateModal').style.display = 'none';
+
+    // 등록 모달 제어
+    function openContentModal() { document.getElementById('contentCreateModal').style.display = 'flex'; }
+    function closeContentModal() { document.getElementById('contentCreateModal').style.display = 'none'; }
+
+    // 💡 수정 모달 동적 제어 함수 추가
+    function openContentUpdateModal(id, title, step, lectureCount, status) {
+        // 기존 데이터를 폼 엘리먼트에 채워 넣음
+        document.getElementById('update-title').value = title;
+        document.getElementById('update-step').value = step;
+        document.getElementById('update-lectureCount').value = lectureCount;
+        document.getElementById('update-status').value = status;
+
+        // Form의 action 주소에 콘텐츠 ID값을 동적으로 가공 주입
+        document.getElementById('contentUpdateForm').action = '/admin/content/update/' + id;
+
+        // 모달창 오픈
+        document.getElementById('contentUpdateModal').style.display = 'flex';
+    }
+
+    function closeContentUpdateModal() {
+        document.getElementById('contentUpdateModal').style.display = 'none';
     }
 </script>
 

@@ -332,4 +332,35 @@ public class ContentService {
         return result;
     }
 
+    // ── 💡 엔티티 설계(stage)에 맞추어 최종 보완된 수정 로직 ──
+    @Transactional
+    public void update(Long id, String title, String step, Integer lectureCount, String status) {
+        // 1. ID로 수정할 데이터 조회
+        Content content = contentRepository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("해당 콘텐츠가 존재하지 않습니다. id=" + id));
+
+        // 2. 제목(title)과 상태(status) 업데이트
+        content.setTitle(title);
+        content.setStatus(status);
+
+        // 3. 화면의 글자(step)를 엔티티의 숫자(stage)로 변환하여 매핑
+        int stageValue = 1; // 기본값 (음절)
+        if ("단어".equals(step)) {
+            stageValue = 2;
+        } else if ("문장".equals(step)) {
+            stageValue = 3;
+        } else if ("일상회화".equals(step)) {
+            stageValue = 4;
+        }
+        content.setStage(stageValue);
+
+        // 4. ⚠️ 엔티티에 lectureCount(강의수) 필드가 없으므로,
+        // 필요하다면 sequence 필드 등에 임시 저장하거나 혹은 주석 처리하여 에러를 방지합니다.
+        if (lectureCount != null) {
+            content.setSequence(lectureCount);
+        }
+
+        // @Transactional에 의해 메서드 종료 시 DB에 자동 반영됩니다.
+    }
+
 }

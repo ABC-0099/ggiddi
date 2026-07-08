@@ -2,7 +2,6 @@ package com.meta12.SS8911.controller;
 
 import com.meta12.SS8911.entity.AdminContent;
 import com.meta12.SS8911.entity.Qna;
-import com.meta12.SS8911.entity.SiteUser;
 import com.meta12.SS8911.service.AdminContentService;
 import com.meta12.SS8911.service.QnaService;
 import com.meta12.SS8911.service.SiteUserService;
@@ -18,19 +17,29 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-@RequiredArgsConstructor
+@RequiredArgsConstructor // 💡 private final로 선언된 모든 객체의 생성자 주입을 자동으로 처리합니다.
 public class AdminController {
 
     private final QnaService qnaService;
     private final SiteUserService siteUserService;
-    private final AdminContentService adminContentService;
+    private final AdminContentService adminContentService; // 💡 필드 단일화로 주입 충돌 방지
 
     @GetMapping("/admin")
-    public String adminDashboard(Model model) {
+    public String adminDashboard(Model model,
+                                 @RequestParam(value = "category", defaultValue = "notice") String category,
+                                 @RequestParam(value = "kw", defaultValue = "") String kw,
+                                 @RequestParam(value = "panel", defaultValue = "stats") String panel) {
+
+        // 브라우저 새로고침 시에도 기존에 보던 탭(패널)이 그대로 열려있도록 전달
+        model.addAttribute("currentPanel", panel);
+        model.addAttribute("currentCategory", category);
+        model.addAttribute("kw", kw);
+
         // ==========================================
-        // 1. Q&A 데이터 연동 (진짜 DB)
+        // 1. Q&A / 게시판 관리 데이터 연동 (진짜 DB)
         // ==========================================
-        Page<Qna> realQnas = qnaService.getAllQnas(PageRequest.of(0, 20));
+        Page<Qna> realQnas = qnaService.getAdminBoardList(category, kw, PageRequest.of(0, 20));
+
         List<QnaWrapper> wrappedList = new ArrayList<>();
         for (Qna q : realQnas.getContent()) {
             String authorName = (q.getAuthor() != null) ? q.getAuthor().getUsername() : "알 수 없음";
@@ -50,10 +59,7 @@ public class AdminController {
         List<AdminContentDto> wrappedContentList = new ArrayList<>();
         for (AdminContent ac : realAdminContents) {
             String dateStr = (ac.getCreatedDate() != null) ? ac.getCreatedDate().toLocalDate().toString() : "-";
-
-            wrappedContentList.add(new AdminContentDto(
-                    ac.getId(), ac.getTitle(), ac.getStep(), ac.getLectureCount(), dateStr, ac.getStatus()
-            ));
+            wrappedContentList.add(new AdminContentDto(ac.getId(), ac.getTitle(), ac.getStep(), ac.getLectureCount(), dateStr, ac.getStatus()));
         }
         model.addAttribute("contents", wrappedContentList);
         model.addAttribute("totalContentCount", wrappedContentList.size());
@@ -77,7 +83,7 @@ public class AdminController {
     }
 
     // ==========================================
-    // ⭐ [추가] 실제 콘텐츠 등록 처리 API
+    // 실제 콘텐츠 등록 처리 API
     // ==========================================
     @PostMapping("/admin/content/create")
     public String createContent(@RequestParam String title,
@@ -91,11 +97,34 @@ public class AdminController {
         newContent.setLectureCount(lectureCount);
         newContent.setStatus(status);
 
-        // Service를 통해 진짜 DB에 저장(Insert)합니다.
         adminContentService.saveContent(newContent);
 
-        // 저장이 완료되면 다시 대시보드의 '콘텐츠 관리' 탭으로 새로고침(리다이렉트) 합니다.
-        return "redirect:/admin?panel=contents";
+        return "redirect:/admin?panel=content";
+    }
+
+    // ==========================================
+    // 💡 실제 콘텐츠 수정 처리 API (안전하게 교체됨)
+    // ==========================================
+    @PostMapping("/admin/content/update/{id}")
+    public String updateContent(@PathVariable("id") Long id,
+                                @RequestParam("title") String title,
+                                @RequestParam("step") String step,
+                                @RequestParam("lectureCount") Integer lectureCount,
+                                @RequestParam("status") String status) {
+
+        // 정렬된 단일 빈 구조인 adminContentService 인스턴스로 안전하게 위임 호출합니다.
+        adminContentService.updateContent(id, title, step, lectureCount, status);
+        return "redirect:/admin?panel=content";
+    }
+
+    // ==========================================
+    // 💡 실제 콘텐츠 삭제 처리 API (안전하게 교체됨)
+    // ==========================================
+    @GetMapping("/admin/content/delete/{id}")
+    public String deleteContent(@PathVariable("id") Long id) {
+
+        adminContentService.deleteContent(id);
+        return "redirect:/admin?panel=content";
     }
 
     // ── 가짜/DTO 내부 클래스 구조들 (유지) ──

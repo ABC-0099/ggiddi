@@ -179,6 +179,8 @@ public class QnaService {
         }
     }
 
+// ... 상단 패키지, 임포트 및 기존 원본 코드들 (create, update, delete, saveFiles 등) 전부 그대로 유지 ...
+
     private void deletePhysicalFile(String savedPath) {
         try {
             String fileName = savedPath.substring(savedPath.lastIndexOf('/') + 1);
@@ -187,5 +189,23 @@ public class QnaService {
         } catch (Exception e) {
             System.err.println("파일 삭제 실패: " + savedPath);
         }
+    }
+
+    // ── 💡 보유하신 QnaCategory Enum 구조에 맞춰 최종 보완된 메서드 ──
+    public Page<Qna> getAdminBoardList(String categoryStr, String kw, Pageable pageable) {
+        if (kw == null) {
+            kw = "";
+        }
+
+        com.meta12.SS8911.config.QnaCategory category;
+        try {
+            // 화면에서 넘어온 값이 소문자일 수 있으므로 대문자로 변환하여 매칭 (예: "content" -> CONTENT)
+            category = com.meta12.SS8911.config.QnaCategory.valueOf(categoryStr.toUpperCase());
+        } catch (IllegalArgumentException e) {
+            // 매칭되는 Enum 상수가 없거나 에러가 나면 첫 번째 항목인 ACCOUNT를 기본값으로 설정
+            category = com.meta12.SS8911.config.QnaCategory.ACCOUNT;
+        }
+
+        return qnaRepository.findByCategoryAndKeyword(category, kw, pageable);
     }
 }
