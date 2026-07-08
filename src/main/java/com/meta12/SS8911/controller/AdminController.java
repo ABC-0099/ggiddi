@@ -25,15 +25,15 @@ public class AdminController {
     private final SiteUserService siteUserService;
     private final AdminContentService adminContentService;
 
-    /**
-     * 사이드바 뱃지 + 탑바 알림 점 표시용.
-     * @ModelAttribute로 선언해두면 이 컨트롤러의 모든 @GetMapping/@PostMapping 메서드 실행 전에
-     * 자동으로 model에 "pendingQnaCount"가 채워집니다. (각 메서드마다 반복 추가할 필요 없음)
-     */
+    @GetMapping("")
+    public String adminHome() {
+        return "redirect:/admin/stats";
+    }
+
     @ModelAttribute("pendingQnaCount")
-//    public int pendingQnaCount() {
-//        return qnaService.countPending();
-//    }
+    public int pendingQnaCount() {
+        return (int) qnaService.countPending();
+    }
 
     // ==========================================
     // 통계 대시보드
@@ -73,9 +73,9 @@ public class AdminController {
 
     @PostMapping("/content/create")
     public String createContent(@RequestParam String title,
-                                 @RequestParam String step,
-                                 @RequestParam int lectureCount,
-                                 @RequestParam(defaultValue = "공개") String status) {
+                                @RequestParam String step,
+                                @RequestParam int lectureCount,
+                                @RequestParam(defaultValue = "공개") String status) {
 
         AdminContent newContent = new AdminContent();
         newContent.setTitle(title);
@@ -90,10 +90,10 @@ public class AdminController {
 
     @PostMapping("/content/update/{id}")
     public String updateContent(@PathVariable("id") Long id,
-                                 @RequestParam("title") String title,
-                                 @RequestParam("step") String step,
-                                 @RequestParam("lectureCount") Integer lectureCount,
-                                 @RequestParam("status") String status) {
+                                @RequestParam("title") String title,
+                                @RequestParam("step") String step,
+                                @RequestParam("lectureCount") Integer lectureCount,
+                                @RequestParam("status") String status) {
 
         adminContentService.updateContent(id, title, step, lectureCount, status);
         return "redirect:/admin/content";
@@ -121,8 +121,8 @@ public class AdminController {
     // ==========================================
     @GetMapping("/board")
     public String board(Model model,
-                         @RequestParam(value = "category", defaultValue = "notice") String category,
-                         @RequestParam(value = "kw", defaultValue = "") String kw) {
+                        @RequestParam(value = "category", defaultValue = "notice") String category,
+                        @RequestParam(value = "kw", defaultValue = "") String kw) {
 
         model.addAttribute("activeMenu", "board");
         model.addAttribute("pageTitle", "게시판 관리");

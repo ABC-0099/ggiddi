@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>끼역띠귿 - 회원 관리</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" th:href="@{/css/admin/common.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/members.css}">
+</head>
+<body>
+
+<aside th:replace="~{admin/fragments/sidebar :: sidebar}"></aside>
+
+<div class="main">
+
+    <header th:replace="~{admin/fragments/topbar :: topbar}"></header>
+
+    <div class="content">
+        <div class="section-header">
+            <div>
+                <div class="section-title">회원 관리</div>
+                <div class="section-subtitle" th:text="|전체 ${#lists.size(users)}명|">전체 0명</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <table class="data-table">
+                <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>아이디</th>
+                    <th>이름</th>
+                    <th>이메일</th>
+                    <th>권한</th>
+                    <th>가입일</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(users)}">
+                    <td colspan="6" style="text-align:center;padding:40px;">
+                        등록된 회원이 없습니다.
+                    </td>
+                </tr>
+                <tr th:each="user, stat : ${users}">
+                    <td th:text="${stat.count}"></td>
+                    <td th:text="${user.username}"></td>
+                    <td th:text="${user.name}"></td>
+                    <td th:text="${user.email}"></td>
+                    <td th:text="${user.role}"></td>
+                    <td th:text="${user.joinDate}"></td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

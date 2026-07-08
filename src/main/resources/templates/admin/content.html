@@ -1,0 +1,169 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>끼역띠귿 - 콘텐츠 관리</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" th:href="@{/css/admin/common.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/content.css}">
+</head>
+<body>
+
+<aside th:replace="~{admin/fragments/sidebar :: sidebar}"></aside>
+
+<div class="main">
+
+    <header th:replace="~{admin/fragments/topbar :: topbar}"></header>
+
+    <div class="content">
+        <div class="section-header">
+            <div>
+                <div class="section-title">콘텐츠 관리</div>
+                <div class="section-subtitle" th:text="|전체 ${totalContentCount}개 콘텐츠|">전체 0개 콘텐츠</div>
+            </div>
+            <div class="section-actions">
+                <button class="btn btn-primary" onclick="openContentModal()"><i class="ti ti-plus"></i>콘텐츠 추가</button>
+            </div>
+        </div>
+
+        <div class="card">
+            <table class="data-table">
+                <thead>
+                <tr>
+                    <th style="width:40px">#</th>
+                    <th>콘텐츠</th>
+                    <th>단계</th>
+                    <th>강의 수</th>
+                    <th>등록일</th>
+                    <th>상태</th>
+                    <th style="width:80px; text-align:center;">관리</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(contents)}">
+                    <td colspan="7" style="text-align: center; color: var(--gray-400); padding: 50px 0;">
+                        등록된 콘텐츠가 없습니다. '콘텐츠 추가' 버튼을 눌러 첫 데이터를 진짜로 등록해 보세요!
+                    </td>
+                </tr>
+                <tr th:each="content, loop : ${contents}">
+                    <td style="color:var(--gray-400)" th:text="${loop.count}">1</td>
+                    <td>
+                        <div class="content-title-cell">
+                            <div class="content-thumb"><i class="ti ti-video"></i></div>
+                            <div class="content-name" th:text="${content.title}">제목</div>
+                        </div>
+                    </td>
+                    <td>
+                        <span class="stage-badge"
+                              th:classappend="${content.step == '음절' ? 'stage-1' : (content.step == '단어' ? 'stage-2' : (content.step == '문장' ? 'stage-3' : 'stage-4'))}"
+                              th:text="${content.step}">음절</span>
+                    </td>
+                    <td th:text="|${content.lectureCount}강|">0강</td>
+                    <td th:text="${content.createdDate}">2026-07-08</td>
+                    <td>
+                        <span class="badge" th:classappend="${content.status == '공개' ? 'badge-success' : 'badge-gray'}" th:text="${content.status}">공개</span>
+                    </td>
+                    <td style="text-align:center;">
+                        <div class="action-buttons-cell">
+                            <button class="btn-action-icon btn-action-edit" title="수정"
+                                    th:onclick="openContentUpdateModal([[${content.id}]], [[${content.title}]], [[${content.step}]], [[${content.lectureCount}]], [[${content.status}]])">
+                                <i class="ti ti-edit"></i>
+                            </button>
+                            <a th:href="@{|/admin/content/delete/${content.id}|}" class="btn-action-icon btn-action-delete" title="삭제"
+                               onclick="return confirm('이 콘텐츠를 정말 삭제하시겠습니까? 관련 데이터가 함께 제거됩니다.');">
+                                <i class="ti ti-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+<!-- 새 콘텐츠 등록 모달 -->
+<div id="contentCreateModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-head">
+            <h3>새 콘텐츠 등록</h3>
+            <i class="ti ti-x" onclick="closeContentModal()"></i>
+        </div>
+        <form th:action="@{/admin/content/create}" method="post" class="modal-form">
+            <div class="modal-form-group">
+                <label>콘텐츠 제목</label>
+                <input type="text" name="title" placeholder="예: 초급 회화 필수 표현" required>
+            </div>
+            <div class="modal-form-group">
+                <label>학습 단계</label>
+                <select name="step">
+                    <option value="음절">음절</option>
+                    <option value="단어">단어</option>
+                    <option value="문장">문장</option>
+                    <option value="일상회화">일상회화</option>
+                </select>
+            </div>
+            <div class="modal-form-group">
+                <label>강의 수</label>
+                <input type="number" name="lectureCount" min="0" placeholder="숫자만 입력" required>
+            </div>
+            <div class="modal-form-group">
+                <label>공개 상태</label>
+                <select name="status">
+                    <option value="공개">공개</option>
+                    <option value="비공개">비공개</option>
+                </select>
+            </div>
+            <div class="modal-form-actions">
+                <button type="button" class="btn btn-outline" onclick="closeContentModal()">취소</button>
+                <button type="submit" class="btn btn-primary">저장하기</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<!-- 콘텐츠 수정 모달 -->
+<div id="contentUpdateModal" class="modal-overlay">
+    <div class="modal-content">
+        <div class="modal-head">
+            <h3>콘텐츠 설정 수정</h3>
+            <i class="ti ti-x" onclick="closeContentUpdateModal()"></i>
+        </div>
+        <form id="contentUpdateForm" method="post" class="modal-form">
+            <div class="modal-form-group">
+                <label>콘텐츠 제목</label>
+                <input type="text" id="update-title" name="title" required>
+            </div>
+            <div class="modal-form-group">
+                <label>학습 단계</label>
+                <select id="update-step" name="step">
+                    <option value="음절">음절</option>
+                    <option value="단어">단어</option>
+                    <option value="문장">문장</option>
+                    <option value="일상회화">일상회화</option>
+                </select>
+            </div>
+            <div class="modal-form-group">
+                <label>강의 수</label>
+                <input type="number" id="update-lectureCount" name="lectureCount" min="0" required>
+            </div>
+            <div class="modal-form-group">
+                <label>공개 상태</label>
+                <select id="update-status" name="status">
+                    <option value="공개">공개</option>
+                    <option value="비공개">비공개</option>
+                </select>
+            </div>
+            <div class="modal-form-actions">
+                <button type="button" class="btn btn-outline" onclick="closeContentUpdateModal()">취소</button>
+                <button type="submit" class="btn btn-primary">변경사항 저장</button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<script th:src="@{/js/admin/content.js}"></script>
+
+</body>
+</html>

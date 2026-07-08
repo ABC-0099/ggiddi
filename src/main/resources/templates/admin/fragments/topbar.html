@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  탑바 공통 프래그먼트.
+  각 페이지 컨트롤러는 model에 아래 값을 넣어주세요.
+    - pageTitle       : 상단 breadcrumb에 표시할 현재 페이지명 (예: "통계 대시보드")
+    - pendingQnaCount : 알림 점(dot) 표시 여부 판단용 (int, optional)
+-->
+<header class="topbar" th:fragment="topbar">
+    <div class="topbar-left">
+        <div class="breadcrumb">
+            <span class="breadcrumb-root">끼역띠귿</span>
+            <span class="breadcrumb-sep">/</span>
+            <span class="breadcrumb-current" th:text="${pageTitle}">통계 대시보드</span>
+        </div>
+    </div>
+    <div class="topbar-right">
+        <button class="topbar-btn">
+            <i class="ti ti-calendar"></i>
+            2026년 7월
+        </button>
+        <button class="topbar-btn">
+            <i class="ti ti-download"></i>
+            내보내기
+        </button>
+        <div class="topbar-divider"></div>
+        <button class="notif-btn">
+            <i class="ti ti-bell"></i>
+            <div class="notif-dot" th:if="${pendingQnaCount != null and pendingQnaCount > 0}"></div>
+        </button>
+    </div>
+</header>
+
+</body>
+</html>

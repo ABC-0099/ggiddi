@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  사이드바 공통 프래그먼트.
+  각 페이지 컨트롤러는 model에 아래 두 값을 꼭 넣어주세요.
+    - activeMenu      : "stats" | "content" | "members" | "board" | "event" | "payment" | "settings"
+    - pendingQnaCount : 게시판 관리 미답변 건수 (int)
+-->
+<aside class="sidebar" th:fragment="sidebar">
+    <div class="sidebar-logo">
+        <a th:href="@{/}" style="text-decoration:none; color:inherit; display:block;">
+            <div class="logo-title">끼역띠귿</div>
+            <div class="logo-sub">관리자 패널</div>
+        </a>
+    </div>
+
+    <nav class="sidebar-nav">
+        <div class="nav-section-label">메인</div>
+        <a class="nav-item" th:classappend="${activeMenu == 'stats'} ? 'active'" th:href="@{/admin/stats}">
+            <i class="ti ti-layout-dashboard"></i>
+            통계 대시보드
+        </a>
+
+        <div class="nav-section-label">관리</div>
+        <a class="nav-item" th:classappend="${activeMenu == 'content'} ? 'active'" th:href="@{/admin/content}">
+            <i class="ti ti-video"></i>
+            콘텐츠 관리
+        </a>
+        <a class="nav-item" th:classappend="${activeMenu == 'members'} ? 'active'" th:href="@{/admin/members}">
+            <i class="ti ti-users"></i>
+            회원 관리
+        </a>
+        <a class="nav-item" th:classappend="${activeMenu == 'board'} ? 'active'" th:href="@{/admin/board}">
+            <i class="ti ti-message-circle"></i>
+            게시판 관리
+            <span class="nav-badge" th:if="${pendingQnaCount != null and pendingQnaCount > 0}" th:text="${pendingQnaCount}">0</span>
+        </a>
+        <a class="nav-item" th:classappend="${activeMenu == 'event'} ? 'active'" th:href="@{/admin/event}">
+            <i class="ti ti-calendar-event"></i>
+            이벤트 관리
+        </a>
+        <a class="nav-item" th:classappend="${activeMenu == 'payment'} ? 'active'" th:href="@{/admin/payment}">
+            <i class="ti ti-credit-card"></i>
+            결제/수강 관리
+        </a>
+
+        <div class="nav-section-label">설정</div>
+        <a class="nav-item" th:classappend="${activeMenu == 'settings'} ? 'active'" th:href="@{/admin/settings}">
+            <i class="ti ti-settings"></i>
+            사이트 설정
+        </a>
+    </nav>
+
+    <div class="sidebar-footer">
+        <div class="admin-avatar">관</div>
+        <div class="admin-info">
+            <div class="admin-name">최고관리자</div>
+            <div class="admin-role">admin@kkiyeok.com</div>
+        </div>
+        <i class="ti ti-logout"></i>
+    </div>
+</aside>
+
+</body>
+</html>

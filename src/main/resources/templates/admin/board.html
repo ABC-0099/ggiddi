@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>끼역띠귿 - 게시판 관리</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" th:href="@{/css/admin/common.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/board.css}">
+</head>
+<body>
+
+<aside th:replace="~{admin/fragments/sidebar :: sidebar}"></aside>
+
+<div class="main">
+
+    <header th:replace="~{admin/fragments/topbar :: topbar}"></header>
+
+    <div class="content">
+        <div class="section-header">
+            <div>
+                <div class="section-title">게시판 관리 (Q&amp;A)</div>
+                <div class="section-subtitle" th:text="|답변 대기 중인 문의: ${pendingQnaCount}건|">0건</div>
+            </div>
+        </div>
+
+        <div class="card">
+            <div style="padding: 24px 24px 0;">
+                <div class="board-menu-tabs">
+                    <a th:href="@{/admin/board(category='account')}" class="board-tab" th:classappend="${currentCategory == 'account'} ? 'active'">계정/로그인</a>
+                    <a th:href="@{/admin/board(category='payment')}" class="board-tab" th:classappend="${currentCategory == 'payment'} ? 'active'">결제/환불</a>
+                    <a th:href="@{/admin/board(category='content')}" class="board-tab" th:classappend="${currentCategory == 'content'} ? 'active'">학습 콘텐츠</a>
+                    <a th:href="@{/admin/board(category='community')}" class="board-tab" th:classappend="${currentCategory == 'community'} ? 'active'">커뮤니티/신고</a>
+                    <a th:href="@{/admin/board(category='bug')}" class="board-tab" th:classappend="${currentCategory == 'bug'} ? 'active'">오류 신고</a>
+                </div>
+
+                <form th:action="@{/admin/board}" method="get" class="search-form-wrap">
+                    <input type="hidden" name="category" th:value="${currentCategory}">
+                    <div class="search-box-container">
+                        <i class="ti ti-search"></i>
+                        <input type="text" name="kw" class="search-input" th:value="${kw}" placeholder="검색어를 입력해 주세요...">
+                    </div>
+                    <button type="submit" class="btn-search-submit">
+                        <i class="ti ti-search"></i>
+                        검색하기
+                    </button>
+                </form>
+            </div>
+
+            <table class="data-table">
+                <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>제목</th>
+                    <th>작성자</th>
+                    <th>등록일</th>
+                    <th>상태</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(qnas.content)}">
+                    <td colspan="5" style="text-align: center; color: var(--gray-400); padding: 50px 0;">
+                        해당 카테고리 내역 중 조건에 일치하는 Q&amp;A 데이터가 존재하지 않습니다.
+                    </td>
+                </tr>
+                <tr th:each="qna : ${qnas.content}">
+                    <td th:text="${qna.id}">1</td>
+                    <td th:text="${qna.title}">문의 제목</td>
+                    <td th:text="${qna.author != null ? qna.author.username : '알 수 없음'}">작성자</td>
+                    <td th:text="${qna.createdDate}">작성일</td>
+                    <td>
+                        <span class="badge" th:classappend="${qna.status == 'COMPLETED' ? 'badge-success' : 'badge-pending'}" th:text="${qna.status}">상태</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>
