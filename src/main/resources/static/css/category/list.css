@@ -44,7 +44,7 @@
     .page-header {
       position: relative; z-index: 1;
       padding: 48px 6% 32px;
-      max-width: 1440px; margin: 0 auto;
+      max-width: 1100px; margin: 0 auto;
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
@@ -321,7 +321,7 @@
     .filter-bar {
       position: relative; z-index: 1;
       padding: 0 6% 28px;
-      max-width: 1440px; margin: 0 auto;
+      max-width: 1100px; margin: 0 auto;
       display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
     }
     .tabs { display: flex; gap: 4px; }
@@ -345,7 +345,7 @@
     .lecture-wrap {
       position: relative; z-index: 1;
       padding: 0 6% 80px;
-      max-width: 1440px; margin: 0 auto;
+      max-width: 1100px; margin: 0 auto;
     }
 
     .stage-section { margin-bottom: 52px; }
