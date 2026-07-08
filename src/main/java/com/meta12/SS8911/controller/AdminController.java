@@ -122,25 +122,60 @@ public class AdminController {
     @GetMapping("/board")
     public String board(Model model,
                         @RequestParam(value = "category", defaultValue = "all") String category,
-                        @RequestParam(value = "kw", defaultValue = "") String kw) {
+                        @RequestParam(value = "kw", defaultValue = "") String kw,
+                        @RequestParam(value = "page", defaultValue = "0") int page) {
 
         model.addAttribute("activeMenu", "board");
         model.addAttribute("pageTitle", "게시판 관리");
         model.addAttribute("currentCategory", category);
         model.addAttribute("kw", kw);
 
-        Page<Qna> realQnas = qnaService.getAdminBoardList(category, kw, PageRequest.of(0, 20));
+        // 한 페이지당 10개씩 조회
+        Page<Qna> realQnas = qnaService.getAdminBoardList(
+                category,
+                kw,
+                PageRequest.of(page, 10)
+        );
 
         List<QnaWrapper> wrappedList = new ArrayList<>();
-        for (Qna q : realQnas.getContent()) {
-            String authorName = (q.getAuthor() != null) ? q.getAuthor().getUsername() : "알 수 없음";
-            String statusStr = (q.getStatus() != null) ? q.getStatus().name() : "PENDING";
-            String dateStr = (q.getCreatedDate() != null) ? q.getCreatedDate().toLocalDate().toString() : "2026-07-08";
 
-            wrappedList.add(new QnaWrapper(q.getId(), q.getTitle(), q.getContent(), authorName, dateStr, statusStr));
+        for (Qna q : realQnas.getContent()) {
+
+            String authorName = (q.getAuthor() != null)
+                    ? q.getAuthor().getUsername()
+                    : "알 수 없음";
+
+            String statusStr = (q.getStatus() != null)
+                    ? q.getStatus().name()
+                    : "PENDING";
+
+            String dateStr = (q.getCreatedDate() != null)
+                    ? q.getCreatedDate().toLocalDate().toString()
+                    : "2026-07-08";
+
+            wrappedList.add(
+                    new QnaWrapper(
+                            q.getId(),
+                            q.getTitle(),
+                            q.getContent(),
+                            authorName,
+                            dateStr,
+                            statusStr
+                    )
+            );
         }
-        Page<QnaWrapper> qnas = new PageImpl<>(wrappedList, realQnas.getPageable(), realQnas.getTotalElements());
+
+        Page<QnaWrapper> qnas = new PageImpl<>(
+                wrappedList,
+                realQnas.getPageable(),
+                realQnas.getTotalElements()
+        );
+
         model.addAttribute("qnas", qnas);
+
+        // 페이지네이션용 데이터
+        model.addAttribute("currentPage", qnas.getNumber());
+        model.addAttribute("totalPages", qnas.getTotalPages());
 
         return "admin/board";
     }

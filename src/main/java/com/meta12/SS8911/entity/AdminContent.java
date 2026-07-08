@@ -3,6 +3,10 @@ package com.meta12.SS8911.entity;
 import jakarta.persistence.*;
 import lombok.Getter;  // 💡 추가
 import lombok.Setter;  // 💡 추가
+import org.springframework.ui.Model;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+
 import java.time.LocalDateTime;
 
 @Entity
