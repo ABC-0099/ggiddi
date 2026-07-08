@@ -33,6 +33,7 @@ public class AdminController {
         // 브라우저 새로고침 시에도 기존에 보던 탭(패널)이 그대로 열려있도록 전달
         model.addAttribute("currentPanel", panel);
         model.addAttribute("currentCategory", category);
+        model.addAttribute("users", siteUserService.getAllUsers());
         model.addAttribute("kw", kw);
 
         // ==========================================
@@ -63,6 +64,7 @@ public class AdminController {
         }
         model.addAttribute("contents", wrappedContentList);
         model.addAttribute("totalContentCount", wrappedContentList.size());
+        model.addAttribute("users", siteUserService.getAllUsers());
 
         // ==========================================
         // 3. 이벤트 가짜 데이터들 (유지)
@@ -144,4 +146,6 @@ public class AdminController {
         public EventMock(String title, String startDate, String endDate, int participantCount, String createdDate, String status) { this.title = title; this.startDate = startDate; this.endDate = endDate; this.participantCount = participantCount; this.createdDate = createdDate; this.status = status; }
         public String getTitle() { return title; } public String getStartDate() { return startDate; } public String getEndDate() { return endDate; } public int getParticipantCount() { return participantCount; } public String getCreatedDate() { return createdDate; } public String getStatus() { return status; }
     }
+
+
 }
