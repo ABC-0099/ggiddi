@@ -14,6 +14,8 @@
 -->
 
 <nav th:fragment="navbar(currentMenu)" class="navbar">
+  <meta name="_csrf" th:content="${_csrf.token}" />
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" />
   <link th:href="@{/css/layout/navbar.css}" rel="stylesheet">
   <div class="navbar-inner">
 
