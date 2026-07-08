@@ -28,6 +28,10 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.util.List;
+import java.util.Map;
+import java.util.HashMap;
+import java.time.LocalDate;
+import java.time.DayOfWeek;
 
 import java.security.Principal;
 
@@ -74,6 +78,7 @@ public class SiteUserController {
                          @RequestParam(defaultValue = "0") int commentPage,
                          @RequestParam(defaultValue = "0") int inquiryPage) {
         SiteUser user = siteUserService.getUserByUsername(principal.getName());
+        String username = principal.getName();
 
         Pageable postPageable = PageRequest.of(postPage, 5);
         Page<Community> myPosts = communityService.getPostsByAuthor(user, postPageable);
@@ -89,6 +94,25 @@ public class SiteUserController {
         model.addAttribute("myComments", myComments);
         model.addAttribute("myInquiries", myInquiries);
         model.addAttribute("heatmapData", siteUserService.getHeatmapData(user));
+
+        // ▼▼▼ 출석 관련 데이터 추가 ▼▼▼
+        int currentStreak = attendanceService.getCurrentStreak(username);
+        boolean[] weeklyAttendance = attendanceService.getWeeklyAttendance(username);
+        int lastWeekAttendedCount = attendanceService.getLastWeekAttendedCount(username);
+
+        int attendedCount = 0;
+        for (boolean attended : weeklyAttendance) {
+            if (attended) {
+                attendedCount++;
+            }
+        }
+
+        model.addAttribute("currentStreak", currentStreak);
+        model.addAttribute("weeklyAttendance", weeklyAttendance);
+        model.addAttribute("attendedCount", attendedCount);
+        model.addAttribute("lastWeekAttendedCount", lastWeekAttendedCount);
+        // ▲▲▲ 출석 관련 데이터 추가 끝 ▲▲▲
+
         return "siteUser/mypage";
     }
 
@@ -173,5 +197,35 @@ public class SiteUserController {
 
         // 1. 위에서 주입받은 객체인 attendanceService를 사용하세요!
         return attendanceService.getMonthlyData(principal.getName(), year, month);
+    }
+
+    @GetMapping("/api/attendance/weekly")
+    @ResponseBody
+    public Map<String, Object> getWeeklyAttendanceApi(
+            @RequestParam(defaultValue = "0") int weekOffset,
+            Principal principal) {
+
+        String username = principal.getName();
+        boolean[] weeklyAttendance = attendanceService.getWeeklyAttendance(username, weekOffset);
+
+        int attendedCount = 0;
+        for (boolean attended : weeklyAttendance) {
+            if (attended) {
+                attendedCount++;
+            }
+        }
+
+        LocalDate monday = LocalDate.now().with(DayOfWeek.MONDAY).plusWeeks(weekOffset);
+        LocalDate sunday = monday.plusDays(6);
+        String weekLabel = monday.getMonthValue() + "." + monday.getDayOfMonth()
+                + " - " + sunday.getMonthValue() + "." + sunday.getDayOfMonth();
+
+        Map<String, Object> result = new HashMap<>();
+        result.put("weeklyAttendance", weeklyAttendance);
+        result.put("attendedCount", attendedCount);
+        result.put("weekLabel", weekLabel);
+        result.put("weekOffset", weekOffset);
+        result.put("isCurrentWeek", weekOffset == 0);
+        return result;
     }
 }

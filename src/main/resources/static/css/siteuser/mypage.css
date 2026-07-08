@@ -540,11 +540,11 @@ html, body {
     display: flex;
     align-items: center;
     gap: 14px;
-    background: linear-gradient(135deg, #FFF7ED, #FEF3C7);
-    border: 1px solid #FDE68A;
+    background: linear-gradient(135deg, var(--mint-pale), var(--navy-light));
+    border: 1px solid var(--border);
     border-radius: 14px;
     padding: 18px 20px;
-    margin-bottom: 20px;
+    margin-bottom: 16px;
 }
 .journal-streak-flame {
     font-size: 32px;
@@ -553,12 +553,12 @@ html, body {
 .journal-streak-current {
     font-size: 15px;
     font-weight: 700;
-    color: #92400E;
+    color: var(--navy-dark);
     margin-bottom: 4px;
 }
 .journal-streak-best {
     font-size: 12.5px;
-    color: #B45309;
+    color: var(--mint-dark);
 }
 
 .journal-compare-grid {
@@ -651,14 +651,6 @@ html, body {
 
 }
 
-.calendar-header{
-    display:flex;
-    align-items:center;
-    justify-content:space-between;
-    margin-bottom:12px;
-    height:32px;
-}
-
 .calendar-header button{
     width:28px;
     height:28px;
@@ -685,9 +677,6 @@ html, body {
     background:var(--mint-pale);
     color:var(--mint-dark);
 }
-
-<button>&lsaquo;</button>
-<button>&rsaquo;</button>
 
 #monthTitle{
     flex:1;
@@ -754,16 +743,8 @@ html, body {
 }
 
 .calendar-day:hover{
-
     transform:translateY(-1px);
-
     background:#DFF7ED;
-
-}
-
-
-.calendar-day:hover {
-    transform: translateY(-1px);
     box-shadow: 0 2px 6px rgba(29, 158, 117, 0.15);
 }
 
@@ -802,13 +783,117 @@ html, body {
 }
 
 .calendar-day.sat{
-
     color:#3B82F6;
-
+}
 
 .calendar-day.active.sun,
 .calendar-day.active.sat{
-
     color:#fff;
+}
 
+.weekly-heatmap-card{
+    background: #fff;
+    border: 1px solid var(--border);
+    border-radius: 14px;
+    padding: 20px;
+}
+
+.weekly-header{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-bottom:12px;
+}
+
+.weekly-title-group{
+    text-align:center;
+}
+
+.weekly-title{
+    font-size:13px;
+    color:var(--ink-soft);
+}
+
+.weekly-range{
+    font-size:11.5px;
+    color:#9CA3AF;
+    margin-top:2px;
+}
+
+.weekly-nav-btn{
+    width:28px;
+    height:28px;
+    border:none;
+    border-radius:8px;
+    background:#F4F7F9;
+    color:var(--ink);
+    font-size:15px;
+    font-weight:700;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    cursor:pointer;
+    transition:.18s;
+}
+
+.weekly-nav-btn:hover:not(:disabled){
+    background:var(--mint-pale);
+    color:var(--mint-dark);
+    transform:translateY(-1px);
+}
+
+.weekly-nav-btn:disabled{
+    opacity:.35;
+    cursor:default;
+}
+
+.weekly-days{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    text-align:center;
+    font-size:12px;
+    color: var(--ink-soft);
+    margin-bottom:8px;
+}
+
+.weekly-grid{
+    display:grid;
+    grid-template-columns:repeat(7,1fr);
+    gap:8px;
+}
+
+.week-box{
+    height:32px;
+    border-radius:10px;
+    background:#E5E7EB;
+}
+
+.week-box.attended{
+    background:linear-gradient(
+            135deg,
+            var(--mint),
+            var(--mint-dark)
+    );
+}
+
+.weekly-footer{
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    margin-top:14px;
+}
+
+.weekly-count{
+    font-size:13px;
+    font-weight:600;
+    color:var(--navy);
+}
+
+.weekly-rate-badge{
+    background: var(--mint-pale);
+    color: var(--mint-dark);
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 5px 12px;
+    border-radius: 20px;
 }
