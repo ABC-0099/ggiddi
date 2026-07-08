@@ -17,28 +17,118 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Controller
-@RequiredArgsConstructor // 💡 private final로 선언된 모든 객체의 생성자 주입을 자동으로 처리합니다.
+@RequiredArgsConstructor
+@RequestMapping("/admin")
 public class AdminController {
 
     private final QnaService qnaService;
     private final SiteUserService siteUserService;
-    private final AdminContentService adminContentService; // 💡 필드 단일화로 주입 충돌 방지
+    private final AdminContentService adminContentService;
 
-    @GetMapping("/admin")
-    public String adminDashboard(Model model,
-                                 @RequestParam(value = "category", defaultValue = "notice") String category,
-                                 @RequestParam(value = "kw", defaultValue = "") String kw,
-                                 @RequestParam(value = "panel", defaultValue = "stats") String panel) {
+    /**
+     * 사이드바 뱃지 + 탑바 알림 점 표시용.
+     * @ModelAttribute로 선언해두면 이 컨트롤러의 모든 @GetMapping/@PostMapping 메서드 실행 전에
+     * 자동으로 model에 "pendingQnaCount"가 채워집니다. (각 메서드마다 반복 추가할 필요 없음)
+     */
+    @ModelAttribute("pendingQnaCount")
+//    public int pendingQnaCount() {
+//        return qnaService.countPending();
+//    }
 
-        // 브라우저 새로고침 시에도 기존에 보던 탭(패널)이 그대로 열려있도록 전달
-        model.addAttribute("currentPanel", panel);
-        model.addAttribute("currentCategory", category);
+    // ==========================================
+    // 통계 대시보드
+    // ==========================================
+    @GetMapping("/stats")
+    public String stats(Model model) {
+        model.addAttribute("activeMenu", "stats");
+        model.addAttribute("pageTitle", "통계 대시보드");
+
+        model.addAttribute("totalContentCount", adminContentService.getAllAdminContents().size());
+        // TODO: 전체 회원수 / 이번 달 매출은 실제 서비스 연결되면 채우기
+        // model.addAttribute("totalUserCount", siteUserService.getAllUsers().size());
+        // model.addAttribute("monthlyRevenue", ...);
+
+        return "admin/stats";
+    }
+
+    // ==========================================
+    // 콘텐츠 관리
+    // ==========================================
+    @GetMapping("/content")
+    public String content(Model model) {
+        model.addAttribute("activeMenu", "content");
+        model.addAttribute("pageTitle", "콘텐츠 관리");
+
+        List<AdminContent> realAdminContents = adminContentService.getAllAdminContents();
+        List<AdminContentDto> wrappedContentList = new ArrayList<>();
+        for (AdminContent ac : realAdminContents) {
+            String dateStr = (ac.getCreatedDate() != null) ? ac.getCreatedDate().toLocalDate().toString() : "-";
+            wrappedContentList.add(new AdminContentDto(ac.getId(), ac.getTitle(), ac.getStep(), ac.getLectureCount(), dateStr, ac.getStatus()));
+        }
+        model.addAttribute("contents", wrappedContentList);
+        model.addAttribute("totalContentCount", wrappedContentList.size());
+
+        return "admin/content";
+    }
+
+    @PostMapping("/content/create")
+    public String createContent(@RequestParam String title,
+                                 @RequestParam String step,
+                                 @RequestParam int lectureCount,
+                                 @RequestParam(defaultValue = "공개") String status) {
+
+        AdminContent newContent = new AdminContent();
+        newContent.setTitle(title);
+        newContent.setStep(step);
+        newContent.setLectureCount(lectureCount);
+        newContent.setStatus(status);
+
+        adminContentService.saveContent(newContent);
+
+        return "redirect:/admin/content";
+    }
+
+    @PostMapping("/content/update/{id}")
+    public String updateContent(@PathVariable("id") Long id,
+                                 @RequestParam("title") String title,
+                                 @RequestParam("step") String step,
+                                 @RequestParam("lectureCount") Integer lectureCount,
+                                 @RequestParam("status") String status) {
+
+        adminContentService.updateContent(id, title, step, lectureCount, status);
+        return "redirect:/admin/content";
+    }
+
+    @GetMapping("/content/delete/{id}")
+    public String deleteContent(@PathVariable("id") Long id) {
+        adminContentService.deleteContent(id);
+        return "redirect:/admin/content";
+    }
+
+    // ==========================================
+    // 회원 관리
+    // ==========================================
+    @GetMapping("/members")
+    public String members(Model model) {
+        model.addAttribute("activeMenu", "members");
+        model.addAttribute("pageTitle", "회원 관리");
         model.addAttribute("users", siteUserService.getAllUsers());
+        return "admin/members";
+    }
+
+    // ==========================================
+    // 게시판 관리 (Q&A)
+    // ==========================================
+    @GetMapping("/board")
+    public String board(Model model,
+                         @RequestParam(value = "category", defaultValue = "notice") String category,
+                         @RequestParam(value = "kw", defaultValue = "") String kw) {
+
+        model.addAttribute("activeMenu", "board");
+        model.addAttribute("pageTitle", "게시판 관리");
+        model.addAttribute("currentCategory", category);
         model.addAttribute("kw", kw);
 
-        // ==========================================
-        // 1. Q&A / 게시판 관리 데이터 연동 (진짜 DB)
-        // ==========================================
         Page<Qna> realQnas = qnaService.getAdminBoardList(category, kw, PageRequest.of(0, 20));
 
         List<QnaWrapper> wrappedList = new ArrayList<>();
@@ -51,24 +141,18 @@ public class AdminController {
         }
         Page<QnaWrapper> qnas = new PageImpl<>(wrappedList, realQnas.getPageable(), realQnas.getTotalElements());
         model.addAttribute("qnas", qnas);
-        model.addAttribute("pendingQnaCount", qnaService.countPending());
 
-        // ==========================================
-        // 2. 콘텐츠 관리 데이터 연동 (진짜 DB)
-        // ==========================================
-        List<AdminContent> realAdminContents = adminContentService.getAllAdminContents();
-        List<AdminContentDto> wrappedContentList = new ArrayList<>();
-        for (AdminContent ac : realAdminContents) {
-            String dateStr = (ac.getCreatedDate() != null) ? ac.getCreatedDate().toLocalDate().toString() : "-";
-            wrappedContentList.add(new AdminContentDto(ac.getId(), ac.getTitle(), ac.getStep(), ac.getLectureCount(), dateStr, ac.getStatus()));
-        }
-        model.addAttribute("contents", wrappedContentList);
-        model.addAttribute("totalContentCount", wrappedContentList.size());
-        model.addAttribute("users", siteUserService.getAllUsers());
+        return "admin/board";
+    }
 
-        // ==========================================
-        // 3. 이벤트 가짜 데이터들 (유지)
-        // ==========================================
+    // ==========================================
+    // 이벤트 관리 (현재는 목데이터 유지)
+    // ==========================================
+    @GetMapping("/event")
+    public String event(Model model) {
+        model.addAttribute("activeMenu", "event");
+        model.addAttribute("pageTitle", "이벤트 관리");
+
         model.addAttribute("ongoingEventCount", 2);
         model.addAttribute("upcomingEventCount", 1);
         model.addAttribute("totalEventParticipants", 386);
@@ -81,52 +165,43 @@ public class AdminController {
         eventList.add(new EventMock("추석맞이 K-문화 퀴즈전", "2026.09.20", "2026.09.27", 0, "2026.06.30", "UPCOMING"));
         model.addAttribute("events", eventList);
 
-        return "admin/dashboard";
+        return "admin/event";
+    }
+
+    @GetMapping("/event/create")
+    public String eventCreateForm(Model model) {
+        model.addAttribute("activeMenu", "event");
+        model.addAttribute("pageTitle", "이벤트 등록");
+        return "admin/event-create";
+    }
+
+    // TODO: 이벤트 등록 저장 로직이 아직 없어서 폼만 있고 실제 저장 처리가 빠져있습니다.
+    // 이벤트 엔티티/서비스가 준비되면 아래처럼 추가하면 됩니다.
+    //
+    // @PostMapping("/event/create")
+    // public String eventCreateSubmit(@RequestParam String title, ...) {
+    //     eventService.create(...);
+    //     return "redirect:/admin/event";
+    // }
+
+    // ==========================================
+    // 결제/수강 관리 (백엔드 연동 전)
+    // ==========================================
+    @GetMapping("/payment")
+    public String payment(Model model) {
+        model.addAttribute("activeMenu", "payment");
+        model.addAttribute("pageTitle", "결제/수강 관리");
+        return "admin/payment";
     }
 
     // ==========================================
-    // 실제 콘텐츠 등록 처리 API
+    // 사이트 설정 (백엔드 연동 전)
     // ==========================================
-    @PostMapping("/admin/content/create")
-    public String createContent(@RequestParam String title,
-                                @RequestParam String step,
-                                @RequestParam int lectureCount,
-                                @RequestParam(defaultValue = "공개") String status) {
-
-        AdminContent newContent = new AdminContent();
-        newContent.setTitle(title);
-        newContent.setStep(step);
-        newContent.setLectureCount(lectureCount);
-        newContent.setStatus(status);
-
-        adminContentService.saveContent(newContent);
-
-        return "redirect:/admin?panel=content";
-    }
-
-    // ==========================================
-    // 💡 실제 콘텐츠 수정 처리 API (안전하게 교체됨)
-    // ==========================================
-    @PostMapping("/admin/content/update/{id}")
-    public String updateContent(@PathVariable("id") Long id,
-                                @RequestParam("title") String title,
-                                @RequestParam("step") String step,
-                                @RequestParam("lectureCount") Integer lectureCount,
-                                @RequestParam("status") String status) {
-
-        // 정렬된 단일 빈 구조인 adminContentService 인스턴스로 안전하게 위임 호출합니다.
-        adminContentService.updateContent(id, title, step, lectureCount, status);
-        return "redirect:/admin?panel=content";
-    }
-
-    // ==========================================
-    // 💡 실제 콘텐츠 삭제 처리 API (안전하게 교체됨)
-    // ==========================================
-    @GetMapping("/admin/content/delete/{id}")
-    public String deleteContent(@PathVariable("id") Long id) {
-
-        adminContentService.deleteContent(id);
-        return "redirect:/admin?panel=content";
+    @GetMapping("/settings")
+    public String settings(Model model) {
+        model.addAttribute("activeMenu", "settings");
+        model.addAttribute("pageTitle", "사이트 설정");
+        return "admin/settings";
     }
 
     // ── 가짜/DTO 내부 클래스 구조들 (유지) ──
@@ -146,6 +221,4 @@ public class AdminController {
         public EventMock(String title, String startDate, String endDate, int participantCount, String createdDate, String status) { this.title = title; this.startDate = startDate; this.endDate = endDate; this.participantCount = participantCount; this.createdDate = createdDate; this.status = status; }
         public String getTitle() { return title; } public String getStartDate() { return startDate; } public String getEndDate() { return endDate; } public int getParticipantCount() { return participantCount; } public String getCreatedDate() { return createdDate; } public String getStatus() { return status; }
     }
-
-
 }

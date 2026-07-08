@@ -1,0 +1,59 @@
+/* ══════════════════════════════════════════════
+   board.css — 게시판 관리(panel-board) 전용
+   common.css 를 먼저 불러온 뒤에 이 파일을 불러오세요.
+   ══════════════════════════════════════════════ */
+
+/* ── 카테고리 탭 (계정/로그인, 결제/환불 ...) ── */
+.board-menu-tabs {
+    display: flex;
+    gap: 8px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--gray-200);
+}
+.board-tab {
+    padding: 10px 20px;
+    font-size: 14px;
+    font-weight: 600;
+    color: var(--gray-600);
+    text-decoration: none;
+    border-bottom: 2px solid transparent;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+.board-tab:hover { color: var(--navy); }
+.board-tab.active {
+    color: var(--navy);
+    border-bottom: 2px solid var(--navy);
+    background: var(--gray-50);
+    border-radius: 6px 6px 0 0;
+}
+.board-new-dot {
+    display: inline-block;
+    width: 6px; height: 6px;
+    border-radius: 50%;
+    background: var(--mint-mid);
+    margin-left: 5px;
+    vertical-align: middle;
+}
+
+/* ── 검색 폼 ── */
+.search-form-wrap { display: flex; gap: 8px; margin-bottom: 20px; width: 100%; }
+.search-box-container { position: relative; flex: 1; display: flex; align-items: center; }
+.search-box-container .ti-search { position: absolute; left: 14px; color: var(--gray-400); font-size: 16px; }
+.search-box-container .search-input { width: 100%; padding: 12px 12px 12px 40px; border: 1px solid var(--gray-200); border-radius: 8px; font-size: 14px; outline: none; }
+.search-box-container .search-input:focus { border-color: var(--navy); box-shadow: 0 0 0 3px rgba(24,95,165,0.1); }
+.btn-search-submit {
+    background: var(--navy);
+    color: white;
+    border: none;
+    padding: 0 20px;
+    border-radius: 8px;
+    font-weight: 600;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    white-space: nowrap;
+}
+.btn-search-submit:hover { background: var(--navy-dark); }

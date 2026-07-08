@@ -1,0 +1,38 @@
+/* ══════════════════════════════════════════════
+   members.css — 회원 관리(panel-members) 전용
+   common.css 를 먼저 불러온 뒤에 이 파일을 불러오세요.
+   ══════════════════════════════════════════════ */
+
+.member-kpi {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-bottom: 20px;
+}
+.member-kpi-card {
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-lg);
+    padding: 14px 18px;
+    text-align: center;
+    box-shadow: var(--shadow-sm);
+}
+.member-kpi-val { font-size: 22px; font-weight: 700; }
+.member-kpi-lbl { font-size: 12px; color: var(--gray-400); margin-top: 3px; }
+
+/* member row */
+.member-avatar {
+    width: 36px; height: 36px;
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 13px;
+    font-weight: 700;
+    flex-shrink: 0;
+}
+.member-cell { display: flex; align-items: center; gap: 10px; }
+.member-name-wrap .name { font-size: 13px; font-weight: 500; }
+.member-name-wrap .email { font-size: 11px; color: var(--gray-400); margin-top: 1px; }
+
+@media (max-width: 1100px) {
+    .member-kpi { grid-template-columns: repeat(2, 1fr); }
+}
