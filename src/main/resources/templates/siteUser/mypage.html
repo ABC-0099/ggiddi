@@ -370,31 +370,53 @@
                 <div class="journal-streak-flame">🔥</div>
                 <div class="journal-streak-text">
                     <div class="journal-streak-current">
-                        <span th:text="${siteUser.streakDays}">0</span>일 연속 학습 중!
+                        <span th:text="${currentStreak}">0</span>일 연속 학습 중!
                     </div>
                     <div class="journal-streak-best"
-                         th:if="${maxStreakDays != null and maxStreakDays > siteUser.streakDays}">
+                         th:if="${maxStreakDays != null and maxStreakDays > currentStreak}">
                         역대 최고: <span th:text="${maxStreakDays}">0</span>일 —
-                        <span th:text="${maxStreakDays - siteUser.streakDays}">0</span>일만 더 하면 신기록!
+                        <span th:text="${maxStreakDays - currentStreak}">0</span>일만 더 하면 신기록!
                     </div>
-                    <div class="journal-streak-best" th:if="${maxStreakDays != null and maxStreakDays <= siteUser.streakDays}">
+                    <div class="journal-streak-best" th:if="${maxStreakDays != null and maxStreakDays <= currentStreak}">
                         🎉 지금이 역대 최고 기록이에요!
                     </div>
                 </div>
             </div>
 
             <!-- 이번 주 vs 지난주 비교 -->
-            <div class="journal-compare-grid">
-                <div class="journal-compare-card">
-                    <div class="journal-compare-label">이번 주 출석일</div>
-                    <div class="journal-compare-value" th:text="${thisWeekAttendance} + '일'">0일</div>
-                    <div class="journal-compare-diff"
-                         th:if="${thisWeekAttendance != null and lastWeekAttendance != null}"
-                         th:classappend="${thisWeekAttendance >= lastWeekAttendance} ? 'up' : 'down'"
-                         th:text="${(thisWeekAttendance >= lastWeekAttendance ? '▲ ' : '▼ ') + #numbers.abs(thisWeekAttendance - lastWeekAttendance)} + '일 (지난주 ' + ${lastWeekAttendance} + '일)'">
-                        지난주 대비
+            <div class="weekly-heatmap-card" id="weeklyCard" th:data-week-offset="0">
+
+                <div class="weekly-header">
+                    <button type="button" class="weekly-nav-btn" id="weeklyPrevBtn" onclick="changeWeek(-1)">&lsaquo;</button>
+                    <div class="weekly-title-group">
+                        <div class="weekly-title">이번 주 출석</div>
+                        <div class="weekly-range" id="weeklyRange"></div>
                     </div>
+                    <button type="button" class="weekly-nav-btn" id="weeklyNextBtn" onclick="changeWeek(1)" disabled>&rsaquo;</button>
                 </div>
+
+                <div class="weekly-days">
+                    <span>월</span>
+                    <span>화</span>
+                    <span>수</span>
+                    <span>목</span>
+                    <span>금</span>
+                    <span>토</span>
+                    <span>일</span>
+                </div>
+
+                <div class="weekly-grid" id="weeklyGrid">
+                    <div class="week-box" th:each="attended : ${weeklyAttendance}"
+                         th:classappend="${attended} ? ' attended' : ''"></div>
+                </div>
+
+                <div class="weekly-footer">
+                    <span class="weekly-count" id="weeklyCount">
+                        <span th:text="${attendedCount}">0</span> / 7일 출석
+                    </span>
+                    <span class="weekly-rate-badge" id="weeklyRateBadge" th:text="'출석률 ' + ${attendedCount * 100 / 7} + '%'">출석률 0%</span>
+                </div>
+
             </div>
         </section>
 
@@ -426,6 +448,49 @@
 </div>
 
 <script>
+    let currentWeekOffset = 0;
+
+    function renderWeekLabel(label, isCurrentWeek) {
+        const rangeEl = document.getElementById('weeklyRange');
+        const titleEl = document.querySelector('.weekly-title');
+        rangeEl.textContent = label;
+        titleEl.textContent = isCurrentWeek ? '이번 주 출석' : '주간 출석';
+    }
+
+    function renderWeeklyGrid(weeklyAttendance) {
+        const grid = document.getElementById('weeklyGrid');
+        grid.innerHTML = '';
+        weeklyAttendance.forEach(attended => {
+            const box = document.createElement('div');
+            box.className = 'week-box' + (attended ? ' attended' : '');
+            grid.appendChild(box);
+        });
+    }
+
+    function changeWeek(direction) {
+        const nextOffset = currentWeekOffset + direction;
+
+        // 미래 주는 막기
+        if (nextOffset > 0) return;
+
+        fetch(`/api/attendance/weekly?weekOffset=${nextOffset}`)
+            .then(res => res.json())
+            .then(data => {
+                currentWeekOffset = data.weekOffset;
+
+                renderWeeklyGrid(data.weeklyAttendance);
+                renderWeekLabel(data.weekLabel, data.isCurrentWeek);
+
+                document.getElementById('weeklyCount').innerHTML =
+                    `<span>${data.attendedCount}</span> / 7일 출석`;
+                document.getElementById('weeklyRateBadge').textContent =
+                    `출석률 ${Math.round(data.attendedCount * 100 / 7)}%`;
+
+                document.getElementById('weeklyNextBtn').disabled = data.isCurrentWeek;
+            })
+            .catch(err => console.error('주간 출석 데이터를 불러오지 못했어요:', err));
+    }
+
     function openWithdrawModal() {
         document.getElementById('withdrawOverlay').style.display = 'flex';
     }
@@ -491,6 +556,11 @@
         }
 
         renderHeatmap();
+
+        fetch('/api/attendance/weekly?weekOffset=0')
+            .then(res => res.json())
+            .then(data => renderWeekLabel(data.weekLabel, data.isCurrentWeek))
+            .catch(err => console.error('이번 주 날짜 라벨을 불러오지 못했어요:', err));
 
         menuItems.forEach(item => {
             item.addEventListener('click', function () {

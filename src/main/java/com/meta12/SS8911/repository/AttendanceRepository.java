@@ -29,4 +29,18 @@ public interface AttendanceRepository extends JpaRepository<Attendance, Long> {
             LocalDate startDate,
             LocalDate endDate
     );
+
+    @Query("""
+        SELECT a
+        FROM Attendance a
+        WHERE a.siteUser.username = :username
+        AND a.date BETWEEN :startDate AND :endDate
+    """)
+    List<Attendance> findWeeklyAttendance(
+            @Param("username") String username,
+            @Param("startDate") LocalDate startDate,
+            @Param("endDate") LocalDate endDate
+    );
+
+    boolean existsBySiteUser_UsernameAndDate(String username, LocalDate date);
 }
