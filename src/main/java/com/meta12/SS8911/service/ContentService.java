@@ -6,6 +6,8 @@ import com.meta12.SS8911.entity.*;
 import com.meta12.SS8911.repository.*;
 import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -27,6 +29,7 @@ public class ContentService {
     private final ProgressRepository progressRepository;
     private final OrderPayRepository orderPayRepository;
     private final SiteUserRepository siteUserRepository;
+
 
     public List<Content> list(Long categoryId, SiteUser user) {
         List<Content> contentList = contentRepository.findByCategoryIdOrderBySequenceAsc(categoryId);
@@ -303,6 +306,11 @@ public class ContentService {
         return progressRepository.findTopBySiteUserOrderByUpdatedAtDesc(user).orElse(null);
     }
 
+    // 마이페이지 "학습 현황" 탭 - 최근 시청순 전체 목록 (완료/진행중 무관, 페이지네이션)
+    public Page<Progress> getMyProgress(SiteUser user, Pageable pageable) {
+        return progressRepository.findBySiteUserOrderByUpdatedAtDesc(user, pageable);
+    }
+
     // 강좌별 진도율 목록 (라인 차트용)
     public List<Map<String, Object>> getCourseProgressList(SiteUser user) {
         List<OrderPay> paidList = orderPayRepository.findBySiteUser(user);
@@ -362,5 +370,7 @@ public class ContentService {
 
         // @Transactional에 의해 메서드 종료 시 DB에 자동 반영됩니다.
     }
+
+
 
 }

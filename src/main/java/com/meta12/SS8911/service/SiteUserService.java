@@ -30,6 +30,7 @@ public class SiteUserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final StudyRecordRepository studyRecordRepository;
 
+
     public List<SiteUser> getAllUsers() {
         return siteUserRepository.findAll();
     }

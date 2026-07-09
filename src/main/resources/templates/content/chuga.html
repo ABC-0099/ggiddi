@@ -174,8 +174,8 @@
             <div class="field-group">
               <label class="field-label" for="status">공개 상태 <span class="req">*</span></label>
               <select class="field-select" id="status" name="status" th:field="*{status}">
-                <option value="DRAFT">임시저장</option>
                 <option value="PUBLISHED">즉시 공개</option>
+                <option value="DRAFT">임시저장</option>
                 <option value="SCHEDULED">예약 공개</option>
               </select>
             </div>
@@ -223,7 +223,7 @@
               </li>
               <li>
                 <span class="sl">상태</span>
-                <span class="sv" id="summary-status">임시저장</span>
+                <span class="sv" id="summary-status">즉시 공개</span>
               </li>
             </ul>
           </section>
