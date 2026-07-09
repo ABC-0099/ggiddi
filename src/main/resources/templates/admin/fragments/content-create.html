@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>끼역띠귿 - 콘텐츠 등록</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" th:href="@{/css/admin/common.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/content-form.css}">
+</head>
+<body>
+
+<aside th:replace="~{admin/fragments/sidebar :: sidebar}"></aside>
+
+<div class="main">
+
+    <header th:replace="~{admin/fragments/topbar :: topbar}"></header>
+
+    <div class="content">
+        <div class="section-header">
+            <div>
+                <div class="section-title">콘텐츠 등록</div>
+                <div class="section-subtitle">새로운 강의 영상을 등록합니다.</div>
+            </div>
+            <div class="section-actions">
+                <a class="btn btn-outline" th:href="@{/admin/content}">목록으로</a>
+            </div>
+        </div>
+
+        <form th:action="@{/admin/content/create}"
+              th:object="${contentDTO}"
+              method="post"
+              enctype="multipart/form-data">
+
+            <!-- 기본 정보 -->
+            <div class="card">
+                <div class="card-head">
+                    <div class="card-title"><i class="ti ti-info-circle"></i>기본 정보</div>
+                </div>
+                <div class="content-form">
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>카테고리(강좌) <span class="required">*</span></label>
+                            <select th:field="*{categoryId}" class="form-select" required>
+                                <option value="" disabled selected>카테고리를 선택하세요</option>
+                                <option th:each="cat : ${categories}"
+                                        th:value="${cat.id}"
+                                        th:text="${cat.title} + ' (' + ${cat.instructor} + ')'">카테고리명</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>영상 순서(sequence)</label>
+                            <input type="number" th:field="*{sequence}" class="form-input" min="1" placeholder="예: 1">
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>콘텐츠 제목 <span class="required">*</span></label>
+                        <input type="text" th:field="*{title}" class="form-input" placeholder="예: 1강. 기본 자음 익히기" required>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>학습 단계</label>
+                            <select th:field="*{stage}" class="form-select">
+                                <option value="1">1단계 - 음절</option>
+                                <option value="2">2단계 - 단어</option>
+                                <option value="3">3단계 - 문장</option>
+                                <option value="4">4단계 - 일상회화</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label>공개 상태</label>
+                            <select th:field="*{status}" class="form-select">
+                                <option value="DRAFT">임시저장</option>
+                                <option value="PUBLISHED">공개</option>
+                                <option value="SCHEDULED">예약공개</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <label>예약 공개 일시</label>
+                            <input type="datetime-local" th:field="*{publishAt}" class="form-input">
+                        </div>
+                        <div class="form-group">
+                            <div class="form-checkbox-row" style="margin-top:38px;">
+                                <input type="checkbox" id="free" th:field="*{free}">
+                                <label for="free" style="margin:0;">무료 콘텐츠로 공개</label>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <label>영상 설명</label>
+                        <textarea th:field="*{description}" class="form-textarea" placeholder="이 영상에 대한 설명을 입력하세요."></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <label>키워드 (검색용, 쉼표로 구분)</label>
+                        <input type="text" th:field="*{keywords}" class="form-input" placeholder="예: 자음, 발음, 기초">
+                    </div>
+
+                    <div class="form-group">
+                        <label>외부 영상 URL (선택 - 파일 업로드 대신 링크로 대체 시)</label>
+                        <input type="text" th:field="*{videoUrl}" class="form-input" placeholder="https://...">
+                    </div>
+                </div>
+            </div>
+
+            <!-- 파일 업로드 -->
+            <div class="card">
+                <div class="card-head">
+                    <div class="card-title"><i class="ti ti-upload"></i>파일 업로드</div>
+                </div>
+                <div class="content-form">
+                    <div class="form-group">
+                        <label>강의 영상 파일</label>
+                        <div class="file-upload-box">
+                            <i class="ti ti-video"></i>
+                            <input type="file" name="videoFile" accept="video/*">
+                            <p>mp4 등 영상 파일을 업로드하세요. (영상 URL을 입력했다면 생략 가능)</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>썸네일 이미지</label>
+                        <div class="file-upload-box">
+                            <i class="ti ti-photo"></i>
+                            <input type="file" name="thumbFile" accept="image/*">
+                            <p>목록에 표시될 썸네일 이미지를 업로드하세요.</p>
+                        </div>
+                    </div>
+                    <div class="form-group">
+                        <label>첨부파일 (선택)</label>
+                        <div class="file-upload-box">
+                            <i class="ti ti-paperclip"></i>
+                            <input type="file" name="attachFile">
+                            <p>학습 자료 PDF 등 추가 첨부파일이 있으면 업로드하세요.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="form-btn-wrap">
+                    <a class="btn btn-outline" th:href="@{/admin/content}">취소</a>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="ti ti-device-floppy"></i>
+                        콘텐츠 등록
+                    </button>
+                </div>
+            </div>
+        </form>
+    </div>
+</div>
+
+</body>
+</html>

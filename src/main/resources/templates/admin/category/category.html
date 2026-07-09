@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>끼역띠귿 - 카테고리 관리</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+    <link rel="stylesheet" th:href="@{/css/admin/common.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/content.css}">
+</head>
+<body>
+
+<aside th:replace="~{admin/fragments/sidebar :: sidebar}"></aside>
+
+<div class="main">
+
+    <header th:replace="~{admin/fragments/topbar :: topbar}"></header>
+
+    <div class="content">
+        <div class="section-header">
+            <div>
+                <div class="section-title">카테고리 관리</div>
+                <div class="section-subtitle" th:text="|전체 ${#lists.size(categories)}개 강좌|">전체 0개 강좌</div>
+            </div>
+            <div class="section-actions">
+                <a class="btn btn-primary" th:href="@{/admin/category/create}">
+                    <i class="ti ti-plus"></i>
+                    카테고리 추가
+                </a>
+            </div>
+        </div>
+
+        <div class="card">
+            <table class="data-table">
+                <thead>
+                <tr>
+                    <th style="width:40px">#</th>
+                    <th>강좌명</th>
+                    <th>강사</th>
+                    <th>소속 콘텐츠 수</th>
+                    <th>등록일</th>
+                    <th style="width:80px; text-align:center;">관리</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(categories)}">
+                    <td colspan="6" style="text-align: center; color: var(--gray-400); padding: 50px 0;">
+                        등록된 카테고리가 없습니다. '카테고리 추가' 버튼을 눌러 첫 강좌를 등록해 보세요!
+                    </td>
+                </tr>
+                <tr th:each="cat, loop : ${categories}">
+                    <td style="color:var(--gray-400)" th:text="${loop.count}">1</td>
+                    <td>
+                        <div class="content-title-cell">
+                            <div class="content-thumb"><i class="ti ti-category"></i></div>
+                            <div class="content-name" th:text="${cat.title}">강좌명</div>
+                        </div>
+                    </td>
+                    <td th:text="${cat.instructor} ?: '-'">강사명</td>
+                    <td th:text="${cat.contents != null ? #lists.size(cat.contents) : 0} + '개'">0개</td>
+                    <td th:text="${cat.createdDate != null ? #temporals.format(cat.createdDate, 'yyyy-MM-dd') : '-'}">-</td>
+                    <td style="text-align:center;">
+                        <div class="action-buttons-cell">
+                            <a class="btn-action-icon btn-action-edit" title="수정" th:href="@{|/admin/category/edit/${cat.id}|}">
+                                <i class="ti ti-edit"></i>
+                            </a>
+                            <a th:href="@{|/admin/category/delete/${cat.id}|}" class="btn-action-icon btn-action-delete" title="삭제"
+                               onclick="return confirm('이 카테고리를 삭제하면 소속된 모든 강의 영상도 함께 삭제됩니다. 정말 삭제하시겠습니까?');">
+                                <i class="ti ti-trash"></i>
+                            </a>
+                        </div>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+</body>
+</html>

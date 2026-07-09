@@ -155,15 +155,7 @@ public class ContentService {
             e.printStackTrace();
         }
     }
-    // 파일 저장을 위한 공통 메서드 추출
-    private void saveFile(MultipartFile file, String saveName) {
-        try {
-            file.transferTo(new File(uploadPath + saveName));
 
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
     public void sakjeProc(ContentDTO contentDTO) {
         Category category = categoryRepository.findById(contentDTO.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 강의가 없습니다."));
@@ -369,6 +361,16 @@ public class ContentService {
         }
 
         // @Transactional에 의해 메서드 종료 시 DB에 자동 반영됩니다.
+    }
+
+    @Transactional
+    public void delete(Long id){
+
+        Content content = contentRepository.findById(id)
+                .orElseThrow(() ->
+                        new IllegalArgumentException("콘텐츠가 없습니다."));
+
+        contentRepository.delete(content);
     }
 
 
