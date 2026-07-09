@@ -181,7 +181,7 @@ public class AdminController {
         model.addAttribute("contents", contents);
         model.addAttribute("totalContentCount", contents.size());
 
-        return "admin/content";
+        return "admin/admin_content/content";
     }
 
     @GetMapping("/content/create")
@@ -190,7 +190,7 @@ public class AdminController {
         model.addAttribute("pageTitle", "콘텐츠 등록");
         model.addAttribute("categories", categoryService.findAll());
         model.addAttribute("contentDTO", new ContentDTO());
-        return "admin/content-create";
+        return "admin/admin_content/content-create";
     }
 
     @PostMapping("/content/create")
@@ -222,7 +222,7 @@ public class AdminController {
 
         model.addAttribute("contentDTO", dto);
         model.addAttribute("existingContent", content);
-        return "admin/content-edit";
+        return "admin/admin_content/content-edit";
     }
 
     @PostMapping("/content/update/{id}")
@@ -344,6 +344,18 @@ public class AdminController {
         model.addAttribute("failedCount", failedCount);
         model.addAttribute("totalRevenue", totalRevenue);
 
+        // ── 페이지네이션 번호 그룹 계산 (템플릿의 startPage/endPage/currentPage 에서 사용) ──
+        int pageGroupSize = 10;
+        int currentPage = orders.getNumber() + 1; // Page는 0부터 시작하므로 화면 표시용으로 1을 더함
+        int totalPages = Math.max(orders.getTotalPages(), 1);
+        int startPage = ((currentPage - 1) / pageGroupSize) * pageGroupSize + 1;
+        int endPage = Math.min(startPage + pageGroupSize - 1, totalPages);
+
+        model.addAttribute("currentPage", currentPage);
+        model.addAttribute("totalPages", totalPages);
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
+
         return "admin/payment";
     }
 
@@ -365,7 +377,7 @@ public class AdminController {
         model.addAttribute("activeMenu", "category");
         model.addAttribute("pageTitle", "카테고리 관리");
         model.addAttribute("categories", categoryService.findAll());
-        return "admin/category";
+        return "admin/admin_category/category";
     }
 
     @GetMapping("/category/create")
@@ -373,7 +385,7 @@ public class AdminController {
         model.addAttribute("activeMenu", "category");
         model.addAttribute("pageTitle", "카테고리 등록");
         model.addAttribute("categoryDTO", new CategoryDTO());
-        return "admin/category-create";
+        return "admin/admin_category/category-create";
     }
 
     @PostMapping("/category/create")
@@ -401,7 +413,7 @@ public class AdminController {
 
         model.addAttribute("categoryDTO", dto);
         model.addAttribute("existingCategory", category);
-        return "admin/category-edit";
+        return "admin/admin_category/category-edit";
     }
 
     @PostMapping("/category/update/{id}")
