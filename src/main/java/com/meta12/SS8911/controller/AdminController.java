@@ -2,13 +2,10 @@ package com.meta12.SS8911.controller;
 
 
 import com.meta12.SS8911.dto.EventCreateRequestDto;
-import com.meta12.SS8911.entity.AdminContent;
-import com.meta12.SS8911.entity.Event;
+import com.meta12.SS8911.entity.*;
 import com.meta12.SS8911.config.OrderPayStatus;
 import com.meta12.SS8911.entity.AdminContent;
-import com.meta12.SS8911.entity.OrderPay;
 
-import com.meta12.SS8911.entity.Qna;
 import com.meta12.SS8911.repository.OrderPayRepository;
 import com.meta12.SS8911.service.*;
 
@@ -22,7 +19,6 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.meta12.SS8911.entity.SiteUser;
 import java.time.YearMonth;
 import java.util.Collections;
 import java.util.Map;
@@ -45,7 +41,7 @@ public class AdminController {
 
     private final OrderPayService orderPayService;
     private final OrderPayRepository orderPayRepository; // payment 페이지 페이징 조회 전용 (Repository/Service 파일 자체는 미수정)
-
+    private final SettingsService settingsService;
 
     /**
      * 사이드바 뱃지 + 탑바 알림 점 표시용.
@@ -407,10 +403,22 @@ public class AdminController {
     // 사이트 설정 (백엔드 연동 전)
     // ==========================================
     @GetMapping("/settings")
-    public String settings(Model model) {
-        model.addAttribute("activeMenu", "settings");
-        model.addAttribute("pageTitle", "사이트 설정");
+    public String settings(Model model){
+
+        model.addAttribute("activeMenu","settings");
+        model.addAttribute("pageTitle","사이트 설정");
+
+        model.addAttribute("settings", settingsService.getSettings());
+
         return "admin/settings";
+    }
+
+    @PostMapping("/settings")
+    public String saveSettings(Settings settings){
+
+        settingsService.save(settings);
+
+        return "redirect:/admin/settings";
     }
 
     // ── 가짜/DTO 내부 클래스 구조들 (유지) ──

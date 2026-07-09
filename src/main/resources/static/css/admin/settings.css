@@ -1,0 +1,129 @@
+/* =====================================================
+   settings.css
+   관리자 - 사이트 설정
+   ===================================================== */
+
+.setting-card{
+    padding:28px;
+    margin-bottom:24px;
+}
+
+.setting-title{
+    display:flex;
+    align-items:center;
+    gap:10px;
+
+    margin-bottom:24px;
+
+    font-size:18px;
+    font-weight:700;
+
+    color:var(--navy);
+}
+
+.setting-group{
+    display:flex;
+    flex-direction:column;
+    gap:8px;
+
+    margin-bottom:24px;
+}
+
+.setting-group label{
+    font-size:14px;
+    font-weight:600;
+    color:var(--gray-700);
+}
+
+.setting-group input,
+.setting-group textarea{
+
+    width:100%;
+
+    padding:12px 14px;
+
+    border:1px solid var(--gray-200);
+    border-radius:8px;
+
+    font-size:14px;
+
+    outline:none;
+
+    transition:.2s;
+}
+
+.setting-group input:focus,
+.setting-group textarea:focus{
+
+    border-color:var(--navy);
+
+    box-shadow:0 0 0 3px rgba(24,95,165,.1);
+
+}
+
+.setting-group textarea{
+    resize:vertical;
+}
+
+.check-item{
+
+    display:flex;
+    align-items:center;
+    gap:12px;
+
+    padding:14px 0;
+
+    border-bottom:1px solid var(--gray-100);
+
+    cursor:pointer;
+
+    font-size:15px;
+}
+
+.check-item:last-child{
+    border-bottom:none;
+}
+
+.check-item input{
+
+    width:18px;
+    height:18px;
+
+    accent-color:var(--navy);
+}
+
+.setting-btn-wrap{
+
+    display:flex;
+    justify-content:flex-end;
+
+    gap:12px;
+
+    margin-top:28px;
+}
+
+.setting-btn-wrap .btn{
+    min-width:120px;
+
+    display:flex;
+    justify-content:center;
+    align-items:center;
+    gap:6px;
+}
+
+@media (max-width:768px){
+
+    .setting-card{
+        padding:20px;
+    }
+
+    .setting-btn-wrap{
+
+        flex-direction:column;
+    }
+
+    .setting-btn-wrap .btn{
+
+        width:100%;
+    }
+}
