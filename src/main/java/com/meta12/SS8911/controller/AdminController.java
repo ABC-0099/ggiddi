@@ -1,8 +1,11 @@
 package com.meta12.SS8911.controller;
 
+import com.meta12.SS8911.dto.EventCreateRequestDto;
 import com.meta12.SS8911.entity.AdminContent;
+import com.meta12.SS8911.entity.Event;
 import com.meta12.SS8911.entity.Qna;
 import com.meta12.SS8911.service.AdminContentService;
+import com.meta12.SS8911.service.EventService;
 import com.meta12.SS8911.service.QnaService;
 import com.meta12.SS8911.service.SiteUserService;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +15,7 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +28,7 @@ public class AdminController {
     private final QnaService qnaService;
     private final SiteUserService siteUserService;
     private final AdminContentService adminContentService;
+    private final EventService eventService;
 
     @GetMapping("")
     public String adminHome() {
@@ -185,20 +190,27 @@ public class AdminController {
     // ==========================================
     @GetMapping("/event")
     public String event(Model model) {
+
         model.addAttribute("activeMenu", "event");
         model.addAttribute("pageTitle", "이벤트 관리");
 
+
+        // DB 이벤트 목록 조회
+        List<Event> eventList = eventService.findAll();
+
+        model.addAttribute("events", eventList);
+
+
+        // 통계 (임시)
         model.addAttribute("ongoingEventCount", 2);
         model.addAttribute("upcomingEventCount", 1);
         model.addAttribute("totalEventParticipants", 386);
         model.addAttribute("endedEventCount", 5);
-        model.addAttribute("totalEventCount", 8);
+        model.addAttribute("totalEventCount", eventList.size());
 
-        List<EventMock> eventList = new ArrayList<>();
-        eventList.add(new EventMock("여름맞이 출석 챌린지", "2026.07.01", "2026.07.31", 128, "2026.06.20", "ONGOING"));
-        eventList.add(new EventMock("신규가입 웰컴 이벤트", "2026.06.01", "상시", 241, "2026.05.28", "ONGOING"));
-        eventList.add(new EventMock("추석맞이 K-문화 퀴즈전", "2026.09.20", "2026.09.27", 0, "2026.06.30", "UPCOMING"));
-        model.addAttribute("events", eventList);
+
+        System.out.println("eventList : " + eventList);
+
 
         return "admin/event";
     }
@@ -213,11 +225,52 @@ public class AdminController {
     // TODO: 이벤트 등록 저장 로직이 아직 없어서 폼만 있고 실제 저장 처리가 빠져있습니다.
     // 이벤트 엔티티/서비스가 준비되면 아래처럼 추가하면 됩니다.
     //
-    // @PostMapping("/event/create")
-    // public String eventCreateSubmit(@RequestParam String title, ...) {
-    //     eventService.create(...);
-    //     return "redirect:/admin/event";
-    // }
+    // 이벤트 등록 처리
+    @PostMapping("/event/create")
+    public String eventCreateSubmit(
+            @ModelAttribute EventCreateRequestDto  eventDto,
+            @RequestParam(value = "posterFile", required = false) MultipartFile  posterFile,
+            @RequestParam(value = "thumbnailFile", required = false) MultipartFile thumbnailFile
+    ) {
+        System.out.println("eventDto :" + eventDto);
+        eventService.create(eventDto, posterFile, thumbnailFile);
+
+        return "redirect:/admin/event";
+    }
+
+    // 이벤트 수정 페이지 이동
+    @GetMapping("/event/edit/{id}")
+    public String eventEditPage(
+            @PathVariable Long id,
+            Model model
+    ) {
+
+        Event event = eventService.findById(id);
+
+        model.addAttribute("event", event);
+
+        return "admin/eventEdit";
+    }
+
+
+    // 이벤트 수정 처리
+    @PostMapping("/edit/{id}")
+    public String eventEditSubmit(
+            @PathVariable Long id,
+            @ModelAttribute EventCreateRequestDto dto,
+            @RequestParam(value = "posterFile", required = false) MultipartFile posterFile,
+            @RequestParam(value = "thumbnailFile", required = false) MultipartFile thumbnailFile
+    ) {
+
+        eventService.update(
+                id,
+                dto,
+                posterFile,
+                thumbnailFile
+        );
+
+        return "redirect:/admin/event";
+    }
 
     // ==========================================
     // 결제/수강 관리 (백엔드 연동 전)
