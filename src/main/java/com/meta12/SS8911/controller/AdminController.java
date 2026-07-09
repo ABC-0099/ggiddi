@@ -17,9 +17,15 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import com.meta12.SS8911.entity.SiteUser;
+import java.time.YearMonth;
+import java.util.Collections;
+import java.util.Map;
+import java.util.stream.Collectors;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Controller
 @RequiredArgsConstructor
@@ -48,8 +54,109 @@ public class AdminController {
     public String stats(Model model) {
         model.addAttribute("activeMenu", "stats");
         model.addAttribute("pageTitle", "통계 대시보드");
+
+        // ── KPI: 전체 회원, 전체 콘텐츠 ──
+        List<SiteUser> allUsers = siteUserService.getAllUsers();
+        long activeUserCount = allUsers.stream().filter(u -> !u.isWithdrawn()).count();
+        model.addAttribute("totalUserCount", activeUserCount);
         model.addAttribute("totalContentCount", adminContentService.getAllAdminContents().size());
+
+        // ── KPI: 이번 달 신규가입 ──
+        YearMonth thisMonth = YearMonth.now();
+        long newSignupsThisMonth = allUsers.stream()
+                .filter(u -> u.getJoinDate() != null)
+                .filter(u -> YearMonth.from(u.getJoinDate()).equals(thisMonth))
+                .count();
+        model.addAttribute("newSignupsThisMonth", newSignupsThisMonth);
+
+        // ── KPI: 이번 달 매출 (성공 결제만) ──
+        List<OrderPay> allOrders = orderPayService.listAll();
+        long monthlyRevenue = allOrders.stream()
+                .filter(o -> o.getStatus() == OrderPayStatus.SUCCESS)
+                .filter(o -> o.getPayday() != null && YearMonth.from(o.getPayday()).equals(thisMonth))
+                .mapToLong(this::parsePrice)
+                .sum();
+        model.addAttribute("monthlyRevenue", monthlyRevenue);
+
+        // ── 막대 차트: 월별 신규 가입자 수 (최근 6개월) ──
+        List<MonthlyStat> monthlyStats = new ArrayList<>();
+        String[] barColors = {"var(--mint-light)", "var(--mint-light)", "var(--mint-light)",
+                "var(--mint-mid)", "var(--mint-mid)", "var(--navy)"};
+        List<Integer> rawCounts = new ArrayList<>();
+        for (int i = 5; i >= 0; i--) {
+            YearMonth ym = thisMonth.minusMonths(i);
+            long count = allUsers.stream()
+                    .filter(u -> u.getJoinDate() != null)
+                    .filter(u -> YearMonth.from(u.getJoinDate()).equals(ym))
+                    .count();
+            rawCounts.add((int) count);
+        }
+        int maxCount = Math.max(1, Collections.max(rawCounts));
+        for (int i = 5; i >= 0; i--) {
+            YearMonth ym = thisMonth.minusMonths(i);
+            int count = rawCounts.get(5 - i);
+            int heightPx = count == 0 ? 4 : Math.max(8, (int) ((count / (double) maxCount) * 110));
+            monthlyStats.add(new MonthlyStat(ym.getMonthValue() + "월", count, heightPx, barColors[5 - i]));
+        }
+        model.addAttribute("monthlyStats", monthlyStats);
+        model.addAttribute("cumulativeUserCount", activeUserCount);
+
+        // ── 도넛 차트: 카테고리별 결제 비율 (성공 결제 기준) ──
+        List<OrderPay> successOrders = allOrders.stream()
+                .filter(o -> o.getStatus() == OrderPayStatus.SUCCESS)
+                .collect(Collectors.toList());
+
+        Map<String, Long> categoryCounts = successOrders.stream()
+                .collect(Collectors.groupingBy(
+                        o -> (o.getCategory() != null && o.getCategory().getTitle() != null) ? o.getCategory().getTitle() : "미분류",
+                        Collectors.counting()));
+
+        List<CategoryStat> categoryStats = new ArrayList<>();
+        String donutGradient = null;
+        long totalSuccessCount = successOrders.size();
+
+        if (totalSuccessCount > 0) {
+            String[] donutColors = {"#185FA5", "#5DCAA5", "#9FE1CB", "#EF9F27", "#D85A30", "#E6F1FB"};
+            List<Map.Entry<String, Long>> sorted = categoryCounts.entrySet().stream()
+                    .sorted((a, b) -> Long.compare(b.getValue(), a.getValue()))
+                    .collect(Collectors.toList());
+
+            StringBuilder gradient = new StringBuilder("conic-gradient(");
+            double cursor = 0;
+            int colorIdx = 0;
+            for (Map.Entry<String, Long> e : sorted) {
+                double percent = (e.getValue() * 100.0) / totalSuccessCount;
+                String color = donutColors[colorIdx % donutColors.length];
+                gradient.append(color).append(" ").append(cursor).append("% ").append(cursor + percent).append("%, ");
+                categoryStats.add(new CategoryStat(e.getKey(), e.getValue(), Math.round(percent), color));
+                cursor += percent;
+                colorIdx++;
+            }
+            gradient.setLength(gradient.length() - 2); // 마지막 ", " 제거
+            gradient.append(")");
+            donutGradient = gradient.toString();
+        }
+        model.addAttribute("categoryStats", categoryStats);
+        model.addAttribute("donutGradient", donutGradient);
+
+        // ── 최근 결제 내역 5건 ──
+        List<OrderPay> recentPayments = allOrders.stream()
+                .filter(o -> o.getPayday() != null)
+                .sorted((a, b) -> b.getPayday().compareTo(a.getPayday()))
+                .limit(5)
+                .collect(Collectors.toList());
+        model.addAttribute("recentPayments", recentPayments);
+
         return "admin/stats";
+    }
+
+    // price(String)를 숫자로 안전 변환하는 헬퍼
+    private long parsePrice(OrderPay order) {
+        try {
+            return Long.parseLong(order.getPrice().replaceAll("[^0-9]", ""));
+        } catch (Exception e) {
+            return 0L;
+        }
     }
 
     // ==========================================
@@ -177,6 +284,11 @@ public class AdminController {
         return "admin/event-create";
     }
 
+    @GetMapping("")
+    public String adminRoot() {
+        return "redirect:/admin/stats";
+    }
+
     // TODO: 이벤트 실제 저장 로직은 아직 없음 (지금은 화면만 보여주기로 결정됨)
 
     // ==========================================
@@ -251,8 +363,14 @@ public class AdminController {
         public String getTitle() { return title; } public String getStartDate() { return startDate; } public String getEndDate() { return endDate; } public int getParticipantCount() { return participantCount; } public String getCreatedDate() { return createdDate; } public String getStatus() { return status; }
     }
 
-    @GetMapping("")
-    public String adminRoot() {
-        return "redirect:/admin/stats";
+    public static class MonthlyStat {
+        private final String label; private final int count; private final int heightPx; private final String color;
+        public MonthlyStat(String label, int count, int heightPx, String color) { this.label = label; this.count = count; this.heightPx = heightPx; this.color = color; }
+        public String getLabel() { return label; } public int getCount() { return count; } public int getHeightPx() { return heightPx; } public String getColor() { return color; }
+    }
+    public static class CategoryStat {
+        private final String label; private final long count; private final long percent; private final String color;
+        public CategoryStat(String label, long count, long percent, String color) { this.label = label; this.count = count; this.percent = percent; this.color = color; }
+        public String getLabel() { return label; } public long getCount() { return count; } public long getPercent() { return percent; } public String getColor() { return color; }
     }
 }
