@@ -294,9 +294,9 @@ public class AdminController {
         model.addAttribute("totalEventCount", 8);
 
         List<EventMock> eventList = new ArrayList<>();
-        eventList.add(new EventMock("여름맞이 출석 챌린지", "2026.07.01", "2026.07.31", 128, "2026.06.20", "ONGOING"));
-        eventList.add(new EventMock("신규가입 웰컴 이벤트", "2026.06.01", "상시", 241, "2026.05.28", "ONGOING"));
-        eventList.add(new EventMock("추석맞이 K-문화 퀴즈전", "2026.09.20", "2026.09.27", 0, "2026.06.30", "UPCOMING"));
+        eventList.add(new EventMock(1L, "여름맞이 출석 챌린지", "2026.07.01", "2026.07.31", 128, "2026.06.20", "ONGOING"));
+        eventList.add(new EventMock(2L, "신규가입 웰컴 이벤트", "2026.06.01", "상시", 241, "2026.05.28", "ONGOING"));
+        eventList.add(new EventMock(3L, "추석맞이 K-문화 퀴즈전", "2026.09.20", "2026.09.27", 0, "2026.06.30", "UPCOMING"));
         model.addAttribute("events", eventList);
 
         return "admin/event";
@@ -444,9 +444,9 @@ public class AdminController {
     }
     public static class AuthorMock { private final String username; public AuthorMock(String username) { this.username = username; } public String getUsername() { return username; } }
     public static class EventMock {
-        private final String title; private final String startDate; private final String endDate; private final int participantCount; private final String createdDate; private final String status;
-        public EventMock(String title, String startDate, String endDate, int participantCount, String createdDate, String status) { this.title = title; this.startDate = startDate; this.endDate = endDate; this.participantCount = participantCount; this.createdDate = createdDate; this.status = status; }
-        public String getTitle() { return title; } public String getStartDate() { return startDate; } public String getEndDate() { return endDate; } public int getParticipantCount() { return participantCount; } public String getCreatedDate() { return createdDate; } public String getStatus() { return status; }
+        private final Long id; private final String title; private final String startDate; private final String endDate; private final int participantCount; private final String createdDate; private final String status;
+        public EventMock(Long id, String title, String startDate, String endDate, int participantCount, String createdDate, String status) { this.id = id; this.title = title; this.startDate = startDate; this.endDate = endDate; this.participantCount = participantCount; this.createdDate = createdDate; this.status = status; }
+        public Long getId() { return id; } public String getTitle() { return title; } public String getStartDate() { return startDate; } public String getEndDate() { return endDate; } public int getParticipantCount() { return participantCount; } public String getCreatedDate() { return createdDate; } public String getStatus() { return status; }
     }
     public static class MonthlyStat {
         private final String label; private final int count; private final int heightPx; private final String color;
