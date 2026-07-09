@@ -198,9 +198,8 @@ public class QnaService {
             kw = "";
         }
 
-        // "전체" 탭: 카테고리 필터 없이 keyword로만 검색
         if (categoryStr == null || categoryStr.equalsIgnoreCase("all")) {
-            return qnaRepository.findByKeyword(kw, pageable);   // ← Repository에 이미 있던 메서드 사용
+            return qnaRepository.findByKeyword(kw, pageable);
         }
 
         com.meta12.SS8911.config.QnaCategory category;

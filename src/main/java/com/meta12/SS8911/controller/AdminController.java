@@ -1,7 +1,10 @@
 package com.meta12.SS8911.controller;
 
+import com.meta12.SS8911.config.OrderPayStatus;
 import com.meta12.SS8911.entity.AdminContent;
+import com.meta12.SS8911.entity.OrderPay;
 import com.meta12.SS8911.entity.Qna;
+import com.meta12.SS8911.repository.OrderPayRepository;
 import com.meta12.SS8911.service.AdminContentService;
 import com.meta12.SS8911.service.OrderPayService;
 import com.meta12.SS8911.service.QnaService;
@@ -10,12 +13,10 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import com.meta12.SS8911.entity.OrderPay;
-import com.meta12.SS8911.service.OrderPayService;
-import com.meta12.SS8911.config.OrderPayStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,12 +30,12 @@ public class AdminController {
     private final SiteUserService siteUserService;
     private final AdminContentService adminContentService;
     private final OrderPayService orderPayService;
+    private final OrderPayRepository orderPayRepository; // payment 페이지 페이징 조회 전용 (Repository/Service 파일 자체는 미수정)
 
-    @GetMapping("")
-    public String adminHome() {
-        return "redirect:/admin/stats";
-    }
-
+    /**
+     * 사이드바 뱃지 + 탑바 알림 점 표시용.
+     * 모든 /admin/** 페이지에서 자동으로 model에 채워짐.
+     */
     @ModelAttribute("pendingQnaCount")
     public int pendingQnaCount() {
         return (int) qnaService.countPending();
@@ -47,12 +48,7 @@ public class AdminController {
     public String stats(Model model) {
         model.addAttribute("activeMenu", "stats");
         model.addAttribute("pageTitle", "통계 대시보드");
-
         model.addAttribute("totalContentCount", adminContentService.getAllAdminContents().size());
-        // TODO: 전체 회원수 / 이번 달 매출은 실제 서비스 연결되면 채우기
-        // model.addAttribute("totalUserCount", siteUserService.getAllUsers().size());
-        // model.addAttribute("monthlyRevenue", ...);
-
         return "admin/stats";
     }
 
@@ -78,9 +74,9 @@ public class AdminController {
 
     @PostMapping("/content/create")
     public String createContent(@RequestParam String title,
-                                @RequestParam String step,
-                                @RequestParam int lectureCount,
-                                @RequestParam(defaultValue = "공개") String status) {
+                                 @RequestParam String step,
+                                 @RequestParam int lectureCount,
+                                 @RequestParam(defaultValue = "공개") String status) {
 
         AdminContent newContent = new AdminContent();
         newContent.setTitle(title);
@@ -95,10 +91,10 @@ public class AdminController {
 
     @PostMapping("/content/update/{id}")
     public String updateContent(@PathVariable("id") Long id,
-                                @RequestParam("title") String title,
-                                @RequestParam("step") String step,
-                                @RequestParam("lectureCount") Integer lectureCount,
-                                @RequestParam("status") String status) {
+                                 @RequestParam("title") String title,
+                                 @RequestParam("step") String step,
+                                 @RequestParam("lectureCount") Integer lectureCount,
+                                 @RequestParam("status") String status) {
 
         adminContentService.updateContent(id, title, step, lectureCount, status);
         return "redirect:/admin/content";
@@ -122,13 +118,13 @@ public class AdminController {
     }
 
     // ==========================================
-    // 게시판 관리 (Q&A)
+    // 게시판 관리 (Q&A) — "전체" 탭 + 페이지네이션 반영
     // ==========================================
     @GetMapping("/board")
     public String board(Model model,
-                        @RequestParam(value = "category", defaultValue = "all") String category,
-                        @RequestParam(value = "kw", defaultValue = "") String kw,
-                        @RequestParam(value = "page", defaultValue = "0") int page) {
+                         @RequestParam(value = "category", defaultValue = "all") String category,
+                         @RequestParam(value = "kw", defaultValue = "") String kw,
+                         @RequestParam(value = "page", defaultValue = "0") int page) {
 
         model.addAttribute("activeMenu", "board");
         model.addAttribute("pageTitle", "게시판 관리");
@@ -142,9 +138,9 @@ public class AdminController {
             String authorName = (q.getAuthor() != null) ? q.getAuthor().getUsername() : "알 수 없음";
             String statusStr = (q.getStatus() != null) ? q.getStatus().name() : "PENDING";
             String dateStr = (q.getCreatedDate() != null) ? q.getCreatedDate().toLocalDate().toString() : "2026-07-08";
+
             wrappedList.add(new QnaWrapper(q.getId(), q.getTitle(), q.getContent(), authorName, dateStr, statusStr));
         }
-
         Page<QnaWrapper> qnas = new PageImpl<>(wrappedList, realQnas.getPageable(), realQnas.getTotalElements());
         model.addAttribute("qnas", qnas);
 
@@ -152,7 +148,7 @@ public class AdminController {
     }
 
     // ==========================================
-    // 이벤트 관리 (현재는 목데이터 유지)
+    // 이벤트 관리 (현재는 목데이터만 - 보여주기 전용)
     // ==========================================
     @GetMapping("/event")
     public String event(Model model) {
@@ -181,62 +177,44 @@ public class AdminController {
         return "admin/event-create";
     }
 
-    // TODO: 이벤트 등록 저장 로직이 아직 없어서 폼만 있고 실제 저장 처리가 빠져있습니다.
-    // 이벤트 엔티티/서비스가 준비되면 아래처럼 추가하면 됩니다.
-    //
-    // @PostMapping("/event/create")
-    // public String eventCreateSubmit(@RequestParam String title, ...) {
-    //     eventService.create(...);
-    //     return "redirect:/admin/event";
-    // }
+    // TODO: 이벤트 실제 저장 로직은 아직 없음 (지금은 화면만 보여주기로 결정됨)
 
     // ==========================================
-    // 결제/수강 관리 (백엔드 연동 전)
+    // 결제/수강 관리 — OrderPay 실데이터 연동
+    // (OrderPayRepository/OrderPayService 파일 자체는 미수정 - 이미 있는 기본/기존 메서드만 사용)
     // ==========================================
     @GetMapping("/payment")
     public String payment(Model model,
-                          @RequestParam(value = "page", defaultValue = "0") int page) {
+                           @RequestParam(value = "page", defaultValue = "0") int page) {
 
         model.addAttribute("activeMenu", "payment");
         model.addAttribute("pageTitle", "결제/수강 관리");
 
-        // 기존에 있던 listAll()만 사용 - Repository/Service는 안 건드림
+        // JpaRepository가 기본 제공하는 findAll(Pageable) / count() 사용
+        Page<OrderPay> orders = orderPayRepository.findAll(
+                PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "payday"))
+        );
+        model.addAttribute("orders", orders);
+        model.addAttribute("totalOrderCount", orderPayRepository.count());
+
+        // KPI 집계는 기존 OrderPayService.listAll() 사용
         List<OrderPay> allOrders = orderPayService.listAll();
 
-        // 최신 결제일 순 정렬 (결제일 없는 건 뒤로)
-        allOrders.sort((a, b) -> {
-            if (a.getPayday() == null && b.getPayday() == null) return 0;
-            if (a.getPayday() == null) return 1;
-            if (b.getPayday() == null) return -1;
-            return b.getPayday().compareTo(a.getPayday());
-        });
-
-        // 컨트롤러 안에서 직접 페이지 자르기 (한 페이지 10건)
-        int pageSize = 10;
-        int totalElements = allOrders.size();
-        int totalPages = (int) Math.ceil((double) totalElements / pageSize);
-        int fromIndex = Math.min(page * pageSize, totalElements);
-        int toIndex = Math.min(fromIndex + pageSize, totalElements);
-        List<OrderPay> pageContent = allOrders.subList(fromIndex, toIndex);
-
-        model.addAttribute("orders", pageContent);
-        model.addAttribute("currentPage", page);
-        model.addAttribute("totalPages", totalPages);
-
-        // 상태별 집계도 컨트롤러에서 직접 (status enum 값은 SUCCESS/CANCEL/FAILED 가정)
         long successCount = allOrders.stream().filter(o -> o.getStatus() == OrderPayStatus.SUCCESS).count();
-        long cancelCount  = allOrders.stream().filter(o -> o.getStatus() == OrderPayStatus.CANCEL).count();
-        long failedCount  = allOrders.stream().filter(o -> o.getStatus() == OrderPayStatus.FAILED).count();
+        long cancelCount = allOrders.stream().filter(o -> o.getStatus() == OrderPayStatus.CANCEL).count();
+        long failedCount = allOrders.stream().filter(o -> o.getStatus() == OrderPayStatus.FAILED).count();
 
         long totalRevenue = allOrders.stream()
                 .filter(o -> o.getStatus() == OrderPayStatus.SUCCESS)
                 .mapToLong(o -> {
-                    try { return Long.parseLong(o.getPrice().replaceAll("[^0-9]", "")); }
-                    catch (Exception e) { return 0L; }
+                    try {
+                        return Long.parseLong(o.getPrice().replaceAll("[^0-9]", ""));
+                    } catch (Exception e) {
+                        return 0L;
+                    }
                 })
                 .sum();
 
-        model.addAttribute("totalOrderCount", totalElements);
         model.addAttribute("successCount", successCount);
         model.addAttribute("cancelCount", cancelCount);
         model.addAttribute("failedCount", failedCount);
@@ -271,5 +249,10 @@ public class AdminController {
         private final String title; private final String startDate; private final String endDate; private final int participantCount; private final String createdDate; private final String status;
         public EventMock(String title, String startDate, String endDate, int participantCount, String createdDate, String status) { this.title = title; this.startDate = startDate; this.endDate = endDate; this.participantCount = participantCount; this.createdDate = createdDate; this.status = status; }
         public String getTitle() { return title; } public String getStartDate() { return startDate; } public String getEndDate() { return endDate; } public int getParticipantCount() { return participantCount; } public String getCreatedDate() { return createdDate; } public String getStatus() { return status; }
+    }
+
+    @GetMapping("")
+    public String adminRoot() {
+        return "redirect:/admin/stats";
     }
 }
