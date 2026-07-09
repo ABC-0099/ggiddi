@@ -188,12 +188,60 @@
                     학습 현황
                 </h2>
             </div>
-            <div class="empty-panel">
+
+            <!-- 영상 시청 내역 (최근 시청순, 완료/진행중 전체) - 영상 1개당 딱 2줄 -->
+            <div class="my-post-list" th:if="${!myProgress.empty}">
+                <a class="my-progress-item" th:each="p : ${myProgress.content}"
+                   th:href="@{/content/view/{id}(id=${p.content.id})}"
+                   style="position:relative; display:block; padding:8px 12px 10px; border-bottom:1px solid #EEF6F1; text-decoration:none; color:inherit; overflow:hidden;">
+
+                    <!-- 1줄: 상태 + 제목 (절대 줄바꿈 안 됨) -->
+                    <div style="display:flex; align-items:center; gap:6px; white-space:nowrap; margin-bottom:3px;">
+                        <span th:text="${p.completed} ? '완료' : '진행중'"
+                              style="flex:0 0 auto; font-size:10.5px; font-weight:700;"
+                              th:style="'flex:0 0 auto;font-size:10.5px;font-weight:700;' + (${p.completed} ? 'color:#1E9E5B;' : 'color:#B7791F;')"></span>
+                        <span th:text="${p.content.title}"
+                              style="flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:13.5px; font-weight:600; color:#0A1F17;">강의 제목</span>
+                    </div>
+
+                    <!-- 2줄: 퍼센트 + 날짜만 (바는 아래 장식 라인으로 분리) -->
+                    <div style="display:flex; align-items:center; justify-content:space-between; white-space:nowrap;">
+                        <span th:text="${#numbers.formatDecimal(p.percentage, 1, 0)} + '% 시청'"
+                              style="flex:0 0 auto; font-size:11px; color:#6B7280;">0% 시청</span>
+                        <span th:text="${#temporals.format(p.updatedAt, 'yyyy.MM.dd HH:mm')}"
+                              style="flex:0 0 auto; font-size:11px; color:#9CA3AF;">최근 시청일</span>
+                    </div>
+
+                    <!-- 진도바: 텍스트 줄을 차지하지 않는 카드 하단 장식 라인 -->
+                    <span style="position:absolute; left:0; right:0; bottom:0; height:2px; background:#EAF7F1;">
+                        <span th:style="'display:block;height:100%;background:#2FBE72;width:' + ${#numbers.formatDecimal(p.percentage, 1, 0)} + '%;'"></span>
+                    </span>
+                </a>
+            </div>
+
+            <div class="empty-panel" th:if="${myProgress.empty}">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px; margin-right:4px;">
                     <path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/>
                     <path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/>
                 </svg>
-                학습 현황 기능은 준비 중입니다
+                아직 시청한 영상이 없어요
+            </div>
+
+            <!-- ★ 시청 내역 페이지네이션 -->
+            <div class="my-post-pagination" th:if="${!myProgress.empty}">
+                <a th:href="@{/siteUser/mypage(progressPage=${myProgress.number - 1}, tab='study')}"
+                   th:classappend="${myProgress.first} ? 'disabled'"
+                   class="page-btn page-prev">‹</a>
+
+                <a th:each="i : ${#numbers.sequence(0, myProgress.totalPages - 1)}"
+                   th:href="@{/siteUser/mypage(progressPage=${i}, tab='study')}"
+                   th:text="${i + 1}"
+                   th:classappend="${i == myProgress.number} ? 'active'"
+                   class="page-btn"></a>
+
+                <a th:href="@{/siteUser/mypage(progressPage=${myProgress.number + 1}, tab='study')}"
+                   th:classappend="${myProgress.last} ? 'disabled'"
+                   class="page-btn page-next">›</a>
             </div>
         </section>
 
@@ -206,13 +254,54 @@
                 </svg>
                 구매 내역
             </h2>
-            <div class="empty-panel">
+
+            <!-- 결제(구매) 내역 - 최근 결제순, 영상 시청내역과 동일하게 항목 1개당 딱 2줄 -->
+            <div class="my-post-list" th:if="${!myPurchases.empty}">
+                <div class="my-purchase-item" th:each="o : ${myPurchases.content}"
+                     style="padding:9px 12px; border-bottom:1px solid #EEF6F1;">
+
+                    <!-- 1줄: 강좌/플랜명 + 가격 -->
+                    <div style="display:flex; align-items:center; justify-content:space-between; gap:8px; white-space:nowrap; margin-bottom:3px;">
+                        <span th:text="${o.category != null ? o.category.title : o.instructorName}"
+                              style="flex:1 1 auto; min-width:0; overflow:hidden; text-overflow:ellipsis; white-space:nowrap; font-size:13.5px; font-weight:600; color:#0A1F17;">강좌명</span>
+                        <span th:text="${o.price} + '원'"
+                              style="flex:0 0 auto; font-size:13px; font-weight:700; color:#1E9E5B;">0원</span>
+                    </div>
+
+                    <!-- 2줄: 결제수단(플랜명) + 결제일시 -->
+                    <div style="display:flex; align-items:center; justify-content:space-between; white-space:nowrap;">
+                        <span th:text="${o.payType != null ? o.payType : o.instructorName}"
+                              style="flex:0 0 auto; font-size:11px; color:#6B7280;">결제수단</span>
+                        <span th:text="${#temporals.format(o.payday, 'yyyy.MM.dd HH:mm')}"
+                              style="flex:0 0 auto; font-size:11px; color:#9CA3AF;">결제일시</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="empty-panel" th:if="${myPurchases.empty}">
                 <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-3px; margin-right:4px;">
                     <circle cx="9" cy="21" r="1"/>
                     <circle cx="18" cy="21" r="1"/>
                     <path d="M2.5 3h2l2.7 12.5a2 2 0 0 0 2 1.6h8.6a2 2 0 0 0 2-1.6L21 8H6"/>
                 </svg>
-                구매 내역 기능은 준비 중입니다
+                아직 결제 내역이 없어요
+            </div>
+
+            <!-- ★ 구매 내역 페이지네이션 -->
+            <div class="my-post-pagination" th:if="${!myPurchases.empty}">
+                <a th:href="@{/siteUser/mypage(purchasePage=${myPurchases.number - 1}, tab='purchase')}"
+                   th:classappend="${myPurchases.first} ? 'disabled'"
+                   class="page-btn page-prev">‹</a>
+
+                <a th:each="i : ${#numbers.sequence(0, myPurchases.totalPages - 1)}"
+                   th:href="@{/siteUser/mypage(purchasePage=${i}, tab='purchase')}"
+                   th:text="${i + 1}"
+                   th:classappend="${i == myPurchases.number} ? 'active'"
+                   class="page-btn"></a>
+
+                <a th:href="@{/siteUser/mypage(purchasePage=${myPurchases.number + 1}, tab='purchase')}"
+                   th:classappend="${myPurchases.last} ? 'disabled'"
+                   class="page-btn page-next">›</a>
             </div>
         </section>
 

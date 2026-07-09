@@ -5,6 +5,8 @@ import com.meta12.SS8911.dto.SiteUserDTO;
 import com.meta12.SS8911.dto.SiteUserEditDTO;
 import com.meta12.SS8911.entity.Comment;
 import com.meta12.SS8911.entity.Community;
+import com.meta12.SS8911.entity.OrderPay;
+import com.meta12.SS8911.entity.Progress;
 import com.meta12.SS8911.entity.Qna;
 import com.meta12.SS8911.entity.SiteUser;
 import com.meta12.SS8911.service.*;
@@ -14,6 +16,7 @@ import jakarta.servlet.http.HttpServletResponse;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -27,11 +30,13 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 import java.util.HashMap;
 import java.time.LocalDate;
 import java.time.DayOfWeek;
+import java.util.stream.Collectors;
 
 import java.security.Principal;
 
@@ -43,6 +48,8 @@ public class SiteUserController {
     private final CommentService commentService;
     private final QnaService qnaService;
     private final AttendanceService attendanceService;
+    private final ContentService contentService; // ★ 영상 시청 내역(Progress) 조회용 추가
+    private final OrderPayService orderPayService; // ★ 결제(구매) 내역 조회용 추가
 
     @GetMapping("/siteUser/chuga")
     public String chugaForm(SiteUserDTO siteUserDTO) {
@@ -76,23 +83,51 @@ public class SiteUserController {
     public String mypage(Model model, Principal principal,
                          @RequestParam(defaultValue = "0") int postPage,
                          @RequestParam(defaultValue = "0") int commentPage,
-                         @RequestParam(defaultValue = "0") int inquiryPage) {
+                         @RequestParam(defaultValue = "0") int inquiryPage,
+                         @RequestParam(defaultValue = "0") int progressPage,
+                         @RequestParam(defaultValue = "0") int purchasePage) {
         SiteUser user = siteUserService.getUserByUsername(principal.getName());
         String username = principal.getName();
 
-        Pageable postPageable = PageRequest.of(postPage, 5);
+        Pageable postPageable = PageRequest.of(postPage, 3);
         Page<Community> myPosts = communityService.getPostsByAuthor(user, postPageable);
 
-        Pageable commentPageable = PageRequest.of(commentPage, 5);
+        Pageable commentPageable = PageRequest.of(commentPage, 3);
         Page<Comment> myComments = commentService.getCommentsByAuthor(user, commentPageable);
 
-        Pageable qnaPageable = PageRequest.of(inquiryPage, 5);
+        Pageable qnaPageable = PageRequest.of(inquiryPage, 3);
         Page<Qna> myInquiries = qnaService.getMyQnas(user, qnaPageable);
+
+        // ▼▼▼ 영상 시청 내역(학습 현황) - 최근 시청순, 완료/진행중 전체, 페이지네이션 ▼▼▼
+        Pageable progressPageable = PageRequest.of(progressPage, 3);
+        Page<Progress> myProgress = contentService.getMyProgress(user, progressPageable);
+        // ▲▲▲ 영상 시청 내역 끝 ▲▲▲
+
+        // ▼▼▼ 결제(구매) 내역 - 실제 결제 완료건만, 최근 결제순, 페이지네이션 ▼▼▼
+        // OrderPayRepository엔 Pageable 메서드가 없어서, 전체를 가져온 뒤 필터링/정렬/수동 페이징합니다.
+        List<OrderPay> allOrders = orderPayService.list(username);
+        List<OrderPay> realPayments = allOrders.stream()
+                .filter(o -> o.getPayday() != null) // 결제일 없는(미결제) 건 제외
+                .filter(o -> o.getPayType() == null ||
+                        (!o.getPayType().trim().equals("강사 칭찬 도장")      // 도장 데이터 제외
+                                && !o.getPayType().trim().equals("구독 강의 접근"))) // 구독 카테고리 접근권한용 레코드 제외
+                .sorted(Comparator.comparing(OrderPay::getPayday).reversed()) // 최근 결제순
+                .collect(Collectors.toList());
+
+        int purchaseSize = 5;
+        Pageable purchasePageable = PageRequest.of(purchasePage, purchaseSize);
+        int fromIndex = Math.min((int) purchasePageable.getOffset(), realPayments.size());
+        int toIndex = Math.min(fromIndex + purchaseSize, realPayments.size());
+        Page<OrderPay> myPurchases = new PageImpl<>(
+                realPayments.subList(fromIndex, toIndex), purchasePageable, realPayments.size());
+        // ▲▲▲ 결제(구매) 내역 끝 ▲▲▲
 
         model.addAttribute("siteUser", user);
         model.addAttribute("myPosts", myPosts);
         model.addAttribute("myComments", myComments);
         model.addAttribute("myInquiries", myInquiries);
+        model.addAttribute("myProgress", myProgress);
+        model.addAttribute("myPurchases", myPurchases);
         model.addAttribute("heatmapData", siteUserService.getHeatmapData(user));
 
         // ▼▼▼ 출석 관련 데이터 추가 ▼▼▼

@@ -35,27 +35,45 @@ public class OrderPayService {
     private final SiteUserRepository siteUserRepository;
     private final CategoryRepository categoryRepository;
 
-    // 구독 결제: 플랜을 사면 모든 카테고리에 대해 결제 완료(OrderPay) 처리를 해줍니다.
-    // 이미 결제된 카테고리는 중복 생성하지 않습니다.
+    // 구독 결제 시, 카테고리 접근권한용 레코드의 payType에 찍어두는 내부 마커.
+    // 구매 내역(마이페이지)에서는 이 마커가 찍힌 행을 제외하고,
+    // 아래에서 생성하는 "대표 결제 레코드" 1건만 노출합니다.
+    private static final String SUBSCRIPTION_ACCESS_MARKER = "구독 강의 접근";
+
+    // 구독 결제: 플랜을 사면 (1) "실제 결제 1건"을 나타내는 대표 레코드를 항상 새로 만들고,
+    // (2) 모든 카테고리에 대해 접근 권한용 레코드를 만들어줍니다. (이미 접근권한이 있는 카테고리는 건너뜀)
     @Transactional
     public void subscribeAllCategories(String username, String planName, String price, String payType, String cardNumber) {
         SiteUser user = siteUserRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
+        // 1) 마이페이지 "구매 내역"에 뜨는 대표 결제 레코드 (카테고리 없음, 플랜명 표시용)
+        //    -> 재결제(갱신)할 때마다 매번 새로 쌓여서 결제 이력이 누락되지 않습니다.
+        OrderPay mainOrder = new OrderPay();
+        mainOrder.setSiteUser(user);
+        mainOrder.setCategory(null);
+        mainOrder.setPrice(price);
+        mainOrder.setPayType(payType);
+        mainOrder.setCardNumber(cardNumber);
+        mainOrder.setInstructorName(planName); // 구매 내역 화면에 플랜명으로 표시됨
+        mainOrder.setPayday(LocalDateTime.now());
+        orderPayRepository.save(mainOrder);
+
+        // 2) 카테고리별 접근 권한 부여용 레코드 (구매 내역 화면에서는 숨겨짐)
         List<Category> categories = categoryRepository.findAll();
 
         for (Category category : categories) {
             if (orderPayRepository.existsBySiteUserAndCategory(user, category)) {
-                continue; // 이미 결제된 카테고리는 건너뜀
+                continue; // 이미 접근권한이 있는 카테고리는 건너뜀
             }
 
             OrderPay orderPay = new OrderPay();
             orderPay.setSiteUser(user);
             orderPay.setCategory(category);
             orderPay.setPrice(price);
-            orderPay.setPayType(payType);
+            orderPay.setPayType(SUBSCRIPTION_ACCESS_MARKER); // 실제 결제수단 대신 마커를 저장
             orderPay.setCardNumber(cardNumber);
-            orderPay.setInstructorName(planName); // 구독 플랜명 기록용
+            orderPay.setInstructorName(planName);
             orderPay.setPayday(LocalDateTime.now());
 
             orderPayRepository.save(orderPay);

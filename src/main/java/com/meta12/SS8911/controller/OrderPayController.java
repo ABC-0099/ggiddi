@@ -300,7 +300,9 @@ public class OrderPayController {
         for (OrderPay pay : allList) {
             // 도장 데이터의 payType이 정확히 "강사 칭찬 도장"인지 확인합니다.
             // 데이터베이스에 공백이 있을 수 있으니 trim()을 사용합니다.
-            if (pay.getPayType() == null || !pay.getPayType().trim().equals("강사 칭찬 도장")) {
+            if (pay.getPayType() == null ||
+                    (!pay.getPayType().trim().equals("강사 칭찬 도장")      // 도장 데이터 제외
+                            && !pay.getPayType().trim().equals("구독 강의 접근"))) { // 구독 카테고리 접근권한용 레코드 제외
                 realPaymentList.add(pay);
             }
         }
