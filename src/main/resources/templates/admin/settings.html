@@ -4,8 +4,11 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>끼역띠귿 - 사이트 설정</title>
+
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+
     <link rel="stylesheet" th:href="@{/css/admin/common.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/settings.css}">
 </head>
 <body>
 
@@ -16,13 +19,135 @@
     <header th:replace="~{admin/fragments/topbar :: topbar}"></header>
 
     <div class="content">
+
         <div class="section-header">
-            <div class="section-title">사이트 설정</div>
+            <div>
+                <div class="section-title">사이트 설정</div>
+                <div class="section-subtitle">
+                    사이트 운영에 필요한 기본 설정을 관리합니다.
+                </div>
+            </div>
         </div>
-        <div class="card">
-            <div style="padding: 40px; text-align: center; color: var(--gray-400);">시스템 기본 설정 구역입니다.</div>
-        </div>
+
+        <form th:action="@{/admin/settings}" method="post">
+
+            <!-- 기본 설정 -->
+            <div class="card setting-card">
+
+                <div class="setting-title">
+                    <i class="ti ti-settings"></i>
+                    기본 설정
+                </div>
+
+                <div class="setting-group">
+                    <label for="siteName">사이트명</label>
+                    <input
+                            id="siteName"
+                            type="text"
+                            name="siteName"
+                            th:value="${settings.siteName}">
+                </div>
+
+                <div class="setting-group">
+                    <label for="siteDescription">사이트 소개</label>
+                    <textarea
+                            id="siteDescription"
+                            rows="3"
+                            name="siteDescription"
+                            th:text="${settings.siteDescription}">
+                    </textarea>
+                </div>
+
+            </div>
+
+            <!-- 회원 설정 -->
+            <div class="card setting-card">
+
+                <div class="setting-title">
+                    <i class="ti ti-user"></i>
+                    회원 설정
+                </div>
+
+                <label class="check-item">
+                    <input
+                            type="checkbox"
+                            name="signupEnabled"
+                            th:checked="${settings.signupEnabled}">
+                    회원가입 허용
+                </label>
+
+                <label class="check-item">
+                    <input
+                            type="checkbox"
+                            name="emailVerification"
+                            th:checked="${settings.emailVerification}">
+                    이메일 인증
+                </label>
+
+                <label class="check-item">
+                    <input
+                            type="checkbox"
+                            name="rejoinEnabled"
+                            th:checked="${settings.rejoinEnabled}">
+                    탈퇴 후 재가입 허용
+                </label>
+
+            </div>
+
+            <!-- 게시판 설정 -->
+            <div class="card setting-card">
+
+                <div class="setting-title">
+                    <i class="ti ti-message-circle"></i>
+                    게시판 설정
+                </div>
+
+                <div class="setting-group">
+                    <label for="boardPageSize">페이지당 게시글</label>
+                    <input
+                            id="boardPageSize"
+                            type="number"
+                            name="boardPageSize"
+                            min="5"
+                            max="50"
+                            th:value="${settings.boardPageSize}">
+                </div>
+
+                <label class="check-item">
+                    <input
+                            type="checkbox"
+                            name="commentEnabled"
+                            th:checked="${settings.commentEnabled}">
+                    댓글 기능 사용
+                </label>
+
+                <label class="check-item">
+                    <input
+                            type="checkbox"
+                            name="attachmentEnabled"
+                            th:checked="${settings.attachmentEnabled}">
+                    첨부파일 허용
+                </label>
+
+            </div>
+
+            <div class="setting-btn-wrap">
+
+                <button type="reset" class="btn btn-outline">
+                    취소
+                </button>
+
+                <button type="submit" class="btn btn-primary">
+                    <i class="ti ti-device-floppy"></i>
+                    설정 저장
+                </button>
+
+            </div>
+
+        </form>
+
     </div>
+
 </div>
 
 </body>
