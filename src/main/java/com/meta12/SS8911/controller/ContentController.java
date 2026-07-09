@@ -62,7 +62,7 @@ public class ContentController {
     }
 
     @GetMapping("/content/view/{id}")
-    public String view(@PathVariable("id") Long id, Model model, Principal principal) {
+    public String view(@PathVariable("id") Long id, Model model, Principal principal, org.springframework.web.servlet.mvc.support.RedirectAttributes redirectAttributes) {
         // 1. 유저 정보 먼저 가져오기
         System.out.println("[DEBUG-1] principal = " + (principal == null ? "null" : principal.getName())); // 추가
 
@@ -83,8 +83,10 @@ public class ContentController {
         boolean hasAccess = false;
         boolean isPaid = false;
 
-        // 3. 권한 체크
-        if (currentUser != null) {
+        // 3. 권한 체크 (무료 콘텐츠는 결제 여부와 상관없이 열람 가능)
+        if (content.isFree()) {
+            hasAccess = true;
+        } else if (currentUser != null) {
             if (currentUser.getRole() == Role.ADMIN) {
                 hasAccess = true;
             } else {
@@ -94,14 +96,11 @@ public class ContentController {
         }
         System.out.println("[DEBUG-4] hasAccess = " + hasAccess); // 추가
 
-        // 4. 권한 없을 때
+        // 4. 권한 없을 때 (존재하지 않는 템플릿으로 forward하면 500 에러가 나므로,
+        //    강의 목록(카테고리 화면)으로 redirect하고 알림 메시지만 전달)
         if (!hasAccess) {
-            model.addAttribute("alertMsg", "이 강의는 수강 신청을 하셔야 보실 수 있어요 어르신!");
-            model.addAttribute("redirectUrl", "/category/view/" + category.getId());
-            model.addAttribute("contentList", contentService.list(category.getId(), currentUser));
-            model.addAttribute("category", category);
-            model.addAttribute("isPaid", false);
-            return "content/management";
+            redirectAttributes.addFlashAttribute("alertMsg", "이 강의는 수강 신청을 하셔야 보실 수 있어요 어르신!");
+            return "redirect:/category/view/" + category.getId();
         }
 
         // 5. 권한 있을 때
@@ -115,7 +114,7 @@ public class ContentController {
 
         // ── 영상 완료 후 임베드 퀴즈 ──
         Quiz quiz = quizService.getQuizEntityForContent(id);
-        if (quiz != null) {
+        if (quiz != null && principal != null) {
             model.addAttribute("quizId", quiz.getId());
             model.addAttribute("quizTitle", quiz.getTitle());
             boolean quizUnlocked = quizService.isUnlocked(quiz, principal.getName());
