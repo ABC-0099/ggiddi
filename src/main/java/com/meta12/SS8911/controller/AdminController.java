@@ -366,7 +366,14 @@ public class AdminController {
     public String settings(Model model) {
         model.addAttribute("activeMenu", "settings");
         model.addAttribute("pageTitle", "사이트 설정");
+        model.addAttribute("settings", new SettingsMock());
         return "admin/settings";
+    }
+
+    // TODO: 실제 설정 저장 로직(DB/설정파일 연동)은 아직 없음 - 지금은 폼 제출 시 그대로 되돌아가기만 함
+    @PostMapping("/settings")
+    public String settingsSubmit() {
+        return "redirect:/admin/settings";
     }
 
     // ==========================================
@@ -450,5 +457,25 @@ public class AdminController {
         private final String label; private final long count; private final long percent; private final String color;
         public CategoryStat(String label, long count, long percent, String color) { this.label = label; this.count = count; this.percent = percent; this.color = color; }
         public String getLabel() { return label; } public long getCount() { return count; } public long getPercent() { return percent; } public String getColor() { return color; }
+    }
+    // 사이트 설정 화면(admin/settings.html)용 임시 mock - 아직 실제 저장/조회 백엔드 연동 전
+    public static class SettingsMock {
+        private String siteName = "끼역띠귿";
+        private String siteDescription = "외국인을 위한 한국어 학습 플랫폼";
+        private boolean signupEnabled = true;
+        private boolean emailVerification = false;
+        private boolean rejoinEnabled = true;
+        private int boardPageSize = 10;
+        private boolean commentEnabled = true;
+        private boolean attachmentEnabled = true;
+
+        public String getSiteName() { return siteName; }
+        public String getSiteDescription() { return siteDescription; }
+        public boolean isSignupEnabled() { return signupEnabled; }
+        public boolean isEmailVerification() { return emailVerification; }
+        public boolean isRejoinEnabled() { return rejoinEnabled; }
+        public int getBoardPageSize() { return boardPageSize; }
+        public boolean isCommentEnabled() { return commentEnabled; }
+        public boolean isAttachmentEnabled() { return attachmentEnabled; }
     }
 }
