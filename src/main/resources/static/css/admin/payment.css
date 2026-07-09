@@ -1,8 +1,5 @@
 /* ══════════════════════════════════════════════
-   payment.css — 결제/수강 관리(panel-payment) 전용
-   common.css 를 먼저 불러온 뒤에 이 파일을 불러오세요.
-   지금은 백엔드 연동 전이라 비워둔 상태이며,
-   추후 결제 KPI 카드를 넣을 때 사용할 클래스만 미리 준비해 두었습니다.
+   payment.css — 결제/수강 관리(panel-payment)
    ══════════════════════════════════════════════ */
 
 .pay-kpi {
@@ -13,5 +10,62 @@
 }
 
 @media (max-width: 1100px) {
-    .pay-kpi { grid-template-columns: repeat(2, 1fr); }
+    .pay-kpi {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+
+/* ==========================
+   Pagination
+========================== */
+
+.pagination {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6px;
+
+    padding: 18px 24px;
+
+    border-top: 1px solid var(--gray-100);
+}
+
+.pagination span {
+    display: flex;
+    gap: 6px;
+}
+
+.page-btn {
+    width: 34px;
+    height: 34px;
+
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    text-decoration: none;
+
+    border: 1px solid var(--gray-200);
+    border-radius: 8px;
+
+    background: #fff;
+    color: var(--gray-600);
+
+    transition: .2s;
+}
+
+.page-btn:hover {
+    border-color: var(--navy);
+    color: var(--navy);
+}
+
+.page-btn.active {
+    background: var(--navy);
+    color: #fff;
+    border-color: var(--navy);
+}
+
+.page-btn.disabled {
+    pointer-events: none;
+    opacity: .45;
 }

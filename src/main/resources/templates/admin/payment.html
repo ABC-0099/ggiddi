@@ -90,27 +90,27 @@
             </table>
 
             <!-- 페이지네이션 -->
-            <div class="pagination" th:if="${orders.totalPages > 0}">
+            <div class="pagination" th:if="${orders.totalPages > 1}">
+
+                <!-- 이전 -->
                 <a class="page-btn"
-                   th:if="${orders.number > 0}"
-                   th:href="@{/admin/payment(page=${orders.number - 1})}">
+                   th:if="${startPage > 0}"
+                   th:href="@{/admin/payment(page=${startPage - 1})}">
                     &lt;
                 </a>
 
-                <span th:each="pageNum : ${#numbers.sequence(
-                        (orders.number / 5) * 5,
-                        T(java.lang.Math).min((orders.number / 5) * 5 + 4, orders.totalPages - 1)
-                    )}">
-                    <a class="page-btn"
-                       th:href="@{/admin/payment(page=${pageNum})}"
-                       th:text="${pageNum + 1}"
-                       th:classappend="${pageNum == orders.number} ? 'active'">
-                    </a>
-                </span>
-
+                <!-- 페이지 번호 -->
                 <a class="page-btn"
-                   th:if="${orders.number < orders.totalPages - 1}"
-                   th:href="@{/admin/payment(page=${orders.number + 1})}">
+                   th:each="pageNum : ${#numbers.sequence(startPage, endPage)}"
+                   th:href="@{/admin/payment(page=${pageNum})}"
+                   th:text="${pageNum + 1}"
+                   th:classappend="${pageNum == orders.number} ? ' active'">
+                </a>
+
+                <!-- 다음 -->
+                <a class="page-btn"
+                   th:if="${endPage < orders.totalPages - 1}"
+                   th:href="@{/admin/payment(page=${endPage + 1})}">
                     &gt;
                 </a>
             </div>
