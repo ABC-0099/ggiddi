@@ -17,16 +17,31 @@ public class NoticeService {
 
     @Transactional(readOnly = true)
     public Page<NoticeDTO> getNoticePage(int page) {
-        return getNoticePage(page, null);
+        return getNoticePage(page, null, null);
     }
 
     @Transactional(readOnly = true)
     public Page<NoticeDTO> getNoticePage(int page, String category) {
+        return getNoticePage(page, category, null);
+    }
+
+    // 🌟 [추가]: 카테고리 필터 + 제목 검색(keyword)을 함께 처리
+    @Transactional(readOnly = true)
+    public Page<NoticeDTO> getNoticePage(int page, String category, String keyword) {
         Pageable pageable = PageRequest.of(page, 5, Sort.by(Sort.Direction.DESC, "id"));
-        if (category == null || category.isBlank()) {
+
+        boolean hasCategory = category != null && !category.isBlank();
+        boolean hasKeyword = keyword != null && !keyword.isBlank();
+
+        if (hasCategory && hasKeyword) {
+            return repository.findByCategoryAndTitleContaining(category, keyword, pageable).map(this::toDTO);
+        } else if (hasCategory) {
+            return repository.findByCategory(category, pageable).map(this::toDTO);
+        } else if (hasKeyword) {
+            return repository.findByTitleContaining(keyword, pageable).map(this::toDTO);
+        } else {
             return repository.findAll(pageable).map(this::toDTO);
         }
-        return repository.findByCategory(category, pageable).map(this::toDTO);
     }
 
     @Transactional(readOnly = true)

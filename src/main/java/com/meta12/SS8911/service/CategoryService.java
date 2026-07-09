@@ -135,6 +135,45 @@ public class CategoryService {
         }
     }
 
+    // 🌟 [재설계]: "이어보기"가 진짜 다음 컨텐츠로 넘어가도록 하는 로직
+    // - 방식: 마지막으로 본 강의 기준이 아니라, 전체 카테고리를 순서대로 훑어서
+    //         "아직 완료 안 한 첫 번째 강의"를 찾는다. (건너뛴 완료 강의로 다시 안내하는 문제 방지)
+    // - 전부 다 완료했으면 -> 맨 마지막 강의를 반환 (더 볼 게 없음)
+    public Content getContinueContent(SiteUser user) {
+        if (user == null) {
+            return null;
+        }
+
+        List<Category> categoryList = categoryRepository.findAll();
+        Content lastPublishedFallback = null;
+
+        for (Category category : categoryList) {
+            List<Content> contentList = contentRepository
+                    .findByCategoryIdOrderBySequenceAsc(category.getId());
+
+            for (Content content : contentList) {
+                if (!"PUBLISHED".equals(content.getStatus())) {
+                    continue;
+                }
+
+                lastPublishedFallback = content; // 완료 여부 상관없이 "가장 마지막으로 훑은 공개 강의" 기록
+
+                Optional<Progress> progressOpt = progressRepository.findBySiteUserAndContent(user, content);
+                boolean done = progressOpt.isPresent()
+                        && (progressOpt.get().isCompleted()
+                        || (progressOpt.get().getPercentage() != null
+                        && progressOpt.get().getPercentage() >= 100.0));
+
+                if (!done) {
+                    return content; // 완료 안 한 첫 번째 강의를 바로 반환
+                }
+            }
+        }
+
+        // 전부 다 완료했으면 -> 맨 마지막 공개 강의로 (더 볼 게 없다는 뜻)
+        return lastPublishedFallback;
+    }
+
     // CategoryService.java에 추가
     public int getCategoryProgress(Category category, SiteUser user) {
         if (user == null) return 0;

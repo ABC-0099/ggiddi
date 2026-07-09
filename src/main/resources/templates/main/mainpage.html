@@ -117,8 +117,7 @@
                 </div>
 
                 <!-- 이어보기 버튼 -->
-                <a th:href="@{/lectures}" class="dash-btn">
-                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;">
+                <a th:if="${continueContent != null}" th:href="@{/content/view/{id}(id=${continueContent.id})}" class="dash-btn">                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;">
                         <path d="M22 10L12 5 2 10l10 5 10-5z"/>
                         <path d="M6 12v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/>
                     </svg>
