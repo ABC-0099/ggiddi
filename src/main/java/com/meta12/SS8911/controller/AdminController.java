@@ -368,8 +368,16 @@ public class AdminController {
 
         // JpaRepository가 기본 제공하는 findAll(Pageable) / count() 사용
         Page<OrderPay> orders = orderPayRepository.findAll(
-                PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "payday"))
+                PageRequest.of(page, 5, Sort.by(Sort.Direction.DESC, "payday"))
         );
+        int nowPage = orders.getNumber();
+        int totalPages = orders.getTotalPages();
+
+        int startPage = (nowPage / 5) * 5;
+        int endPage = Math.min(startPage + 4, totalPages - 1);
+
+        model.addAttribute("startPage", startPage);
+        model.addAttribute("endPage", endPage);
         model.addAttribute("orders", orders);
         model.addAttribute("totalOrderCount", orderPayRepository.count());
 
