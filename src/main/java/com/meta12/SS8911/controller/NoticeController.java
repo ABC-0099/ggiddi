@@ -29,12 +29,14 @@ public class NoticeController {
     @GetMapping("/list")
     public String list(@RequestParam(defaultValue = "0") int page,
                        @RequestParam(required = false) String category,
+                       @RequestParam(required = false) String keyword,
                        Model model) {
-        Page<NoticeDTO> noticePage = noticeService.getNoticePage(page, category);
+        Page<NoticeDTO> noticePage = noticeService.getNoticePage(page, category, keyword);
         model.addAttribute("list", noticePage.getContent());
         model.addAttribute("currentPage", page);
         model.addAttribute("totalPages", noticePage.getTotalPages());
         model.addAttribute("category", category);
+        model.addAttribute("keyword", keyword);
         return "notice/list";
     }
 

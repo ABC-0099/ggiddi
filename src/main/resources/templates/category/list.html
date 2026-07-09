@@ -99,7 +99,7 @@
                 <span class="llb-prog-label">전체 진도율</span>
                 <span class="llb-prog-pct" th:text="${avgProgress} + '%'">30%</span>
             </div>
-            <a th:href="@{/content/view/{id}(id=${lastProgress.content.id})}" class="llb-btn">이어보기 →</a>
+            <a th:href="@{/content/view/{id}(id=${continueContent.id})}" class="llb-btn">이어보기 →</a>
         </div>
 
         <div th:if="${lastProgress == null}">

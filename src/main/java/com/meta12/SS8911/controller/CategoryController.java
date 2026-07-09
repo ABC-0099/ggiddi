@@ -85,6 +85,10 @@ public class CategoryController {
         Progress lastProgress = contentService.getLastWatchedProgress(user);
         model.addAttribute("lastProgress", lastProgress);
 
+        // 🌟 [수정]: "이어보기" 버튼이 갈 실제 목적지 - 전체 커리큘럼 중 완료 안 한 첫 강의
+        Content continueContent = categoryService.getContinueContent(user);
+        model.addAttribute("continueContent", continueContent);
+
         return "category/list";
     }
 
