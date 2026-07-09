@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>끼역띠귿 - 퀴즈 관리</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+  <link rel="stylesheet" th:href="@{/css/admin/common.css}">
+  <link rel="stylesheet" th:href="@{/css/admin/board.css}">
+  <link rel="stylesheet" th:href="@{/css/admin/stats.css}">
+  <link rel="stylesheet" th:href="@{/css/admin/quiz.css}">
+</head>
+<body>
+
+<aside th:replace="~{admin/fragments/sidebar :: sidebar}"></aside>
+
+<div class="main">
+
+  <header th:replace="~{admin/fragments/topbar :: topbar}"></header>
+
+  <div class="content">
+    <div class="section-header">
+      <div>
+        <div class="section-title">퀴즈 관리</div>
+        <div class="section-subtitle" th:text="${currentTab == 'mock'} ? '실전 모의고사 통계' : '연습퀴즈 통계'">퀴즈 통계</div>
+      </div>
+    </div>
+
+    <!-- 서브탭 -->
+    <div class="board-menu-tabs">
+      <a th:href="@{/admin/quiz/stats(tab='practice')}" class="board-tab"
+         th:classappend="${currentTab == 'practice'} ? 'active'">연습퀴즈</a>
+      <a th:href="@{/admin/quiz/stats(tab='mock')}" class="board-tab"
+         th:classappend="${currentTab == 'mock'} ? 'active'">실전 모의고사</a>
+    </div>
+
+    <!-- KPI -->
+    <div class="kpi-grid">
+      <div class="kpi-card">
+        <div class="kpi-icon kpi-icon-navy"><i class="ti ti-clipboard-check"></i></div>
+        <div class="kpi-label">전체 응시 횟수</div>
+        <div class="kpi-value" th:text="${totalAttempts}">0</div>
+        <div class="kpi-accent accent-navy"></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon kpi-icon-mint"><i class="ti ti-users"></i></div>
+        <div class="kpi-label">참여 인원</div>
+        <div class="kpi-value" th:text="${participantCount}">0</div>
+        <div class="kpi-accent accent-mint"></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon kpi-icon-amber"><i class="ti ti-percentage"></i></div>
+        <div class="kpi-label">평균 정답률</div>
+        <div class="kpi-value" th:text="|${avgAccuracy}%|">0%</div>
+        <div class="kpi-accent accent-amber"></div>
+      </div>
+      <div class="kpi-card">
+        <div class="kpi-icon kpi-icon-coral"><i class="ti ti-list-details"></i></div>
+        <div class="kpi-label" th:text="${currentTab == 'mock'} ? '문제은행 문항 수' : '문제은행 문항 수'">문제은행 문항 수</div>
+        <div class="kpi-value" th:text="${questionPoolCount}">0</div>
+        <div class="kpi-accent accent-coral"></div>
+      </div>
+    </div>
+
+    <!-- CHART ROW -->
+    <div class="chart-row">
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">최근 7일 응시 추이</div>
+            <div class="card-subtitle">일별 응시 횟수</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="bar-chart-wrap">
+            <div class="bar-group" th:each="d : ${dailyStats}">
+              <div class="bar-fill"
+                   th:style="|height:${d.heightPx}px; background:${d.color};|"
+                   th:title="${d.count} + '회'"></div>
+              <span class="bar-lbl" th:text="${d.label}">1/1</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <div>
+            <div class="card-title">카테고리별 평균 정답률</div>
+            <div class="card-subtitle">테마별 응시 현황</div>
+          </div>
+        </div>
+        <div class="card-body">
+          <div class="category-stat-list" th:if="${not #lists.isEmpty(categoryQuizStats)}">
+            <div class="category-stat-row" th:each="c : ${categoryQuizStats}">
+              <div class="category-stat-label" th:text="${c.label}">카테고리</div>
+              <div class="category-stat-bar-wrap">
+                <div class="category-stat-bar" th:style="|width:${c.avgAccuracy}%;|"></div>
+              </div>
+              <div class="category-stat-value" th:text="|${c.avgAccuracy}%|">0%</div>
+              <div class="category-stat-count" th:text="|${c.attempts}회|">0회</div>
+            </div>
+          </div>
+          <div th:if="${#lists.isEmpty(categoryQuizStats)}" style="text-align:center; color: var(--gray-400); padding: 30px 0;">
+            아직 응시 데이터가 없습니다.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 세트별 통계 테이블 -->
+    <div class="card">
+      <div class="card-head">
+        <div class="card-title" th:text="${currentTab == 'mock'} ? '회차별 통계' : '세트별 통계'">세트별 통계</div>
+      </div>
+      <table class="data-table">
+        <thead>
+        <tr>
+          <th th:text="${currentTab == 'mock'} ? '회차명' : '세트명'">이름</th>
+          <th>카테고리</th>
+          <th>문항 수</th>
+          <th>응시 횟수</th>
+          <th>평균 정답률</th>
+        </tr>
+        </thead>
+        <tbody>
+        <tr th:if="${#lists.isEmpty(setStats)}">
+          <td colspan="5" style="text-align: center; color: var(--gray-400); padding: 50px 0;">
+            등록된 데이터가 없습니다.
+          </td>
+        </tr>
+        <tr th:each="s : ${setStats}">
+          <td th:text="${s.title}">제목</td>
+          <td th:text="${s.categoryName}">카테고리</td>
+          <td th:text="${s.questionCount}">0</td>
+          <td th:text="${s.attempts}">0</td>
+          <td>
+                        <span class="badge"
+                              th:classappend="${s.avgAccuracy >= 70} ? 'badge-success' : (${s.avgAccuracy >= 40} ? 'badge-pending' : 'badge-danger')"
+                              th:text="|${s.avgAccuracy}%|">
+                            0%
+                        </span>
+          </td>
+        </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+</body>
+</html>

@@ -329,6 +329,7 @@ body {
     transition: all 0.15s;
     border: none;
     white-space: nowrap;
+    text-decoration: none;
 }
 .btn-primary { background: var(--navy); color: #fff; }
 .btn-primary:hover { background: var(--navy-dark); }

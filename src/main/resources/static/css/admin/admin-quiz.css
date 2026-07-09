@@ -1,240 +1,68 @@
-/* ── 퀴즈 관리 CRUD 공용 (관리자 대시보드 토큰 재사용) ── */
+/* ══════════════════════════════════════════════
+   event-create.css — 이벤트 등록(panel-event-create) 전용
+   common.css 를 먼저 불러온 뒤에 이 파일을 불러오세요.
+   ══════════════════════════════════════════════ */
 
-.qa-page {
-    max-width: 920px;
-    margin: 0 auto;
-    padding: 32px 24px 80px;
-    font-family: 'Pretendard', 'Noto Sans KR', -apple-system, BlinkMacSystemFont, sans-serif;
-}
-
-.qa-back {
-    display: inline-flex;
-    align-items: center;
-    gap: 5px;
-    font-size: 13px;
-    color: var(--gray-400);
-    text-decoration: none;
-    margin-bottom: 14px;
-}
-.qa-back:hover { color: var(--navy); }
-
-.qa-header {
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    margin-bottom: 22px;
-}
-.qa-title { font-size: 20px; font-weight: 700; color: var(--gray-800); }
-.qa-subtitle { font-size: 13px; color: var(--gray-400); margin-top: 4px; }
-
-/* 폼 */
-.qa-form-card {
-    background: var(--white);
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
-    padding: 24px;
-    margin-bottom: 20px;
-}
-
-.qa-bulk-card {
-    background: var(--gray-50);
-    border-style: dashed;
-}
-
-.qa-bulk-card code {
-    background: var(--gray-100);
-    padding: 1px 5px;
-    border-radius: 4px;
-    font-size: 11px;
-}
-
-.qa-field { margin-bottom: 16px; }
-.qa-field:last-child { margin-bottom: 0; }
-
-.qa-label {
-    display: block;
-    font-size: 12.5px;
-    font-weight: 600;
-    color: var(--gray-600);
-    margin-bottom: 6px;
-}
-
-.qa-input,
-.qa-select,
-.qa-textarea {
-    width: 100%;
-    padding: 9px 12px;
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-md);
-    font-size: 13.5px;
-    color: var(--gray-800);
-    outline: none;
-    font-family: inherit;
-    transition: border-color 0.15s;
-}
-.qa-input:focus,
-.qa-select:focus,
-.qa-textarea:focus { border-color: var(--navy); }
-
-.qa-textarea { resize: vertical; min-height: 60px; }
-
-/* 문제 빌더 */
-.qa-question-list {
+.event-form {
     display: flex;
     flex-direction: column;
-    gap: 16px;
-    margin-bottom: 16px;
+    gap: 24px;
+    padding: 24px 20px;
 }
 
-.qa-question-card {
-    background: var(--white);
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow-sm);
-    padding: 20px;
-    position: relative;
-}
-
-.qa-question-head {
-    display: flex;
+.form-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
     align-items: center;
-    justify-content: space-between;
-    margin-bottom: 14px;
 }
 
-.qa-question-num {
-    font-size: 13px;
-    font-weight: 700;
-    color: var(--navy);
-}
+.form-group { display: flex; flex-direction: column; gap: 12px; }
+.form-group label { font-size: 15px; font-weight: 700; color: #374151; }
+.required { color: var(--red); }
 
-.qa-question-remove {
-    background: none;
-    border: none;
-    color: var(--gray-400);
-    font-size: 13px;
-    cursor: pointer;
-    display: flex;
-    align-items: center;
-    gap: 4px;
-}
-.qa-question-remove:hover { color: var(--red); }
-
-.qa-option-row {
-    display: flex;
-    align-items: center;
-    gap: 10px;
-    margin-bottom: 8px;
-}
-.qa-option-row:last-of-type { margin-bottom: 0; }
-
-.qa-option-radio {
-    flex-shrink: 0;
-    width: 18px;
-    height: 18px;
-    accent-color: var(--mint-mid);
-    cursor: pointer;
-}
-
-.qa-option-input {
-    flex: 1;
-    padding: 8px 12px;
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-sm);
-    font-size: 13px;
-    outline: none;
-}
-.qa-option-input:focus { border-color: var(--navy); }
-
-.qa-option-num {
-    width: 20px;
-    flex-shrink: 0;
-    font-size: 12px;
-    color: var(--gray-400);
-    text-align: center;
-}
-
-.qa-explanation-wrap { margin-top: 12px; }
-
-.qa-add-question {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
+.form-input,
+.form-textarea {
     width: 100%;
-    padding: 12px;
-    border: 1.5px dashed var(--gray-200);
-    border-radius: var(--radius-md);
-    background: var(--gray-50);
-    color: var(--gray-400);
-    font-size: 13px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: all 0.15s;
-}
-.qa-add-question:hover { border-color: var(--navy); color: var(--navy); }
-
-.qa-form-actions {
-    display: flex;
-    justify-content: flex-end;
-    gap: 8px;
-    margin-top: 4px;
-}
-
-.qa-hint {
-    font-size: 12px;
-    color: var(--gray-400);
-    margin-top: 6px;
-}
-
-/* 상세보기 */
-.qa-view-question {
-    background: var(--white);
-    border: 1px solid var(--gray-200);
-    border-radius: var(--radius-lg);
-    padding: 18px 20px;
-    margin-bottom: 12px;
-}
-.qa-view-question-text {
+    padding: 13px 15px;
+    border: 1px solid #dbe3ef;
+    border-radius: 10px;
     font-size: 14px;
-    font-weight: 600;
-    color: var(--gray-800);
-    margin-bottom: 10px;
+    background: #fff;
+    transition: all .2s ease;
+    box-sizing: border-box;
 }
-.qa-question-type-badge {
-    display: inline-block;
-    font-size: 11px;
-    font-weight: 700;
-    color: var(--navy);
-    background: rgba(24, 95, 165, 0.08);
-    padding: 3px 10px;
-    border-radius: 20px;
-    margin-bottom: 8px;
+.form-input:focus,
+.form-textarea:focus {
+    border-color: var(--navy);
+    outline: none;
+    box-shadow: 0 0 0 3px rgba(24,95,165,.12);
 }
-.qa-view-option {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 7px 10px;
-    border-radius: var(--radius-sm);
-    font-size: 13px;
-    color: var(--gray-600);
+.form-textarea { resize: vertical; min-height: 220px; font-family: inherit; line-height: 1.6; }
+
+.poster-upload {
+    border: 2px dashed #d5dce8;
+    border-radius: 14px;
+    padding: 60px 20px;
+    text-align: center;
+    background: #fafcff;
+    transition: .25s;
 }
-.qa-view-option.is-answer {
-    background: var(--mint-bg);
-    color: var(--green);
-    font-weight: 600;
-}
-.qa-view-explanation {
-    margin-top: 10px;
-    padding-top: 10px;
-    border-top: 1px solid var(--gray-100);
-    font-size: 12.5px;
-    color: var(--gray-400);
+.poster-upload:hover { border-color: var(--navy); background: #f5f9ff; }
+
+.upload-icon { font-size: 52px; color: var(--navy); margin-bottom: 16px; }
+.poster-upload h3 { margin: 12px 0 8px; font-size: 20px; font-weight: 700; color: #1f2937; }
+.poster-upload p { color: #6b7280; margin-bottom: 24px; font-size: 14px; }
+
+.event-btn-wrap { display: flex; justify-content: flex-end; gap: 12px; padding: 20px; }
+
+@media (max-width: 768px) {
+    .form-row { grid-template-columns: 1fr; }
+    .event-btn-wrap { flex-direction: column; }
 }
 
-@media (max-width: 640px) {
-    .qa-page { padding: 20px 16px 60px; }
-    .qa-header { flex-direction: column; gap: 10px; }
+/* ── 링크형 버튼(<a class="btn ...">) 밑줄 제거 ── */
+.event-btn-wrap .btn,
+.event-btn-wrap a.btn {
+    text-decoration: none;
 }

@@ -186,9 +186,9 @@ public class AdminController {
 
     @PostMapping("/content/create")
     public String createContent(@RequestParam String title,
-                                 @RequestParam String step,
-                                 @RequestParam int lectureCount,
-                                 @RequestParam(defaultValue = "공개") String status) {
+                                @RequestParam String step,
+                                @RequestParam int lectureCount,
+                                @RequestParam(defaultValue = "공개") String status) {
 
         AdminContent newContent = new AdminContent();
         newContent.setTitle(title);
@@ -203,10 +203,10 @@ public class AdminController {
 
     @PostMapping("/content/update/{id}")
     public String updateContent(@PathVariable("id") Long id,
-                                 @RequestParam("title") String title,
-                                 @RequestParam("step") String step,
-                                 @RequestParam("lectureCount") Integer lectureCount,
-                                 @RequestParam("status") String status) {
+                                @RequestParam("title") String title,
+                                @RequestParam("step") String step,
+                                @RequestParam("lectureCount") Integer lectureCount,
+                                @RequestParam("status") String status) {
 
         adminContentService.updateContent(id, title, step, lectureCount, status);
         return "redirect:/admin/content";
@@ -234,9 +234,9 @@ public class AdminController {
     // ==========================================
     @GetMapping("/board")
     public String board(Model model,
-                         @RequestParam(value = "category", defaultValue = "all") String category,
-                         @RequestParam(value = "kw", defaultValue = "") String kw,
-                         @RequestParam(value = "page", defaultValue = "0") int page) {
+                        @RequestParam(value = "category", defaultValue = "all") String category,
+                        @RequestParam(value = "kw", defaultValue = "") String kw,
+                        @RequestParam(value = "page", defaultValue = "0") int page) {
 
         model.addAttribute("activeMenu", "board");
         model.addAttribute("pageTitle", "게시판 관리");
@@ -361,7 +361,7 @@ public class AdminController {
     // ==========================================
     @GetMapping("/payment")
     public String payment(Model model,
-                           @RequestParam(value = "page", defaultValue = "0") int page) {
+                          @RequestParam(value = "page", defaultValue = "0") int page) {
 
         model.addAttribute("activeMenu", "payment");
         model.addAttribute("pageTitle", "결제/수강 관리");

@@ -1,0 +1,56 @@
+/* ══════════════════════════════════════════════
+   quiz.css — 퀴즈 관리(panel-quiz) 전용
+   common.css, board.css, stats.css 를 먼저 불러온 뒤에 이 파일을 불러오세요.
+   ══════════════════════════════════════════════ */
+
+/* ── 카테고리별 평균 정답률 가로 바 리스트 ── */
+.category-stat-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    padding: 4px 0;
+}
+
+.category-stat-row {
+    display: grid;
+    grid-template-columns: 88px 1fr 48px 52px;
+    align-items: center;
+    gap: 10px;
+}
+
+.category-stat-label {
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--gray-700, #444);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.category-stat-bar-wrap {
+    height: 8px;
+    border-radius: 4px;
+    background: var(--gray-100, #f0f0f0);
+    overflow: hidden;
+}
+
+.category-stat-bar {
+    height: 100%;
+    border-radius: 4px;
+    background: linear-gradient(90deg, var(--mint-mid), var(--navy));
+    transition: width 0.3s ease;
+}
+
+.category-stat-value {
+    font-size: 13px;
+    font-weight: 700;
+    color: var(--navy);
+    text-align: right;
+}
+
+.category-stat-count {
+    font-size: 12px;
+    color: var(--gray-400);
+    text-align: right;
+    white-space: nowrap;
+}
