@@ -3,6 +3,7 @@ package com.meta12.SS8911.controller;
 import com.meta12.SS8911.entity.AdminContent;
 import com.meta12.SS8911.entity.Qna;
 import com.meta12.SS8911.service.AdminContentService;
+import com.meta12.SS8911.service.OrderPayService;
 import com.meta12.SS8911.service.QnaService;
 import com.meta12.SS8911.service.SiteUserService;
 import lombok.RequiredArgsConstructor;
@@ -12,6 +13,9 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import com.meta12.SS8911.entity.OrderPay;
+import com.meta12.SS8911.service.OrderPayService;
+import com.meta12.SS8911.config.OrderPayStatus;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -24,6 +28,7 @@ public class AdminController {
     private final QnaService qnaService;
     private final SiteUserService siteUserService;
     private final AdminContentService adminContentService;
+    private final OrderPayService orderPayService;
 
     @GetMapping("")
     public String adminHome() {
@@ -130,52 +135,18 @@ public class AdminController {
         model.addAttribute("currentCategory", category);
         model.addAttribute("kw", kw);
 
-        // 한 페이지당 10개씩 조회
-        Page<Qna> realQnas = qnaService.getAdminBoardList(
-                category,
-                kw,
-                PageRequest.of(page, 10)
-        );
+        Page<Qna> realQnas = qnaService.getAdminBoardList(category, kw, PageRequest.of(page, 10));
 
         List<QnaWrapper> wrappedList = new ArrayList<>();
-
         for (Qna q : realQnas.getContent()) {
-
-            String authorName = (q.getAuthor() != null)
-                    ? q.getAuthor().getUsername()
-                    : "알 수 없음";
-
-            String statusStr = (q.getStatus() != null)
-                    ? q.getStatus().name()
-                    : "PENDING";
-
-            String dateStr = (q.getCreatedDate() != null)
-                    ? q.getCreatedDate().toLocalDate().toString()
-                    : "2026-07-08";
-
-            wrappedList.add(
-                    new QnaWrapper(
-                            q.getId(),
-                            q.getTitle(),
-                            q.getContent(),
-                            authorName,
-                            dateStr,
-                            statusStr
-                    )
-            );
+            String authorName = (q.getAuthor() != null) ? q.getAuthor().getUsername() : "알 수 없음";
+            String statusStr = (q.getStatus() != null) ? q.getStatus().name() : "PENDING";
+            String dateStr = (q.getCreatedDate() != null) ? q.getCreatedDate().toLocalDate().toString() : "2026-07-08";
+            wrappedList.add(new QnaWrapper(q.getId(), q.getTitle(), q.getContent(), authorName, dateStr, statusStr));
         }
 
-        Page<QnaWrapper> qnas = new PageImpl<>(
-                wrappedList,
-                realQnas.getPageable(),
-                realQnas.getTotalElements()
-        );
-
+        Page<QnaWrapper> qnas = new PageImpl<>(wrappedList, realQnas.getPageable(), realQnas.getTotalElements());
         model.addAttribute("qnas", qnas);
-
-        // 페이지네이션용 데이터
-        model.addAttribute("currentPage", qnas.getNumber());
-        model.addAttribute("totalPages", qnas.getTotalPages());
 
         return "admin/board";
     }
@@ -223,9 +194,54 @@ public class AdminController {
     // 결제/수강 관리 (백엔드 연동 전)
     // ==========================================
     @GetMapping("/payment")
-    public String payment(Model model) {
+    public String payment(Model model,
+                          @RequestParam(value = "page", defaultValue = "0") int page) {
+
         model.addAttribute("activeMenu", "payment");
         model.addAttribute("pageTitle", "결제/수강 관리");
+
+        // 기존에 있던 listAll()만 사용 - Repository/Service는 안 건드림
+        List<OrderPay> allOrders = orderPayService.listAll();
+
+        // 최신 결제일 순 정렬 (결제일 없는 건 뒤로)
+        allOrders.sort((a, b) -> {
+            if (a.getPayday() == null && b.getPayday() == null) return 0;
+            if (a.getPayday() == null) return 1;
+            if (b.getPayday() == null) return -1;
+            return b.getPayday().compareTo(a.getPayday());
+        });
+
+        // 컨트롤러 안에서 직접 페이지 자르기 (한 페이지 10건)
+        int pageSize = 10;
+        int totalElements = allOrders.size();
+        int totalPages = (int) Math.ceil((double) totalElements / pageSize);
+        int fromIndex = Math.min(page * pageSize, totalElements);
+        int toIndex = Math.min(fromIndex + pageSize, totalElements);
+        List<OrderPay> pageContent = allOrders.subList(fromIndex, toIndex);
+
+        model.addAttribute("orders", pageContent);
+        model.addAttribute("currentPage", page);
+        model.addAttribute("totalPages", totalPages);
+
+        // 상태별 집계도 컨트롤러에서 직접 (status enum 값은 SUCCESS/CANCEL/FAILED 가정)
+        long successCount = allOrders.stream().filter(o -> o.getStatus() == OrderPayStatus.SUCCESS).count();
+        long cancelCount  = allOrders.stream().filter(o -> o.getStatus() == OrderPayStatus.CANCEL).count();
+        long failedCount  = allOrders.stream().filter(o -> o.getStatus() == OrderPayStatus.FAILED).count();
+
+        long totalRevenue = allOrders.stream()
+                .filter(o -> o.getStatus() == OrderPayStatus.SUCCESS)
+                .mapToLong(o -> {
+                    try { return Long.parseLong(o.getPrice().replaceAll("[^0-9]", "")); }
+                    catch (Exception e) { return 0L; }
+                })
+                .sum();
+
+        model.addAttribute("totalOrderCount", totalElements);
+        model.addAttribute("successCount", successCount);
+        model.addAttribute("cancelCount", cancelCount);
+        model.addAttribute("failedCount", failedCount);
+        model.addAttribute("totalRevenue", totalRevenue);
+
         return "admin/payment";
     }
 

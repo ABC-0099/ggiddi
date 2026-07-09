@@ -194,21 +194,20 @@ public class QnaService {
 
     // ── 💡 보유하신 QnaCategory Enum 구조에 맞춰 최종 보완된 메서드 ──
     public Page<Qna> getAdminBoardList(String categoryStr, String kw, Pageable pageable) {
-
         if (kw == null) {
             kw = "";
         }
 
-        // 전체 조회
-        if ("all".equalsIgnoreCase(categoryStr)) {
-            return qnaRepository.findByKeyword(kw, pageable);
+        // "전체" 탭: 카테고리 필터 없이 keyword로만 검색
+        if (categoryStr == null || categoryStr.equalsIgnoreCase("all")) {
+            return qnaRepository.findByKeyword(kw, pageable);   // ← Repository에 이미 있던 메서드 사용
         }
 
-        QnaCategory category;
+        com.meta12.SS8911.config.QnaCategory category;
         try {
-            category = QnaCategory.valueOf(categoryStr.toUpperCase());
+            category = com.meta12.SS8911.config.QnaCategory.valueOf(categoryStr.toUpperCase());
         } catch (IllegalArgumentException e) {
-            category = QnaCategory.ACCOUNT;
+            category = com.meta12.SS8911.config.QnaCategory.ACCOUNT;
         }
 
         return qnaRepository.findByCategoryAndKeyword(category, kw, pageable);
