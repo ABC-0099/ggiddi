@@ -18,10 +18,102 @@
 
     <div class="content">
         <div class="section-header">
-            <div class="section-title">결제/수강 관리</div>
+            <div>
+                <div class="section-title">결제/수강 관리</div>
+                <div class="section-subtitle" th:text="|전체 ${totalOrderCount}건|">전체 0건</div>
+            </div>
         </div>
+
+        <div class="pay-kpi">
+            <div class="kpi-card">
+                <div class="kpi-icon kpi-icon-navy"><i class="ti ti-receipt"></i></div>
+                <div class="kpi-label">전체 결제건수</div>
+                <div class="kpi-value" th:text="${totalOrderCount}">0</div>
+                <div class="kpi-accent accent-navy"></div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon kpi-icon-mint"><i class="ti ti-cash"></i></div>
+                <div class="kpi-label">총 매출 (성공건 기준)</div>
+                <div class="kpi-value" th:text="|₩${#numbers.formatInteger(totalRevenue, 0, 'COMMA')}|">₩0</div>
+                <div class="kpi-accent accent-mint"></div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon kpi-icon-amber"><i class="ti ti-clock-x"></i></div>
+                <div class="kpi-label">결제 취소</div>
+                <div class="kpi-value" th:text="${cancelCount}">0</div>
+                <div class="kpi-accent accent-amber"></div>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-icon kpi-icon-coral"><i class="ti ti-alert-triangle"></i></div>
+                <div class="kpi-label">결제 실패</div>
+                <div class="kpi-value" th:text="${failedCount}">0</div>
+                <div class="kpi-accent accent-coral"></div>
+            </div>
+        </div>
+
         <div class="card">
-            <div style="padding: 40px; text-align: center; color: var(--gray-400);">백엔드 연동 전 단계입니다.</div>
+            <table class="data-table">
+                <thead>
+                <tr>
+                    <th>번호</th>
+                    <th>구매자</th>
+                    <th>카테고리</th>
+                    <th>강사</th>
+                    <th>결제금액</th>
+                    <th>결제수단</th>
+                    <th>결제일</th>
+                    <th style="text-align:center">상태</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:if="${#lists.isEmpty(orders.content)}">
+                    <td colspan="8" style="text-align: center; color: var(--gray-400); padding: 50px 0;">
+                        결제 내역이 없습니다.
+                    </td>
+                </tr>
+                <tr th:each="order : ${orders.content}">
+                    <td th:text="${order.id}">1</td>
+                    <td th:text="${order.siteUser != null ? order.siteUser.username : '알 수 없음'}">구매자</td>
+                    <td th:text="${order.category != null ? order.category.title : '-'}">카테고리</td>
+                    <td th:text="${order.instructorName} ?: '-'">강사명</td>
+                    <td th:text="|₩${order.price}|">₩0</td>
+                    <td th:text="${order.payType} ?: '-'">카드</td>
+                    <td th:text="${order.payday != null ? #temporals.format(order.payday, 'yyyy-MM-dd HH:mm') : '-'}">-</td>
+                    <td style="text-align:center">
+                        <span class="badge badge-success" th:if="${order.status != null and order.status.name() == 'SUCCESS'}">성공</span>
+                        <span class="badge badge-gray" th:if="${order.status != null and order.status.name() == 'CANCEL'}">취소</span>
+                        <span class="badge badge-danger" th:if="${order.status != null and order.status.name() == 'FAILED'}">실패</span>
+                        <span class="badge badge-pending" th:if="${order.status == null}">대기</span>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+
+            <!-- 페이지네이션 -->
+            <div class="pagination" th:if="${orders.totalPages > 0}">
+                <a class="page-btn"
+                   th:if="${orders.number > 0}"
+                   th:href="@{/admin/payment(page=${orders.number - 1})}">
+                    &lt;
+                </a>
+
+                <span th:each="pageNum : ${#numbers.sequence(
+                        (orders.number / 5) * 5,
+                        T(java.lang.Math).min((orders.number / 5) * 5 + 4, orders.totalPages - 1)
+                    )}">
+                    <a class="page-btn"
+                       th:href="@{/admin/payment(page=${pageNum})}"
+                       th:text="${pageNum + 1}"
+                       th:classappend="${pageNum == orders.number} ? 'active'">
+                    </a>
+                </span>
+
+                <a class="page-btn"
+                   th:if="${orders.number < orders.totalPages - 1}"
+                   th:href="@{/admin/payment(page=${orders.number + 1})}">
+                    &gt;
+                </a>
+            </div>
         </div>
     </div>
 </div>

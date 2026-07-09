@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>끼역띠귿 - 이벤트 등록</title>
+    <title>끼역띠귿 - 이벤트 수정</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     <link rel="stylesheet" th:href="@{/css/admin/common.css}">
     <link rel="stylesheet" th:href="@{/css/admin/event-create.css}">
@@ -19,15 +19,17 @@
     <div class="content">
         <div class="section-header">
             <div>
-                <div class="section-title">이벤트 등록</div>
-                <div class="section-subtitle">새로운 이벤트를 등록합니다.</div>
+                <div class="section-title">이벤트 수정</div>
+                <div class="section-subtitle">이벤트 정보를 수정합니다.</div>
             </div>
             <div class="section-actions">
                 <a class="btn btn-outline" th:href="@{/admin/event}">목록으로</a>
             </div>
         </div>
 
-        <form th:action="@{/admin/event/create}" method="post" enctype="multipart/form-data">
+        <form th:action="@{/admin/event/edit/{id}(id=${event.id})}"
+              method="post"
+              enctype="multipart/form-data">
 
             <!-- 이벤트 정보 -->
             <div class="card">
@@ -41,29 +43,60 @@
                 <div class="event-form">
                     <div class="form-group">
                         <label>이벤트 제목 <span class="required">*</span></label>
-                        <input type="text" name="title" class="form-input" placeholder="이벤트 제목을 입력하세요." required>
+                        <input type="text"
+                               name="title"
+                               class="form-input"
+                               th:value="${event.title}"
+                               required>
                     </div>
 
                     <div class="form-group">
                         <label>이벤트 내용 <span class="required">*</span></label>
-                        <textarea name="content" class="form-textarea" rows="8" placeholder="이벤트 내용을 입력하세요." required></textarea>
+                        <textarea name="content"
+                                  class="form-textarea"
+                                  rows="8"
+                                  required
+                                  th:text="${event.content}">
+                        </textarea>
                     </div>
 
                     <div class="form-group">
                         <label>이벤트 기간</label>
                         <div class="form-row">
-                            <input type="date" name="startDate" class="form-input">
-                            <input type="date" name="endDate" class="form-input">
+                            <input type="date"
+                                   name="startDate"
+                                   class="form-input"
+                                   th:value="${event.startDate}">
+
+                            <input type="date"
+                                   name="endDate"
+                                   class="form-input"
+                                   th:value="${event.endDate}">
+
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label>이벤트 상태</label>
                         <select name="status" class="form-input">
-                            <option value="UPCOMING">진행 예정</option>
-                            <option value="ONGOING">진행 중</option>
-                            <option value="ENDED">종료</option>
+
+                            <option value="UPCOMING"
+                                    th:selected="${event.status == 'UPCOMING'}">
+                                진행 예정
+                            </option>
+
+                            <option value="ONGOING"
+                                    th:selected="${event.status == 'ONGOING'}">
+                                진행 중
+                            </option>
+
+                            <option value="ENDED"
+                                    th:selected="${event.status == 'ENDED'}">
+                                종료
+                            </option>
+
                         </select>
+
                     </div>
                 </div>
             </div>
@@ -76,17 +109,27 @@
                         이벤트 포스터
                     </div>
                 </div>
+
                 <div class="poster-upload">
                     <i class="ti ti-photo-plus upload-icon"></i>
                     <h3>포스터 업로드</h3>
                     <p>이벤트 상세 페이지에 표시될 포스터를 업로드하세요.</p>
+
                     <label class="btn btn-outline" style="cursor:pointer;">
                         <i class="ti ti-upload"></i>
                         파일 선택
-                        <input type="file" id="posterFile" name="posterFile" accept="image/*" style="display:none;">
 
+                        <input type="file"
+                               id="posterFile"
+                               name="posterFile"
+                               accept="image/*"
+                               style="display:none;">
+
+                        <!-- 기존 포스터 -->
                         <img id="posterPreview"
-                             style="display:none; width:200px; margin-top:20px; border-radius:10px;">
+                             th:if="${event.poster != null}"
+                             th:src="${event.poster}"
+                             style="width:200px; margin-top:20px; border-radius:10px;">
                     </label>
                 </div>
             </div>
@@ -99,17 +142,27 @@
                         이벤트 썸네일
                     </div>
                 </div>
+
                 <div class="poster-upload">
                     <i class="ti ti-photo-plus upload-icon"></i>
                     <h3>썸네일 업로드</h3>
                     <p>이벤트 목록에 표시될 썸네일 이미지를 업로드하세요.</p>
+
                     <label class="btn btn-outline" style="cursor:pointer;">
                         <i class="ti ti-upload"></i>
                         파일 선택
-                        <input type="file" id="thumbnailFile" name="thumbnailFile" accept="image/*" style="display:none;">
 
+                        <input type="file"
+                               id="thumbnailFile"
+                               name="thumbnailFile"
+                               accept="image/*"
+                               style="display:none;">
+
+                        <!-- 기존 썸네일 -->
                         <img id="thumbnailPreview"
-                             style="display:none; width:200px; margin-top:20px; border-radius:10px;">
+                             th:if="${event.thumbnail != null}"
+                             th:src="${event.thumbnail}"
+                             style="width:200px; margin-top:20px; border-radius:10px;">
                     </label>
                 </div>
             </div>
@@ -126,7 +179,7 @@
                     <a class="btn btn-outline" th:href="@{/admin/event}">취소</a>
                     <button type="submit" class="btn btn-primary">
                         <i class="ti ti-device-floppy"></i>
-                        이벤트 등록
+                        이벤트 수정
                     </button>
                 </div>
             </div>
