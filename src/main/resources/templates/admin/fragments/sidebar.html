@@ -28,6 +28,16 @@
             <i class="ti ti-video"></i>
             콘텐츠 관리
         </a>
+        <a class="nav-item" id="nav-quiz" th:classappend="${activeMenu == 'quiz'} ? 'active'" th:href="@{/admin/quiz}"
+           onclick="return loadAdminPanel(event, this.href, 'quiz', '퀴즈 관리')">
+            <i class="ti ti-help-circle"></i>
+            퀴즈 관리
+        </a>
+        <a class="nav-item" id="nav-quiz-stats" th:classappend="${activeMenu == 'quiz-stats'} ? 'active'" th:href="@{/admin/quiz/stats}"
+           onclick="return loadAdminPanel(event, this.href, 'quiz-stats', '퀴즈 통계')">
+            <i class="ti ti-chart-bar"></i>
+            퀴즈 통계
+        </a>
         <a class="nav-item" th:classappend="${activeMenu == 'members'} ? 'active'" th:href="@{/admin/members}">
             <i class="ti ti-users"></i>
             회원 관리
@@ -61,6 +71,100 @@
         </div>
         <i class="ti ti-logout"></i>
     </div>
+
+    <script>
+        /*
+          사이드바 메뉴를 페이지 이동 없이 .content 영역만 교체하는 스크립트.
+          onclick="return loadAdminPanel(event, this.href, 'quiz', '퀴즈 관리')" 처럼
+          쓰고 싶은 메뉴에만 붙이면 됨 (전체 메뉴에 강제 적용 아님).
+        */
+        function loadAdminPanel(event, url, menuKey, title) {
+            if (event) event.preventDefault();
+
+            fetch(url)
+                .then(function (res) {
+                    if (!res.ok) throw new Error('페이지 로드 실패: ' + res.status);
+                    return res.text();
+                })
+                .then(function (html) {
+                    applyAdminPanel(html, menuKey, title);
+                    history.pushState({ menuKey: menuKey, url: url, title: title }, '', url);
+                })
+                .catch(function (err) {
+                    console.error(err);
+                    // 실패하면 그냥 일반 페이지 이동으로 fallback
+                    window.location.href = url;
+                });
+
+            return false;
+        }
+
+        function applyAdminPanel(html, menuKey, title) {
+            var parser = new DOMParser();
+            var doc = parser.parseFromString(html, 'text/html');
+
+            var newContent = doc.querySelector('.content');
+            var currentContent = document.querySelector('.content');
+            if (!newContent || !currentContent) {
+                window.location.reload();
+                return;
+            }
+
+            // 1) 새 페이지가 쓰는 CSS 중 현재 화면에 없는 것만 추가 (CSS 깨짐 방지)
+            doc.querySelectorAll('link[rel="stylesheet"]').forEach(function (link) {
+                var href = link.getAttribute('href');
+                if (href && !document.querySelector('link[href="' + href + '"]')) {
+                    var newLink = document.createElement('link');
+                    newLink.rel = 'stylesheet';
+                    newLink.href = href;
+                    document.head.appendChild(newLink);
+                }
+            });
+
+            // 2) 본문 교체
+            currentContent.innerHTML = newContent.innerHTML;
+
+            // 3) 사이드바 active 상태 갱신
+            document.querySelectorAll('.nav-item').forEach(function (el) {
+                el.classList.remove('active');
+            });
+            var activeEl = document.getElementById('nav-' + menuKey);
+            if (activeEl) activeEl.classList.add('active');
+
+            // 4) 탑바 breadcrumb 갱신
+            var bc = document.querySelector('.breadcrumb-current');
+            if (bc && title) bc.textContent = title;
+
+            // 5) 새 페이지 본문에 있던 <script>들 재실행 (innerHTML 교체로는 스크립트가 실행 안 됨)
+            doc.querySelectorAll('script').forEach(function (oldScript) {
+                var src = oldScript.getAttribute('src');
+                // 아이콘 폰트 등 이미 로드된 외부 스크립트는 중복 실행 방지
+                if (src && document.querySelector('script[src="' + src + '"]')) return;
+
+                var script = document.createElement('script');
+                if (src) {
+                    script.src = src;
+                } else {
+                    script.textContent = oldScript.textContent;
+                }
+                document.body.appendChild(script);
+            });
+        }
+
+        // 뒤로가기/앞으로가기 버튼 처리
+        window.addEventListener('popstate', function (event) {
+            if (event.state && event.state.url) {
+                fetch(event.state.url)
+                    .then(function (res) { return res.text(); })
+                    .then(function (html) {
+                        applyAdminPanel(html, event.state.menuKey, event.state.title);
+                    })
+                    .catch(function () {
+                        window.location.href = event.state.url;
+                    });
+            }
+        });
+    </script>
 </aside>
 
 </body>

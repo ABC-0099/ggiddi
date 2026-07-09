@@ -5,10 +5,38 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>모의고사 관리 - 끼역띠귿</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-    <link rel="stylesheet" th:href="@{/css/admin/main.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/common.css}">
     <link rel="stylesheet" th:href="@{/css/admin/admin-quiz.css}">
+    <link rel="stylesheet" th:href="@{/css/mock/list.css}">
+    <style>
+        /* ── admin-quiz.css 로드 실패나 잔여 인라인 스타일이 있어도 무조건 이기도록 !important ── */
+        .qa-page {
+            max-width: 920px !important;
+            margin: 0 auto !important;
+            padding: 32px 24px 80px !important;
+        }
+        .qa-back {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            font-size: 13px;
+            color: var(--gray-400, #888780);
+            text-decoration: none;
+            margin-bottom: 14px;
+        }
+        .qa-back:hover { color: var(--navy, #185FA5); }
+        .qa-header {
+            display: flex;
+            align-items: flex-start;
+            justify-content: space-between;
+            margin-bottom: 22px;
+        }
+        .qa-title { font-size: 20px; font-weight: 700; color: var(--gray-800, #2C2C2A); }
+        .qa-subtitle { font-size: 13px; color: var(--gray-400, #888780); margin-top: 4px; }
+    </style>
+
 </head>
-<body style="display:block; background:var(--gray-50);">
+<body>
 
 <div class="qa-page">
     <a th:href="@{/admin}" class="qa-back"><i class="ti ti-arrow-left"></i> 관리자 대시보드로</a>
