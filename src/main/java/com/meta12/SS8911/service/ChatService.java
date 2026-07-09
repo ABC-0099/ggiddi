@@ -113,4 +113,15 @@ public class ChatService {
         Collections.reverse(recent); // 최신순 -> 오래된순으로 뒤집기
         return recent.stream().map(ChatMessageViewDTO::from).collect(Collectors.toList());
     }
+
+    /**
+     * 방에 남은 인원이 0명이면 그 방의 채팅 기록을 전부 삭제.
+     * WebSocket 연결 종료(disconnect) 시점에 호출하면 됨.
+     */
+    @Transactional
+    public void clearRoomIfEmpty(Long roomId) {
+        if (chatPresenceService.getCount(roomId) == 0) {
+            chatMessageRepository.deleteAllByRoomId(roomId);
+        }
+    }
 }

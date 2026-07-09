@@ -1,13 +1,19 @@
 package com.meta12.SS8911.controller;
 
-
-import com.meta12.SS8911.dto.EventCreateRequestDto;
-import com.meta12.SS8911.entity.*;
 import com.meta12.SS8911.config.OrderPayStatus;
-import com.meta12.SS8911.entity.AdminContent;
-
+import com.meta12.SS8911.dto.ContentDTO;
+import com.meta12.SS8911.entity.Content;
+import com.meta12.SS8911.entity.OrderPay;
+import com.meta12.SS8911.entity.Qna;
+import com.meta12.SS8911.entity.SiteUser;
 import com.meta12.SS8911.repository.OrderPayRepository;
-import com.meta12.SS8911.service.*;
+import com.meta12.SS8911.service.CategoryService;
+import com.meta12.SS8911.service.ContentService;
+import com.meta12.SS8911.service.OrderPayService;
+import com.meta12.SS8911.service.QnaService;
+import com.meta12.SS8911.service.SiteUserService;
+import com.meta12.SS8911.dto.CategoryDTO;
+import com.meta12.SS8911.entity.Category;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -17,15 +23,12 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 import java.time.YearMonth;
-import java.util.Collections;
-import java.util.Map;
-import java.util.stream.Collectors;
-
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 @Controller
@@ -35,13 +38,10 @@ public class AdminController {
 
     private final QnaService qnaService;
     private final SiteUserService siteUserService;
-    private final AdminContentService adminContentService;
-
-    private final EventService eventService;
-
+    private final ContentService contentService;
+    private final CategoryService categoryService;
     private final OrderPayService orderPayService;
-    private final OrderPayRepository orderPayRepository; // payment 페이지 페이징 조회 전용 (Repository/Service 파일 자체는 미수정)
-    private final SettingsService settingsService;
+    private final OrderPayRepository orderPayRepository; // payment 페이지 페이징 조회 전용 (findAll(Pageable) 내장 메서드만 사용)
 
     /**
      * 사이드바 뱃지 + 탑바 알림 점 표시용.
@@ -64,7 +64,7 @@ public class AdminController {
         List<SiteUser> allUsers = siteUserService.getAllUsers();
         long activeUserCount = allUsers.stream().filter(u -> !u.isWithdrawn()).count();
         model.addAttribute("totalUserCount", activeUserCount);
-        model.addAttribute("totalContentCount", adminContentService.getAllAdminContents().size());
+        model.addAttribute("totalContentCount", contentService.getAllContentList().size());
 
         // ── KPI: 이번 달 신규가입 ──
         YearMonth thisMonth = YearMonth.now();
@@ -164,57 +164,77 @@ public class AdminController {
         }
     }
 
+    @GetMapping("")
+    public String adminRoot() {
+        return "redirect:/admin/stats";
+    }
+
     // ==========================================
-    // 콘텐츠 관리
+    // 콘텐츠 관리 (Content/Category 실데이터)
     // ==========================================
     @GetMapping("/content")
     public String content(Model model) {
         model.addAttribute("activeMenu", "content");
         model.addAttribute("pageTitle", "콘텐츠 관리");
 
-        List<AdminContent> realAdminContents = adminContentService.getAllAdminContents();
-        List<AdminContentDto> wrappedContentList = new ArrayList<>();
-        for (AdminContent ac : realAdminContents) {
-            String dateStr = (ac.getCreatedDate() != null) ? ac.getCreatedDate().toLocalDate().toString() : "-";
-            wrappedContentList.add(new AdminContentDto(ac.getId(), ac.getTitle(), ac.getStep(), ac.getLectureCount(), dateStr, ac.getStatus()));
-        }
-        model.addAttribute("contents", wrappedContentList);
-        model.addAttribute("totalContentCount", wrappedContentList.size());
+        List<Content> contents = contentService.getAllContentList();
+        model.addAttribute("contents", contents);
+        model.addAttribute("totalContentCount", contents.size());
 
         return "admin/content";
     }
 
+    @GetMapping("/content/create")
+    public String contentCreateForm(Model model) {
+        model.addAttribute("activeMenu", "content");
+        model.addAttribute("pageTitle", "콘텐츠 등록");
+        model.addAttribute("categories", categoryService.findAll());
+        model.addAttribute("contentDTO", new ContentDTO());
+        return "admin/content-create";
+    }
+
     @PostMapping("/content/create")
-    public String createContent(@RequestParam String title,
-                                @RequestParam String step,
-                                @RequestParam int lectureCount,
-                                @RequestParam(defaultValue = "공개") String status) {
-
-        AdminContent newContent = new AdminContent();
-        newContent.setTitle(title);
-        newContent.setStep(step);
-        newContent.setLectureCount(lectureCount);
-        newContent.setStatus(status);
-
-        adminContentService.saveContent(newContent);
-
+    public String contentCreateSubmit(@ModelAttribute ContentDTO contentDTO) {
+        contentService.chugaProc(contentDTO);
         return "redirect:/admin/content";
     }
 
-    @PostMapping("/content/update/{id}")
-    public String updateContent(@PathVariable("id") Long id,
-                                @RequestParam("title") String title,
-                                @RequestParam("step") String step,
-                                @RequestParam("lectureCount") Integer lectureCount,
-                                @RequestParam("status") String status) {
+    @GetMapping("/content/edit/{id}")
+    public String contentEditForm(@PathVariable Long id, Model model) {
+        model.addAttribute("activeMenu", "content");
+        model.addAttribute("pageTitle", "콘텐츠 수정");
+        model.addAttribute("categories", categoryService.findAll());
 
-        adminContentService.updateContent(id, title, step, lectureCount, status);
+        Content content = contentService.getContent(id);
+
+        ContentDTO dto = new ContentDTO();
+        dto.setId(content.getId());
+        dto.setTitle(content.getTitle());
+        dto.setVideoUrl(content.getVideoUrl());
+        dto.setSequence(content.getSequence());
+        dto.setCategoryId(content.getCategory() != null ? content.getCategory().getId() : null);
+        dto.setStage(content.getStage());
+        dto.setDescription(content.getDescription());
+        dto.setKeywords(content.getKeywords());
+        dto.setStatus(content.getStatus());
+        dto.setPublishAt(content.getPublishAt());
+        dto.setFree(content.isFree());
+
+        model.addAttribute("contentDTO", dto);
+        model.addAttribute("existingContent", content);
+        return "admin/content-edit";
+    }
+
+    @PostMapping("/content/update/{id}")
+    public String contentUpdateSubmit(@PathVariable Long id, @ModelAttribute ContentDTO contentDTO) {
+        contentDTO.setId(id);
+        contentService.sujungProc(contentDTO);
         return "redirect:/admin/content";
     }
 
     @GetMapping("/content/delete/{id}")
-    public String deleteContent(@PathVariable("id") Long id) {
-        adminContentService.deleteContent(id);
+    public String deleteContent(@PathVariable Long id) {
+        contentService.delete(id);
         return "redirect:/admin/content";
     }
 
@@ -230,7 +250,7 @@ public class AdminController {
     }
 
     // ==========================================
-    // 게시판 관리 (Q&A) — "전체" 탭 + 페이지네이션 반영
+    // 게시판 관리 (Q&A) — "전체" 탭 + 페이지네이션
     // ==========================================
     @GetMapping("/board")
     public String board(Model model,
@@ -264,27 +284,20 @@ public class AdminController {
     // ==========================================
     @GetMapping("/event")
     public String event(Model model) {
-
         model.addAttribute("activeMenu", "event");
         model.addAttribute("pageTitle", "이벤트 관리");
 
-
-        // DB 이벤트 목록 조회
-        List<Event> eventList = eventService.findAll();
-
-        model.addAttribute("events", eventList);
-
-
-        // 통계 (임시)
         model.addAttribute("ongoingEventCount", 2);
         model.addAttribute("upcomingEventCount", 1);
         model.addAttribute("totalEventParticipants", 386);
         model.addAttribute("endedEventCount", 5);
-        model.addAttribute("totalEventCount", eventList.size());
+        model.addAttribute("totalEventCount", 8);
 
-
-        System.out.println("eventList : " + eventList);
-
+        List<EventMock> eventList = new ArrayList<>();
+        eventList.add(new EventMock("여름맞이 출석 챌린지", "2026.07.01", "2026.07.31", 128, "2026.06.20", "ONGOING"));
+        eventList.add(new EventMock("신규가입 웰컴 이벤트", "2026.06.01", "상시", 241, "2026.05.28", "ONGOING"));
+        eventList.add(new EventMock("추석맞이 K-문화 퀴즈전", "2026.09.20", "2026.09.27", 0, "2026.06.30", "UPCOMING"));
+        model.addAttribute("events", eventList);
 
         return "admin/event";
     }
@@ -296,68 +309,11 @@ public class AdminController {
         return "admin/event-create";
     }
 
-
-    // TODO: 이벤트 등록 저장 로직이 아직 없어서 폼만 있고 실제 저장 처리가 빠져있습니다.
-    // 이벤트 엔티티/서비스가 준비되면 아래처럼 추가하면 됩니다.
-    //
-    // 이벤트 등록 처리
-    @PostMapping("/event/create")
-    public String eventCreateSubmit(
-            @ModelAttribute EventCreateRequestDto  eventDto,
-            @RequestParam(value = "posterFile", required = false) MultipartFile  posterFile,
-            @RequestParam(value = "thumbnailFile", required = false) MultipartFile thumbnailFile
-    ) {
-        System.out.println("eventDto :" + eventDto);
-        eventService.create(eventDto, posterFile, thumbnailFile);
-
-        return "redirect:/admin/event";
-    }
-
-    // 이벤트 수정 페이지 이동
-    @GetMapping("/event/edit/{id}")
-    public String eventEditPage(
-            @PathVariable Long id,
-            Model model
-    ) {
-
-        Event event = eventService.findById(id);
-
-        model.addAttribute("event", event);
-
-        return "admin/eventEdit";
-    }
-
-
-    // 이벤트 수정 처리
-    @PostMapping("/edit/{id}")
-    public String eventEditSubmit(
-            @PathVariable Long id,
-            @ModelAttribute EventCreateRequestDto dto,
-            @RequestParam(value = "posterFile", required = false) MultipartFile posterFile,
-            @RequestParam(value = "thumbnailFile", required = false) MultipartFile thumbnailFile
-    ) {
-
-        eventService.update(
-                id,
-                dto,
-                posterFile,
-                thumbnailFile
-        );
-
-        return "redirect:/admin/event";
-    }
-
-    @GetMapping("")
-    public String adminRoot() {
-        return "redirect:/admin/stats";
-    }
-
     // TODO: 이벤트 실제 저장 로직은 아직 없음 (지금은 화면만 보여주기로 결정됨)
-
 
     // ==========================================
     // 결제/수강 관리 — OrderPay 실데이터 연동
-    // (OrderPayRepository/OrderPayService 파일 자체는 미수정 - 이미 있는 기본/기존 메서드만 사용)
+    // (OrderPayRepository/OrderPayService 파일 자체는 미수정 - 내장/기존 메서드만 사용)
     // ==========================================
     @GetMapping("/payment")
     public String payment(Model model,
@@ -366,14 +322,12 @@ public class AdminController {
         model.addAttribute("activeMenu", "payment");
         model.addAttribute("pageTitle", "결제/수강 관리");
 
-        // JpaRepository가 기본 제공하는 findAll(Pageable) / count() 사용
         Page<OrderPay> orders = orderPayRepository.findAll(
                 PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "payday"))
         );
         model.addAttribute("orders", orders);
         model.addAttribute("totalOrderCount", orderPayRepository.count());
 
-        // KPI 집계는 기존 OrderPayService.listAll() 사용
         List<OrderPay> allOrders = orderPayService.listAll();
 
         long successCount = allOrders.stream().filter(o -> o.getStatus() == OrderPayStatus.SUCCESS).count();
@@ -382,13 +336,7 @@ public class AdminController {
 
         long totalRevenue = allOrders.stream()
                 .filter(o -> o.getStatus() == OrderPayStatus.SUCCESS)
-                .mapToLong(o -> {
-                    try {
-                        return Long.parseLong(o.getPrice().replaceAll("[^0-9]", ""));
-                    } catch (Exception e) {
-                        return 0L;
-                    }
-                })
+                .mapToLong(this::parsePrice)
                 .sum();
 
         model.addAttribute("successCount", successCount);
@@ -403,42 +351,84 @@ public class AdminController {
     // 사이트 설정 (백엔드 연동 전)
     // ==========================================
     @GetMapping("/settings")
-    public String settings(Model model){
-
-        model.addAttribute("activeMenu","settings");
-        model.addAttribute("pageTitle","사이트 설정");
-
-        model.addAttribute("settings", settingsService.getSettings());
-
+    public String settings(Model model) {
+        model.addAttribute("activeMenu", "settings");
+        model.addAttribute("pageTitle", "사이트 설정");
         return "admin/settings";
     }
 
-    @PostMapping("/settings")
-    public String saveSettings(Settings settings){
-
-        settingsService.save(settings);
-
-        return "redirect:/admin/settings";
+    // ==========================================
+// 카테고리(강좌) 관리
+// ==========================================
+    @GetMapping("/category")
+    public String category(Model model) {
+        model.addAttribute("activeMenu", "category");
+        model.addAttribute("pageTitle", "카테고리 관리");
+        model.addAttribute("categories", categoryService.findAll());
+        return "admin/category";
     }
 
-    // ── 가짜/DTO 내부 클래스 구조들 (유지) ──
+    @GetMapping("/category/create")
+    public String categoryCreateForm(Model model) {
+        model.addAttribute("activeMenu", "category");
+        model.addAttribute("pageTitle", "카테고리 등록");
+        model.addAttribute("categoryDTO", new CategoryDTO());
+        return "admin/category-create";
+    }
+
+    @PostMapping("/category/create")
+    public String categoryCreateSubmit(@ModelAttribute CategoryDTO categoryDTO) {
+        categoryService.chugaProc(categoryDTO);
+        return "redirect:/admin/category";
+    }
+
+    @GetMapping("/category/edit/{id}")
+    public String categoryEditForm(@PathVariable Long id, Model model) {
+        model.addAttribute("activeMenu", "category");
+        model.addAttribute("pageTitle", "카테고리 수정");
+
+        Category category = categoryService.view(id);
+        if (category == null) {
+            return "redirect:/admin/category";
+        }
+
+        CategoryDTO dto = new CategoryDTO();
+        dto.setId(category.getId());
+        dto.setTitle(category.getTitle());
+        dto.setInstructor(category.getInstructor());
+        dto.setDescription(category.getDescription());
+        dto.setFileName(category.getFileName()); // sujungProc이 이 값을 그대로 덮어쓰므로 반드시 유지해서 넘겨야 함
+
+        model.addAttribute("categoryDTO", dto);
+        model.addAttribute("existingCategory", category);
+        return "admin/category-edit";
+    }
+
+    @PostMapping("/category/update/{id}")
+    public String categoryUpdateSubmit(@PathVariable Long id, @ModelAttribute CategoryDTO categoryDTO) {
+        categoryDTO.setId(id);
+        categoryService.sujungProc(categoryDTO);
+        return "redirect:/admin/category";
+    }
+
+    @GetMapping("/category/delete/{id}")
+    public String categoryDelete(@PathVariable Long id) {
+        categoryService.delete(id);
+        return "redirect:/admin/category";
+    }
+
+    // ── 가짜/DTO 내부 클래스 구조들 ──
     public static class QnaWrapper {
         private final Long id; private final String title; private final String content; private final AuthorMock author; private final String createdDate; private final String status;
         public QnaWrapper(Long id, String title, String content, String username, String createdDate, String status) { this.id = id; this.title = title; this.content = content; this.author = new AuthorMock(username); this.createdDate = createdDate; this.status = status; }
         public Long getId() { return id; } public String getTitle() { return title; } public String getContent() { return content; } public AuthorMock getAuthor() { return author; } public String getCreatedDate() { return createdDate; } public String getStatus() { return status; }
     }
     public static class AuthorMock { private final String username; public AuthorMock(String username) { this.username = username; } public String getUsername() { return username; } }
-    public static class AdminContentDto {
-        private final Long id; private final String title; private final String step; private final int lectureCount; private final String createdDate; private final String status;
-        public AdminContentDto(Long id, String title, String step, int lectureCount, String createdDate, String status) { this.id = id; this.title = title; this.step = step; this.lectureCount = lectureCount; this.createdDate = createdDate; this.status = status; }
-        public Long getId() { return id; } public String getTitle() { return title; } public String getStep() { return step; } public int getLectureCount() { return lectureCount; } public String getCreatedDate() { return createdDate; } public String getStatus() { return status; }
-    }
     public static class EventMock {
         private final String title; private final String startDate; private final String endDate; private final int participantCount; private final String createdDate; private final String status;
         public EventMock(String title, String startDate, String endDate, int participantCount, String createdDate, String status) { this.title = title; this.startDate = startDate; this.endDate = endDate; this.participantCount = participantCount; this.createdDate = createdDate; this.status = status; }
         public String getTitle() { return title; } public String getStartDate() { return startDate; } public String getEndDate() { return endDate; } public int getParticipantCount() { return participantCount; } public String getCreatedDate() { return createdDate; } public String getStatus() { return status; }
     }
-
     public static class MonthlyStat {
         private final String label; private final int count; private final int heightPx; private final String color;
         public MonthlyStat(String label, int count, int heightPx, String color) { this.label = label; this.count = count; this.heightPx = heightPx; this.color = color; }
