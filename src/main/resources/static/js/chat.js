@@ -239,6 +239,10 @@ document.addEventListener('DOMContentLoaded', function () {
                     const body = JSON.parse(frame.body);
                     appendMessage(body);
                 });
+                // 서버 메모리(ChatPresenceService)에 입장 등록 -> 로비 인원수 반영
+                stompClient.publish({
+                    destination: '/app/chat/' + roomId + '/enter',
+                });
                 loadHistory(roomId);
             },
 

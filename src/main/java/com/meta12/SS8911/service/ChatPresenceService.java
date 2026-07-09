@@ -29,7 +29,11 @@ public class ChatPresenceService {
         sessionRoom.put(sessionId, roomId);
     }
 
-    public void leave(String sessionId) {
+    /**
+     * 세션을 현재 방에서 제거.
+     * @return 세션이 나간 roomId (원래 어느 방에도 없었다면 null)
+     */
+    public Long leave(String sessionId) {
         Long roomId = sessionRoom.remove(sessionId);
         if (roomId != null) {
             Set<String> sessions = roomSessions.get(roomId);
@@ -37,6 +41,7 @@ public class ChatPresenceService {
                 sessions.remove(sessionId);
             }
         }
+        return roomId;
     }
 
     public int getCount(Long roomId) {
