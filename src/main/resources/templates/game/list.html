@@ -28,7 +28,9 @@
         <li><a th:href="@{/game}" class="active">게임</a></li>
         <li><a th:href="@{/faq/list}">FAQ</a></li>
         <li><a th:href="@{/qna/write}">1:1 질문하기</a></li>
-        <li><a th:href="@{/siteUser/mypage}">마이페이지</a></li>
+        <li sec:authorize="!(hasRole('ADMIN') or authentication.name == 'admin888')">
+            <a th:href="@{/siteUser/mypage}">마이페이지</a>
+        </li>
     </ul>
     <div sec:authorize="isAuthenticated()" class="nav-user-box">
         <div class="avatar" sec:authentication="name" th:text="${#strings.substring(#authentication.name,0,1)}">유</div>
@@ -279,7 +281,9 @@
                     <ul>
                         <li><a th:href="@{/terms}">이용약관</a></li>
                         <li><a th:href="@{/privacy}">개인정보처리방침</a></li>
-                        <li><a th:href="@{/siteUser/mypage}">마이페이지</a></li>
+                        <li sec:authorize="!(hasRole('ADMIN') or authentication.name == 'admin888')">
+                            <a th:href="@{/siteUser/mypage}">마이페이지</a>
+                        </li>
                     </ul>
                 </div>
             </div>
