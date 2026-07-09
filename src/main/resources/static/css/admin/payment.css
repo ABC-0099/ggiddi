@@ -65,7 +65,7 @@
     border-color: var(--navy);
 }
 
-.page-btn.disabled {
-    pointer-events: none;
-    opacity: .45;
+.page-btn.disabled{
+    pointer-events:none;
+    opacity:.4;
 }

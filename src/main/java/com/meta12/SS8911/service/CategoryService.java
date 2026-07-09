@@ -86,11 +86,26 @@ public class CategoryService {
         category.setTitle(categoryDTO.getTitle());
         category.setInstructor(categoryDTO.getInstructor());
         category.setDescription(categoryDTO.getDescription());
-        category.setFileName(categoryDTO.getFileName());
 
+        // 새 파일이 업로드된 경우에만 실제로 저장하고 교체, 없으면 기존 파일 그대로 유지
         if (categoryDTO.getAttachFile() != null && !categoryDTO.getAttachFile().isEmpty()) {
-            category.setFileOrigin(categoryDTO.getAttachFile().getOriginalFilename());
+            String originalFilename = categoryDTO.getAttachFile().getOriginalFilename();
+            String saveFileName = "FILE_" + System.currentTimeMillis() + "_" + originalFilename;
+
+            try {
+                File dir = new File(uploadPath);
+                if (!dir.exists()) dir.mkdirs();
+
+                File saveFile = new File(uploadPath + saveFileName);
+                categoryDTO.getAttachFile().transferTo(saveFile);
+
+                category.setFileName(saveFileName);
+                category.setFileOrigin(originalFilename);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
+        // 새 파일이 없으면 fileName/fileOrigin은 아예 건드리지 않음 → 기존 값 안전하게 유지
 
         categoryRepository.save(category);
     }
