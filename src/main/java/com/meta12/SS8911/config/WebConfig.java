@@ -7,14 +7,28 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    private static final String UPLOAD_DIR = "C:/meta12/SS8911/uploads/community/";
 
     @Override
     public void addResourceHandlers(ResourceHandlerRegistry registry) {
+
+
         registry.addResourceHandler("/uploads/community/**")
-                .addResourceLocations("file:" + "C:/meta12/SS8911/uploads/community/");
+                .addResourceLocations(
+                        "file:C:/meta12/SS8911/uploads/community/"
+                );
+
 
         registry.addResourceHandler("/uploads/qna/**")
-                .addResourceLocations("file:" + "C:/meta12/SS8911/uploads/qna/");
+                .addResourceLocations(
+                        "file:C:/meta12/SS8911/uploads/qna/"
+                );
+
+
+        // 이벤트 이미지
+        registry.addResourceHandler("/uploads/**")
+                .addResourceLocations(
+                        "file:C:/Users/user/Documents/GitHub/ggiddi/src/main/resources/static/images/"
+                );
+
     }
 }
