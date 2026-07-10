@@ -17,33 +17,45 @@
     <div class="banner-slide active">
         <img th:src="@{/images/banner1.png}" class="banner-image">
 
-        <div class="banner-controls">
-            <span class="page-number">1 / 3</span>
+        <button class="arrow-btn prev-btn">&lt;</button>
+        <button class="arrow-btn next-btn">&gt;</button>
 
-            <button class="arrow-btn prev-btn">&lt;</button>
-            <button class="arrow-btn next-btn">&gt;</button>
+        <div class="banner-controls">
+            <div class="banner-dots">
+                <span class="dot active" data-index="0"></span>
+                <span class="dot" data-index="1"></span>
+                <span class="dot" data-index="2"></span>
+            </div>
         </div>
     </div>
 
     <div class="banner-slide">
         <img th:src="@{/images/banner2.png}" class="banner-image">
 
-        <div class="banner-controls">
-            <span class="page-number">2 / 3</span>
+        <button class="arrow-btn prev-btn">&lt;</button>
+        <button class="arrow-btn next-btn">&gt;</button>
 
-            <button class="arrow-btn prev-btn">&lt;</button>
-            <button class="arrow-btn next-btn">&gt;</button>
+        <div class="banner-controls">
+            <div class="banner-dots">
+                <span class="dot" data-index="0"></span>
+                <span class="dot active" data-index="1"></span>
+                <span class="dot" data-index="2"></span>
+            </div>
         </div>
     </div>
 
     <div class="banner-slide">
         <img th:src="@{/images/banner3.png}" class="banner-image">
 
-        <div class="banner-controls">
-            <span class="page-number">3 / 3</span>
+        <button class="arrow-btn prev-btn">&lt;</button>
+        <button class="arrow-btn next-btn">&gt;</button>
 
-            <button class="arrow-btn prev-btn">&lt;</button>
-            <button class="arrow-btn next-btn">&gt;</button>
+        <div class="banner-controls">
+            <div class="banner-dots">
+                <span class="dot" data-index="0"></span>
+                <span class="dot" data-index="1"></span>
+                <span class="dot active" data-index="2"></span>
+            </div>
         </div>
     </div>
 
@@ -95,6 +107,41 @@
 </section>
 
 <script th:src="@{/js/event.js}"></script>
+
+<script>
+    // 배너 슬라이드 + 점(dot) 인디케이터 로직
+    (function () {
+        const slides = document.querySelectorAll('.banner-slide');
+        let current = 0;
+
+        function showSlide(index) {
+            if (index < 0) index = slides.length - 1;
+            if (index >= slides.length) index = 0;
+
+            slides.forEach((slide, i) => {
+                slide.classList.toggle('active', i === index);
+
+                slide.querySelectorAll('.dot').forEach(dot => {
+                    dot.classList.toggle('active', Number(dot.dataset.index) === index);
+                });
+            });
+
+            current = index;
+        }
+
+        document.querySelectorAll('.next-btn').forEach(btn => {
+            btn.addEventListener('click', () => showSlide(current + 1));
+        });
+
+        document.querySelectorAll('.prev-btn').forEach(btn => {
+            btn.addEventListener('click', () => showSlide(current - 1));
+        });
+
+        document.querySelectorAll('.dot').forEach(dot => {
+            dot.addEventListener('click', () => showSlide(Number(dot.dataset.index)));
+        });
+    })();
+</script>
 
 </body>
 </html>

@@ -116,7 +116,9 @@
                 </tr>
 
 
-                <tr th:each="qna : ${qnas.content}">
+                <tr th:each="qna : ${qnas.content}"
+                    th:onclick="|location.href='@{/qna/{id}(id=${qna.id})}'|"
+                    style="cursor: pointer;">
 
                     <td th:text="${qna.id}">
                         1
@@ -136,10 +138,10 @@
 
                     <td>
                         <span class="badge"
-                              th:classappend="${qna.status == 'COMPLETED'
+                              th:classappend="${qna.status == 'ANSWERED'
                               ? 'badge-success'
                               : 'badge-pending'}"
-                              th:text="${qna.status}">
+                              th:text="${qna.status == 'ANSWERED'} ? '답변완료' : '답변대기'">
                             상태
                         </span>
                     </td>

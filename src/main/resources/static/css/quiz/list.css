@@ -1,8 +1,7 @@
 /* ── 연습퀴즈 목록 (배움터 메인과 톤 통일) ── */
 
-*, *::before, *::after {
-    box-sizing: border-box;
-}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; padding: 0; }
 
 /* 히어로 (풀블리드 다크 그라디언트) */
 .ql-hero {

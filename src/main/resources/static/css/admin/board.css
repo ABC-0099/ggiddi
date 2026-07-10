@@ -85,3 +85,22 @@
     color: #fff;
     border-color: var(--navy);
 }
+
+/* ── 목록 행 클릭 가능 표시 ── */
+.data-table tbody tr {
+    cursor: pointer;
+    transition: background 0.15s;
+}
+.data-table tbody tr:hover {
+    background: var(--gray-50);
+}
+
+/* ── 상태 뱃지 (답변대기/답변완료) — view.css 톤과 통일 ── */
+.badge.badge-pending {
+    background: #FCE4A1;
+    color: #92400E;
+}
+.badge.badge-success {
+    background: #CFF3E4;
+    color: #146B52;
+}

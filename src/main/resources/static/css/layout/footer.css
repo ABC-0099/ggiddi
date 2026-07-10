@@ -11,11 +11,6 @@
     background: #0F6E56;
   }
 
-  .site-footer.footer-admin .footer-logo .logo-pixel {
-    background: #ffffff;
-    color: #0F6E56;
-  }
-
   .site-footer.footer-admin .footer-col h4 {
     color: #9FE1CB;
   }
@@ -47,29 +42,20 @@
   .footer-logo {
     display: flex;
     align-items: center;
-    gap: 8px;
     text-decoration: none;
     margin-bottom: 14px;
   }
 
-  .footer-logo .logo-pixel {
-    width: 30px;
+  .footer-logo-img {
     height: 30px;
-    background: #9FE1CB;
-    color: #0f3f73;
-    font-size: 14px;
-    font-weight: 900;
-    border-radius: 7px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    width: auto;
+    display: block;
   }
 
-.footer-logo .logo-text {
-  font-size: 16px;
-  font-weight: 600;
-  color: #ffffff;
-}
+  /* 관리자 테마에서는 민트색 버전으로 전환 (navbar와 동일한 방식) */
+  .footer-logo-img-admin { display: none; }
+  .site-footer.footer-admin .footer-logo-img-default { display: none; }
+  .site-footer.footer-admin .footer-logo-img-admin { display: block; }
 
   .footer-tagline {
     font-size: 12.5px;

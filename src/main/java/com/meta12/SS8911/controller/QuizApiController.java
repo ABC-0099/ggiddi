@@ -37,10 +37,11 @@ public class QuizApiController {
      */
     @PostMapping("/question/{questionId}/check")
     public QuizAnswerCheckResultDTO check(@PathVariable Long questionId,
-                                          @RequestBody QuizAnswerCheckRequestDTO req) {
-        return quizService.checkAnswer(questionId, req.getSelectedOption());
+                                          @RequestBody QuizAnswerCheckRequestDTO req,
+                                          Authentication authentication) {
+        String username = authentication != null ? authentication.getName() : null;
+        return quizService.checkAnswer(questionId, req.getSelectedOption(), username);
     }
-
     /**
      * 퀴즈 완주 - 집계된 점수를 QuizBox에 기록.
      */

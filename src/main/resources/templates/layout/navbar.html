@@ -9,7 +9,7 @@
   <div th:replace="~{layout/navbar :: navbar(currentMenu='lectures')}"></div>
 
   currentMenu 값 목록:
-    home | notices | community | event | lectures | game | practiceQuiz | practiceMock | faq | qna | qnaMain | mypage
+    home | notices | community | event | lectures | game | practiceQuiz | practiceMock | practiceWrong | faq | qna | qnaMain | mypage
   ================================
 -->
 
@@ -93,7 +93,7 @@
       </li>
 
       <!-- 배움터 드롭다운 -->
-      <li class="has-dropdown" th:classappend="${currentMenu == 'practiceQuiz' or currentMenu == 'practiceMock'} ? 'active'">
+      <li class="has-dropdown" th:classappend="${currentMenu == 'practiceQuiz' or currentMenu == 'practiceMock' or currentMenu == 'practiceWrong'} ? 'active'">
         <a th:href="@{/practice/main}" class="dropdown-trigger">
           배움터
           <svg class="arrow-icon" viewBox="0 0 10 6" fill="none">
@@ -126,6 +126,20 @@
               <div>
                 <strong>실전 모의고사</strong>
                 <small>시간제한 실전평가</small>
+              </div>
+            </a>
+          </li>
+          <li>
+            <a th:href="@{/practice/wrong-notes}" th:classappend="${currentMenu == 'practiceWrong'} ? 'active'">
+              <span class="drop-icon">
+                <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M12 9v4M12 16.5h.01" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                  <circle cx="12" cy="12" r="9" stroke="currentColor" stroke-width="1.5"/>
+                </svg>
+              </span>
+              <div>
+                <strong>오답노트</strong>
+                <small>틀린 문제 다시 보기</small>
               </div>
             </a>
           </li>

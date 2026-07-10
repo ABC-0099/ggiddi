@@ -3,6 +3,7 @@ package com.meta12.SS8911.service;
 import com.meta12.SS8911.dto.*;
 import com.meta12.SS8911.entity.*;
 import com.meta12.SS8911.repository.*;
+import com.meta12.SS8911.config.SourceType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -25,6 +26,7 @@ public class QuizService {
     private final ContentRepository contentRepository;
     private final SiteUserRepository siteUserRepository;
     private final ProgressRepository progressRepository;
+    private final WrongAnswerNoteRepository wrongAnswerNoteRepository; // ★ 오답노트 저장용
 
     /**
      * 특정 강의(콘텐츠)의 연습퀴즈 세트 (학습자용, 정답 미포함).
@@ -234,19 +236,60 @@ public class QuizService {
 
     /**
      * 문항 하나 채점 - 선택하는 즉시 정답/해설을 바로 알려주는 방식.
+     * ★ username을 받아서, 틀렸을 경우 오답노트에 스냅샷을 저장함.
      */
-    @Transactional(readOnly = true)
-    public QuizAnswerCheckResultDTO checkAnswer(Long questionId, Integer selectedOption) {
+    @Transactional
+    public QuizAnswerCheckResultDTO checkAnswer(Long questionId, Integer selectedOption, String username) {
         QuizQuestion question = quizQuestionRepository.findById(questionId)
                 .orElseThrow(() -> new IllegalArgumentException("존재하지 않는 문항입니다."));
 
         boolean correct = question.getAnswer().equals(selectedOption);
+
+        if (!correct && username != null) {
+            saveWrongAnswer(question, selectedOption, username);
+        }
 
         return QuizAnswerCheckResultDTO.builder()
                 .correct(correct)
                 .correctAnswer(correct ? null : question.getAnswer())
                 .explanation(question.getExplanation())
                 .build();
+    }
+
+    /**
+     * 연습퀴즈 오답을 스냅샷으로 저장 (원본 문항이 나중에 수정/삭제돼도 내용은 그대로 보존됨).
+     */
+    private void saveWrongAnswer(QuizQuestion question, Integer selectedOption, String username) {
+        SiteUser user = siteUserRepository.findByUsername(username).orElse(null);
+        if (user == null) return;
+
+        Quiz quiz = question.getQuiz();
+
+        WrongAnswerNote note = new WrongAnswerNote();
+        note.setSiteUser(user);
+        note.setSourceType(SourceType.PRACTICE_QUIZ);
+        note.setSourceQuestionId(question.getId());
+        note.setQuestionText(question.getQuestion());
+        note.setUserAnswer(optionText(question, selectedOption));
+        note.setCorrectAnswer(optionText(question, question.getAnswer()));
+        note.setExplanation(question.getExplanation());
+        note.setQuizSetId(quiz.getId());
+        note.setQuizSetTitle(quiz.getTitle());
+        note.setCategory(quiz.getContent().getCategory().getTitle());
+
+        wrongAnswerNoteRepository.save(note);
+    }
+
+    // 선택 번호(1~4)를 실제 보기 텍스트로 변환 (null이면 미답)
+    private String optionText(QuizQuestion q, Integer optionNumber) {
+        if (optionNumber == null) return null;
+        return switch (optionNumber) {
+            case 1 -> q.getOption1();
+            case 2 -> q.getOption2();
+            case 3 -> q.getOption3();
+            case 4 -> q.getOption4();
+            default -> null;
+        };
     }
 
     /**
