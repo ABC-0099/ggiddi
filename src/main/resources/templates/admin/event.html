@@ -32,7 +32,7 @@
             <div class="kpi-card">
                 <div class="kpi-icon kpi-icon-mint"><i class="ti ti-calendar-event"></i></div>
                 <div class="kpi-label">진행 중</div>
-                <div class="kpi-value" th:text="${ongoingEventCount} ?: '2'">2</div>
+                <div class="kpi-value" th:text="${ongoingEventCount}">2</div>
                 <div class="kpi-change" style="color:var(--gray-400);">현재 참여 가능</div>
                 <div class="kpi-accent accent-mint"></div>
             </div>
@@ -99,9 +99,9 @@
                             <div class="content-name" th:text="${event.title}">여름맞이 출석 챌린지</div>
                         </div>
                     </td>
-                    <td th:text="${event.startDate} + ' ~ ' + ${event.endDate}">2026.07.01 ~ 2026.07.31</td>
+                    <td th:text="${#temporals.format(event.startDate, 'yyyy.MM.dd')} + ' ~ ' + ${#temporals.format(event.endDate, 'yyyy.MM.dd')}">2026.07.01 ~ 2026.07.31</td>
                     <td th:text="${event.participantCount} + '명'">128명</td>
-                    <td th:text="${event.createdDate}">2026.06.20</td>
+                    <td th:text="${#temporals.format(event.createdDate, 'yyyy.MM.dd')}">2026.06.20</td>
                     <td style="text-align:center">
                         <span class="badge badge-success" th:if="${event.status == 'ONGOING'}">진행중</span>
                         <span class="badge badge-info" th:if="${event.status == 'UPCOMING'}">예정</span>
@@ -117,70 +117,14 @@
                     </td>
                 </tr>
 
-                <!-- events가 비어있을 때 보여줄 미리보기 행 (백엔드 연동 전 임시 데이터) -->
-                <tr th:if="${events == null or #lists.isEmpty(events)}">
-                    <td style="color:var(--gray-400)">1</td>
-                    <td>
-                        <div class="content-title-cell">
-                            <div class="content-thumb"><i class="ti ti-gift"></i></div>
-                            <div class="content-name">여름맞이 출석 챌린지</div>
-                        </div>
-                    </td>
-                    <td>2026.07.01 ~ 2026.07.31</td>
-                    <td>128명</td>
-                    <td>2026.06.20</td>
-                    <td style="text-align:center"><span class="badge badge-success">진행중</span></td>
-                    <td style="text-align:center">
-                        <button class="btn btn-outline btn-sm"><i class="ti ti-edit"></i>수정</button>
-                        <button class="btn btn-danger-outline btn-sm"><i class="ti ti-trash"></i></button>
-                    </td>
-                </tr>
-                <tr th:if="${events == null or #lists.isEmpty(events)}">
-                    <td style="color:var(--gray-400)">2</td>
-                    <td>
-                        <div class="content-title-cell">
-                            <div class="content-thumb" style="background:var(--navy-bg); color:var(--navy);"><i class="ti ti-gift"></i></div>
-                            <div class="content-name">신규가입 웰컴 이벤트</div>
-                        </div>
-                    </td>
-                    <td>2026.06.01 ~ 상시</td>
-                    <td>241명</td>
-                    <td>2026.05.28</td>
-                    <td style="text-align:center"><span class="badge badge-success">진행중</span></td>
-                    <td style="text-align:center">
-                        <button class="btn btn-outline btn-sm"><i class="ti ti-edit"></i>수정</button>
-                        <button class="btn btn-danger-outline btn-sm"><i class="ti ti-trash"></i></button>
-                    </td>
-                </tr>
-                <tr th:if="${events == null or #lists.isEmpty(events)}">
-                    <td style="color:var(--gray-400)">3</td>
-                    <td>
-                        <div class="content-title-cell">
-                            <div class="content-thumb" style="background:var(--amber-bg); color:#854F0B;"><i class="ti ti-gift"></i></div>
-                            <div class="content-name">추석맞이 K-문화 퀴즈전</div>
-                        </div>
-                    </td>
-                    <td>2026.09.20 ~ 2026.09.27</td>
-                    <td>0명</td>
-                    <td>2026.06.30</td>
-                    <td style="text-align:center"><span class="badge badge-info">예정</span></td>
-                    <td style="text-align:center">
-                        <button class="btn btn-outline btn-sm"><i class="ti ti-edit"></i>수정</button>
-                        <button class="btn btn-danger-outline btn-sm"><i class="ti ti-trash"></i></button>
+                <tr th:if="${events.empty}">
+                    <td colspan="7" style="text-align:center; color:var(--gray-400); padding:50px 0;">
+                        등록된 이벤트가 없습니다.
                     </td>
                 </tr>
                 </tbody>
             </table>
-            <div class="pagination">
-                <span class="pagination-info">전체 <span th:text="${totalEventCount} ?: '8'">8</span>건 중 1–3 표시</span>
-                <div class="pagination-btns">
-                    <button class="page-btn"><i class="ti ti-chevron-left" style="font-size:12px"></i></button>
-                    <button class="page-btn active">1</button>
-                    <button class="page-btn">2</button>
-                    <button class="page-btn">3</button>
-                    <button class="page-btn"><i class="ti ti-chevron-right" style="font-size:12px"></i></button>
-                </div>
-            </div>
+            <div th:replace="~{admin/fragments/pagination :: pagination(${events}, '/admin/event', ${{}})}"></div>
         </div>
     </div>
 </div>

@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<body>
+
+<!--
+  페이지네이션 공통 프래그먼트.
+  주의: params 자리에는 항상 Map을 넘겨야 합니다. 추가 파라미터가 없으면 반드시 ${{}} 로 명시적으로 넘길 것 (null 금지)
+-->
+<div class="pagination" th:fragment="pagination(page, baseUrl, params)" th:if="${page.totalPages > 0}">
+
+    <a class="page-btn"
+       th:if="${page.number > 0}"
+       th:href="@{__${baseUrl}__(page=${page.number - 1}, ${params})}">
+        <i class="ti ti-chevron-left"></i>
+    </a>
+
+    <span th:each="pageNum : ${#numbers.sequence(
+            (page.number / 5) * 5,
+            T(java.lang.Math).min((page.number / 5) * 5 + 4, page.totalPages - 1)
+        )}">
+        <a class="page-btn"
+           th:classappend="${pageNum == page.number} ? ' active'"
+           th:href="@{__${baseUrl}__(page=${pageNum}, ${params})}"
+           th:text="${pageNum + 1}">
+        </a>
+    </span>
+
+    <a class="page-btn"
+       th:if="${page.number < page.totalPages - 1}"
+       th:href="@{__${baseUrl}__(page=${page.number + 1}, ${params})}">
+        <i class="ti ti-chevron-right"></i>
+    </a>
+
+</div>
+
+</body>
+</html>

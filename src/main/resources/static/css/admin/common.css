@@ -461,3 +461,28 @@ body {
 @media (max-width: 1100px) {
     .kpi-grid { grid-template-columns: repeat(2, 1fr); }
 }
+
+.pagination {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    gap: 6px;
+    padding: 16px 24px;
+}
+.page-btn {
+    min-width: 32px;
+    height: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 6px;
+    color: var(--gray-500);
+    text-decoration: none;
+}
+.page-btn.active {
+    background: var(--navy);
+    color: #fff;
+}
+.page-btn:hover:not(.active) {
+    background: var(--gray-100);
+}

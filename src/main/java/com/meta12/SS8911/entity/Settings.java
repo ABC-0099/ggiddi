@@ -1,29 +1,27 @@
 package com.meta12.SS8911.entity;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import lombok.Getter;
-import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Entity
 @Getter
 @Setter
-@NoArgsConstructor
 public class Settings {
 
     @Id
-    private Long id = 1L;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-    private String siteName;
-    private String siteDescription;
+    private String siteName = "끼역띠귿";
+    private String siteDescription = "외국인을 위한 한국어 학습 플랫폼";
 
-    private boolean signupEnabled;
-    private boolean emailVerification;
-    private boolean rejoinEnabled;
+    private boolean signupEnabled = true;
+    private boolean emailVerification = false;
+    private boolean rejoinEnabled = true;
 
-    private int boardPageSize;
+    private int boardPageSize = 10;
 
-    private boolean commentEnabled;
-    private boolean attachmentEnabled;
+    private boolean commentEnabled = true;
+    private boolean attachmentEnabled = true;
 }

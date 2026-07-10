@@ -223,6 +223,10 @@ public class ContentService {
         return contentRepository.findAll();
     }
 
+    public Page<Content> getAllContentList(Pageable pageable) {
+        return contentRepository.findAll(pageable);
+    }
+
     // 결제 여부 확인 로직
     public boolean hasAccess(SiteUser user, String categoryTitle) {
         // OrderPay 테이블에서 해당 유저와 카테고리 이름으로 결제 내역 조회
@@ -371,6 +375,10 @@ public class ContentService {
                         new IllegalArgumentException("콘텐츠가 없습니다."));
 
         contentRepository.delete(content);
+    }
+
+    public Page<SiteUser> getAllUsers(Pageable pageable) {
+        return siteUserRepository.findAll(pageable);
     }
 
 

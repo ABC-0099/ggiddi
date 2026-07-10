@@ -5,6 +5,8 @@ import com.meta12.SS8911.dto.CategoryDTO;
 import com.meta12.SS8911.entity.*;
 import com.meta12.SS8911.repository.*;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -208,6 +210,10 @@ public class CategoryService {
 
         // 3. 평균 계산 후 반올림
         return (int) Math.round(totalPercent / contentList.size());
+    }
+
+    public Page<Category> findAll(Pageable pageable) {
+        return this.categoryRepository.findAll(pageable);
     }
 
 }
