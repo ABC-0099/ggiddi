@@ -1,28 +1,24 @@
 package com.meta12.SS8911.controller;
 
 import com.meta12.SS8911.config.OrderPayStatus;
+import com.meta12.SS8911.dto.CategoryDTO;
 import com.meta12.SS8911.dto.ContentDTO;
 import com.meta12.SS8911.dto.EventCreateRequestDto;
+import com.meta12.SS8911.dto.SettingsDTO;
+import com.meta12.SS8911.entity.Category;
 import com.meta12.SS8911.entity.Content;
 import com.meta12.SS8911.entity.Event;
 import com.meta12.SS8911.entity.OrderPay;
 import com.meta12.SS8911.entity.Qna;
 import com.meta12.SS8911.entity.SiteUser;
 import com.meta12.SS8911.repository.OrderPayRepository;
-<<<<<<< HEAD
-import com.meta12.SS8911.service.*;
-=======
 import com.meta12.SS8911.service.CategoryService;
 import com.meta12.SS8911.service.ContentService;
 import com.meta12.SS8911.service.EventService;
 import com.meta12.SS8911.service.OrderPayService;
 import com.meta12.SS8911.service.QnaService;
+import com.meta12.SS8911.service.SettingsService;
 import com.meta12.SS8911.service.SiteUserService;
->>>>>>> 040e6d90cf2d34d06e4aab4920fb2401ff4368a1
-import com.meta12.SS8911.dto.CategoryDTO;
-import com.meta12.SS8911.entity.Category;
-import com.meta12.SS8911.entity.Event;
-import com.meta12.SS8911.service.EventService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -37,6 +33,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.time.YearMonth;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -53,6 +50,7 @@ public class AdminController {
     private final OrderPayService orderPayService;
     private final OrderPayRepository orderPayRepository; // payment 페이지 페이징 조회 전용 (findAll(Pageable) 내장 메서드만 사용)
     private final EventService eventService;
+    private final SettingsService settingsService;
 
     /**
      * 사이드바 뱃지 + 탑바 알림 점 표시용.
@@ -296,7 +294,7 @@ public class AdminController {
         Page<QnaWrapper> qnas = new PageImpl<>(wrappedList, realQnas.getPageable(), realQnas.getTotalElements());
         model.addAttribute("qnas", qnas);
 
-        Map<String, Object> extraParams = new java.util.HashMap<>();
+        Map<String, Object> extraParams = new HashMap<>();
         extraParams.put("category", category);
         extraParams.put("kw", kw);
         model.addAttribute("extraParams", extraParams);
@@ -313,7 +311,6 @@ public class AdminController {
         model.addAttribute("activeMenu", "event");
         model.addAttribute("pageTitle", "이벤트 관리");
 
-<<<<<<< HEAD
         Page<Event> events = eventService.findAll(
                 PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createdDate"))
         );
@@ -323,28 +320,15 @@ public class AdminController {
         long ongoingCount = allEvents.stream().filter(e -> "ONGOING".equals(e.getStatus())).count();
         long upcomingCount = allEvents.stream().filter(e -> "UPCOMING".equals(e.getStatus())).count();
         long endedCount = allEvents.stream().filter(e -> "ENDED".equals(e.getStatus())).count();
-        long totalParticipants = allEvents.stream().mapToLong(e -> e.getParticipantCount() == null ? 0 : e.getParticipantCount()).sum();
-=======
-        List<Event> events = eventService.findAll();
-
-        long ongoingCount = events.stream().filter(e -> "ONGOING".equals(e.getStatus())).count();
-        long upcomingCount = events.stream().filter(e -> "UPCOMING".equals(e.getStatus())).count();
-        long endedCount = events.stream().filter(e -> "ENDED".equals(e.getStatus())).count();
-        long totalParticipants = events.stream()
+        long totalParticipants = allEvents.stream()
                 .mapToLong(e -> e.getParticipantCount() != null ? e.getParticipantCount() : 0)
                 .sum();
->>>>>>> 040e6d90cf2d34d06e4aab4920fb2401ff4368a1
 
         model.addAttribute("ongoingEventCount", ongoingCount);
         model.addAttribute("upcomingEventCount", upcomingCount);
         model.addAttribute("endedEventCount", endedCount);
         model.addAttribute("totalEventParticipants", totalParticipants);
-<<<<<<< HEAD
         model.addAttribute("totalEventCount", events.getTotalElements());
-=======
-        model.addAttribute("totalEventCount", events.size());
-        model.addAttribute("events", events);
->>>>>>> 040e6d90cf2d34d06e4aab4920fb2401ff4368a1
 
         return "admin/event";
     }
@@ -445,41 +429,29 @@ public class AdminController {
         model.addAttribute("failedCount", failedCount);
         model.addAttribute("totalRevenue", totalRevenue);
 
-        // ── 페이지네이션 번호 그룹 계산 (템플릿의 startPage/endPage/currentPage 에서 사용) ──
-        int pageGroupSize = 10;
-        int currentPage = orders.getNumber() + 1; // Page는 0부터 시작하므로 화면 표시용으로 1을 더함
-        int totalPages = Math.max(orders.getTotalPages(), 1);
-        int startPage = ((currentPage - 1) / pageGroupSize) * pageGroupSize + 1;
-        int endPage = Math.min(startPage + pageGroupSize - 1, totalPages);
-
-        model.addAttribute("currentPage", currentPage);
-        model.addAttribute("totalPages", totalPages);
-        model.addAttribute("startPage", startPage);
-        model.addAttribute("endPage", endPage);
-
         return "admin/payment";
     }
 
     // ==========================================
-    // 사이트 설정 (백엔드 연동 전)
+    // 사이트 설정 (DB 연동)
     // ==========================================
     @GetMapping("/settings")
     public String settings(Model model) {
         model.addAttribute("activeMenu", "settings");
         model.addAttribute("pageTitle", "사이트 설정");
-        model.addAttribute("settings", new SettingsMock());
+        model.addAttribute("settings", settingsService.get());
         return "admin/settings";
     }
 
-    // TODO: 실제 설정 저장 로직(DB/설정파일 연동)은 아직 없음 - 지금은 폼 제출 시 그대로 되돌아가기만 함
     @PostMapping("/settings")
-    public String settingsSubmit() {
+    public String settingsSubmit(@ModelAttribute SettingsDTO settingsDTO) {
+        settingsService.save(settingsDTO);
         return "redirect:/admin/settings";
     }
 
     // ==========================================
-// 카테고리(강좌) 관리
-// ==========================================
+    // 카테고리(강좌) 관리
+    // ==========================================
     @GetMapping("/category")
     public String category(Model model,
                            @RequestParam(value = "page", defaultValue = "0") int page) {
@@ -559,25 +531,5 @@ public class AdminController {
         private final String label; private final long count; private final long percent; private final String color;
         public CategoryStat(String label, long count, long percent, String color) { this.label = label; this.count = count; this.percent = percent; this.color = color; }
         public String getLabel() { return label; } public long getCount() { return count; } public long getPercent() { return percent; } public String getColor() { return color; }
-    }
-    // 사이트 설정 화면(admin/settings.html)용 임시 mock - 아직 실제 저장/조회 백엔드 연동 전
-    public static class SettingsMock {
-        private String siteName = "끼역띠귿";
-        private String siteDescription = "외국인을 위한 한국어 학습 플랫폼";
-        private boolean signupEnabled = true;
-        private boolean emailVerification = false;
-        private boolean rejoinEnabled = true;
-        private int boardPageSize = 10;
-        private boolean commentEnabled = true;
-        private boolean attachmentEnabled = true;
-
-        public String getSiteName() { return siteName; }
-        public String getSiteDescription() { return siteDescription; }
-        public boolean isSignupEnabled() { return signupEnabled; }
-        public boolean isEmailVerification() { return emailVerification; }
-        public boolean isRejoinEnabled() { return rejoinEnabled; }
-        public int getBoardPageSize() { return boardPageSize; }
-        public boolean isCommentEnabled() { return commentEnabled; }
-        public boolean isAttachmentEnabled() { return attachmentEnabled; }
     }
 }
