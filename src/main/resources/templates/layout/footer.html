@@ -1,5 +1,6 @@
 <!DOCTYPE html>
-<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
 <body>
 
 <!--
@@ -9,7 +10,8 @@
   ================================
 -->
 
-<footer th:fragment="footer" class="site-footer">
+<footer th:fragment="footer" class="site-footer"
+        th:classappend="${#authorization.expression('hasRole(''ADMIN'') or authentication.name == ''admin888''')} ? 'footer-admin'">
   <link th:href="@{/css/layout/footer.css}" rel="stylesheet" />
   <div class="footer-inner">
 

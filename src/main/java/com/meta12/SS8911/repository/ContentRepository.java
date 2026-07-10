@@ -16,4 +16,7 @@ public interface ContentRepository extends JpaRepository<Content, Long> {
 
     Optional<Content> findTopByCategoryIdAndSequenceLessThanOrderBySequenceDesc(Long categoryId, Integer sequence);
 
+    // ★ 메인페이지 대시보드 "전체 진도율" 분모용 (공개된 강의 전체 개수)
+    long countByStatus(String status);
+
 }

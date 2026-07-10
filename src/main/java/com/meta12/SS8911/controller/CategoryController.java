@@ -81,6 +81,7 @@ public class CategoryController {
         // 상단 통계 박스용 데이터
         model.addAttribute("completedCount", contentService.getCompletedCount(user));
         model.addAttribute("avgProgress", (int) Math.round(contentService.getAverageProgress(user)));
+        model.addAttribute("streakDays", user != null ? user.getStreakDays() : 0);
 
         Progress lastProgress = contentService.getLastWatchedProgress(user);
         model.addAttribute("lastProgress", lastProgress);

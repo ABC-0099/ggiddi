@@ -91,19 +91,15 @@
                     </div>
                 </div>
 
-                <!-- 통계 3개 -->
+                <!-- 통계 2개 -->
                 <div class="dash-stats">
                     <div class="dash-stat">
-                        <div class="dash-stat-num">8강</div>
+                        <div class="dash-stat-num" th:text="${completedCount} + '강'">8강</div>
                         <div class="dash-stat-label">완료 강의</div>
                     </div>
                     <div class="dash-stat">
-                        <div class="dash-stat-num">142</div>
-                        <div class="dash-stat-label">습득 단어</div>
-                    </div>
-                    <div class="dash-stat">
-                        <div class="dash-stat-num">7일</div>
-                        <div class="dash-stat-label">연속 학습</div>
+                        <div class="dash-stat-num" th:text="${streakDays} + '일'">7일</div>
+                        <div class="dash-stat-label">연속 출석</div>
                     </div>
                 </div>
 
@@ -111,16 +107,16 @@
                 <div class="dash-progress">
                     <div class="dash-prog-label">
                         <span>전체 진도율</span>
-                        <span>30%</span>
+                        <span th:text="${progressPercent} + '%'">30%</span>
                     </div>
-                    <div class="dash-prog-bar"><div class="dash-prog-fill" style="width:30%"></div></div>
+                    <div class="dash-prog-bar"><div class="dash-prog-fill" th:style="'width:' + ${progressPercent} + '%'" style="width:30%"></div></div>
                 </div>
 
                 <!-- 이어보기 버튼 -->
                 <a th:if="${continueContent != null}" th:href="@{/content/view/{id}(id=${continueContent.id})}" class="dash-btn">                    <svg viewBox="0 0 24 24" width="15" height="15" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px; margin-right:4px;">
-                        <path d="M22 10L12 5 2 10l10 5 10-5z"/>
-                        <path d="M6 12v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/>
-                    </svg>
+                    <path d="M22 10L12 5 2 10l10 5 10-5z"/>
+                    <path d="M6 12v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/>
+                </svg>
                     학습 이어가기 →
                 </a>
             </div>
