@@ -63,8 +63,35 @@ public class SiteUserController {
             bindingResult.rejectValue("passwordChk", "error", "비밀번호가 일치하지 않습니다.");
             return "siteUser/chuga";
         }
-        siteUserService.chugaProc(dto);
+        try {
+            siteUserService.chugaProc(dto);
+        } catch (IllegalStateException e) {
+            bindingResult.reject("error", e.getMessage());
+            return "siteUser/chuga";
+        }
         return "redirect:/siteUser/login";
+    }
+
+    // 아이디 중복확인 (AJAX)
+    @GetMapping("/api/check-username")
+    @ResponseBody
+    public Map<String, Object> checkUsername(@RequestParam String username) {
+        Map<String, Object> result = new HashMap<>();
+        boolean available = siteUserService.isUsernameAvailable(username);
+        result.put("available", available);
+        result.put("message", available ? "사용 가능한 아이디입니다." : "이미 사용 중인 아이디입니다.");
+        return result;
+    }
+
+    // 전화번호 중복확인 (AJAX)
+    @GetMapping("/api/check-phone")
+    @ResponseBody
+    public Map<String, Object> checkPhone(@RequestParam String phone) {
+        Map<String, Object> result = new HashMap<>();
+        boolean available = siteUserService.isPhoneAvailable(phone);
+        result.put("available", available);
+        result.put("message", available ? "사용 가능한 번호입니다." : "이미 등록된 번호입니다.");
+        return result;
     }
 
     @GetMapping("/siteUser/profile/{username}")

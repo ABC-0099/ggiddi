@@ -9,4 +9,6 @@ public interface SiteUserRepository extends JpaRepository<SiteUser, Long> {
     Optional<SiteUser> findByUsername(String username);
 
     boolean existsByUsername(String username);
+
+    boolean existsByPhone(String phone);
 }

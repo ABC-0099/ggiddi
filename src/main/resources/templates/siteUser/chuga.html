@@ -117,15 +117,15 @@
         <label for="userid">아이디 <span class="required-mark">필수</span></label>
         <div style="display:flex;gap:8px;">
           <input type="text" id="userid" name="username" placeholder="영문 소문자, 숫자 조합 4~20자" style="flex:1;"
-                 oninput="this.value = this.value.toLowerCase().replace(/[^a-z0-9]/g, '')" />
-          <button type="button" style="
+                 oninput="this.value = this.value.toLowerCase().replace(/[^a-z0-9]/g, ''); usernameChecked=false;" />
+          <button type="button" id="username-check-btn" onclick="checkUsername()" style="
             padding: 0 16px; border-radius: 10px; border: 1.5px solid var(--mint);
             background: var(--mint-pale); color: var(--mint-dark);
             font-size: 13px; font-weight: 600; font-family: inherit;
             cursor: pointer; white-space: nowrap;
           ">중복 확인</button>
         </div>
-        <span class="field-hint">영문 소문자, 숫자 조합 4~20자로 입력해주세요.</span>
+        <span class="field-hint" id="username-check-msg">영문 소문자, 숫자 조합 4~20자로 입력해주세요.</span>
       </div>
 
       <div class="field">
@@ -136,7 +136,8 @@
       <div class="field">
         <label for="phone">휴대폰 번호 <span class="required-mark">필수</span></label>
         <div style="display:flex;gap:8px;">
-          <input type="tel" id="phone" name="phone" placeholder="010-0000-0000" style="flex:1;" />
+          <input type="tel" id="phone" name="phone" placeholder="010-0000-0000" style="flex:1;"
+                 oninput="phoneChecked=false;" />
           <button type="button" id="phone-btn" onclick="requestVerify()" style="
             padding: 0 16px; border-radius: 10px; border: 1.5px solid var(--mint);
             background: var(--mint-pale); color: var(--mint-dark);
@@ -144,6 +145,7 @@
             cursor: pointer; white-space: nowrap; transition: all .15s;
           ">인증 요청</button>
         </div>
+        <span class="field-hint" id="phone-check-msg"></span>
         <div id="verify-row" style="display:none;margin-top:8px;gap:8px;flex-direction:row;">
           <input type="text" id="verify-code" placeholder="인증번호 6자리" style="flex:1;" />
           <button type="button" style="
@@ -236,12 +238,79 @@
 </div>
 
 <script>
-  // 폼 제출 시 최종 대문자 방어
+  let usernameChecked = false;
+  let phoneChecked = false;
+
+  // 아이디 중복확인
+  function checkUsername() {
+    const username = document.getElementById('userid').value;
+    const msg = document.getElementById('username-check-msg');
+
+    if (!username || !/^[a-z0-9_]{4,20}$/.test(username)) {
+      msg.textContent = '영문 소문자, 숫자 조합 4~20자로 입력해주세요.';
+      msg.style.color = 'var(--error, #EF4444)';
+      usernameChecked = false;
+      return;
+    }
+
+    fetch('/api/check-username?username=' + encodeURIComponent(username))
+      .then(res => res.json())
+      .then(data => {
+        msg.textContent = data.message;
+        msg.style.color = data.available ? 'var(--mint-dark)' : 'var(--error, #EF4444)';
+        usernameChecked = data.available;
+      })
+      .catch(() => {
+        msg.textContent = '중복확인 중 오류가 발생했습니다.';
+        msg.style.color = 'var(--error, #EF4444)';
+        usernameChecked = false;
+      });
+  }
+
+  // 전화번호 중복확인 (성공 시 콜백 실행)
+  function checkPhoneDuplicate(callback) {
+    const phone = document.getElementById('phone').value;
+    const msg = document.getElementById('phone-check-msg');
+
+    if (!phone) {
+      msg.textContent = '휴대폰 번호를 입력해주세요.';
+      msg.style.color = 'var(--error, #EF4444)';
+      phoneChecked = false;
+      return;
+    }
+
+    fetch('/api/check-phone?phone=' + encodeURIComponent(phone))
+      .then(res => res.json())
+      .then(data => {
+        msg.textContent = data.message;
+        msg.style.color = data.available ? 'var(--mint-dark)' : 'var(--error, #EF4444)';
+        phoneChecked = data.available;
+        if (data.available && callback) callback();
+      })
+      .catch(() => {
+        msg.textContent = '중복확인 중 오류가 발생했습니다.';
+        msg.style.color = 'var(--error, #EF4444)';
+        phoneChecked = false;
+      });
+  }
+
+  // 폼 제출 시 최종 방어 (대문자 + 중복확인 완료 여부)
   document.querySelector('.form').addEventListener('submit', function(e) {
     const userid = document.getElementById('userid').value;
     if (/[A-Z]/.test(userid)) {
       e.preventDefault();
       alert('아이디는 영문 소문자와 숫자만 가능합니다.');
+      return;
+    }
+    if (!usernameChecked) {
+      e.preventDefault();
+      alert('아이디 중복확인을 완료해주세요.');
+      return;
+    }
+    if (!phoneChecked) {
+      e.preventDefault();
+      alert('휴대폰 번호 중복확인을 완료해주세요.');
+      return;
     }
   });
 
@@ -285,13 +354,15 @@
     else            { msg.textContent = '비밀번호가 일치하지 않아요'; msg.style.color = 'var(--error, #EF4444)'; }
   }
 
-  // 인증 요청
+  // 인증 요청 (전화번호 중복확인 먼저 수행)
   function requestVerify() {
-    const row = document.getElementById('verify-row');
-    row.style.display = 'flex';
-    const btn = document.getElementById('phone-btn');
-    btn.textContent = '재전송';
-    btn.style.background = 'var(--bg)';
+    checkPhoneDuplicate(() => {
+      const row = document.getElementById('verify-row');
+      row.style.display = 'flex';
+      const btn = document.getElementById('phone-btn');
+      btn.textContent = '재전송';
+      btn.style.background = 'var(--bg)';
+    });
   }
 </script>
 

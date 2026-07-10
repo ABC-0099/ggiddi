@@ -1,8 +1,8 @@
 package com.meta12.SS8911.service;
 
-import com.meta12.SS8911.config.Role;
 import com.meta12.SS8911.dto.SiteUserDTO;
 import com.meta12.SS8911.dto.SiteUserEditDTO;
+import com.meta12.SS8911.config.Role;
 import com.meta12.SS8911.entity.SiteUser;
 import com.meta12.SS8911.entity.StudyRecord;
 import com.meta12.SS8911.exception.DataNotFoundException;
@@ -10,7 +10,9 @@ import com.meta12.SS8911.repository.SiteUserRepository;
 import com.meta12.SS8911.repository.StudyRecordRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.data.domain.Sort;
 import org.springframework.security.core.userdetails.*;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -28,6 +30,7 @@ public class SiteUserService implements UserDetailsService {
     private final PasswordEncoder passwordEncoder;
     private final StudyRecordRepository studyRecordRepository;
 
+
     public List<SiteUser> getAllUsers() {
         return siteUserRepository.findAll();
     }
@@ -38,35 +41,44 @@ public class SiteUserService implements UserDetailsService {
 
     @Transactional
     public void chugaProc(SiteUserDTO dto) {
-        String lowerUsername = dto.getUsername().toLowerCase();
-
-        // 1. 아이디에 대문자가 포함되어 있는지 확인 (정규식: [A-Z])
-        if (dto.getUsername().matches(".*[A-Z].*")) {
-            throw new IllegalStateException("아이디는 소문자만 입력 가능합니다.");
-        }
-
-        if (siteUserRepository.existsByUsername(lowerUsername)) {
+        if (siteUserRepository.existsByUsername(dto.getUsername())) {
             throw new IllegalStateException("이미 존재하는 아이디입니다.");
+        }
+        if (siteUserRepository.existsByPhone(dto.getPhone())) {
+            throw new IllegalStateException("이미 등록된 전화번호입니다.");
         }
 
         SiteUser user = new SiteUser();
-        user.setUsername(lowerUsername);
+        user.setUsername(dto.getUsername());
         user.setPassword(passwordEncoder.encode(dto.getPassword()));
         user.setName(dto.getName());
         user.setBirth(dto.getBirth());
         user.setPhone(dto.getPhone());
         user.setEmail(dto.getEmail());
         user.setNationality(dto.getNationality());
-        user.setUsername(dto.getUsername());
+
         user.setRole(Role.USER);
         user.setJoinDate(LocalDateTime.now());
 
         siteUserRepository.save(user);
     }
 
+    // 아이디 중복확인 (AJAX용) - 사용 가능하면 true
+    public boolean isUsernameAvailable(String username) {
+        return !siteUserRepository.existsByUsername(username);
+    }
+
+    // 전화번호 중복확인 (AJAX용) - 사용 가능하면 true
+    public boolean isPhoneAvailable(String phone) {
+        return !siteUserRepository.existsByPhone(phone);
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // 변환 없이 입력된 username 그대로 조회
+        if (!username.equals(username.toLowerCase())) {
+            throw new UsernameNotFoundException("아이디는 소문자만 사용할 수 있습니다.");
+        }
+
         SiteUser siteUser = siteUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
 
@@ -79,13 +91,12 @@ public class SiteUserService implements UserDetailsService {
     }
 
     public SiteUser getUser(String username) {
-        // 호출 시에도 소문자 변환을 고려하여 username.toLowerCase() 사용 권장
-        return siteUserRepository.findByUsername(username.toLowerCase())
+        return siteUserRepository.findByUsername(username)
                 .orElseThrow(() -> new DataNotFoundException("user not found"));
     }
 
     public SiteUser getUserByUsername(String username) {
-        return siteUserRepository.findByUsername(username.toLowerCase())
+        return siteUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
     }
 
@@ -102,6 +113,7 @@ public class SiteUserService implements UserDetailsService {
         user.setPhone(dto.getPhone());
         user.setBirth(dto.getBirth());
         user.setNationality(dto.getNationality());
+
         siteUserRepository.save(user);
     }
 
@@ -115,12 +127,14 @@ public class SiteUserService implements UserDetailsService {
 
         user.setWithdrawn(true);
         user.setWithdrawnDate(LocalDateTime.now());
+
         siteUserRepository.save(user);
     }
 
     @Transactional
     public void editProc(String username, SiteUserEditDTO dto) {
-        SiteUser user = getUserByUsername(username);
+        SiteUser user = siteUserRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalStateException("사용자를 찾을 수 없습니다."));
 
         user.setPhone(dto.getPhone());
         user.setNationality(dto.getNationality());
@@ -134,6 +148,7 @@ public class SiteUserService implements UserDetailsService {
             }
             user.setPassword(passwordEncoder.encode(dto.getNewPassword()));
         }
+
         siteUserRepository.save(user);
     }
 
