@@ -16,15 +16,6 @@
     box-shadow: 0 12px 28px -8px rgba(15, 110, 86, 0.55);
   }
 
-  .navbar.navbar-admin .logo-pixel {
-    background: #ffffff;
-    color: #0F6E56;
-  }
-
-  .navbar.navbar-admin .logo-text {
-    color: #ffffff;
-  }
-
   .navbar.navbar-admin .navbar-menu > li > a,
   .navbar.navbar-admin .navbar-menu > li > .dropdown-trigger {
     color: rgba(255, 255, 255, 0.8);
@@ -102,33 +93,21 @@
   .navbar-logo {
     display: flex;
     align-items: center;
-    gap: 8px;
     text-decoration: none;
     margin-right: 40px;
     flex-shrink: 0;
   }
 
-  .logo-pixel {
-    width: 32px;
-    height: 32px;
-    background: #185FA5;
-    color: #9FE1CB;
-    font-size: 15px;
-    font-weight: 900;
-    border-radius: 8px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    letter-spacing: -1px;
-    image-rendering: pixelated;
+  .logo-img {
+    height: 34px;
+    width: auto;
+    display: block;
   }
 
-  .logo-text {
-    font-size: 17px;
-    font-weight: 800;
-    color: #185FA5;
-    letter-spacing: -0.3px;
-  }
+  /* 관리자 테마에서는 민트색 버전으로 전환 */
+  .logo-img-admin { display: none; }
+  .navbar.navbar-admin .logo-img-default { display: none; }
+  .navbar.navbar-admin .logo-img-admin { display: block; }
 
   /* 메뉴 */
   .navbar-menu {

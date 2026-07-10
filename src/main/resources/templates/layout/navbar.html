@@ -20,10 +20,10 @@
   <link th:href="@{/css/layout/navbar.css}" rel="stylesheet">
   <div class="navbar-inner">
 
-    <!-- 로고 -->
+    <!-- 로고: 일반 테마 / 관리자 테마 두 버전을 넣고 CSS에서 navbar-admin 클래스로 전환 -->
     <a class="navbar-logo" th:href="@{/}">
-      <span class="logo-pixel">끼</span>
-      <span class="logo-text">끼역띠귿</span>
+      <img th:src="@{/images/logo.png}" alt="끼역띠귿" class="logo-img logo-img-default" />
+      <img th:src="@{/images/logo-admin.png}" alt="끼역띠귿" class="logo-img logo-img-admin" />
     </a>
 
     <!-- 햄버거 (모바일) -->
