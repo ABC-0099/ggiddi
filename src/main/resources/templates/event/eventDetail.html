@@ -3,99 +3,178 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title th:text="${event.title}">이벤트 상세</title>
+
+    <title th:text="${event.title}">
+        이벤트 상세
+    </title>
 
     <link rel="stylesheet" th:href="@{/css/event/eventDetail.css}">
 </head>
+
+
 <body>
+
 
 <!-- 네비게이션 -->
 <div th:replace="~{layout/navbar :: navbar(currentMenu='event')}"></div>
 
-<section class="event-detail">
 
-    <!-- 제목 -->
-    <h1 class="event-title" th:text="${event.title}"></h1>
 
-    <!-- 기간 -->
-    <div class="event-date">
-        📅
-        <span th:text="${event.startDate}"></span>
-        ~
-        <span th:text="${event.endDate}"></span>
-    </div>
+<main class="event-page">
 
-    <!-- 포스터 -->
-    <img
-            th:src="@{/images/{file}(file=${event.thumbnail})}"
-            class="event-poster"
-            alt="이벤트 이미지">
 
-    <!-- 내용 -->
-    <div class="event-content"
-         th:utext="${event.content}">
-    </div>
+    <section class="event-detail">
 
-    <!-- 버튼 -->
-    <div class="participate-wrap">
-        <button class="participate-btn" onclick="openModal()">
-            이벤트 참여하기
-        </button>
-    </div>
 
-    <!-- 댓글 -->
-    <div class="comment-section">
+        <!-- 제목 -->
+        <h1 class="event-title"
+            th:text="${event.title}">
+        </h1>
 
-        <h2 class="comment-title">💬 댓글</h2>
 
-        <div class="comment-item">
-            <div class="comment-header">
-                <span class="comment-user">파이리</span>
-                <span class="comment-date">방금 전</span>
-            </div>
 
-            <div class="comment-content-text">
-                너무 좋은 이벤트네요 😊 저도 참여하겠습니다 (-영상첨부-)
-            </div>
+        <!-- 기간 -->
+        <div class="event-date">
+
+            📅
+
+            <span th:text="${event.startDate}"></span>
+
+            ~
+
+            <span th:text="${event.endDate}"></span>
+
         </div>
 
-        <div class="comment-write">
 
-            <textarea
-                    class="comment-input"
-                    placeholder="댓글을 입력해주세요."></textarea>
 
-            <button class="comment-btn">
-                등록
+
+        <!-- 포스터 -->
+        <img
+                th:src="${event.poster}"
+                class="event-poster"
+                alt="이벤트 이미지">
+
+
+
+
+        <!-- 이벤트 내용 -->
+        <div class="event-content"
+             th:utext="${event.content}">
+        </div>
+
+
+
+
+
+        <!-- 이벤트 참여 버튼 -->
+        <div class="participate-wrap">
+
+            <button class="participate-btn"
+                    onclick="openModal()">
+
+                이벤트 참여하기
+
             </button>
 
         </div>
 
-    </div>
 
-</section>
 
-<!-- 참여 모달 -->
-<div class="modal-overlay" id="eventModal">
+
+
+        <!-- 댓글 영역 -->
+        <div class="comment-section">
+
+
+            <h2 class="comment-title">
+                💬 댓글
+            </h2>
+
+
+
+            <!-- 댓글 목록 -->
+            <div class="comment-item" th:each="comment : ${comments}">
+                <div class="comment-header">
+                    <span class="comment-user" th:text="${comment.author.displayName}">
+                        파이리
+                    </span>
+                    <span class="comment-date" th:text="${#temporals.format(comment.createDate, 'yyyy-MM-dd HH:mm')}">
+                        방금 전
+                    </span>
+                </div>
+                <div class="comment-content-text" th:text="${comment.content}">
+                    너무 좋은 이벤트네요 😊
+                    저도 참여하겠습니다 (-영상첨부-)
+                </div>
+            </div>
+
+            <p class="comment-empty" th:if="${#lists.isEmpty(comments)}">
+                아직 댓글이 없습니다. 첫 댓글을 남겨보세요!
+            </p>
+
+
+
+
+
+            <!-- 댓글 작성 -->
+
+            <form th:action="@{/event/{id}/comment(id=${event.id})}" method="post">
+                <div class="comment-write">
+                    <textarea name="content" class="comment-input" placeholder="댓글을 입력해주세요." required></textarea>
+                    <button type="submit" class="comment-btn">
+                        등록
+                    </button>
+                </div>
+            </form>
+
+
+        </div>
+
+
+
+    </section>
+
+
+</main>
+
+<!-- 이벤트 참여 모달 -->
+
+<div class="modal-overlay"
+     id="eventModal">
 
     <div class="event-modal">
 
+        <!-- 모달 헤더 -->
+
         <div class="modal-header">
 
+
             <div class="modal-title">
+
                 📝 이벤트 참여하기
+
             </div>
 
-            <button class="close-btn" onclick="closeModal()">
+            <button class="close-btn"
+                    onclick="closeModal()">
+
                 ×
+
             </button>
 
+
         </div>
+
+        <!-- 모달 내용 -->
 
         <div class="modal-body">
 
             <label class="input-label">
-                이름 <span class="required">*</span>
+
+                이름
+                <span class="required">*</span>
+
             </label>
 
             <input
@@ -104,57 +183,91 @@
                     placeholder="홍길동">
 
             <label class="input-label">
-                영상 첨부 <span class="required">*</span>
-            </label>
 
+                영상 첨부
+                <span class="required">*</span>
+
+            </label>
             <input
                     type="file"
                     class="modal-input"
                     accept="video/*">
 
             <label class="input-label">
+
                 이벤트
+
             </label>
 
             <div class="event-preview"
                  th:text="${event.title}">
+
             </div>
 
         </div>
 
+        <!-- 모달 하단 버튼 -->
+
         <div class="modal-footer">
 
+
             <button class="submit-btn">
+
                 참여하기
+
             </button>
 
+
         </div>
+
 
     </div>
 
 </div>
 
+
+<!-- 푸터 -->
+
 <div th:replace="~{layout/footer :: footer}"></div>
 
 <script>
 
+
     function openModal(){
-        document.getElementById("eventModal").style.display="flex";
+
+        document.getElementById("eventModal").style.display = "flex";
+
     }
+
+
 
     function closeModal(){
-        document.getElementById("eventModal").style.display="none";
+
+        document.getElementById("eventModal").style.display = "none";
+
     }
 
-    window.onclick=function(e){
 
-        const modal=document.getElementById("eventModal");
 
-        if(e.target===modal){
-            modal.style.display="none";
+
+    window.onclick = function(e){
+
+
+        const modal =
+            document.getElementById("eventModal");
+
+
+
+        if(e.target === modal){
+
+            modal.style.display = "none";
+
         }
 
+
     }
+
+
 
 </script>
 
