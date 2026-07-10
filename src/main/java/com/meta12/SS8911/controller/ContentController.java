@@ -15,9 +15,8 @@ import com.meta12.SS8911.service.ContentService;
 import com.meta12.SS8911.service.QuizService;
 import com.meta12.SS8911.service.SiteUserService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.core.io.Resource;
-import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -25,7 +24,7 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.util.UriUtils;
 
-import java.net.MalformedURLException;
+import java.net.URI;
 import java.nio.charset.StandardCharsets;
 import java.security.Principal;
 import java.time.LocalDateTime;
@@ -104,8 +103,6 @@ public class ContentController {
         }
 
         // 5. 권한 있을 때
-        // 5. 권한 있을 때 부분에 추가
-        // 5. 권한 있을 때 부분에 추가
         Progress progress = progressRepository.findBySiteUserAndContent(currentUser, content).orElse(null);
         model.addAttribute("savedTime", (progress != null) ? progress.getLastWatchedTime() : 0);
         model.addAttribute("content", content);
@@ -147,6 +144,7 @@ public class ContentController {
         lectureForm.setAttachFileName(content.getAttachFileName());
         lectureForm.setAttachFileOrigin(content.getAttachFileOrigin());
         lectureForm.setVideoOriginalName(content.getFileOrigin());
+        // fileName엔 이제 Cloudinary URL이 통째로 들어있으므로, 재생용 경로는 그대로 스트림 엔드포인트로 유지
         lectureForm.setVideoUrl(content.getFileName() != null ? "/content/stream/" + content.getId() : null);
 
         model.addAttribute("lectureForm", lectureForm);
@@ -214,32 +212,36 @@ public class ContentController {
     }
 
     // 플레이어에서 바로 재생(스트리밍)할 때 쓰는 엔드포인트.
-    // downloadFile()은 강제 다운로드용(Content-Disposition: attachment)이라 <video> 태그에서 못 씀.
+    // fileName엔 이제 Cloudinary secure_url이 통째로 저장되어 있으므로,
+    // 로컬 파일을 읽는 대신 그 URL로 302 redirect만 해주면 <video> 태그가 알아서 재생함.
     @GetMapping("/content/stream/{id}")
-    public ResponseEntity<Resource> streamFile(@PathVariable("id") Long id) throws MalformedURLException {
+    public ResponseEntity<Void> streamFile(@PathVariable("id") Long id) {
         Content content = contentService.view(id);
         if (content == null || content.getFileName() == null) {
             return ResponseEntity.notFound().build();
         }
 
-        UrlResource resource = new UrlResource("file:C:/meta12/masil/videos/" + content.getFileName());
-
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_TYPE, "video/mp4")
-                .header(HttpHeaders.CONTENT_DISPOSITION, "inline")
-                .body(resource);
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create(content.getFileName()))
+                .build();
     }
 
+    // 강제 다운로드도 마찬가지로 Cloudinary URL로 redirect.
+    // 파일명을 원본 이름으로 강제하고 싶으면 Cloudinary URL에 fl_attachment 플래그를 붙이는 방법도 있음.
     @GetMapping("/content/download/{id}")
-    public ResponseEntity<Resource> downloadFile(@PathVariable("id") Long id) throws MalformedURLException {
+    public ResponseEntity<Void> downloadFile(@PathVariable("id") Long id) {
         Content content = contentService.view(id);
-        UrlResource resource = new UrlResource("file:C:/meta12/masil/videos/" + content.getFileName());
-        String encodedName = UriUtils.encode(content.getFileOrigin(), StandardCharsets.UTF_8);
+        if (content == null || content.getFileName() == null) {
+            return ResponseEntity.notFound().build();
+        }
+        // fl_attachment를 붙이면 Cloudinary가 Content-Disposition: attachment로 내려줌
+        String downloadUrl = content.getFileName().replace("/upload/", "/upload/fl_attachment/");
 
-        return ResponseEntity.ok()
-                .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + encodedName + "\"")
-                .body(resource);
+        return ResponseEntity.status(HttpStatus.FOUND)
+                .location(URI.create(downloadUrl))
+                .build();
     }
+
     @PostMapping("/content/progress/{id}")
     @ResponseBody
     public String updateProgress(@PathVariable("id") Long id,

@@ -22,7 +22,11 @@ public class CommunityFile {
     private Community community;
 
     private String originalName;   // 사용자가 업로드한 원본 파일명
-    private String savedPath;      // 서버에 저장된 경로 (또는 URL)
+
+    // 이제 로컬 경로가 아니라 Cloudinary secure_url이 통째로 들어감 → length 넉넉하게
+    @Column(length = 500)
+    private String savedPath;
+
     private String fileType;       // "IMAGE" | "ATTACH"
     private Long fileSize;         // 바이트 단위
 

@@ -125,7 +125,7 @@
 
                         <!-- 기존 이미지 -->
                         <img id="posterPreview"
-                             th:src="@{'/images/' + ${event.poster}}"
+                             th:src="${event.poster}"
                              th:style="${event.poster != null} ?
             'display:block;width:220px;margin:20px auto;border-radius:10px;'
             :
@@ -168,7 +168,7 @@
 
                     <!-- 기존 이미지 -->
                     <img id="thumbnailPreview"
-                         th:src="@{'/images/' + ${event.thumbnail}}"
+                         th:src="${event.thumbnail}"
                          th:style="${event.thumbnail != null} ?
             'display:block;width:220px;margin:20px auto;border-radius:10px;'
             :

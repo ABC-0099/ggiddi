@@ -28,10 +28,16 @@ public class Content {
     private String fileOrigin;      // 영상 원본 파일명
     private String attachFileOrigin; // 첨부파일 원본 파일명 (fileOrigin과 분리)
 
-    // --- DB에 저장될 파일명들을 따로 관리 (덮어쓰기 방지) ---
-    private String fileName;       // 영상 저장 파일명
-    private String thumbFileName;  // 썸네일 저장 파일명 (추가됨)
-    private String attachFileName; // 첨부파일 저장 파일명 (추가됨)
+    // --- DB에 저장될 파일명(이제는 Cloudinary URL)들을 따로 관리 (덮어쓰기 방지) ---
+    // Cloudinary secure_url이 로컬 파일명보다 훨씬 길어서 length를 넉넉하게 늘려둠
+    @Column(length = 500)
+    private String fileName;       // 영상 URL
+
+    @Column(length = 500)
+    private String thumbFileName;  // 썸네일 URL
+
+    @Column(length = 500)
+    private String attachFileName; // 첨부파일 URL
 
     private Integer stage;
 
