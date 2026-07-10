@@ -239,7 +239,7 @@ public class AdminController {
 
     @GetMapping("/content/delete/{id}")
     public String deleteContent(@PathVariable Long id) {
-        contentService.delete(id);
+//        contentService.delete(id);
         return "redirect:/admin/content";
     }
 
@@ -353,7 +353,10 @@ public class AdminController {
 
         model.addAttribute("eventCreateRequestDto", dto);
         model.addAttribute("existingEvent", event);
-        return "admin/event-edit";
+        model.addAttribute("event", event);   // ⭐ 추가
+
+
+        return "admin/eventEdit";
     }
 
     // 폼 enctype="multipart/form-data" 필수. 파일을 새로 선택 안 하면 기존 포스터/썸네일 유지됨

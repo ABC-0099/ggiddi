@@ -91,83 +91,62 @@
                 </tr>
                 </thead>
                 <tbody>
+                <tbody>
+
                 <tr th:each="event, iter : ${events}">
-                    <td style="color:var(--gray-400)" th:text="${iter.count}">1</td>
+                    <td th:text="${iter.count}"></td>
+
                     <td>
                         <div class="content-title-cell">
-                            <div class="content-thumb"><i class="ti ti-gift"></i></div>
-                            <div class="content-name" th:text="${event.title}">여름맞이 출석 챌린지</div>
+                            <div class="content-thumb">
+                                <i class="ti ti-gift"></i>
+                            </div>
+                            <div class="content-name"
+                                 th:text="${event.title}">
+                            </div>
                         </div>
                     </td>
-                    <td th:text="${event.startDate} + ' ~ ' + ${event.endDate}">2026.07.01 ~ 2026.07.31</td>
-                    <td th:text="${event.participantCount} + '명'">128명</td>
-                    <td th:text="${event.createdDate}">2026.06.20</td>
-                    <td style="text-align:center">
-                        <span class="badge badge-success" th:if="${event.status == 'ONGOING'}">진행중</span>
-                        <span class="badge badge-info" th:if="${event.status == 'UPCOMING'}">예정</span>
-                        <span class="badge badge-gray" th:if="${event.status == 'ENDED'}">종료</span>
+
+                    <td>
+                        <span th:text="${event.startDate}"></span>
+                        ~
+                        <span th:text="${event.endDate}"></span>
                     </td>
+
+                    <td th:text="${event.participantCount + '명'}"></td>
+
+                    <td th:text="${event.createdDate}"></td>
+
+                    <td style="text-align:center">
+                        <span class="badge badge-success"
+                              th:if="${event.status == 'ONGOING'}">
+                            진행중
+                        </span>
+
+                        <span class="badge badge-info"
+                              th:if="${event.status == 'UPCOMING'}">
+                            예정
+                        </span>
+
+                        <span class="badge badge-gray"
+                              th:if="${event.status == 'ENDED'}">
+                            종료
+                        </span>
+                    </td>
+
                     <td style="text-align:center">
                         <a class="btn btn-outline btn-sm"
                            th:href="@{/admin/event/edit/{id}(id=${event.id})}">
                             <i class="ti ti-edit"></i>
                             수정
                         </a>
-                        <button class="btn btn-danger-outline btn-sm"><i class="ti ti-trash"></i></button>
+                        <a class="btn btn-outline btn-sm"
+                           th:href="@{/admin/event/delete/{id}(id=${event.id})}">
+                            <i class="ti ti-edit"></i>
+                            삭제
+                        </a>
                     </td>
-                </tr>
 
-                <!-- events가 비어있을 때 보여줄 미리보기 행 (백엔드 연동 전 임시 데이터) -->
-                <tr th:if="${events == null or #lists.isEmpty(events)}">
-                    <td style="color:var(--gray-400)">1</td>
-                    <td>
-                        <div class="content-title-cell">
-                            <div class="content-thumb"><i class="ti ti-gift"></i></div>
-                            <div class="content-name">여름맞이 출석 챌린지</div>
-                        </div>
-                    </td>
-                    <td>2026.07.01 ~ 2026.07.31</td>
-                    <td>128명</td>
-                    <td>2026.06.20</td>
-                    <td style="text-align:center"><span class="badge badge-success">진행중</span></td>
-                    <td style="text-align:center">
-                        <button class="btn btn-outline btn-sm"><i class="ti ti-edit"></i>수정</button>
-                        <button class="btn btn-danger-outline btn-sm"><i class="ti ti-trash"></i></button>
-                    </td>
-                </tr>
-                <tr th:if="${events == null or #lists.isEmpty(events)}">
-                    <td style="color:var(--gray-400)">2</td>
-                    <td>
-                        <div class="content-title-cell">
-                            <div class="content-thumb" style="background:var(--navy-bg); color:var(--navy);"><i class="ti ti-gift"></i></div>
-                            <div class="content-name">신규가입 웰컴 이벤트</div>
-                        </div>
-                    </td>
-                    <td>2026.06.01 ~ 상시</td>
-                    <td>241명</td>
-                    <td>2026.05.28</td>
-                    <td style="text-align:center"><span class="badge badge-success">진행중</span></td>
-                    <td style="text-align:center">
-                        <button class="btn btn-outline btn-sm"><i class="ti ti-edit"></i>수정</button>
-                        <button class="btn btn-danger-outline btn-sm"><i class="ti ti-trash"></i></button>
-                    </td>
-                </tr>
-                <tr th:if="${events == null or #lists.isEmpty(events)}">
-                    <td style="color:var(--gray-400)">3</td>
-                    <td>
-                        <div class="content-title-cell">
-                            <div class="content-thumb" style="background:var(--amber-bg); color:#854F0B;"><i class="ti ti-gift"></i></div>
-                            <div class="content-name">추석맞이 K-문화 퀴즈전</div>
-                        </div>
-                    </td>
-                    <td>2026.09.20 ~ 2026.09.27</td>
-                    <td>0명</td>
-                    <td>2026.06.30</td>
-                    <td style="text-align:center"><span class="badge badge-info">예정</span></td>
-                    <td style="text-align:center">
-                        <button class="btn btn-outline btn-sm"><i class="ti ti-edit"></i>수정</button>
-                        <button class="btn btn-danger-outline btn-sm"><i class="ti ti-trash"></i></button>
-                    </td>
                 </tr>
                 </tbody>
             </table>
