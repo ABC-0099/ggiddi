@@ -20,6 +20,8 @@ public class AdminMockExamController {
 
     @GetMapping
     public String list(Model model) {
+        model.addAttribute("activeMenu", "quiz");
+        model.addAttribute("pageTitle", "모의고사 관리");
         model.addAttribute("exams", mockExamService.getAllForAdmin());
         return "mock/admin/list";
     }

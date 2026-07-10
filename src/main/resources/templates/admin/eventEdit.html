@@ -27,7 +27,7 @@
             </div>
         </div>
 
-        <form th:action="@{/admin/event/edit/{id}(id=${event.id})}"
+        <form th:action="@{/admin/event/update/{id}(id=${event.id})}"
               method="post"
               enctype="multipart/form-data">
 
@@ -115,22 +115,37 @@
                     <h3>포스터 업로드</h3>
                     <p>이벤트 상세 페이지에 표시될 포스터를 업로드하세요.</p>
 
-                    <label class="btn btn-outline" style="cursor:pointer;">
-                        <i class="ti ti-upload"></i>
-                        파일 선택
+                    <div class="poster-upload">
 
-                        <input type="file"
-                               id="posterFile"
-                               name="posterFile"
-                               accept="image/*"
-                               style="display:none;">
+                        <i class="ti ti-photo-plus upload-icon"></i>
 
-                        <!-- 기존 포스터 -->
+                        <h3>포스터 업로드</h3>
+
+                        <p>이벤트 상세 페이지에 표시될 포스터를 업로드하세요.</p>
+
+                        <!-- 기존 이미지 -->
                         <img id="posterPreview"
-                             th:if="${event.poster != null}"
-                             th:src="${event.poster}"
-                             style="width:200px; margin-top:20px; border-radius:10px;">
-                    </label>
+                             th:src="@{'/images/' + ${event.poster}}"
+                             th:style="${event.poster != null} ?
+            'display:block;width:220px;margin:20px auto;border-radius:10px;'
+            :
+            'display:none;width:220px;margin:20px auto;border-radius:10px;'">
+
+                        <label class="btn btn-outline" style="cursor:pointer;">
+
+                            <i class="ti ti-upload"></i>
+                            파일 선택
+
+                            <input
+                                    type="file"
+                                    id="posterFile"
+                                    name="posterFile"
+                                    accept="image/*"
+                                    style="display:none;">
+
+                        </label>
+
+                    </div>
                 </div>
             </div>
 
@@ -144,26 +159,35 @@
                 </div>
 
                 <div class="poster-upload">
+
                     <i class="ti ti-photo-plus upload-icon"></i>
+
                     <h3>썸네일 업로드</h3>
+
                     <p>이벤트 목록에 표시될 썸네일 이미지를 업로드하세요.</p>
 
+                    <!-- 기존 이미지 -->
+                    <img id="thumbnailPreview"
+                         th:src="@{'/images/' + ${event.thumbnail}}"
+                         th:style="${event.thumbnail != null} ?
+            'display:block;width:220px;margin:20px auto;border-radius:10px;'
+            :
+            'display:none;width:220px;margin:20px auto;border-radius:10px;'">
+
                     <label class="btn btn-outline" style="cursor:pointer;">
+
                         <i class="ti ti-upload"></i>
                         파일 선택
 
-                        <input type="file"
-                               id="thumbnailFile"
-                               name="thumbnailFile"
-                               accept="image/*"
-                               style="display:none;">
+                        <input
+                                type="file"
+                                id="thumbnailFile"
+                                name="thumbnailFile"
+                                accept="image/*"
+                                style="display:none;">
 
-                        <!-- 기존 썸네일 -->
-                        <img id="thumbnailPreview"
-                             th:if="${event.thumbnail != null}"
-                             th:src="${event.thumbnail}"
-                             style="width:200px; margin-top:20px; border-radius:10px;">
                     </label>
+
                 </div>
             </div>
 

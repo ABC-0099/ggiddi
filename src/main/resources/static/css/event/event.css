@@ -25,7 +25,6 @@ body{
 
 .banner{
     position: relative;
-    height: 260px;
     margin: 20px;
     overflow: hidden;
     border-radius: 12px;
@@ -55,12 +54,12 @@ body{
 }
 
 .banner-image{
-    width: 90%;
+    width: 100%;
     height: 100%;
     object-fit: contain;
 
     display: block;
-    margin: 0 auto;
+
 }
 
 .banner-controls{

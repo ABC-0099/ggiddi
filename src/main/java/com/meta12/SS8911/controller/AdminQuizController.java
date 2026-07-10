@@ -48,6 +48,8 @@ public class AdminQuizController {
     // 목록
     @GetMapping
     public String list(Model model) {
+        model.addAttribute("activeMenu", "quiz");
+        model.addAttribute("pageTitle", "연습퀴즈 관리");
         model.addAttribute("quizzes", quizService.getAllForAdmin());
         return "quiz/admin/list";
     }

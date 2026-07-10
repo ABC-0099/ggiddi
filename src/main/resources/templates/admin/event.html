@@ -91,32 +91,59 @@
                 </tr>
                 </thead>
                 <tbody>
+                <tbody>
+
                 <tr th:each="event, iter : ${events}">
-                    <td style="color:var(--gray-400)" th:text="${iter.count}">1</td>
+                    <td th:text="${iter.count}"></td>
+
                     <td>
                         <div class="content-title-cell">
-                            <div class="content-thumb"><i class="ti ti-gift"></i></div>
-                            <div class="content-name" th:text="${event.title}">여름맞이 출석 챌린지</div>
+                            <div class="content-thumb">
+                                <i class="ti ti-gift"></i>
+                            </div>
+                            <div class="content-name"
+                                 th:text="${event.title}">
+                            </div>
                         </div>
                     </td>
+
                     <td th:text="${#temporals.format(event.startDate, 'yyyy.MM.dd')} + ' ~ ' + ${#temporals.format(event.endDate, 'yyyy.MM.dd')}">2026.07.01 ~ 2026.07.31</td>
-                    <td th:text="${event.participantCount} + '명'">128명</td>
-                    <td th:text="${#temporals.format(event.createdDate, 'yyyy.MM.dd')}">2026.06.20</td>
+                    
+
+
+                    <td th:text="${event.participantCount + '명'}"></td>
+
+                    <td th:text="${event.createdDate}"></td>
+
                     <td style="text-align:center">
-                        <span class="badge badge-success" th:if="${event.status == 'ONGOING'}">진행중</span>
-                        <span class="badge badge-info" th:if="${event.status == 'UPCOMING'}">예정</span>
-                        <span class="badge badge-gray" th:if="${event.status == 'ENDED'}">종료</span>
+                        <span class="badge badge-success"
+                              th:if="${event.status == 'ONGOING'}">
+                            진행중
+                        </span>
+
+                        <span class="badge badge-info"
+                              th:if="${event.status == 'UPCOMING'}">
+                            예정
+                        </span>
+
+                        <span class="badge badge-gray"
+                              th:if="${event.status == 'ENDED'}">
+                            종료
+                        </span>
                     </td>
+
                     <td style="text-align:center">
                         <a class="btn btn-outline btn-sm"
                            th:href="@{/admin/event/edit/{id}(id=${event.id})}">
                             <i class="ti ti-edit"></i>
                             수정
                         </a>
-                        <button class="btn btn-danger-outline btn-sm"><i class="ti ti-trash"></i></button>
+                        <a class="btn btn-outline btn-sm"
+                           th:href="@{/admin/event/delete/{id}(id=${event.id})}">
+                            <i class="ti ti-edit"></i>
+                            삭제
+                        </a>
                     </td>
-                </tr>
-
                 <tr th:if="${events.empty}">
                     <td colspan="7" style="text-align:center; color:var(--gray-400); padding:50px 0;">
                         등록된 이벤트가 없습니다.

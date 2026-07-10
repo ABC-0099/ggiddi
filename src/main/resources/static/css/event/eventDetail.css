@@ -1,181 +1,292 @@
-body {
-    background-color: #f5f6f8;
+body{
+    background:#f5f6f8;
+    margin:0;
+    font-family:'Pretendard',sans-serif;
 }
 
-.event-detail {
-    width: 1200px;
-    margin: 50px auto;
+/* 전체 */
+
+.event-detail{
+    width:900px;
+    margin:60px auto;
 }
 
-.event-poster {
-    width: 800px;
-    display: block;
-    margin: 0 auto;
-    border-radius: 20px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.1);
+/* 제목 */
+
+.event-title{
+    text-align:center;
+    font-size:38px;
+    font-weight:700;
+    color:#1f5ca8;
+    margin-bottom:15px;
 }
 
-.participate-wrap {
-    width: 800px;
-    margin: 20px auto;
-    text-align: right;
+/* 기간 */
+
+.event-date{
+    text-align:center;
+    color:#777;
+    font-size:17px;
+    margin-bottom:35px;
 }
 
-.participate-btn {
-    width: 180px;
-    height: 50px;
-    border: none;
-    border-radius: 12px;
-    background: linear-gradient(135deg,#56d0b3,#2f74d0);
-    color: white;
-    font-size: 16px;
-    font-weight: bold;
-    cursor: pointer;
+/* 포스터 */
+
+.event-poster{
+
+    width:100%;
+    border-radius:20px;
+    display:block;
+    box-shadow:0 8px 30px rgba(0,0,0,.12);
 }
 
-.event-content,
-.comment-section {
-    width: 800px;
-    margin: 30px auto;
-    background: white;
-    border-radius: 20px;
-    padding: 40px;
-    box-shadow: 0 5px 20px rgba(0,0,0,0.08);
+/* 내용 */
+
+.event-content{
+
+    margin-top:35px;
+    background:white;
+    padding:45px;
+    border-radius:20px;
+    box-shadow:0 5px 20px rgba(0,0,0,.08);
 }
 
-.event-content h2 {
-    color: #1f5ca8;
-    margin-top: 40px;
+.event-content h2{
+
+    color:#1f5ca8;
+    margin-top:35px;
 }
 
-.event-content p {
-    line-height: 2;
-    font-size: 17px;
+.event-content p{
+
+    line-height:2;
+    font-size:17px;
 }
 
-.comment-title {
-    color: #1f5ca8;
-    margin-bottom: 20px;
+/* 버튼 */
+
+.participate-wrap{
+
+    text-align:center;
+    margin:45px 0;
 }
 
-.comment-item {
-    padding-bottom: 20px;
-    border-bottom: 1px solid #eee;
+.participate-btn{
+
+    width:220px;
+    height:55px;
+
+    border:none;
+    border-radius:14px;
+
+    background:linear-gradient(135deg,#56d0b3,#2f74d0);
+
+    color:white;
+    font-size:18px;
+    font-weight:bold;
+
+    cursor:pointer;
+    transition:.25s;
 }
 
-.comment-header {
-    display: flex;
-    justify-content: space-between;
+.participate-btn:hover{
+
+    transform:translateY(-2px);
+    box-shadow:0 10px 20px rgba(0,0,0,.15);
 }
 
-.comment-user {
-    font-weight: bold;
-    color: #1f5ca8;
+/* 댓글 */
+
+.comment-section{
+
+    background:white;
+    padding:40px;
+    border-radius:20px;
+    box-shadow:0 5px 20px rgba(0,0,0,.08);
 }
 
-.comment-date {
-    color: gray;
+.comment-title{
+
+    color:#1f5ca8;
+    margin-bottom:30px;
 }
 
-.comment-content-text {
-    margin-top: 10px;
+.comment-item{
+
+    padding-bottom:20px;
+    margin-bottom:25px;
+    border-bottom:1px solid #eee;
 }
 
-.comment-write {
-    margin-top: 20px;
+.comment-header{
+
+    display:flex;
+    justify-content:space-between;
 }
 
-.comment-input {
-    width: 100%;
-    height: 100px;
-    padding: 15px;
-    border: 1px solid #ddd;
-    border-radius: 15px;
-    resize: none;
-    box-sizing: border-box;
+.comment-user{
+
+    color:#1f5ca8;
+    font-weight:bold;
 }
 
-.comment-btn {
-    margin-top: 15px;
-    float: right;
-    width: 100px;
-    height: 45px;
-    border: none;
-    border-radius: 12px;
-    background-color: #1f5ca8;
-    color: white;
-    cursor: pointer;
+.comment-date{
+
+    color:#999;
 }
 
-.comment-section::after {
-    content: "";
-    display: block;
-    clear: both;
+.comment-content-text{
+
+    margin-top:12px;
+    line-height:1.8;
+}
+
+.comment-write{
+
+    margin-top:30px;
+}
+
+.comment-input{
+
+    width:100%;
+    height:110px;
+
+    border:1px solid #ddd;
+    border-radius:15px;
+
+    padding:15px;
+    resize:none;
+    box-sizing:border-box;
+}
+
+.comment-btn{
+
+    float:right;
+    margin-top:15px;
+
+    width:110px;
+    height:45px;
+
+    border:none;
+    border-radius:12px;
+
+    background:#1f5ca8;
+    color:white;
+
+    cursor:pointer;
+}
+
+.comment-section::after{
+
+    content:"";
+    display:block;
+    clear:both;
 }
 
 /* 모달 */
 
-.modal-overlay {
-    position: fixed;
-    top: 0;
-    left: 0;
-    right: 0;
-    bottom: 0;
+.modal-overlay{
 
-    background: rgba(0,0,0,0.4);
+    position:fixed;
+    inset:0;
 
-    display: none;
-    justify-content: center;
-    align-items: center;
+    display:none;
+    justify-content:center;
+    align-items:center;
 
-    z-index: 9999;
+    background:rgba(0,0,0,.45);
+
+    z-index:999;
 }
 
-.event-modal {
-    width: 520px;
-    background: white;
-    border-radius: 25px;
-    padding: 35px;
+.event-modal{
+
+    width:520px;
+
+    background:white;
+
+    border-radius:22px;
+
+    padding:35px;
 }
 
-.modal-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+.modal-header{
+
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+
+    margin-bottom:25px;
 }
 
-.close-btn {
-    border: none;
-    background: none;
-    font-size: 30px;
-    cursor: pointer;
+.modal-title{
+
+    font-size:22px;
+    font-weight:bold;
 }
 
-.modal-input {
-    width: 100%;
-    padding: 15px;
-    margin: 10px 0 25px 0;
-    border: 1px solid #ddd;
-    border-radius: 12px;
-    box-sizing: border-box;
+.close-btn{
+
+    border:none;
+    background:none;
+
+    font-size:30px;
+
+    cursor:pointer;
 }
 
-.event-preview {
-    background: #f5f6f8;
-    padding: 15px;
-    border-radius: 12px;
-    margin-top: 10px;
+.input-label{
+
+    display:block;
+    margin-bottom:8px;
+    font-weight:600;
 }
 
-.submit-btn {
-    width: 120px;
-    height: 45px;
-    border: none;
-    border-radius: 12px;
-    background: linear-gradient(135deg,#56d0b3,#2f74d0);
-    color: white;
-    font-weight: bold;
-    cursor: pointer;
-    margin-top: 30px;
-    float: right;
+.required{
+
+    color:red;
+}
+
+.modal-input{
+
+    width:100%;
+    margin-bottom:25px;
+
+    padding:14px;
+
+    border:1px solid #ddd;
+    border-radius:12px;
+
+    box-sizing:border-box;
+}
+
+.event-preview{
+
+    padding:15px;
+
+    background:#f5f6f8;
+
+    border-radius:12px;
+}
+
+.submit-btn{
+
+    float:right;
+
+    margin-top:30px;
+
+    width:130px;
+    height:48px;
+
+    border:none;
+    border-radius:12px;
+
+    background:linear-gradient(135deg,#56d0b3,#2f74d0);
+
+    color:white;
+
+    font-size:16px;
+    font-weight:bold;
+
+    cursor:pointer;
 }
