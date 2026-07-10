@@ -93,34 +93,25 @@
 
 
 
-            <!-- 댓글 예시 -->
-            <div class="comment-item">
-
-
+            <!-- 댓글 목록 -->
+            <div class="comment-item" th:each="comment : ${comments}">
                 <div class="comment-header">
-
-                    <span class="comment-user">
+                    <span class="comment-user" th:text="${comment.author.displayName}">
                         파이리
                     </span>
-
-
-                    <span class="comment-date">
+                    <span class="comment-date" th:text="${#temporals.format(comment.createDate, 'yyyy-MM-dd HH:mm')}">
                         방금 전
                     </span>
-
                 </div>
-
-
-
-                <div class="comment-content-text">
-
+                <div class="comment-content-text" th:text="${comment.content}">
                     너무 좋은 이벤트네요 😊
                     저도 참여하겠습니다 (-영상첨부-)
-
                 </div>
-
-
             </div>
+
+            <p class="comment-empty" th:if="${#lists.isEmpty(comments)}">
+                아직 댓글이 없습니다. 첫 댓글을 남겨보세요!
+            </p>
 
 
 
@@ -128,24 +119,14 @@
 
             <!-- 댓글 작성 -->
 
-            <div class="comment-write">
-
-
-                <textarea
-                        class="comment-input"
-                        placeholder="댓글을 입력해주세요.">
-                </textarea>
-
-
-
-                <button class="comment-btn">
-
-                    등록
-
-                </button>
-
-
-            </div>
+            <form th:action="@{/event/{id}/comment(id=${event.id})}" method="post">
+                <div class="comment-write">
+                    <textarea name="content" class="comment-input" placeholder="댓글을 입력해주세요." required></textarea>
+                    <button type="submit" class="comment-btn">
+                        등록
+                    </button>
+                </div>
+            </form>
 
 
         </div>
@@ -157,22 +138,12 @@
 
 </main>
 
-
-
-
-
-
-
 <!-- 이벤트 참여 모달 -->
 
 <div class="modal-overlay"
      id="eventModal">
 
-
-
     <div class="event-modal">
-
-
 
         <!-- 모달 헤더 -->
 
@@ -185,8 +156,6 @@
 
             </div>
 
-
-
             <button class="close-btn"
                     onclick="closeModal()">
 
@@ -197,17 +166,9 @@
 
         </div>
 
-
-
-
-
-
-
         <!-- 모달 내용 -->
 
         <div class="modal-body">
-
-
 
             <label class="input-label">
 
@@ -216,17 +177,10 @@
 
             </label>
 
-
-
             <input
                     type="text"
                     class="modal-input"
                     placeholder="홍길동">
-
-
-
-
-
 
             <label class="input-label">
 
@@ -234,18 +188,10 @@
                 <span class="required">*</span>
 
             </label>
-
-
-
             <input
                     type="file"
                     class="modal-input"
                     accept="video/*">
-
-
-
-
-
 
             <label class="input-label">
 
@@ -253,22 +199,12 @@
 
             </label>
 
-
-
             <div class="event-preview"
                  th:text="${event.title}">
 
             </div>
 
-
-
         </div>
-
-
-
-
-
-
 
         <!-- 모달 하단 버튼 -->
 
@@ -285,28 +221,14 @@
         </div>
 
 
-
-
     </div>
 
-
-
 </div>
-
-
-
-
 
 
 <!-- 푸터 -->
 
 <div th:replace="~{layout/footer :: footer}"></div>
-
-
-
-
-
-
 
 <script>
 
@@ -348,8 +270,6 @@
 
 
 </script>
-
-
 
 </body>
 </html>
