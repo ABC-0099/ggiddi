@@ -5,52 +5,57 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>연습퀴즈 등록 - 끼역띠귿</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-  <link rel="stylesheet" th:href="@{/css/admin/main.css}">
+  <link rel="stylesheet" th:href="@{/css/admin/common.css}">
   <link rel="stylesheet" th:href="@{/css/admin/admin-quiz.css}">
 </head>
-<body style="display:block; background:var(--gray-50);">
+<body>
 
-<div class="qa-page">
-  <a th:href="@{/admin/quiz}" class="qa-back"><i class="ti ti-arrow-left"></i> 연습퀴즈 목록으로</a>
+<aside th:replace="~{admin/fragments/sidebar :: sidebar}"></aside>
 
-  <div class="qa-header">
-    <div>
-      <div class="qa-title">새 퀴즈 등록</div>
-      <div class="qa-subtitle">강의 하나를 골라 그 차시가 끝나면 나올 연습문제를 등록하세요</div>
-    </div>
-  </div>
+<div class="main">
 
-  <div class="qa-form-card">
-    <div class="qa-field">
-      <label class="qa-label">세트 제목</label>
-      <input type="text" class="qa-input" id="quizTitle" placeholder="예: 1강 연습퀴즈">
-    </div>
-    <div class="qa-field">
-      <label class="qa-label">소속 강의</label>
-      <select class="qa-select" id="contentId">
-        <option value="">강의를 선택하세요</option>
-        <option th:each="content : ${contents}"
-                th:value="${content.id}"
-                th:text="${content.title}">1강. 한글 자음 기초</option>
-      </select>
-    </div>
-    <div class="qa-field">
-      <label class="qa-label">출제 문항 수</label>
-      <input type="number" class="qa-input" id="pickCount" min="1" placeholder="예: 5 (문제은행에서 매번 랜덤으로 이만큼 뽑아요)">
-      <p class="qa-hint">비워두면 등록한 문항 전체를 출제해요. 예: 40문항 등록 + 여기 5 입력 → 매번 5문항만 랜덤 출제</p>
-    </div>
-  </div>
+  <header th:replace="~{admin/fragments/topbar :: topbar}"></header>
 
-  <div class="qa-form-card qa-bulk-card">
-    <div class="qa-field">
-      <label class="qa-label">엑셀/메모장에서 붙여넣기 (선택)</label>
-      <p class="qa-hint" style="margin-top:0; margin-bottom:8px;">
-        두 형식 중 편한 걸로 붙여넣으면 자동으로 인식해요.<br>
-        <strong>① 문서 형식</strong>: <code>Q1. [유형] 문제 ... ① 보기1 ② 보기2 ③ 보기3 ④ 보기4 ... 정답: ② ... 해설: ...</code> 그대로 복사 붙여넣기<br>
-        <strong>② 엑셀 형식</strong>: 한 줄 = 문제 하나, 유형·문제·보기1·보기2·보기3·보기4·정답번호(1~4)·해설 순서로 <strong>탭(Tab)</strong> 구분 (문제에 줄바꿈 필요하면 <code>\n</code> 문자 그대로 입력)
-      </p>
-      <textarea class="qa-textarea" id="bulkInput" rows="8"
-                placeholder="Q1. [어휘] 다음 중 인사말로 알맞은 것은?
+  <div class="content">
+    <div class="section-header">
+      <div>
+        <a th:href="@{/admin/quiz}" class="qa-back"><i class="ti ti-arrow-left"></i> 연습퀴즈 목록으로</a>
+        <div class="section-title">새 퀴즈 등록</div>
+        <div class="section-subtitle">강의 하나를 골라 그 차시가 끝나면 나올 연습문제를 등록하세요</div>
+      </div>
+    </div>
+
+    <div class="qa-form-card">
+      <div class="qa-field">
+        <label class="qa-label">세트 제목</label>
+        <input type="text" class="qa-input" id="quizTitle" placeholder="예: 1강 연습퀴즈">
+      </div>
+      <div class="qa-field">
+        <label class="qa-label">소속 강의</label>
+        <select class="qa-select" id="contentId">
+          <option value="">강의를 선택하세요</option>
+          <option th:each="content : ${contents}"
+                  th:value="${content.id}"
+                  th:text="${content.title}">1강. 한글 자음 기초</option>
+        </select>
+      </div>
+      <div class="qa-field">
+        <label class="qa-label">출제 문항 수</label>
+        <input type="number" class="qa-input" id="pickCount" min="1" placeholder="예: 5 (문제은행에서 매번 랜덤으로 이만큼 뽑아요)">
+        <p class="qa-hint">비워두면 등록한 문항 전체를 출제해요. 예: 40문항 등록 + 여기 5 입력 → 매번 5문항만 랜덤 출제</p>
+      </div>
+    </div>
+
+    <div class="qa-form-card qa-bulk-card">
+      <div class="qa-field">
+        <label class="qa-label">엑셀/메모장에서 붙여넣기 (선택)</label>
+        <p class="qa-hint" style="margin-top:0; margin-bottom:8px;">
+          두 형식 중 편한 걸로 붙여넣으면 자동으로 인식해요.<br>
+          <strong>① 문서 형식</strong>: <code>Q1. [유형] 문제 ... ① 보기1 ② 보기2 ③ 보기3 ④ 보기4 ... 정답: ② ... 해설: ...</code> 그대로 복사 붙여넣기<br>
+          <strong>② 엑셀 형식</strong>: 한 줄 = 문제 하나, 유형·문제·보기1·보기2·보기3·보기4·정답번호(1~4)·해설 순서로 <strong>탭(Tab)</strong> 구분 (문제에 줄바꿈 필요하면 <code>\n</code> 문자 그대로 입력)
+        </p>
+        <textarea class="qa-textarea" id="bulkInput" rows="8"
+                  placeholder="Q1. [어휘] 다음 중 인사말로 알맞은 것은?
 ① 안녕하세요
 ② 감사합니다
 ③ 미안해요
@@ -59,23 +64,24 @@
 정답: ① 안녕하세요
 
 해설: 기본적인 인사 표현입니다."></textarea>
-      <button type="button" class="btn btn-outline" style="margin-top:8px;" onclick="bulkAddQuestions()">
-        <i class="ti ti-arrow-down"></i> 붙여넣은 내용으로 문제 카드 생성
+        <button type="button" class="btn btn-outline" style="margin-top:8px;" onclick="bulkAddQuestions()">
+          <i class="ti ti-arrow-down"></i> 붙여넣은 내용으로 문제 카드 생성
+        </button>
+      </div>
+    </div>
+
+    <div class="qa-question-list" id="questionList"></div>
+
+    <button type="button" class="qa-add-question" onclick="addQuestion()">
+      <i class="ti ti-plus"></i> 문제 추가
+    </button>
+
+    <div class="qa-form-actions" style="margin-top:20px;">
+      <a th:href="@{/admin/quiz}" class="btn btn-outline">취소</a>
+      <button type="button" class="btn btn-primary" onclick="submitQuiz()">
+        <i class="ti ti-check"></i>등록하기
       </button>
     </div>
-  </div>
-
-  <div class="qa-question-list" id="questionList"></div>
-
-  <button type="button" class="qa-add-question" onclick="addQuestion()">
-    <i class="ti ti-plus"></i> 문제 추가
-  </button>
-
-  <div class="qa-form-actions" style="margin-top:20px;">
-    <a th:href="@{/admin/quiz}" class="btn btn-outline">취소</a>
-    <button type="button" class="btn btn-primary" onclick="submitQuiz()">
-      <i class="ti ti-check"></i>등록하기
-    </button>
   </div>
 </div>
 
