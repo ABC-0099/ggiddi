@@ -59,32 +59,31 @@ public class SecurityConfig {
                                 "/siteUser/login",
                                 "/siteUser/chuga",
                                 "/siteUser/chugaProc",
+                                "/api/check-username",   // ★ 추가: 회원가입 아이디 중복확인 (비로그인 접근 가능해야 함)
+                                "/api/check-phone",      // ★ 추가: 회원가입 전화번호 중복확인 (비로그인 접근 가능해야 함)
                                 "/notices",
                                 "/faq",
                                 "/lectures",
                                 "/lectures/**",
                                 "/game",
-                                "/games/**",         // ★ 유니티 WebGL 빌드 정적 파일 인증 없이 접근 허용
+                                "/games/**",
                                 "/practice/main",
-                                "/practice/mock",     // ★ 배움터 메인/모의고사 메인은 비로그인도 열람 가능
-                                "/qna/main",         // ★ 질문센터 메인(FAQ+1:1 문의 카드)은 비로그인도 열람 가능
+                                "/practice/mock",
+                                "/qna/main",
                                 "/css/**",
                                 "/js/**",
                                 "/images/**",
                                 "/fonts/**",
                                 "/ws/chat/**",
                                 "/api/chat/**",
-                                "/error",            // ★ 에러 페이지가 인증 필요 경로로 잡히면서 CSRF 토큰이 새로 갈아치워지는 문제 방지
-                                "/favicon.ico",       // ★ 파비콘 요청도 인증 체크에서 제외
-                                "/.well-known/**",   // ★ 크롬 devtools 자동 요청 무시용
-                                "/api/ai-tutor/**",   // ★ 띠귿이 AI 튜터봇 - 강의 시청 중 누구나 질문 가능
-                                "/api/translate/**"   // ★ 띠귿이 답변 번역 - 로그인 여부 상관없이 사용 가능
+                                "/error",
+                                "/favicon.ico",
+                                "/.well-known/**",
+                                "/api/ai-tutor/**",
+                                "/api/translate/**"
                         ).permitAll()
-                        // ★ 연습퀴즈 풀이/제출은 로그인 필요 (QuizService가 로그인 유저 기준으로 채점·잠금체크함)
                         .requestMatchers("/quiz/**", "/api/quiz/**").authenticated()
-                        // ★ 연습퀴즈 관리자 CRUD - 로그인 필요 (역할 체크는 컨트롤러/서비스 단에서 추가로 확인 권장)
                         .requestMatchers("/admin/quiz/**", "/api/admin/quiz/**").authenticated()
-                        // ★ 커뮤니티는 로그인한 회원(및 관리자)만 열람 가능하도록 명시적으로 인증 필요 처리
                         .requestMatchers("/api/ai-chat").authenticated()
                         .requestMatchers("/community/**").authenticated()
                         .anyRequest().authenticated()
@@ -128,5 +127,7 @@ public class SecurityConfig {
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
     }
+
+
 
 }
