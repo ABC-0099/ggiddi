@@ -52,6 +52,7 @@
                 </tr>
                 </tbody>
             </table>
+            <div th:replace="~{admin/fragments/pagination :: pagination(${users}, '/admin/members', ${{}})}"></div>
         </div>
     </div>
 </div>

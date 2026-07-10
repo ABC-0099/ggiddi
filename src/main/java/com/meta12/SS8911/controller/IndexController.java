@@ -2,6 +2,8 @@ package com.meta12.SS8911.controller;
 
 import com.meta12.SS8911.entity.Content;
 import com.meta12.SS8911.entity.SiteUser;
+import com.meta12.SS8911.repository.ContentRepository;
+import com.meta12.SS8911.repository.ProgressRepository;
 import com.meta12.SS8911.repository.SiteUserRepository;
 import com.meta12.SS8911.service.CategoryService;
 import lombok.RequiredArgsConstructor;
@@ -17,6 +19,8 @@ public class IndexController {
 
     private final CategoryService categoryService;
     private final SiteUserRepository siteUserRepository;
+    private final ProgressRepository progressRepository;
+    private final ContentRepository contentRepository;
 
     @GetMapping("/")
     public String list(
@@ -33,6 +37,17 @@ public class IndexController {
         if (user != null) {
             Content continueContent = categoryService.getContinueContent(user);
             model.addAttribute("continueContent", continueContent);
+
+            // 🌟 [추가]: 대시보드 통계 카드 (완료 강의 / 연속 출석 / 전체 진도율)
+            long completedCount = progressRepository.countBySiteUserAndCompletedTrue(user);
+            long totalPublished = contentRepository.countByStatus("PUBLISHED");
+            int progressPercent = (totalPublished == 0)
+                    ? 0
+                    : (int) Math.round(completedCount * 100.0 / totalPublished);
+
+            model.addAttribute("completedCount", completedCount);
+            model.addAttribute("streakDays", user.getStreakDays());
+            model.addAttribute("progressPercent", progressPercent);
         }
 
         return "main/mainpage";

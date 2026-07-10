@@ -32,6 +32,14 @@
             <i class="ti ti-category"></i>
             카테고리 관리
         </a>
+        <a class="nav-item" th:classappend="${activeMenu == 'quiz'} ? 'active'" th:href="@{/admin/quiz}">
+            <i class="ti ti-help-circle"></i>
+            퀴즈 관리
+        </a>
+        <a class="nav-item" th:classappend="${activeMenu == 'quiz-stats'} ? 'active'" th:href="@{/admin/quiz/stats}">
+            <i class="ti ti-chart-bar"></i>
+            퀴즈 통계
+        </a>
         <a class="nav-item" th:classappend="${activeMenu == 'members'} ? 'active'" th:href="@{/admin/members}">
             <i class="ti ti-users"></i>
             회원 관리

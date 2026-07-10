@@ -46,6 +46,7 @@
     border-radius:8px;
 
     font-size:14px;
+    font-family:inherit;   /* ← 추가 */
 
     outline:none;
 

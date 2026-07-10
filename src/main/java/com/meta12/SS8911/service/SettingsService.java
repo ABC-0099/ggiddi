@@ -1,43 +1,39 @@
 package com.meta12.SS8911.service;
 
+import com.meta12.SS8911.dto.SettingsDTO;
 import com.meta12.SS8911.entity.Settings;
 import com.meta12.SS8911.repository.SettingsRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
 public class SettingsService {
 
-    private final SettingsRepository repository;
+    private final SettingsRepository settingsRepository;
 
-    public Settings getSettings() {
-
-        return repository.findById(1L)
-                .orElseGet(() -> {
-
-                    Settings settings = new Settings();
-
-                    settings.setSiteName("끼역띠귿");
-                    settings.setSiteDescription("한국어 학습 플랫폼");
-
-                    settings.setSignupEnabled(true);
-                    settings.setEmailVerification(true);
-                    settings.setRejoinEnabled(false);
-
-                    settings.setBoardPageSize(10);
-
-                    settings.setCommentEnabled(true);
-                    settings.setAttachmentEnabled(true);
-
-                    return repository.save(settings);
-                });
+    // 설정은 row 1개만 사용. 없으면 기본값으로 생성해서 저장 후 반환.
+    @Transactional
+    public Settings get() {
+        return settingsRepository.findAll().stream()
+                .findFirst()
+                .orElseGet(() -> settingsRepository.save(new Settings()));
     }
 
-    public void save(Settings settings) {
+    @Transactional
+    public void save(SettingsDTO dto) {
+        Settings settings = get(); // 기존 row 가져오기 (없으면 생성)
 
-        settings.setId(1L);
+        settings.setSiteName(dto.getSiteName());
+        settings.setSiteDescription(dto.getSiteDescription());
+        settings.setSignupEnabled(dto.isSignupEnabled());
+        settings.setEmailVerification(dto.isEmailVerification());
+        settings.setRejoinEnabled(dto.isRejoinEnabled());
+        settings.setBoardPageSize(dto.getBoardPageSize());
+        settings.setCommentEnabled(dto.isCommentEnabled());
+        settings.setAttachmentEnabled(dto.isAttachmentEnabled());
 
-        repository.save(settings);
+        settingsRepository.save(settings);
     }
 }

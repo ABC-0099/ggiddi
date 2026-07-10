@@ -10,6 +10,8 @@
   텍스트를 드래그하면 선택 영역 근처에 "번역" 버튼이 뜨고,
   클릭하면 /api/translate 호출해서 팝업으로 번역 결과를 보여줌.
   타깃 언어는 우측 하단 지구본 버튼으로 바꿀 수 있고 localStorage에 기억됨.
+  (띠귿이 AI 튜터 버튼 바로 위에 쌓이도록 배치되어 있고, 띠귿이 패널이 열리면
+   z-index가 더 낮아서 패널 뒤로 자연스럽게 가려짐 — 겹침 문제 없음)
   ================================
 -->
 
@@ -37,7 +39,7 @@
     </div>
   </div>
 
-  <!-- 우측 하단 고정 언어 선택 버튼 -->
+  <!-- 우측 하단 고정 언어 선택 버튼 (띠귿이 버튼 바로 위에 쌓임) -->
   <div id="dtLangWidget" class="dt-lang-widget">
     <button id="dtLangToggle" class="dt-lang-toggle" type="button" title="번역 언어 설정">
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">

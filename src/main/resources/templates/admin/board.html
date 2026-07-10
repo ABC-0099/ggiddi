@@ -151,52 +151,7 @@
             </table>
 
 
-            <!-- 페이지네이션 -->
-            <div class="pagination" th:if="${qnas.totalPages > 0}">
-
-                <!-- 이전 페이지 그룹 -->
-                <a class="page-btn"
-                   th:if="${qnas.number > 0}"
-                   th:href="@{/admin/board(
-            page=${qnas.number - 1},
-            category=${currentCategory},
-            kw=${kw}
-       )}">
-                    &lt;
-                </a>
-
-
-                <!-- 페이지 번호 (5개 단위) -->
-                <span th:each="pageNum : ${#numbers.sequence(
-        (qnas.number / 5) * 5,
-        T(java.lang.Math).min((qnas.number / 5) * 5 + 4, qnas.totalPages - 1)
-    )}">
-
-        <a class="page-btn"
-           th:href="@{/admin/board(
-                page=${pageNum},
-                category=${currentCategory},
-                kw=${kw}
-           )}"
-           th:text="${pageNum + 1}"
-           th:classappend="${pageNum == qnas.number} ? 'active'">
-        </a>
-
-    </span>
-
-
-                <!-- 다음 페이지 그룹 -->
-                <a class="page-btn"
-                   th:if="${qnas.number < qnas.totalPages - 1}"
-                   th:href="@{/admin/board(
-            page=${qnas.number + 1},
-            category=${currentCategory},
-            kw=${kw}
-       )}">
-                    &gt;
-                </a>
-
-            </div>
+            <div th:replace="~{admin/fragments/pagination :: pagination(${qnas}, '/admin/board', ${extraParams})}"></div>
 
 
         </div>

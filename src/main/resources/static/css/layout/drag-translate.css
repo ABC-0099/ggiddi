@@ -74,9 +74,16 @@
 
 .dt-lang-widget {
   position: fixed;
-  right: 20px;
-  bottom: 20px;
-  z-index: 1900;
+  right: 28px;
+  bottom: 96px; /* 띠귿이 토글 버튼(bottom:28px, height:56px) 바로 위에 쌓임 */
+  z-index: 900; /* 띠귿이 패널(z-index:999)보다 낮게 잡아, 패널이 열리면 자연스럽게 가려짐 */
+}
+
+@media (max-width: 640px) {
+  .dt-lang-widget {
+    right: 16px;
+    bottom: 84px; /* 모바일 띠귿이 패널과 동일한 offset */
+  }
 }
 .dt-lang-toggle {
   width: 44px;

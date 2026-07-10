@@ -56,8 +56,8 @@
           <div class="pl-hero-stat-label">평균 정답률</div>
         </div>
         <div class="pl-hero-stat">
-          <div class="pl-hero-stat-num" th:text="${lastMockScore} ?: '84점'">84점</div>
-          <div class="pl-hero-stat-label">최근 모의고사</div>
+          <div class="pl-hero-stat-num" th:text="${lastMockScore} ?: '-'">84점</div>
+          <div class="pl-hero-stat-label" th:text="${lastMockScore} != null ? '최근 모의고사' : '모의고사 미응시'">최근 모의고사</div>
         </div>
       </div>
     </th:block>

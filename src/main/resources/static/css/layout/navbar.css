@@ -9,7 +9,7 @@
     transition: background 0.25s, box-shadow 0.25s;
   }
 
-  /* ── 관리자 로그인 시 전용 스타일: 배경 전체를 딥그린으로, 아래쪽에 은은한 조명 효과 ── */
+/* ── 관리자 로그인 시 전용 스타일: 배경 전체를 초록(딥그린)으로, 아래쪽에 은은한 조명 효과 ── */
   .navbar.navbar-admin {
     background: #0F6E56;
     border-bottom: 1px solid rgba(255, 255, 255, 0.12);

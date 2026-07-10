@@ -7,6 +7,7 @@ import com.meta12.SS8911.repository.MockExamBoxRepository;
 import com.meta12.SS8911.repository.QuizRepository;
 import com.meta12.SS8911.repository.SiteUserRepository;
 import com.meta12.SS8911.service.CategoryService;
+import com.meta12.SS8911.service.QuizService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -26,6 +27,7 @@ public class PracticeController {
     private final SiteUserRepository siteUserRepository;
     private final CategoryService categoryService;
     private final QuizRepository quizRepository;
+    private final QuizService quizService;
 
     /**
      * 배움터 메인 (연습퀴즈 카테고리 목록 + 실전모의고사 최근 응시 이력).
@@ -71,6 +73,19 @@ public class PracticeController {
                         .collect(Collectors.toList());
 
                 model.addAttribute("recentExams", recentExams);
+
+                // ★ 히어로 "완료 퀴즈" - 연습퀴즈(QuizBox) 풀이 횟수
+                long completedQuizCount = quizService.countCompletedByUser(user.getId());
+                model.addAttribute("completedQuizCount", completedQuizCount);
+
+                // ★ 히어로 "최근 모의고사" - 가장 최근 응시 1건의 점수. 응시 기록이 없으면 null 유지 (fallback 오표시 방지)
+                if (!boxes.isEmpty()) {
+                    MockExamBox latest = boxes.get(0);
+                    int latestPercent = latest.getTotal() > 0
+                            ? (int) Math.round(latest.getScore() * 100.0 / latest.getTotal())
+                            : 0;
+                    model.addAttribute("lastMockScore", latestPercent + "점");
+                }
 
                 Double avgAccuracy = mockExamBoxRepository.findAvgAccuracyByUserId(user.getId());
                 int avgAccuracyPercent = (int) Math.round((avgAccuracy != null ? avgAccuracy : 0) * 100);

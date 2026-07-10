@@ -22,4 +22,7 @@ public interface ProgressRepository extends JpaRepository<Progress, Long> {
 
     // ★ 마이페이지 "최근 시청순" 목록용 (완료/진행중 전부 포함, 페이지네이션)
     Page<Progress> findBySiteUserOrderByUpdatedAtDesc(SiteUser siteUser, Pageable pageable);
+
+    // ★ 메인페이지 대시보드 "완료 강의" 카드용
+    long countBySiteUserAndCompletedTrue(SiteUser siteUser);
 }
