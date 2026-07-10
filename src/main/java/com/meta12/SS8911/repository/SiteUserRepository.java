@@ -13,4 +13,6 @@ public interface SiteUserRepository extends JpaRepository<SiteUser, Long> {
 
     // 관리자 대시보드: 오늘 가입한 회원 수
     long countByJoinDateBetween(LocalDateTime start, LocalDateTime end);
+
+    boolean existsByPhone(String phone);
 }

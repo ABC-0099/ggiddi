@@ -2,6 +2,7 @@ package com.meta12.SS8911.dto;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -15,6 +16,7 @@ public class SiteUserDTO {
     private Long id;
 
     @NotBlank(message = "아이디는 필수입니다.")
+    @Pattern(regexp = "^[a-z0-9_]{4,20}$", message = "아이디는 영문 소문자, 숫자, 언더스코어만 사용할 수 있습니다. (4~20자)")
     private String username;
 
     @NotBlank(message = "이름은 필수입니다.")

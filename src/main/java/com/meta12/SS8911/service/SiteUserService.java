@@ -41,11 +41,11 @@ public class SiteUserService implements UserDetailsService {
 
     @Transactional
     public void chugaProc(SiteUserDTO dto) {
-        // 저장 시에도 소문자로 변환
-        String lowerUsername = dto.getUsername().toLowerCase();
-
-        if (siteUserRepository.existsByUsername(lowerUsername)) {
+        if (siteUserRepository.existsByUsername(dto.getUsername())) {
             throw new IllegalStateException("이미 존재하는 아이디입니다.");
+        }
+        if (siteUserRepository.existsByPhone(dto.getPhone())) {
+            throw new IllegalStateException("이미 등록된 전화번호입니다.");
         }
 
         SiteUser user = new SiteUser();
@@ -63,16 +63,27 @@ public class SiteUserService implements UserDetailsService {
         siteUserRepository.save(user);
     }
 
+    // 아이디 중복확인 (AJAX용) - 사용 가능하면 true
+    public boolean isUsernameAvailable(String username) {
+        return !siteUserRepository.existsByUsername(username);
+    }
+
+    // 전화번호 중복확인 (AJAX용) - 사용 가능하면 true
+    public boolean isPhoneAvailable(String phone) {
+        return !siteUserRepository.existsByPhone(phone);
+    }
+
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        // 입력받은 username을 강제로 소문자로 변환해서 조회
-        String lowerUsername = username.toLowerCase();
+        if (!username.equals(username.toLowerCase())) {
+            throw new UsernameNotFoundException("아이디는 소문자만 사용할 수 있습니다.");
+        }
 
-        SiteUser siteUser = siteUserRepository.findByUsername(lowerUsername)
+        SiteUser siteUser = siteUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
 
         return User.builder()
-                .username(siteUser.getUsername()) // DB에 저장된 원래 아이디 반환
+                .username(siteUser.getUsername())
                 .password(siteUser.getPassword())
                 .roles(siteUser.getRole().name())
                 .disabled(siteUser.isWithdrawn())

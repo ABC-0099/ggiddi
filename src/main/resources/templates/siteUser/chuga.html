@@ -12,24 +12,19 @@
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
-
 </head>
 <body>
 
-<!-- 배경 오브 -->
 <div class="bg-orbs">
   <div class="orb o1"></div>
   <div class="orb o2"></div>
   <div class="orb o3"></div>
 </div>
 
-<!-- 네브바 -->
 <div th:replace="~{layout/navbar :: navbar(currentMenu='')}"></div>
 
-<!-- MAIN -->
 <div class="main">
 
-  <!-- 왼쪽 소개 -->
   <div class="left-side">
     <div class="left-tag">한국어 학습 플랫폼</div>
     <h1>지금 가입하고<br /><span class="grad">모험을 시작해요</span></h1>
@@ -67,12 +62,10 @@
     </div>
   </div>
 
-  <!-- 오른쪽 회원가입 카드 -->
   <div class="signup-card">
     <h2 class="card-title">회원가입</h2>
     <p class="card-sub">간단하게 가입하고 바로 시작해요</p>
 
-    <!-- 소셜 가입 -->
     <div class="social-btns">
       <button class="social-btn">
         <svg class="social-icon" viewBox="0 0 24 24">
@@ -91,14 +84,12 @@
       </button>
     </div>
 
-    <!-- 구분선 -->
     <div class="divider">
       <div class="divider-line"></div>
       <span class="divider-text">또는 이메일로 가입</span>
       <div class="divider-line"></div>
     </div>
 
-    <!-- 진행 스텝 -->
     <div class="steps">
       <div class="step done">
         <div class="step-circle">✓</div>
@@ -114,7 +105,6 @@
       </div>
     </div>
 
-    <!-- 폼 -->
     <form class="form" th:action="@{/siteUser/chugaProc}" method="post">
       <input type="hidden" id="csrf-hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
 
@@ -126,15 +116,16 @@
       <div class="field">
         <label for="userid">아이디 <span class="required-mark">필수</span></label>
         <div style="display:flex;gap:8px;">
-          <input type="text" id="userid" name="username" placeholder="영문, 숫자 조합 4~20자" style="flex:1;" />
-          <button type="button" style="
+          <input type="text" id="userid" name="username" placeholder="영문 소문자, 숫자 조합 4~20자" style="flex:1;"
+                 oninput="this.value=this.value.replace(/[^A-Za-z0-9]/g,''); usernameChecked=false;" />
+          <button type="button" id="username-check-btn" onclick="checkUsername()" style="
             padding: 0 16px; border-radius: 10px; border: 1.5px solid var(--mint);
             background: var(--mint-pale); color: var(--mint-dark);
             font-size: 13px; font-weight: 600; font-family: inherit;
             cursor: pointer; white-space: nowrap;
           ">중복 확인</button>
         </div>
-        <span class="field-hint">영문 소문자, 숫자 조합 4~20자로 입력해주세요.</span>
+        <span class="field-hint" id="username-check-msg">영문 소문자, 숫자 조합 4~20자로 입력해주세요.</span>
       </div>
 
       <div class="field">
@@ -213,7 +204,6 @@
         <span class="field-hint">맞춤 학습 콘텐츠 제공에 활용됩니다.</span>
       </div>
 
-      <!-- 약관 동의 -->
       <div class="agree-section">
         <label class="agree-all">
           <input type="checkbox" id="agreeAll" /> 전체 동의
@@ -254,13 +244,41 @@
 </div>
 
 <script>
-  // 전체 동의
+  let usernameChecked = false;
+
+  // ── 아이디 중복확인 ──
+  function checkUsername() {
+    const username = document.getElementById('userid').value;
+    const msg = document.getElementById('username-check-msg');
+
+    if (!username || !/^[a-z0-9_]{4,20}$/.test(username)) {
+      msg.textContent = '영문 소문자, 숫자 조합 4~20자로 입력해주세요.';
+      msg.style.color = 'var(--error, #EF4444)';
+      usernameChecked = false;
+      return;
+    }
+
+    fetch('/api/check-username?username=' + encodeURIComponent(username))
+      .then(res => res.json())
+      .then(data => {
+        msg.textContent = data.message;
+        msg.style.color = data.available ? 'var(--mint-dark)' : 'var(--error, #EF4444)';
+        usernameChecked = data.available;
+      })
+      .catch(() => {
+        msg.textContent = '중복확인 중 오류가 발생했습니다.';
+        msg.style.color = 'var(--error, #EF4444)';
+        usernameChecked = false;
+      });
+  }
+
+  // ── 전체 동의 ──
   const agreeAll = document.getElementById('agreeAll');
   const checkboxes = document.querySelectorAll('.agree-section input[type="checkbox"]:not(#agreeAll)');
   agreeAll.addEventListener('change', () => { checkboxes.forEach(cb => cb.checked = agreeAll.checked); });
   checkboxes.forEach(cb => { cb.addEventListener('change', () => { agreeAll.checked = [...checkboxes].every(c => c.checked); }); });
 
-  // 비밀번호 강도
+  // ── 비밀번호 강도 ──
   function checkPwStrength(val) {
     const el = document.getElementById('pw-strength');
     const label = document.getElementById('pw-label');
@@ -284,7 +302,7 @@
     label.textContent = cfg.text;
   }
 
-  // 비밀번호 확인
+  // ── 비밀번호 확인 ──
   function checkPwMatch() {
     const pw = document.getElementById('pw').value;
     const pw2 = document.getElementById('pw2').value;
@@ -299,7 +317,7 @@
   const csrfParamName = csrfInput.name;
   const csrfToken = csrfInput.value;
 
-  // ── 휴대폰 인증 요청 ──
+  // ── 휴대폰 인증 요청 (SMS 인증 코드 발급) ──
   function requestVerify() {
     const phone = document.getElementById('phone').value.trim();
     if (!phone) { alert('휴대폰 번호를 입력해주세요.'); return; }
@@ -335,7 +353,7 @@
       });
   }
 
-  // ── 휴대폰 인증 확인 ──
+  // ── 휴대폰 인증 확인 (실제 문자 도착 여부 확인) ──
   function checkVerify() {
     const phone = document.getElementById('phone').value.trim();
     const statusMsg = document.getElementById('verify-status-msg');
@@ -378,17 +396,29 @@
       });
   }
 
-  // ── 제출 전 휴대폰 인증 여부 확인 ──
+  // ── 제출 전 최종 검증 (아이디 형식/중복확인 + 번호 중복확인 + SMS 인증 완료 여부) ──
   document.querySelector('.form').addEventListener('submit', function (e) {
+    const userid = document.getElementById('userid').value;
+
+    if (/[A-Z]/.test(userid)) {
+      e.preventDefault();
+      alert('아이디는 영문 소문자와 숫자만 가능합니다.');
+      return;
+    }
+    if (!usernameChecked) {
+      e.preventDefault();
+      alert('아이디 중복확인을 완료해주세요.');
+      return;
+    }
     const verified = document.getElementById('phone-verified-flag').value === 'true';
     if (!verified) {
       e.preventDefault();
       alert('휴대폰 인증을 먼저 완료해주세요.');
+      return;
     }
   });
 </script>
 
-<!-- 푸터 -->
 <div th:replace="~{layout/footer :: footer}"></div>
 <div th:replace="~{layout/drag-translate :: dragTranslate}"></div>
 </body>
