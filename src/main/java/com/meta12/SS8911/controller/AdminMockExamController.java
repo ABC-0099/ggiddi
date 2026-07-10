@@ -28,12 +28,16 @@ public class AdminMockExamController {
 
     @GetMapping("/chuga")
     public String chuga(Model model) {
+        model.addAttribute("activeMenu", "quiz");
+        model.addAttribute("pageTitle", "모의고사 등록");
         model.addAttribute("categories", categoryRepository.findAll());
         return "mock/admin/chuga";
     }
 
     @GetMapping("/sujung/{id}")
     public String sujung(@PathVariable Long id, Model model) {
+        model.addAttribute("activeMenu", "quiz");
+        model.addAttribute("pageTitle", "모의고사 수정");
         model.addAttribute("exam", mockExamService.getForAdmin(id));
         model.addAttribute("categories", categoryRepository.findAll());
         return "mock/admin/sujung";
@@ -41,6 +45,8 @@ public class AdminMockExamController {
 
     @GetMapping("/view/{id}")
     public String view(@PathVariable Long id, Model model) {
+        model.addAttribute("activeMenu", "quiz");
+        model.addAttribute("pageTitle", "모의고사 상세보기");
         model.addAttribute("exam", mockExamService.getForAdmin(id));
         return "mock/admin/view";
     }

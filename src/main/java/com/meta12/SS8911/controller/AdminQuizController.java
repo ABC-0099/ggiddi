@@ -57,6 +57,8 @@ public class AdminQuizController {
     // 등록 화면
     @GetMapping("/chuga")
     public String chuga(Model model) {
+        model.addAttribute("activeMenu", "quiz");
+        model.addAttribute("pageTitle", "연습퀴즈 등록");
         model.addAttribute("contents", contentRepository.findAll());
         return "quiz/admin/chuga";
     }
@@ -64,6 +66,8 @@ public class AdminQuizController {
     // 수정 화면
     @GetMapping("/sujung/{id}")
     public String sujung(@PathVariable Long id, Model model) {
+        model.addAttribute("activeMenu", "quiz");
+        model.addAttribute("pageTitle", "연습퀴즈 수정");
         model.addAttribute("quiz", quizService.getForAdmin(id));
         model.addAttribute("contents", contentRepository.findAll());
         return "quiz/admin/sujung";
@@ -72,6 +76,8 @@ public class AdminQuizController {
     // 상세보기 (정답 포함, 관리자만)
     @GetMapping("/view/{id}")
     public String view(@PathVariable Long id, Model model) {
+        model.addAttribute("activeMenu", "quiz");
+        model.addAttribute("pageTitle", "연습퀴즈 상세보기");
         QuizAdminDTO quiz = quizService.getForAdmin(id);
         model.addAttribute("quiz", quiz);
         return "quiz/admin/view";

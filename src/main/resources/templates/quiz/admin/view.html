@@ -5,58 +5,66 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>연습퀴즈 상세보기 - 끼역띠귿</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-  <link rel="stylesheet" th:href="@{/css/admin/main.css}">
+  <link rel="stylesheet" th:href="@{/css/admin/common.css}">
   <link rel="stylesheet" th:href="@{/css/admin/admin-quiz.css}">
 </head>
-<body style="display:block; background:var(--gray-50);">
+<body>
 
-<div class="qa-page">
-  <a th:href="@{/admin/quiz}" class="qa-back"><i class="ti ti-arrow-left"></i> 연습퀴즈 목록으로</a>
+<aside th:replace="~{admin/fragments/sidebar :: sidebar}"></aside>
 
-  <div class="qa-header">
-    <div>
-      <div class="qa-title" th:text="${quiz.title}">1강 연습퀴즈</div>
-      <div class="qa-subtitle"
-           th:text="${quiz.contentTitle} + ' · 문제은행 ' + ${quiz.questions.size()} + '개 중 ' + (${quiz.questionCount} ?: ${quiz.questions.size()}) + '문항 랜덤 출제'">
-        1강. 한글 자음 기초 · 문제은행 40개 중 5문항 랜덤 출제
+<div class="main">
+
+  <header th:replace="~{admin/fragments/topbar :: topbar}"></header>
+
+  <div class="content">
+    <div class="section-header">
+      <div>
+        <a th:href="@{/admin/quiz}" class="qa-back"><i class="ti ti-arrow-left"></i> 연습퀴즈 목록으로</a>
+        <div class="section-title" th:text="${quiz.title}">1강 연습퀴즈</div>
+        <div class="section-subtitle"
+             th:text="${quiz.contentTitle} + ' · 문제은행 ' + ${quiz.questions.size()} + '개 중 ' + (${quiz.questionCount} ?: ${quiz.questions.size()}) + '문항 랜덤 출제'">
+          1강. 한글 자음 기초 · 문제은행 40개 중 5문항 랜덤 출제
+        </div>
+      </div>
+      <div class="section-actions">
+        <a th:href="@{/admin/quiz/sujung/{id}(id=${quiz.id})}" class="btn btn-primary">
+          <i class="ti ti-edit"></i>수정하기
+        </a>
       </div>
     </div>
-    <a th:href="@{/admin/quiz/sujung/{id}(id=${quiz.id})}" class="btn btn-primary">
-      <i class="ti ti-edit"></i>수정하기
-    </a>
-  </div>
 
-  <div th:each="q, iter : ${quiz.questions}" class="qa-view-question">
-        <span class="qa-question-type-badge" th:if="${q.questionType != null and !#strings.isEmpty(q.questionType)}"
-              th:text="${q.questionType}">종합 대화형</span>
-    <div class="qa-view-question-text" style="white-space: pre-line;"
-         th:text="${iter.count} + '. ' + ${q.question}">1. 문제 내용</div>
+    <div th:each="q, iter : ${quiz.questions}" class="qa-view-question">
+      <span class="qa-question-type-badge" th:if="${q.questionType != null and !#strings.isEmpty(q.questionType)}"
+            th:text="${q.questionType}">종합 대화형</span>
+      <div class="qa-view-question-text" style="white-space: pre-line;"
+           th:text="${iter.count} + '. ' + ${q.question}">1. 문제 내용</div>
 
-    <div class="qa-view-option" th:classappend="${q.answer == 1} ? 'is-answer'">
-      <span th:text="${q.answer == 1} ? '✓' : '1'"></span>
-      <span th:text="${q.option1}">보기 1</span>
-    </div>
-    <div class="qa-view-option" th:classappend="${q.answer == 2} ? 'is-answer'">
-      <span th:text="${q.answer == 2} ? '✓' : '2'"></span>
-      <span th:text="${q.option2}">보기 2</span>
-    </div>
-    <div class="qa-view-option" th:classappend="${q.answer == 3} ? 'is-answer'">
-      <span th:text="${q.answer == 3} ? '✓' : '3'"></span>
-      <span th:text="${q.option3}">보기 3</span>
-    </div>
-    <div class="qa-view-option" th:classappend="${q.answer == 4} ? 'is-answer'">
-      <span th:text="${q.answer == 4} ? '✓' : '4'"></span>
-      <span th:text="${q.option4}">보기 4</span>
+      <div class="qa-view-option" th:classappend="${q.answer == 1} ? 'is-answer'">
+        <span th:text="${q.answer == 1} ? '✓' : '1'"></span>
+        <span th:text="${q.option1}">보기 1</span>
+      </div>
+      <div class="qa-view-option" th:classappend="${q.answer == 2} ? 'is-answer'">
+        <span th:text="${q.answer == 2} ? '✓' : '2'"></span>
+        <span th:text="${q.option2}">보기 2</span>
+      </div>
+      <div class="qa-view-option" th:classappend="${q.answer == 3} ? 'is-answer'">
+        <span th:text="${q.answer == 3} ? '✓' : '3'"></span>
+        <span th:text="${q.option3}">보기 3</span>
+      </div>
+      <div class="qa-view-option" th:classappend="${q.answer == 4} ? 'is-answer'">
+        <span th:text="${q.answer == 4} ? '✓' : '4'"></span>
+        <span th:text="${q.option4}">보기 4</span>
+      </div>
+
+      <div class="qa-view-explanation" th:if="${q.explanation != null and !#strings.isEmpty(q.explanation)}">
+        <strong>해설</strong> · <span th:text="${q.explanation}">해설 내용</span>
+      </div>
     </div>
 
-    <div class="qa-view-explanation" th:if="${q.explanation != null and !#strings.isEmpty(q.explanation)}">
-      <strong>해설</strong> · <span th:text="${q.explanation}">해설 내용</span>
+    <div th:if="${quiz.questions == null or #lists.isEmpty(quiz.questions)}"
+         style="text-align:center; color:var(--gray-400); padding:32px;">
+      등록된 문항이 없어요.
     </div>
-  </div>
-
-  <div th:if="${quiz.questions == null or #lists.isEmpty(quiz.questions)}"
-       style="text-align:center; color:var(--gray-400); padding:32px;">
-    등록된 문항이 없어요.
   </div>
 </div>
 
