@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>끼역띠귿 - 사이트 설정</title>
+
+  <link rel="stylesheet"
+        href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+
+  <link rel="stylesheet" th:href="@{/css/admin/common.css}">
+  <link rel="stylesheet" th:href="@{/css/admin/site-setting.css}">
+</head>
+<body>
+
+<aside th:replace="~{admin/fragments/sidebar :: sidebar}"></aside>
+
+<div class="main">
+
+  <header th:replace="~{admin/fragments/topbar :: topbar}"></header>
+
+  <div class="content">
+
+    <div class="section-header">
+      <div>
+        <div class="section-title">사이트 설정</div>
+        <div class="section-subtitle">
+          사이트 운영에 필요한 기본 설정을 관리합니다.
+        </div>
+      </div>
+    </div>
+
+    <form>
+
+      <!-- 기본 설정 -->
+      <div class="card setting-card">
+
+        <div class="setting-title">
+          <i class="ti ti-settings"></i>
+          기본 설정
+        </div>
+
+        <div class="setting-group">
+
+          <label>사이트명</label>
+          <input type="text" value="끼역띠귿">
+
+        </div>
+
+        <div class="setting-group">
+
+          <label>사이트 소개</label>
+          <textarea rows="3">한국어 학습 플랫폼</textarea>
+
+        </div>
+
+      </div>
+
+
+      <!-- 회원 설정 -->
+      <div class="card setting-card">
+
+        <div class="setting-title">
+          <i class="ti ti-user"></i>
+          회원 설정
+        </div>
+
+        <label class="check-item">
+          <input type="checkbox" checked>
+          회원가입 허용
+        </label>
+
+        <label class="check-item">
+          <input type="checkbox" checked>
+          이메일 인증
+        </label>
+
+        <label class="check-item">
+          <input type="checkbox">
+          탈퇴 후 재가입 허용
+        </label>
+
+      </div>
+
+
+      <!-- 게시판 설정 -->
+      <div class="card setting-card">
+
+        <div class="setting-title">
+          <i class="ti ti-message-circle"></i>
+          게시판 설정
+        </div>
+
+        <div class="setting-group">
+
+          <label>페이지당 게시글</label>
+
+          <input type="number"
+                 value="10"
+                 min="5"
+                 max="50">
+
+        </div>
+
+        <label class="check-item">
+          <input type="checkbox" checked>
+          댓글 기능 사용
+        </label>
+
+        <label class="check-item">
+          <input type="checkbox" checked>
+          첨부파일 허용
+        </label>
+
+      </div>
+
+
+      <div class="setting-btn-wrap">
+
+        <button type="reset" class="btn btn-light">
+          취소
+        </button>
+
+        <button type="submit" class="btn btn-primary">
+          <i class="ti ti-device-floppy"></i>
+          설정 저장
+        </button>
+
+      </div>
+
+    </form>
+
+  </div>
+
+</div>
+
+</body>
+</html>

@@ -377,7 +377,6 @@ public class AdminController {
         model.addAttribute("existingEvent", event);
         model.addAttribute("event", event);   // ⭐ 추가
 
-
         return "admin/eventEdit";
     }
 
