@@ -50,6 +50,7 @@ public class SiteUserController {
     private final AttendanceService attendanceService;
     private final ContentService contentService; // ★ 영상 시청 내역(Progress) 조회용 추가
     private final OrderPayService orderPayService; // ★ 결제(구매) 내역 조회용 추가
+    private final PhoneVerificationService phoneVerificationService; // ★ 휴대폰 SMS 인증용 추가
 
     @GetMapping("/siteUser/chuga")
     public String chugaForm(SiteUserDTO siteUserDTO) {
@@ -63,8 +64,34 @@ public class SiteUserController {
             bindingResult.rejectValue("passwordChk", "error", "비밀번호가 일치하지 않습니다.");
             return "siteUser/chuga";
         }
+        if (!phoneVerificationService.isVerified(dto.getPhone())) {
+            bindingResult.rejectValue("phone", "error", "휴대폰 인증을 완료해주세요.");
+            return "siteUser/chuga";
+        }
         siteUserService.chugaProc(dto);
+        phoneVerificationService.clear(dto.getPhone());
         return "redirect:/siteUser/login";
+    }
+
+    // ── 휴대폰 SMS 인증 (옥토모 MO 인증) ──
+
+    @PostMapping("/siteUser/phone/requestCode")
+    @ResponseBody
+    public Map<String, String> requestPhoneCode(@RequestParam("phone") String phone) {
+        String code = phoneVerificationService.issueCode(phone);
+        Map<String, String> result = new HashMap<>();
+        result.put("code", code);
+        result.put("targetNumber", "1666-3538");
+        return result;
+    }
+
+    @PostMapping("/siteUser/phone/verifyCode")
+    @ResponseBody
+    public Map<String, Object> verifyPhoneCode(@RequestParam("phone") String phone) {
+        boolean verified = phoneVerificationService.confirm(phone);
+        Map<String, Object> result = new HashMap<>();
+        result.put("verified", verified);
+        return result;
     }
 
     @GetMapping("/siteUser/profile/{username}")

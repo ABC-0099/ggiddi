@@ -32,6 +32,10 @@ public class ChatController {
         }
         String sessionId = accessor.getSessionId();
         chatPresenceService.join(roomId, sessionId);
+
+        // ★ 입장 직후 최신 인원수를 이 방을 구독 중인 모두에게 방송 (실시간 반영의 핵심)
+        int count = chatPresenceService.getCount(roomId);
+        messagingTemplate.convertAndSend("/topic/chat/" + roomId + "/count", count);
     }
 
     /**

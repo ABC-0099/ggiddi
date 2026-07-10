@@ -178,7 +178,10 @@
                     </svg>
                 </button>
                 <div class="lc-thumb">
-                    <div class="lc-thumb-icon">📖</div>
+                    <img th:if="${content.thumbFileName != null and !content.thumbFileName.isEmpty()}"
+                         th:src="@{${content.thumbFileName}}" class="lc-thumb-img" alt="" />
+                    <div th:unless="${content.thumbFileName != null and !content.thumbFileName.isEmpty()}"
+                         class="lc-thumb-icon">📖</div>
                     <div class="lc-play" th:if="${unlocked}"><div class="play-btn">▶</div></div>
                     <div class="lc-lock" th:unless="${unlocked}">🔒</div>
 

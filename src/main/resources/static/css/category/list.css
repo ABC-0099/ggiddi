@@ -419,6 +419,13 @@
 
     .lc-thumb-icon { font-size: 40px; opacity: .5; }
 
+    .lc-thumb-img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+    }
+
     .lc-play {
       position: absolute; inset: 0;
       display: flex; align-items: center; justify-content: center;

@@ -42,4 +42,5 @@ public class ContentDTO {
 
     private boolean deleteVideo;
     private boolean deleteAttach;
+    private boolean deleteThumb;
 }

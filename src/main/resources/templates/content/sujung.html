@@ -156,6 +156,49 @@
                         </div>
                     </section>
 
+                    <!-- 썸네일 -->
+                    <section class="form-card">
+                        <div class="card-header">
+                            <span class="card-icon">🖼</span>
+                            <span class="card-title">썸네일 이미지</span>
+                            <span class="card-badge-opt">선택</span>
+                        </div>
+
+                        <!-- 기존 썸네일 -->
+                        <div class="existing-video" id="existing-thumb-wrap"
+                             th:if="${lectureForm.thumbFileName != null and !lectureForm.thumbFileName.isEmpty()}">
+                            <div class="existing-label">
+                                <span class="existing-badge">현재 썸네일</span>
+                                <button type="button" class="change-file-btn" onclick="toggleReupload('thumb')">
+                                    🔄 썸네일 교체
+                                </button>
+                            </div>
+                            <img class="existing-thumb-img" th:src="@{${lectureForm.thumbFileName}}" alt="현재 썸네일" />
+                            <!-- 교체 시 기존 썸네일 삭제 플래그 -->
+                            <input type="hidden" name="deleteThumb" id="delete-thumb-flag" value="false" />
+                        </div>
+
+                        <!-- 썸네일 재업로드 존 (기존 이미지 없으면 기본 표시) -->
+                        <div id="thumb-reupload-wrap"
+                             th:style="${lectureForm.thumbFileName == null or lectureForm.thumbFileName.isEmpty()} ? '' : 'display:none;'">
+                            <div class="upload-zone thumb-zone" id="thumb-zone">
+                                <input type="file" id="thumbnailFile" name="thumbFile"
+                                       accept="image/jpeg,image/png,image/webp"
+                                       class="upload-input" />
+                                <div class="upload-placeholder" id="thumb-placeholder">
+                                    <div class="upload-icon" style="font-size:28px;">🖼</div>
+                                    <div class="upload-text">새 썸네일 이미지를 드래그하거나 클릭해서 업로드</div>
+                                    <div class="upload-sub">JPG, PNG, WEBP · 16:9 권장 · 최대 5MB</div>
+                                </div>
+                                <div class="thumb-preview" id="thumb-preview" style="display:none;">
+                                    <img id="thumb-preview-img" class="thumb-preview-img" alt="썸네일 미리보기" />
+                                    <button type="button" class="preview-remove" onclick="removeFile('thumb')">✕ 제거</button>
+                                </div>
+                            </div>
+                        </div>
+                        <span class="field-hint">비워두면 기존(또는 기본) 썸네일이 유지돼요.</span>
+                    </section>
+
                     <!-- 첨부파일 -->
                     <section class="form-card">
                         <div class="card-header">
@@ -252,6 +295,10 @@
                             <li>
                                 <span class="sl">영상</span>
                                 <span class="sv" id="summary-video">미선택</span>
+                            </li>
+                            <li>
+                                <span class="sl">썸네일</span>
+                                <span class="sv" id="summary-thumb">기본 이미지</span>
                             </li>
                             <li>
                                 <span class="sl">첨부</span>
@@ -385,7 +432,7 @@
       });
     }
 
-    // ── 영상/첨부파일 교체 토글 (공용) ──
+    // ── 영상/썸네일/첨부파일 교체 토글 (공용) ──
     function toggleReupload(type) {
       const wrap = document.getElementById(type + '-reupload-wrap');
       const flag = document.getElementById('delete-' + type + '-flag');
@@ -393,10 +440,12 @@
       const isHidden = wrap.style.display === 'none';
       wrap.style.display = isHidden ? '' : 'none';
       if (flag) flag.value = isHidden ? 'true' : 'false';
-      if (btn) btn.textContent = isHidden ? '✕ 교체 취소' : (type === 'video' ? '🔄 영상 교체' : '🔄 파일 교체');
+      const labels = { video: '🔄 영상 교체', attach: '🔄 파일 교체', thumb: '🔄 썸네일 교체' };
+      if (btn) btn.textContent = isHidden ? '✕ 교체 취소' : labels[type];
       if (!isHidden) {
         if (type === 'video') { videoFile = null; }
         if (type === 'attach') { attachFile = null; renderAttachPreview(); }
+        if (type === 'thumb')  { removeFile('thumb'); }
         updateSummary();
       }
     }
@@ -422,17 +471,47 @@
     });
 
     function removeFile(type) {
-      if (type !== 'video') return;
-      videoFile = null;
-      const inp = document.getElementById('videoFile');
-      if (inp) inp.value = '';
-      document.getElementById('video-placeholder').style.display = '';
-      const preview = document.getElementById('video-preview');
-      if (preview) preview.style.display = 'none';
-      const p = document.getElementById('video-preview-player');
-      if (p) { URL.revokeObjectURL(p.src); p.src = ''; }
-      updateSummary();
+      if (type === 'video') {
+        videoFile = null;
+        const inp = document.getElementById('videoFile');
+        if (inp) inp.value = '';
+        document.getElementById('video-placeholder').style.display = '';
+        const preview = document.getElementById('video-preview');
+        if (preview) preview.style.display = 'none';
+        const p = document.getElementById('video-preview-player');
+        if (p) { URL.revokeObjectURL(p.src); p.src = ''; }
+        updateSummary();
+      }
+      if (type === 'thumb') {
+        thumbFile = null;
+        const inp = document.getElementById('thumbnailFile');
+        if (inp) inp.value = '';
+        document.getElementById('thumb-placeholder').style.display = '';
+        const preview = document.getElementById('thumb-preview');
+        if (preview) preview.style.display = 'none';
+        const img = document.getElementById('thumb-preview-img');
+        if (img) { URL.revokeObjectURL(img.src); img.src = ''; }
+        updateSummary();
+      }
     }
+
+    // ── 썸네일 업로드 ──
+    let thumbFile = null;
+
+    bindDrop('thumb-zone', 'thumbnailFile', files => {
+      const f = files[0];
+      if (!f) return;
+      if (!f.type.startsWith('image/')) { alert('이미지 파일(JPG, PNG, WEBP)만 업로드할 수 있어요.'); return; }
+      if (f.size > 5 * 1024 * 1024) { alert('썸네일 이미지는 5MB를 초과할 수 없어요.'); return; }
+      thumbFile = f;
+      document.getElementById('thumb-placeholder').style.display = 'none';
+      const preview = document.getElementById('thumb-preview');
+      if (preview) {
+        preview.style.display = 'block';
+        document.getElementById('thumb-preview-img').src = URL.createObjectURL(f);
+      }
+      updateSummary();
+    });
 
     // ── 첨부파일 (단일 파일, 교체 방식) ──
     let attachFile = null;
@@ -508,6 +587,13 @@
       document.getElementById('summary-video').textContent =
         videoFile ? (videoFile.name.slice(0,18) + (videoFile.name.length>18?'…':'')) :
         keepExisting ? '기존 영상 유지' : '미선택';
+
+      const existingThumbWrap = document.getElementById('existing-thumb-wrap');
+      const deleteThumbFlag   = document.getElementById('delete-thumb-flag');
+      const keepExistingThumb = existingThumbWrap && (!deleteThumbFlag || deleteThumbFlag.value !== 'true');
+      document.getElementById('summary-thumb').textContent =
+        thumbFile ? (thumbFile.name.slice(0,18) + (thumbFile.name.length>18?'…':'')) :
+        keepExistingThumb ? '기존 썸네일 유지' : '기본 이미지';
 
       const existingAttachWrap = document.getElementById('existing-attach-wrap');
       const deleteAttachFlag   = document.getElementById('delete-attach-flag');

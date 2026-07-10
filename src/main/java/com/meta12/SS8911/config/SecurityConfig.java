@@ -59,6 +59,7 @@ public class SecurityConfig {
                                 "/siteUser/login",
                                 "/siteUser/chuga",
                                 "/siteUser/chugaProc",
+                                "/siteUser/phone/**",  // ★ 회원가입 중 휴대폰 SMS 인증(요청/확인)은 비로그인 상태에서 호출됨
                                 "/notices",
                                 "/faq",
                                 "/lectures",
