@@ -6,6 +6,86 @@
     background: #ffffff;
     border-bottom: 1px solid #dce6f0;
     box-shadow: 0 2px 12px rgba(24, 95, 165, 0.06);
+    transition: background 0.25s, box-shadow 0.25s;
+  }
+
+  /* ── 관리자 로그인 시 전용 스타일: 배경 전체를 딥그린으로, 아래쪽에 은은한 조명 효과 ── */
+  .navbar.navbar-admin {
+    background: #0F6E56;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.12);
+    box-shadow: 0 12px 28px -8px rgba(15, 110, 86, 0.55);
+  }
+
+  .navbar.navbar-admin .logo-pixel {
+    background: #ffffff;
+    color: #0F6E56;
+  }
+
+  .navbar.navbar-admin .logo-text {
+    color: #ffffff;
+  }
+
+  .navbar.navbar-admin .navbar-menu > li > a,
+  .navbar.navbar-admin .navbar-menu > li > .dropdown-trigger {
+    color: rgba(255, 255, 255, 0.8);
+  }
+
+  .navbar.navbar-admin .navbar-menu > li > a:hover,
+  .navbar.navbar-admin .navbar-menu > li > .dropdown-trigger:hover {
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+  }
+
+  .navbar.navbar-admin .navbar-menu > li.active > a,
+  .navbar.navbar-admin .navbar-menu > li.active > .dropdown-trigger {
+    color: #ffffff;
+    background: rgba(255, 255, 255, 0.2);
+  }
+
+  .navbar.navbar-admin .btn-login {
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.7);
+  }
+  .navbar.navbar-admin .btn-login:hover {
+    background: #ffffff;
+    color: #0F6E56;
+  }
+
+  .navbar.navbar-admin .btn-signup {
+    background: #ffffff;
+    color: #0F6E56;
+  }
+  .navbar.navbar-admin .btn-signup:hover {
+    background: rgba(255, 255, 255, 0.85);
+  }
+
+  .navbar.navbar-admin .user-chip {
+    background: rgba(255, 255, 255, 0.16);
+  }
+  .navbar.navbar-admin .user-chip:hover {
+    background: rgba(255, 255, 255, 0.26);
+  }
+
+  .navbar.navbar-admin .user-avatar {
+    background: #ffffff;
+    color: #0F6E56;
+  }
+
+  .navbar.navbar-admin .user-name {
+    color: #ffffff;
+  }
+
+  .navbar.navbar-admin .user-suffix {
+    color: rgba(255, 255, 255, 0.75);
+  }
+
+  .navbar.navbar-admin .btn-logout {
+    color: rgba(255, 255, 255, 0.75);
+    border-color: rgba(255, 255, 255, 0.4);
+  }
+  .navbar.navbar-admin .btn-logout:hover {
+    color: #ffffff;
+    border-color: #ffffff;
   }
 
   .navbar-inner {

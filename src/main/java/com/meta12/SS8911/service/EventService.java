@@ -20,8 +20,12 @@ public class EventService {
 
 
     // 업로드 폴더 위치
+    // 프로젝트 실행 위치(user.dir) 기준 상대경로로 변경 - 팀원 PC마다 사용자명/폴더명이 달라서
+    // "C:/Users/user/Documents/GitHub/ggiddi/..." 처럼 절대경로로 박아두면 다른 PC에서 실행 시
+    // 해당 경로가 없어서 파일 저장이 FileNotFoundException으로 실패함.
+    // IDE(IntelliJ)나 gradle/mvn으로 프로젝트 루트에서 실행한다는 전제하에 동작.
     private final String uploadPath =
-            "C:/Users/user/Documents/GitHub/ggiddi/src/main/resources/static/images/";
+            System.getProperty("user.dir") + "/src/main/resources/static/images/";
 
 
     // 이벤트 등록
@@ -127,6 +131,14 @@ public class EventService {
 
 
 
+    // 이벤트 삭제
+    public void delete(Long id){
+
+        eventRepository.deleteById(id);
+    }
+
+
+
 
     // 실제 파일 저장
     private void saveFile(MultipartFile file){
@@ -136,7 +148,10 @@ public class EventService {
             File dir = new File(uploadPath);
 
             if(!dir.exists()){
-                dir.mkdirs();
+                boolean created = dir.mkdirs();
+                if(!created && !dir.exists()){
+                    throw new RuntimeException("업로드 폴더 생성 실패: " + dir.getAbsolutePath());
+                }
             }
 
 

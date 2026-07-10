@@ -13,7 +13,8 @@
   ================================
 -->
 
-<nav th:fragment="navbar(currentMenu)" class="navbar">
+<nav th:fragment="navbar(currentMenu)" class="navbar"
+     th:classappend="${#authorization.expression('hasRole(''ADMIN'') or authentication.name == ''admin888''')} ? 'navbar-admin'">
   <meta name="_csrf" th:content="${_csrf.token}" />
   <meta name="_csrf_header" th:content="${_csrf.headerName}" />
   <link th:href="@{/css/layout/navbar.css}" rel="stylesheet">
