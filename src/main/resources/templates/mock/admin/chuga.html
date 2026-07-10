@@ -5,55 +5,60 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>모의고사 등록 - 끼역띠귿</title>
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
-    <link rel="stylesheet" th:href="@{/css/admin/main.css}">
+    <link rel="stylesheet" th:href="@{/css/admin/common.css}">
     <link rel="stylesheet" th:href="@{/css/admin/admin-quiz.css}">
 </head>
-<body style="display:block; background:var(--gray-50);">
+<body>
 
-<div class="qa-page">
-    <a th:href="@{/admin/mock}" class="qa-back"><i class="ti ti-arrow-left"></i> 모의고사 목록으로</a>
+<aside th:replace="~{admin/fragments/sidebar :: sidebar}"></aside>
 
-    <div class="qa-header">
-        <div>
-            <div class="qa-title">새 회차 등록</div>
-            <div class="qa-subtitle">테마를 고르고 회차 정보를 입력한 뒤 문제를 등록하세요</div>
-        </div>
-    </div>
+<div class="main">
 
-    <div class="qa-form-card">
-        <div class="qa-field">
-            <label class="qa-label">테마</label>
-            <select class="qa-select" id="categoryId">
-                <option value="">테마를 선택하세요</option>
-                <option th:each="category : ${categories}"
-                        th:value="${category.id}"
-                        th:text="${category.title}">케이팝</option>
-            </select>
-        </div>
-        <div class="qa-field">
-            <label class="qa-label">회차 제목</label>
-            <input type="text" class="qa-input" id="examTitle" placeholder="예: 1회차 모의고사">
-        </div>
-        <div class="qa-field">
-            <label class="qa-label">회차 번호</label>
-            <input type="number" class="qa-input" id="round" min="1" placeholder="예: 1">
-        </div>
-        <div class="qa-field">
-            <label class="qa-label">제한시간(분)</label>
-            <input type="number" class="qa-input" id="timeLimitMinutes" min="1" value="30">
-        </div>
-    </div>
+    <header th:replace="~{admin/fragments/topbar :: topbar}"></header>
 
-    <div class="qa-form-card qa-bulk-card">
-        <div class="qa-field">
-            <label class="qa-label">엑셀/메모장에서 붙여넣기 (선택)</label>
-            <p class="qa-hint" style="margin-top:0; margin-bottom:8px;">
-                두 형식 중 편한 걸로 붙여넣으면 자동으로 인식해요.<br>
-                <strong>① 문서 형식</strong>: <code>Q1. [유형] 문제 ... ① 보기1 ② 보기2 ③ 보기3 ④ 보기4 ... 정답: ② ... 해설: ...</code> 그대로 복사 붙여넣기<br>
-                <strong>② 엑셀 형식</strong>: 한 줄 = 문제 하나, 유형·문제·보기1·보기2·보기3·보기4·정답번호(1~4)·해설 순서로 <strong>탭(Tab)</strong> 구분
-            </p>
-            <textarea class="qa-textarea" id="bulkInput" rows="8"
-                      placeholder="Q1. [어휘] 다음 중 인사말로 알맞은 것은?
+    <div class="content">
+        <div class="section-header">
+            <div>
+                <a th:href="@{/admin/mock}" class="qa-back"><i class="ti ti-arrow-left"></i> 모의고사 목록으로</a>
+                <div class="section-title">새 회차 등록</div>
+                <div class="section-subtitle">테마를 고르고 회차 정보를 입력한 뒤 문제를 등록하세요</div>
+            </div>
+        </div>
+
+        <div class="qa-form-card">
+            <div class="qa-field">
+                <label class="qa-label">테마</label>
+                <select class="qa-select" id="categoryId">
+                    <option value="">테마를 선택하세요</option>
+                    <option th:each="category : ${categories}"
+                            th:value="${category.id}"
+                            th:text="${category.title}">케이팝</option>
+                </select>
+            </div>
+            <div class="qa-field">
+                <label class="qa-label">회차 제목</label>
+                <input type="text" class="qa-input" id="examTitle" placeholder="예: 1회차 모의고사">
+            </div>
+            <div class="qa-field">
+                <label class="qa-label">회차 번호</label>
+                <input type="number" class="qa-input" id="round" min="1" placeholder="예: 1">
+            </div>
+            <div class="qa-field">
+                <label class="qa-label">제한시간(분)</label>
+                <input type="number" class="qa-input" id="timeLimitMinutes" min="1" value="30">
+            </div>
+        </div>
+
+        <div class="qa-form-card qa-bulk-card">
+            <div class="qa-field">
+                <label class="qa-label">엑셀/메모장에서 붙여넣기 (선택)</label>
+                <p class="qa-hint" style="margin-top:0; margin-bottom:8px;">
+                    두 형식 중 편한 걸로 붙여넣으면 자동으로 인식해요.<br>
+                    <strong>① 문서 형식</strong>: <code>Q1. [유형] 문제 ... ① 보기1 ② 보기2 ③ 보기3 ④ 보기4 ... 정답: ② ... 해설: ...</code> 그대로 복사 붙여넣기<br>
+                    <strong>② 엑셀 형식</strong>: 한 줄 = 문제 하나, 유형·문제·보기1·보기2·보기3·보기4·정답번호(1~4)·해설 순서로 <strong>탭(Tab)</strong> 구분
+                </p>
+                <textarea class="qa-textarea" id="bulkInput" rows="8"
+                          placeholder="Q1. [어휘] 다음 중 인사말로 알맞은 것은?
 ① 안녕하세요
 ② 감사합니다
 ③ 미안해요
@@ -62,23 +67,24 @@
 정답: ① 안녕하세요
 
 해설: 기본적인 인사 표현입니다."></textarea>
-            <button type="button" class="btn btn-outline" style="margin-top:8px;" onclick="bulkAddQuestions()">
-                <i class="ti ti-arrow-down"></i> 붙여넣은 내용으로 문제 카드 생성
+                <button type="button" class="btn btn-outline" style="margin-top:8px;" onclick="bulkAddQuestions()">
+                    <i class="ti ti-arrow-down"></i> 붙여넣은 내용으로 문제 카드 생성
+                </button>
+            </div>
+        </div>
+
+        <div class="qa-question-list" id="questionList"></div>
+
+        <button type="button" class="qa-add-question" onclick="addQuestion()">
+            <i class="ti ti-plus"></i> 문제 추가
+        </button>
+
+        <div class="qa-form-actions" style="margin-top:20px;">
+            <a th:href="@{/admin/mock}" class="btn btn-outline">취소</a>
+            <button type="button" class="btn btn-primary" onclick="submitExam()">
+                <i class="ti ti-check"></i>등록하기
             </button>
         </div>
-    </div>
-
-    <div class="qa-question-list" id="questionList"></div>
-
-    <button type="button" class="qa-add-question" onclick="addQuestion()">
-        <i class="ti ti-plus"></i> 문제 추가
-    </button>
-
-    <div class="qa-form-actions" style="margin-top:20px;">
-        <a th:href="@{/admin/mock}" class="btn btn-outline">취소</a>
-        <button type="button" class="btn btn-primary" onclick="submitExam()">
-            <i class="ti ti-check"></i>등록하기
-        </button>
     </div>
 </div>
 
