@@ -2,13 +2,16 @@ package com.meta12.SS8911.controller;
 
 import com.meta12.SS8911.config.OrderPayStatus;
 import com.meta12.SS8911.dto.ContentDTO;
+import com.meta12.SS8911.dto.EventCreateRequestDto;
 import com.meta12.SS8911.entity.Content;
+import com.meta12.SS8911.entity.Event;
 import com.meta12.SS8911.entity.OrderPay;
 import com.meta12.SS8911.entity.Qna;
 import com.meta12.SS8911.entity.SiteUser;
 import com.meta12.SS8911.repository.OrderPayRepository;
 import com.meta12.SS8911.service.CategoryService;
 import com.meta12.SS8911.service.ContentService;
+import com.meta12.SS8911.service.EventService;
 import com.meta12.SS8911.service.OrderPayService;
 import com.meta12.SS8911.service.QnaService;
 import com.meta12.SS8911.service.SiteUserService;
@@ -23,6 +26,7 @@ import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.time.YearMonth;
 import java.util.ArrayList;
@@ -42,6 +46,7 @@ public class AdminController {
     private final CategoryService categoryService;
     private final OrderPayService orderPayService;
     private final OrderPayRepository orderPayRepository; // payment 페이지 페이징 조회 전용 (findAll(Pageable) 내장 메서드만 사용)
+    private final EventService eventService;
 
     /**
      * 사이드바 뱃지 + 탑바 알림 점 표시용.
@@ -280,24 +285,28 @@ public class AdminController {
     }
 
     // ==========================================
-    // 이벤트 관리 (현재는 목데이터만 - 보여주기 전용)
+    // 이벤트 관리 (Event 실데이터 - 포스터/썸네일 파일 업로드 포함)
     // ==========================================
     @GetMapping("/event")
     public String event(Model model) {
         model.addAttribute("activeMenu", "event");
         model.addAttribute("pageTitle", "이벤트 관리");
 
-        model.addAttribute("ongoingEventCount", 2);
-        model.addAttribute("upcomingEventCount", 1);
-        model.addAttribute("totalEventParticipants", 386);
-        model.addAttribute("endedEventCount", 5);
-        model.addAttribute("totalEventCount", 8);
+        List<Event> events = eventService.findAll();
 
-        List<EventMock> eventList = new ArrayList<>();
-        eventList.add(new EventMock(1L, "여름맞이 출석 챌린지", "2026.07.01", "2026.07.31", 128, "2026.06.20", "ONGOING"));
-        eventList.add(new EventMock(2L, "신규가입 웰컴 이벤트", "2026.06.01", "상시", 241, "2026.05.28", "ONGOING"));
-        eventList.add(new EventMock(3L, "추석맞이 K-문화 퀴즈전", "2026.09.20", "2026.09.27", 0, "2026.06.30", "UPCOMING"));
-        model.addAttribute("events", eventList);
+        long ongoingCount = events.stream().filter(e -> "ONGOING".equals(e.getStatus())).count();
+        long upcomingCount = events.stream().filter(e -> "UPCOMING".equals(e.getStatus())).count();
+        long endedCount = events.stream().filter(e -> "ENDED".equals(e.getStatus())).count();
+        long totalParticipants = events.stream()
+                .mapToLong(e -> e.getParticipantCount() != null ? e.getParticipantCount() : 0)
+                .sum();
+
+        model.addAttribute("ongoingEventCount", ongoingCount);
+        model.addAttribute("upcomingEventCount", upcomingCount);
+        model.addAttribute("endedEventCount", endedCount);
+        model.addAttribute("totalEventParticipants", totalParticipants);
+        model.addAttribute("totalEventCount", events.size());
+        model.addAttribute("events", events);
 
         return "admin/event";
     }
@@ -306,10 +315,64 @@ public class AdminController {
     public String eventCreateForm(Model model) {
         model.addAttribute("activeMenu", "event");
         model.addAttribute("pageTitle", "이벤트 등록");
+        model.addAttribute("eventCreateRequestDto", new EventCreateRequestDto());
         return "admin/event-create";
     }
 
-    // TODO: 이벤트 실제 저장 로직은 아직 없음 (지금은 화면만 보여주기로 결정됨)
+    // 폼 enctype="multipart/form-data" 필수, input name="posterFile" / name="thumbnailFile"
+    @PostMapping("/event/create")
+    public String eventCreateSubmit(
+            @ModelAttribute EventCreateRequestDto eventCreateRequestDto,
+            @RequestParam(value = "posterFile", required = false) MultipartFile posterFile,
+            @RequestParam(value = "thumbnailFile", required = false) MultipartFile thumbnailFile
+    ) {
+        eventService.create(eventCreateRequestDto, posterFile, thumbnailFile);
+        return "redirect:/admin/event";
+    }
+
+    @GetMapping("/event/edit/{id}")
+    public String eventEditForm(@PathVariable Long id, Model model) {
+        model.addAttribute("activeMenu", "event");
+        model.addAttribute("pageTitle", "이벤트 수정");
+
+        Event event;
+        try {
+            event = eventService.findById(id);
+        } catch (IllegalArgumentException e) {
+            return "redirect:/admin/event";
+        }
+
+        EventCreateRequestDto dto = new EventCreateRequestDto();
+        dto.setTitle(event.getTitle());
+        dto.setContent(event.getContent());
+        dto.setStartDate(event.getStartDate());
+        dto.setEndDate(event.getEndDate());
+        dto.setStatus(event.getStatus());
+        dto.setPoster(event.getPoster());
+        dto.setThumbnail(event.getThumbnail());
+
+        model.addAttribute("eventCreateRequestDto", dto);
+        model.addAttribute("existingEvent", event);
+        return "admin/event-edit";
+    }
+
+    // 폼 enctype="multipart/form-data" 필수. 파일을 새로 선택 안 하면 기존 포스터/썸네일 유지됨
+    @PostMapping("/event/update/{id}")
+    public String eventUpdateSubmit(
+            @PathVariable Long id,
+            @ModelAttribute EventCreateRequestDto eventCreateRequestDto,
+            @RequestParam(value = "posterFile", required = false) MultipartFile posterFile,
+            @RequestParam(value = "thumbnailFile", required = false) MultipartFile thumbnailFile
+    ) {
+        eventService.update(id, eventCreateRequestDto, posterFile, thumbnailFile);
+        return "redirect:/admin/event";
+    }
+
+    @GetMapping("/event/delete/{id}")
+    public String eventDelete(@PathVariable Long id) {
+        eventService.delete(id);
+        return "redirect:/admin/event";
+    }
 
     // ==========================================
     // 결제/수강 관리 — OrderPay 실데이터 연동
@@ -443,11 +506,6 @@ public class AdminController {
         public Long getId() { return id; } public String getTitle() { return title; } public String getContent() { return content; } public AuthorMock getAuthor() { return author; } public String getCreatedDate() { return createdDate; } public String getStatus() { return status; }
     }
     public static class AuthorMock { private final String username; public AuthorMock(String username) { this.username = username; } public String getUsername() { return username; } }
-    public static class EventMock {
-        private final Long id; private final String title; private final String startDate; private final String endDate; private final int participantCount; private final String createdDate; private final String status;
-        public EventMock(Long id, String title, String startDate, String endDate, int participantCount, String createdDate, String status) { this.id = id; this.title = title; this.startDate = startDate; this.endDate = endDate; this.participantCount = participantCount; this.createdDate = createdDate; this.status = status; }
-        public Long getId() { return id; } public String getTitle() { return title; } public String getStartDate() { return startDate; } public String getEndDate() { return endDate; } public int getParticipantCount() { return participantCount; } public String getCreatedDate() { return createdDate; } public String getStatus() { return status; }
-    }
     public static class MonthlyStat {
         private final String label; private final int count; private final int heightPx; private final String color;
         public MonthlyStat(String label, int count, int heightPx, String color) { this.label = label; this.count = count; this.heightPx = heightPx; this.color = color; }
