@@ -51,7 +51,7 @@
 
         <!-- 포스터 -->
         <img
-                th:src="@{/images/{file}(file=${event.poster})}"
+                th:src="${event.poster}"
                 class="event-poster"
                 alt="이벤트 이미지">
 
