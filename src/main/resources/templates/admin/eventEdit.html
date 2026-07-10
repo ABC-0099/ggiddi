@@ -72,31 +72,25 @@
                                    name="endDate"
                                    class="form-input"
                                    th:value="${event.endDate}">
-
                         </div>
                     </div>
 
                     <div class="form-group">
                         <label>이벤트 상태</label>
                         <select name="status" class="form-input">
-
                             <option value="UPCOMING"
                                     th:selected="${event.status == 'UPCOMING'}">
                                 진행 예정
                             </option>
-
                             <option value="ONGOING"
                                     th:selected="${event.status == 'ONGOING'}">
                                 진행 중
                             </option>
-
                             <option value="ENDED"
                                     th:selected="${event.status == 'ENDED'}">
                                 종료
                             </option>
-
                         </select>
-
                     </div>
                 </div>
             </div>
@@ -115,37 +109,23 @@
                     <h3>포스터 업로드</h3>
                     <p>이벤트 상세 페이지에 표시될 포스터를 업로드하세요.</p>
 
-                    <div class="poster-upload">
+                    <!-- 기존 이미지: Cloudinary URL이 통째로 들어있으므로 그대로 src에 사용 -->
+                    <img id="posterPreview"
+                         th:src="${event.poster}"
+                         th:style="${event.poster != null} ?
+             'display:block;width:220px;margin:20px auto;border-radius:10px;'
+             :
+             'display:none;width:220px;margin:20px auto;border-radius:10px;'">
 
-                        <i class="ti ti-photo-plus upload-icon"></i>
-
-                        <h3>포스터 업로드</h3>
-
-                        <p>이벤트 상세 페이지에 표시될 포스터를 업로드하세요.</p>
-
-                        <!-- 기존 이미지 -->
-                        <img id="posterPreview"
-                             th:src="${event.poster}"
-                             th:style="${event.poster != null} ?
-            'display:block;width:220px;margin:20px auto;border-radius:10px;'
-            :
-            'display:none;width:220px;margin:20px auto;border-radius:10px;'">
-
-                        <label class="btn btn-outline" style="cursor:pointer;">
-
-                            <i class="ti ti-upload"></i>
-                            파일 선택
-
-                            <input
-                                    type="file"
-                                    id="posterFile"
-                                    name="posterFile"
-                                    accept="image/*"
-                                    style="display:none;">
-
-                        </label>
-
-                    </div>
+                    <label class="btn btn-outline" style="cursor:pointer;">
+                        <i class="ti ti-upload"></i>
+                        파일 선택
+                        <input type="file"
+                               id="posterFile"
+                               name="posterFile"
+                               accept="image/*"
+                               style="display:none;">
+                    </label>
                 </div>
             </div>
 
@@ -159,39 +139,31 @@
                 </div>
 
                 <div class="poster-upload">
-
                     <i class="ti ti-photo-plus upload-icon"></i>
-
                     <h3>썸네일 업로드</h3>
-
                     <p>이벤트 목록에 표시될 썸네일 이미지를 업로드하세요.</p>
 
-                    <!-- 기존 이미지 -->
+                    <!-- 기존 이미지: Cloudinary URL이 통째로 들어있으므로 그대로 src에 사용 -->
                     <img id="thumbnailPreview"
                          th:src="${event.thumbnail}"
                          th:style="${event.thumbnail != null} ?
-            'display:block;width:220px;margin:20px auto;border-radius:10px;'
-            :
-            'display:none;width:220px;margin:20px auto;border-radius:10px;'">
+             'display:block;width:220px;margin:20px auto;border-radius:10px;'
+             :
+             'display:none;width:220px;margin:20px auto;border-radius:10px;'">
 
                     <label class="btn btn-outline" style="cursor:pointer;">
-
                         <i class="ti ti-upload"></i>
                         파일 선택
-
-                        <input
-                                type="file"
-                                id="thumbnailFile"
-                                name="thumbnailFile"
-                                accept="image/*"
-                                style="display:none;">
-
+                        <input type="file"
+                               id="thumbnailFile"
+                               name="thumbnailFile"
+                               accept="image/*"
+                               style="display:none;">
                     </label>
-
                 </div>
             </div>
 
-            <!-- 등록 -->
+            <!-- 수정 버튼 -->
             <div class="card">
                 <div class="card-head">
                     <div class="card-title">
@@ -207,49 +179,37 @@
                     </button>
                 </div>
             </div>
+
         </form>
     </div>
 </div>
 
 <script>
-
     document.getElementById("posterFile").addEventListener("change", function(e){
-
         const file = e.target.files[0];
-
-        if(file){
+        if (file) {
             const reader = new FileReader();
-
             reader.onload = function(e){
                 const img = document.getElementById("posterPreview");
                 img.src = e.target.result;
                 img.style.display = "block";
             }
-
             reader.readAsDataURL(file);
         }
-
     });
 
-
     document.getElementById("thumbnailFile").addEventListener("change", function(e){
-
         const file = e.target.files[0];
-
-        if(file){
+        if (file) {
             const reader = new FileReader();
-
             reader.onload = function(e){
                 const img = document.getElementById("thumbnailPreview");
                 img.src = e.target.result;
                 img.style.display = "block";
             }
-
             reader.readAsDataURL(file);
         }
-
     });
-
 </script>
 
 </body>
