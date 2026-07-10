@@ -62,7 +62,7 @@
 
             <div class="event-card">
 
-                <img th:src="@{/images/{file}(file=${event.thumbnail})}" alt="썸네일">
+                <img th:src="${event.thumbnail}" alt="썸네일">
 
                 <h3 th:text="${event.title}"></h3>
 

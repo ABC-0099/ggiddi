@@ -40,11 +40,13 @@ public class Event {
     private String status;
 
 
-    // 상세 페이지 포스터 이미지
+    // 상세 페이지 포스터 이미지 - 이제 Cloudinary URL이 통째로 들어감 → length 넉넉하게
+    @Column(length = 500)
     private String poster;
 
 
-    // 목록 썸네일 이미지
+    // 목록 썸네일 이미지 - 이제 Cloudinary URL이 통째로 들어감 → length 넉넉하게
+    @Column(length = 500)
     private String thumbnail;
 
 

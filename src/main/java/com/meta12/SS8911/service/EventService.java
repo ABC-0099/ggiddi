@@ -1,5 +1,7 @@
 package com.meta12.SS8911.service;
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.meta12.SS8911.dto.EventCreateRequestDto;
 import com.meta12.SS8911.entity.Event;
 import com.meta12.SS8911.repository.EventRepository;
@@ -9,23 +11,16 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
+import java.io.IOException;
 import java.util.List;
+import java.util.Map;
 
 @Service
 @RequiredArgsConstructor
 public class EventService {
 
     private final EventRepository eventRepository;
-
-
-    // 업로드 폴더 위치
-    // 프로젝트 실행 위치(user.dir) 기준 상대경로로 변경 - 팀원 PC마다 사용자명/폴더명이 달라서
-    // "C:/Users/user/Documents/GitHub/ggiddi/..." 처럼 절대경로로 박아두면 다른 PC에서 실행 시
-    // 해당 경로가 없어서 파일 저장이 FileNotFoundException으로 실패함.
-    // IDE(IntelliJ)나 gradle/mvn으로 프로젝트 루트에서 실행한다는 전제하에 동작.
-    private final String uploadPath =
-            System.getProperty("user.dir") + "/src/main/resources/static/images/";
+    private final Cloudinary cloudinary; // ← uploadPath/saveFile 대신 이걸로 업로드
 
 
     // 이벤트 등록
@@ -35,31 +30,19 @@ public class EventService {
             MultipartFile thumbnailFile
     ) {
 
-
         Event event = dto.toEntity();
 
-
-        // 포스터 저장
-        if(posterFile != null && !posterFile.isEmpty()) {
-
-            String fileName = posterFile.getOriginalFilename();
-
-            event.setPoster(fileName);
-
-            saveFile(posterFile);
+        // 포스터 저장 (Cloudinary)
+        if (posterFile != null && !posterFile.isEmpty()) {
+            String url = uploadToCloudinary(posterFile);
+            event.setPoster(url);
         }
 
-
-        // 썸네일 저장
-        if(thumbnailFile != null && !thumbnailFile.isEmpty()) {
-
-            String fileName = thumbnailFile.getOriginalFilename();
-
-            event.setThumbnail(fileName);
-
-            saveFile(thumbnailFile);
+        // 썸네일 저장 (Cloudinary)
+        if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
+            String url = uploadToCloudinary(thumbnailFile);
+            event.setThumbnail(url);
         }
-
 
         eventRepository.save(event);
     }
@@ -92,7 +75,6 @@ public class EventService {
 
         Event event = findById(id);
 
-
         // 기본 정보 수정
         event.setTitle(dto.getTitle());
         event.setContent(dto.getContent());
@@ -100,31 +82,17 @@ public class EventService {
         event.setEndDate(dto.getEndDate());
         event.setStatus(dto.getStatus());
 
-
-
-        // 새 포스터 선택했을 때만 변경
-        if(posterFile != null && !posterFile.isEmpty()) {
-
-            String fileName = posterFile.getOriginalFilename();
-
-            event.setPoster(fileName);
-
-            saveFile(posterFile);
+        // 새 포스터 선택했을 때만 변경 (Cloudinary)
+        if (posterFile != null && !posterFile.isEmpty()) {
+            String url = uploadToCloudinary(posterFile);
+            event.setPoster(url);
         }
 
-
-
-        // 새 썸네일 선택했을 때만 변경
-        if(thumbnailFile != null && !thumbnailFile.isEmpty()) {
-
-            String fileName = thumbnailFile.getOriginalFilename();
-
-            event.setThumbnail(fileName);
-
-            saveFile(thumbnailFile);
+        // 새 썸네일 선택했을 때만 변경 (Cloudinary)
+        if (thumbnailFile != null && !thumbnailFile.isEmpty()) {
+            String url = uploadToCloudinary(thumbnailFile);
+            event.setThumbnail(url);
         }
-
-
 
         eventRepository.save(event);
     }
@@ -140,34 +108,17 @@ public class EventService {
 
 
 
-    // 실제 파일 저장
-    private void saveFile(MultipartFile file){
-
-        try{
-
-            File dir = new File(uploadPath);
-
-            if(!dir.exists()){
-                boolean created = dir.mkdirs();
-                if(!created && !dir.exists()){
-                    throw new RuntimeException("업로드 폴더 생성 실패: " + dir.getAbsolutePath());
-                }
-            }
-
-
-            File saveFile =
-                    new File(uploadPath + file.getOriginalFilename());
-
-
-            file.transferTo(saveFile);
-
-
-        }catch(Exception e){
-
-            throw new RuntimeException(e);
-
+    // 실제 파일 업로드 (로컬 저장 대신 Cloudinary, secure_url 리턴)
+    private String uploadToCloudinary(MultipartFile file) {
+        try {
+            Map uploadResult = cloudinary.uploader().upload(
+                    file.getBytes(),
+                    ObjectUtils.asMap("resource_type", "image")
+            );
+            return uploadResult.get("secure_url").toString();
+        } catch (IOException e) {
+            throw new RuntimeException("Cloudinary 업로드 실패: " + file.getOriginalFilename(), e);
         }
-
     }
 
     public Page<Event> findAll(Pageable pageable) {

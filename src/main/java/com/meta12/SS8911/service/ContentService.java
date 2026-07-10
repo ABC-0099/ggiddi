@@ -1,6 +1,8 @@
 package com.meta12.SS8911.service;
 
 
+import com.cloudinary.Cloudinary;
+import com.cloudinary.utils.ObjectUtils;
 import com.meta12.SS8911.dto.ContentDTO;
 import com.meta12.SS8911.entity.*;
 import com.meta12.SS8911.repository.*;
@@ -11,7 +13,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
-import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.List;
@@ -24,11 +25,10 @@ public class ContentService {
 
     private final ContentRepository contentRepository;
     private final CategoryRepository categoryRepository;
-    private final String uploadPath = "C:/meta12/masil/videos/";
-    private final String thumbPath = "C:/meta12/masil/thumbnails/";
     private final ProgressRepository progressRepository;
     private final OrderPayRepository orderPayRepository;
     private final SiteUserRepository siteUserRepository;
+    private final Cloudinary cloudinary; // ← 로컬 uploadPath/thumbPath 대신 이걸로 업로드
 
 
     public List<Content> list(Long categoryId, SiteUser user) {
@@ -69,34 +69,22 @@ public class ContentService {
         Category category = categoryRepository.findById(contentDTO.getCategoryId())
                 .orElseThrow(()-> new IllegalArgumentException("해당 강의가 없습니다."));
 
-        File uploadDir = new File(uploadPath);
-        if (!uploadDir.exists()) uploadDir.mkdirs();
-
-        File thumbDir = new File(thumbPath);
-        if (!thumbDir.exists()) thumbDir.mkdirs();
-
-        // 1. 비디오 파일 저장
+        // 1. 비디오 파일 업로드 (Cloudinary)
         if (contentDTO.getVideoFile() != null && !contentDTO.getVideoFile().isEmpty()) {
-            String originalFilename = contentDTO.getVideoFile().getOriginalFilename();
-            String saveFileName = System.currentTimeMillis() + "_VIDEO_" + originalFilename;
-            saveFile(contentDTO.getVideoFile(), uploadPath, saveFileName); // ← uploadPath
-            contentDTO.setFileName(saveFileName);
+            String videoUrl = uploadToCloudinary(contentDTO.getVideoFile(), "video");
+            contentDTO.setFileName(videoUrl); // 이제 fileName엔 로컬 파일명이 아니라 Cloudinary URL이 통째로 저장됨
         }
 
-        // 2. 썸네일 파일 저장
+        // 2. 썸네일 파일 업로드 (Cloudinary)
         if (contentDTO.getThumbFile() != null && !contentDTO.getThumbFile().isEmpty()) {
-            String originalFilename = contentDTO.getThumbFile().getOriginalFilename();
-            String saveFileName = System.currentTimeMillis() + "_THUMB_" + originalFilename;
-            saveFile(contentDTO.getThumbFile(), thumbPath, saveFileName); // ← thumbPath
-            contentDTO.setThumbFileName(saveFileName);
+            String thumbUrl = uploadToCloudinary(contentDTO.getThumbFile(), "image");
+            contentDTO.setThumbFileName(thumbUrl);
         }
 
-        // 3. 첨부 파일 저장
+        // 3. 첨부 파일 업로드 (Cloudinary, raw 타입)
         if (contentDTO.getAttachFile() != null && !contentDTO.getAttachFile().isEmpty()){
-            String originalFilename = contentDTO.getAttachFile().getOriginalFilename();
-            String saveFileName = System.currentTimeMillis() + "_FILE_" + originalFilename;
-            saveFile(contentDTO.getAttachFile(), uploadPath, saveFileName); // ← uploadPath
-            contentDTO.setAttachFileName(saveFileName);
+            String attachUrl = uploadToCloudinary(contentDTO.getAttachFile(), "raw");
+            contentDTO.setAttachFileName(attachUrl);
         }
 
         Content content = createEntity(contentDTO, category);
@@ -120,26 +108,23 @@ public class ContentService {
         content.setPublishAt(contentDTO.getPublishAt());
         content.setFree(contentDTO.isFree());
 
-        // 영상 파일
+        // 영상 파일 (Cloudinary)
         if (contentDTO.getVideoFile() != null && !contentDTO.getVideoFile().isEmpty()) {
-            String saveFileName = System.currentTimeMillis() + "_VIDEO_" + contentDTO.getVideoFile().getOriginalFilename();
-            saveFile(contentDTO.getVideoFile(), uploadPath, saveFileName); // ← uploadPath
-            content.setFileName(saveFileName);
+            String videoUrl = uploadToCloudinary(contentDTO.getVideoFile(), "video");
+            content.setFileName(videoUrl);
             content.setFileOrigin(contentDTO.getVideoFile().getOriginalFilename());
         }
 
-        // 썸네일 파일
+        // 썸네일 파일 (Cloudinary)
         if (contentDTO.getThumbFile() != null && !contentDTO.getThumbFile().isEmpty()) {
-            String saveFileName = System.currentTimeMillis() + "_THUMB_" + contentDTO.getThumbFile().getOriginalFilename();
-            saveFile(contentDTO.getThumbFile(), thumbPath, saveFileName); // ← thumbPath
-            content.setThumbFileName(saveFileName);
+            String thumbUrl = uploadToCloudinary(contentDTO.getThumbFile(), "image");
+            content.setThumbFileName(thumbUrl);
         }
 
         // 첨부 파일: 새 파일이 들어오면 교체, 삭제 체크면 비우고, 둘 다 아니면 기존 유지
         if (contentDTO.getAttachFile() != null && !contentDTO.getAttachFile().isEmpty()) {
-            String saveFileName = System.currentTimeMillis() + "_FILE_" + contentDTO.getAttachFile().getOriginalFilename();
-            saveFile(contentDTO.getAttachFile(), uploadPath, saveFileName); // ← uploadPath
-            content.setAttachFileName(saveFileName);
+            String attachUrl = uploadToCloudinary(contentDTO.getAttachFile(), "raw");
+            content.setAttachFileName(attachUrl);
             content.setAttachFileOrigin(contentDTO.getAttachFile().getOriginalFilename());
         } else if (contentDTO.isDeleteAttach()) {
             content.setAttachFileName(null);
@@ -147,12 +132,17 @@ public class ContentService {
         }
     }
 
-    // 공통 저장 메서드 (path 파라미터 추가)
-    private void saveFile(MultipartFile file, String path, String saveName) {
+    // 공통 업로드 메서드 (로컬 저장 대신 Cloudinary 업로드, secure_url 리턴)
+    private String uploadToCloudinary(MultipartFile file, String resourceType) {
         try {
-            file.transferTo(new File(path + saveName));
+            Map uploadResult = cloudinary.uploader().upload(
+                    file.getBytes(),
+                    ObjectUtils.asMap("resource_type", resourceType)
+            );
+            return uploadResult.get("secure_url").toString();
         } catch (IOException e) {
             e.printStackTrace();
+            throw new RuntimeException("Cloudinary 업로드 실패: " + file.getOriginalFilename(), e);
         }
     }
 
@@ -172,13 +162,13 @@ public class ContentService {
         content.setSequence(contentDTO.getSequence());
         content.setCategory(category);
 
-        // 1. 비디오 파일명 세팅
+        // 1. 비디오 URL 세팅 (Cloudinary secure_url)
         content.setFileName(contentDTO.getFileName());
 
-        // 2. 썸네일 파일명 세팅 (이 부분이 누락되어 있었습니다!)
+        // 2. 썸네일 URL 세팅
         content.setThumbFileName(contentDTO.getThumbFileName());
 
-        // 3. 첨부파일 파일명 세팅 (이 부분도 함께 추가해야 안전합니다)
+        // 3. 첨부파일 URL 세팅
         content.setAttachFileName(contentDTO.getAttachFileName());
 
         content.setStage(contentDTO.getStage());
