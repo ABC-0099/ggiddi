@@ -132,7 +132,8 @@ public class SiteUserController {
 
         // ▼▼▼ 출석 관련 데이터 추가 ▼▼▼
         int currentStreak = attendanceService.getCurrentStreak(username);
-        boolean[] weeklyAttendance = attendanceService.getWeeklyAttendance(username);
+        // 이번 주를 의미하는 0을 추가해주면 됩니다.
+        boolean[] weeklyAttendance = attendanceService.getWeeklyAttendance(username, 0);
         int lastWeekAttendedCount = attendanceService.getLastWeekAttendedCount(username);
 
         int attendedCount = 0;

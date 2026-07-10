@@ -50,7 +50,7 @@ public class LoginSuccessHandler implements AuthenticationSuccessHandler {
         siteUserRepository.save(user);
 
         // 출석 저장
-        attendanceService.checkAttendance(user);
+        attendanceService.saveAttendance(user);
 
         response.sendRedirect("/");
     }

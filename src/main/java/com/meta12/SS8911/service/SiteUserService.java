@@ -41,7 +41,10 @@ public class SiteUserService implements UserDetailsService {
 
     @Transactional
     public void chugaProc(SiteUserDTO dto) {
-        if (siteUserRepository.existsByUsername(dto.getUsername())) {
+        // 저장 시에도 소문자로 변환
+        String lowerUsername = dto.getUsername().toLowerCase();
+
+        if (siteUserRepository.existsByUsername(lowerUsername)) {
             throw new IllegalStateException("이미 존재하는 아이디입니다.");
         }
 
@@ -62,11 +65,14 @@ public class SiteUserService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        SiteUser siteUser = siteUserRepository.findByUsername(username)
+        // 입력받은 username을 강제로 소문자로 변환해서 조회
+        String lowerUsername = username.toLowerCase();
+
+        SiteUser siteUser = siteUserRepository.findByUsername(lowerUsername)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
 
         return User.builder()
-                .username(siteUser.getUsername())
+                .username(siteUser.getUsername()) // DB에 저장된 원래 아이디 반환
                 .password(siteUser.getPassword())
                 .roles(siteUser.getRole().name())
                 .disabled(siteUser.isWithdrawn())
