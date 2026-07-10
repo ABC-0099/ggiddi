@@ -89,32 +89,8 @@
                 </tbody>
             </table>
 
-            <!-- 페이지네이션 -->
-            <div class="pagination">
+            <div th:replace="~{admin/fragments/pagination :: pagination(${orders}, '/admin/payment', ${{}})}"></div>
 
-                <!-- 이전 -->
-                <a class="page-btn"
-                   th:href="@{/admin/payment(page=${startPage-1})}"
-                   th:classappend="${startPage == 0} ? ' disabled'">
-                    &lt;
-                </a>
-
-                <!-- 페이지 번호 -->
-                <a class="page-btn"
-                   th:each="pageNum : ${#numbers.sequence(startPage,endPage)}"
-                   th:href="@{/admin/payment(page=${pageNum})}"
-                   th:text="${pageNum+1}"
-                   th:classappend="${pageNum==orders.number}? ' active'">
-                </a>
-
-                <!-- 다음 -->
-                <a class="page-btn"
-                   th:href="@{/admin/payment(page=${endPage+1})}"
-                   th:classappend="${endPage >= orders.totalPages-1}? ' disabled'">
-                    &gt;
-                </a>
-                </a>
-            </div>
         </div>
     </div>
 </div>

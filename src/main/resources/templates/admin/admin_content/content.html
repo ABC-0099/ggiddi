@@ -45,7 +45,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:if="${#lists.isEmpty(contents)}">
+                <tr th:if="${contents.empty}">
                     <td colspan="8" style="text-align: center; color: var(--gray-400); padding: 50px 0;">
                         등록된 콘텐츠가 없습니다. '콘텐츠 추가' 버튼을 눌러 첫 데이터를 등록해 보세요!
                     </td>
@@ -84,6 +84,7 @@
                 </tr>
                 </tbody>
             </table>
+            <div th:replace="~{admin/fragments/pagination :: pagination(${contents}, '/admin/content', ${{}})}"></div>
         </div>
     </div>
 </div>

@@ -20,7 +20,7 @@
         <div class="section-header">
             <div>
                 <div class="section-title">카테고리 관리</div>
-                <div class="section-subtitle" th:text="|전체 ${#lists.size(categories)}개 강좌|">전체 0개 강좌</div>
+                <div class="section-subtitle" th:text="|전체 ${categories.totalElements}개 강좌|">전체 0개 강좌</div>
             </div>
             <div class="section-actions">
                 <a class="btn btn-primary" th:href="@{/admin/category/create}">
@@ -43,7 +43,7 @@
                 </tr>
                 </thead>
                 <tbody>
-                <tr th:if="${#lists.isEmpty(categories)}">
+                <tr th:if="${categories.empty}">
                     <td colspan="6" style="text-align: center; color: var(--gray-400); padding: 50px 0;">
                         등록된 카테고리가 없습니다. '카테고리 추가' 버튼을 눌러 첫 강좌를 등록해 보세요!
                     </td>
@@ -73,6 +73,7 @@
                 </tr>
                 </tbody>
             </table>
+            <div th:replace="~{admin/fragments/pagination :: pagination(${categories}, '/admin/category', ${{}})}"></div>
         </div>
     </div>
 </div>

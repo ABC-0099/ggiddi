@@ -35,6 +35,10 @@ public class SiteUserService implements UserDetailsService {
         return siteUserRepository.findAll();
     }
 
+    public Page<SiteUser> getAllUsers(Pageable pageable) {
+        return siteUserRepository.findAll(pageable);
+    }
+
     @Transactional
     public void chugaProc(SiteUserDTO dto) {
         if (siteUserRepository.existsByUsername(dto.getUsername())) {

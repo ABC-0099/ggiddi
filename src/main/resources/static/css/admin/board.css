@@ -58,14 +58,6 @@
 }
 .btn-search-submit:hover { background: var(--navy-dark); }
 
-.pagination {
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 6px;
-    padding: 25px 0;
-}
-
 .page-btn {
     width: 34px;
     height: 34px;

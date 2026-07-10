@@ -7,13 +7,11 @@ import com.meta12.SS8911.entity.OrderPay;
 import com.meta12.SS8911.entity.Qna;
 import com.meta12.SS8911.entity.SiteUser;
 import com.meta12.SS8911.repository.OrderPayRepository;
-import com.meta12.SS8911.service.CategoryService;
-import com.meta12.SS8911.service.ContentService;
-import com.meta12.SS8911.service.OrderPayService;
-import com.meta12.SS8911.service.QnaService;
-import com.meta12.SS8911.service.SiteUserService;
+import com.meta12.SS8911.service.*;
 import com.meta12.SS8911.dto.CategoryDTO;
 import com.meta12.SS8911.entity.Category;
+import com.meta12.SS8911.entity.Event;
+import com.meta12.SS8911.service.EventService;
 
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.Page;
@@ -42,6 +40,7 @@ public class AdminController {
     private final CategoryService categoryService;
     private final OrderPayService orderPayService;
     private final OrderPayRepository orderPayRepository; // payment 페이지 페이징 조회 전용 (findAll(Pageable) 내장 메서드만 사용)
+    private final EventService eventService;
 
     /**
      * 사이드바 뱃지 + 탑바 알림 점 표시용.
@@ -173,13 +172,16 @@ public class AdminController {
     // 콘텐츠 관리 (Content/Category 실데이터)
     // ==========================================
     @GetMapping("/content")
-    public String content(Model model) {
+    public String content(Model model,
+                          @RequestParam(value = "page", defaultValue = "0") int page) {
         model.addAttribute("activeMenu", "content");
         model.addAttribute("pageTitle", "콘텐츠 관리");
 
-        List<Content> contents = contentService.getAllContentList();
+        Page<Content> contents = contentService.getAllContentList(
+                PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createdDate"))
+        );
         model.addAttribute("contents", contents);
-        model.addAttribute("totalContentCount", contents.size());
+        model.addAttribute("totalContentCount", contents.getTotalElements());
 
         return "admin/admin_content/content";
     }
@@ -242,10 +244,16 @@ public class AdminController {
     // 회원 관리
     // ==========================================
     @GetMapping("/members")
-    public String members(Model model) {
+    public String members(Model model,
+                          @RequestParam(value = "page", defaultValue = "0") int page) {
         model.addAttribute("activeMenu", "members");
         model.addAttribute("pageTitle", "회원 관리");
-        model.addAttribute("users", siteUserService.getAllUsers());
+
+        Page<SiteUser> users = siteUserService.getAllUsers(
+                PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "joinDate"))
+        );
+        model.addAttribute("users", users);
+
         return "admin/members";
     }
 
@@ -276,6 +284,11 @@ public class AdminController {
         Page<QnaWrapper> qnas = new PageImpl<>(wrappedList, realQnas.getPageable(), realQnas.getTotalElements());
         model.addAttribute("qnas", qnas);
 
+        Map<String, Object> extraParams = new java.util.HashMap<>();
+        extraParams.put("category", category);
+        extraParams.put("kw", kw);
+        model.addAttribute("extraParams", extraParams);
+
         return "admin/board";
     }
 
@@ -283,21 +296,27 @@ public class AdminController {
     // 이벤트 관리 (현재는 목데이터만 - 보여주기 전용)
     // ==========================================
     @GetMapping("/event")
-    public String event(Model model) {
+    public String event(Model model,
+                        @RequestParam(value = "page", defaultValue = "0") int page) {
         model.addAttribute("activeMenu", "event");
         model.addAttribute("pageTitle", "이벤트 관리");
 
-        model.addAttribute("ongoingEventCount", 2);
-        model.addAttribute("upcomingEventCount", 1);
-        model.addAttribute("totalEventParticipants", 386);
-        model.addAttribute("endedEventCount", 5);
-        model.addAttribute("totalEventCount", 8);
+        Page<Event> events = eventService.findAll(
+                PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createdDate"))
+        );
+        model.addAttribute("events", events);
 
-        List<EventMock> eventList = new ArrayList<>();
-        eventList.add(new EventMock(1L, "여름맞이 출석 챌린지", "2026.07.01", "2026.07.31", 128, "2026.06.20", "ONGOING"));
-        eventList.add(new EventMock(2L, "신규가입 웰컴 이벤트", "2026.06.01", "상시", 241, "2026.05.28", "ONGOING"));
-        eventList.add(new EventMock(3L, "추석맞이 K-문화 퀴즈전", "2026.09.20", "2026.09.27", 0, "2026.06.30", "UPCOMING"));
-        model.addAttribute("events", eventList);
+        List<Event> allEvents = eventService.findAll();
+        long ongoingCount = allEvents.stream().filter(e -> "ONGOING".equals(e.getStatus())).count();
+        long upcomingCount = allEvents.stream().filter(e -> "UPCOMING".equals(e.getStatus())).count();
+        long endedCount = allEvents.stream().filter(e -> "ENDED".equals(e.getStatus())).count();
+        long totalParticipants = allEvents.stream().mapToLong(e -> e.getParticipantCount() == null ? 0 : e.getParticipantCount()).sum();
+
+        model.addAttribute("ongoingEventCount", ongoingCount);
+        model.addAttribute("upcomingEventCount", upcomingCount);
+        model.addAttribute("endedEventCount", endedCount);
+        model.addAttribute("totalEventParticipants", totalParticipants);
+        model.addAttribute("totalEventCount", events.getTotalElements());
 
         return "admin/event";
     }
@@ -380,10 +399,16 @@ public class AdminController {
 // 카테고리(강좌) 관리
 // ==========================================
     @GetMapping("/category")
-    public String category(Model model) {
+    public String category(Model model,
+                           @RequestParam(value = "page", defaultValue = "0") int page) {
         model.addAttribute("activeMenu", "category");
         model.addAttribute("pageTitle", "카테고리 관리");
-        model.addAttribute("categories", categoryService.findAll());
+
+        Page<Category> categories = categoryService.findAll(
+                PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "id"))
+        );
+        model.addAttribute("categories", categories);
+
         return "admin/admin_category/category";
     }
 

@@ -4,6 +4,8 @@ import com.meta12.SS8911.dto.EventCreateRequestDto;
 import com.meta12.SS8911.entity.Event;
 import com.meta12.SS8911.repository.EventRepository;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -151,6 +153,10 @@ public class EventService {
 
         }
 
+    }
+
+    public Page<Event> findAll(Pageable pageable) {
+        return eventRepository.findAll(pageable);
     }
 
 }
