@@ -29,4 +29,6 @@ public class Category {
     private String fileName;
     private String fileOrigin;
 
+    private Integer orderNum;
+
 }
