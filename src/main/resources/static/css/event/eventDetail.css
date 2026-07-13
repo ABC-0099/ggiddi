@@ -1,10 +1,11 @@
 :root{
-    --navy-900:#16283D;
-    --navy-800:#1E3A5F;
-    --navy-600:#2C5282;
-    --mint-500:#2EC4A9;
-    --mint-600:#24A78E;
-    --mint-100:#E3F7F2;
+    --navy-900:#124A80;
+    --navy-800:#185FA5;
+    --navy-600:#3D82C4;
+    --mint-500:#5DCAA5;
+    --mint-600:#46B491;
+    --mint-100:#EAFBF4;
+    --mint-light:#9FE1CB;
 
     --glass-bg: rgba(255,255,255,0.6);
     --glass-border: rgba(255,255,255,0.65);
@@ -13,7 +14,7 @@
 body{
     background:#f5f6f8;
     margin:0;
-    font-family:'Pretendard',sans-serif;
+    font-family:'Noto Sans KR', 'Pretendard', sans-serif;
 }
 
 /* 전체 */

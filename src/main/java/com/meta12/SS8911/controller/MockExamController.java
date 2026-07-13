@@ -19,6 +19,11 @@ public class MockExamController {
 
     @GetMapping
     public String list(Model model, Authentication authentication) {
+        if (authentication == null || !authentication.isAuthenticated()
+                || "anonymousUser".equals(authentication.getName())) {
+            return "redirect:/siteUser/login";
+        }
+
         model.addAttribute("groupedExams", mockExamService.getExamListForUser(authentication.getName()));
 
         int[] stats = mockExamService.getUserExamStats(authentication.getName());
