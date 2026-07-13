@@ -94,7 +94,7 @@
                 <tbody>
 
                 <tr th:each="event, iter : ${events}">
-                    <td th:text="${iter.count}"></td>
+                    <td th:text="${events.totalElements - (events.number * events.size) - iter.index}"></td>
 
                     <td>
                         <div class="content-title-cell">
