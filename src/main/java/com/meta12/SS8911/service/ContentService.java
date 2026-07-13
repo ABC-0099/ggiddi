@@ -148,11 +148,15 @@ public class ContentService {
         }
     }
 
+    @Transactional
     public void sakjeProc(ContentDTO contentDTO) {
         Category category = categoryRepository.findById(contentDTO.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 강의가 없습니다."));
 
         Content content = createEntity(contentDTO, category);
+
+        // FK 자식(progress) 먼저 삭제 후 content 삭제
+        progressRepository.deleteByContentId(content.getId());
         contentRepository.delete(content);
     }
 
@@ -366,6 +370,8 @@ public class ContentService {
                 .orElseThrow(() ->
                         new IllegalArgumentException("콘텐츠가 없습니다."));
 
+        // FK 자식(progress) 먼저 삭제 후 content 삭제
+        progressRepository.deleteByContentId(id);
         contentRepository.delete(content);
     }
 

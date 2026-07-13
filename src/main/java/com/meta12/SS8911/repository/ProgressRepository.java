@@ -6,6 +6,7 @@ import com.meta12.SS8911.entity.SiteUser;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
@@ -25,4 +26,9 @@ public interface ProgressRepository extends JpaRepository<Progress, Long> {
 
     // ★ 메인페이지 대시보드 "완료 강의" 카드용
     long countBySiteUserAndCompletedTrue(SiteUser siteUser);
+
+    // ★ content 삭제 시 FK 제약 회피용
+    @Modifying
+    @Query("delete from Progress p where p.content.id = :contentId")
+    void deleteByContentId(@Param("contentId") Long contentId);
 }
