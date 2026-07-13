@@ -84,7 +84,13 @@ public class AdminController {
         model.addAttribute("newSignupsThisMonth", newSignupsThisMonth);
 
         // ── KPI: 이번 달 매출 (성공 결제만) ──
-        List<OrderPay> allOrders = orderPayService.listAll();
+        // ★ 구독 카테고리 접근권 레코드("구독 강의 접근")와 강사 칭찬 도장 레코드("강사 칭찬 도장")는
+        //   진짜 결제 건이 아니라서 통계/최근 결제 내역에서 제외.
+        List<OrderPay> allOrders = orderPayService.listAll().stream()
+                .filter(o -> o.getPayType() == null ||
+                        (!o.getPayType().trim().equals("구독 강의 접근")
+                                && !o.getPayType().trim().equals("강사 칭찬 도장")))
+                .collect(Collectors.toList());
         long monthlyRevenue = allOrders.stream()
                 .filter(o -> o.getStatus() == OrderPayStatus.SUCCESS)
                 .filter(o -> o.getPayday() != null && YearMonth.from(o.getPayday()).equals(thisMonth))
@@ -115,14 +121,14 @@ public class AdminController {
         model.addAttribute("monthlyStats", monthlyStats);
         model.addAttribute("cumulativeUserCount", activeUserCount);
 
-        // ── 도넛 차트: 카테고리별 결제 비율 (성공 결제 기준) ──
+        // ── 도넛 차트: 플랜별 결제 비율 (성공 결제 기준) ──
         List<OrderPay> successOrders = allOrders.stream()
                 .filter(o -> o.getStatus() == OrderPayStatus.SUCCESS)
                 .collect(Collectors.toList());
 
-        Map<String, Long> categoryCounts = successOrders.stream()
+        Map<String, Long> planCounts = successOrders.stream()
                 .collect(Collectors.groupingBy(
-                        o -> (o.getCategory() != null && o.getCategory().getTitle() != null) ? o.getCategory().getTitle() : "미분류",
+                        o -> planLabel(o.getPlanType()),
                         Collectors.counting()));
 
         List<CategoryStat> categoryStats = new ArrayList<>();
@@ -131,7 +137,7 @@ public class AdminController {
 
         if (totalSuccessCount > 0) {
             String[] donutColors = {"#185FA5", "#5DCAA5", "#9FE1CB", "#EF9F27", "#D85A30", "#E6F1FB"};
-            List<Map.Entry<String, Long>> sorted = categoryCounts.entrySet().stream()
+            List<Map.Entry<String, Long>> sorted = planCounts.entrySet().stream()
                     .sorted((a, b) -> Long.compare(b.getValue(), a.getValue()))
                     .collect(Collectors.toList());
 
@@ -171,6 +177,17 @@ public class AdminController {
         } catch (Exception e) {
             return 0L;
         }
+    }
+
+    // planType 코드를 도넛 차트 범례에 표시할 이름으로 변환
+    private String planLabel(String planType) {
+        if (planType == null) return "개별 구매";
+        return switch (planType.trim()) {
+            case "월구독" -> "월 구독";
+            case "연구독" -> "연 구독";
+            case "평생" -> "평생 소장";
+            default -> planType;
+        };
     }
 
     @GetMapping("")

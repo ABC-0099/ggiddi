@@ -14,6 +14,7 @@ package com.meta12.SS8911.service;
 import com.meta12.SS8911.dto.OrderPayDTO;
 import com.meta12.SS8911.entity.Category;
 
+import com.meta12.SS8911.config.OrderPayStatus;
 import com.meta12.SS8911.entity.OrderPay;
 import com.meta12.SS8911.entity.SiteUser;
 import com.meta12.SS8911.repository.CategoryRepository;
@@ -57,6 +58,7 @@ public class OrderPayService {
         mainOrder.setCardNumber(cardNumber);
         mainOrder.setPlanType(planName); // ★ 플랜명은 planType에 저장 (instructorName은 실제 강사용 필드라 건드리지 않음)
         mainOrder.setPayday(LocalDateTime.now());
+        mainOrder.setStatus(OrderPayStatus.SUCCESS); // ★ 실제 결제가 승인된 시점이므로 SUCCESS로 표시 (안 하면 매출 집계에서 누락됨)
         orderPayRepository.save(mainOrder);
 
         // 2) 카테고리별 접근 권한 부여용 레코드 (구매 내역 화면에서는 숨겨짐)
@@ -75,6 +77,7 @@ public class OrderPayService {
             orderPay.setCardNumber(cardNumber);
             orderPay.setPlanType(planName); // ★ instructorName 대신 planType에 저장
             orderPay.setPayday(LocalDateTime.now());
+            orderPay.setStatus(OrderPayStatus.SUCCESS); // 같은 결제 건이므로 상태 일관성 유지 (통계에서는 마커로 별도 제외됨)
 
             orderPayRepository.save(orderPay);
         }
