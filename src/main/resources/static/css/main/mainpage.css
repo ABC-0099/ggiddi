@@ -611,7 +611,7 @@ a { text-decoration: none; color: inherit; }
 .lc-find a:hover { color: var(--mint-dark); }
 
 /* ── 배경 오브 ── */
-.bg-orbs { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
+.bg-orbs { position: fixed; inset: 0; z-index: -1; pointer-events: none; }
 .orb { position: absolute; border-radius: 50%; filter: blur(90px); }
 .o1 { width:500px; height:500px; top:-100px; left:-100px; background:#9FE1CB; opacity:.4; }
 .o2 { width:400px; height:400px; bottom:-80px; right:-80px; background:#B5D4F4; opacity:.35; }
