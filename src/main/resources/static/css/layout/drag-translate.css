@@ -77,6 +77,7 @@
   right: 28px;
   bottom: 96px; /* 띠귿이 토글 버튼(bottom:28px, height:56px) 바로 위에 쌓임 */
   z-index: 900; /* 띠귿이 패널(z-index:999)보다 낮게 잡아, 패널이 열리면 자연스럽게 가려짐 */
+  touch-action: none; /* 드래그 중 모바일 스크롤/제스처 간섭 방지 */
 }
 
 @media (max-width: 640px) {
@@ -96,7 +97,14 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  cursor: pointer;
+  cursor: grab;
+}
+.dt-lang-widget.dt-dragging .dt-lang-toggle {
+  cursor: grabbing;
+}
+.dt-lang-widget.dt-dragging {
+  opacity: .85;
+  transition: none;
 }
 .dt-lang-toggle svg {
   width: 22px;

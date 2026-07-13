@@ -1,10 +1,21 @@
 :root {
+    --navy-900: #124A80;
+    --navy-800: #185FA5;
+    --navy-600: #3D82C4;
+    --mint-500: #5DCAA5;
+    --mint-600: #46B491;
+    --mint-100: #EAFBF4;
+    --mint-light: #9FE1CB;
+
     --gray-50: #F7F7F6;
     --gray-600: #5F5E5A;
     --gray-800: #2C2C2A;
 
     --shadow-sm: 0 1px 3px rgba(0,0,0,0.07);
-    --shadow-md: 0 4px 12px rgba(0,0,0,0.08);
+    --shadow-md: 0 8px 24px rgba(30,58,95,0.12);
+
+    --glass-bg: rgba(255,255,255,0.55);
+    --glass-border: rgba(255,255,255,0.65);
 }
 
 *{
@@ -14,7 +25,7 @@
 }
 
 body{
-    font-family: 'Pretendard', 'Noto Sans KR', sans-serif;
+    font-family: 'Noto Sans KR', 'Pretendard', sans-serif;
     background: var(--gray-50);
     color: var(--gray-800);
 }
@@ -27,7 +38,8 @@ body{
     position: relative;
     margin: 20px;
     overflow: hidden;
-    border-radius: 12px;
+    border-radius: 16px;
+    box-shadow: var(--shadow-md);
 }
 
 .banner-slide{
@@ -42,15 +54,15 @@ body{
 }
 
 .banner-slide:nth-child(1){
-    background: #dce7f3;
+    background: linear-gradient(135deg, var(--navy-800), var(--navy-600));
 }
 
 .banner-slide:nth-child(2){
-    background: #f7e7da;
+    background: linear-gradient(135deg, var(--mint-600), var(--mint-500));
 }
 
 .banner-slide:nth-child(3){
-    background: #f5efc8;
+    background: linear-gradient(135deg, var(--navy-600), var(--mint-500));
 }
 
 .banner-image{
@@ -72,36 +84,93 @@ body{
     display: flex;
     align-items: center;
     gap: 15px;
-}
 
-.page-number{
-    background: white;
-    padding: 10px 24px;
-    border-radius: 10px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
 
-    font-size: 16px;
-    font-weight: 600;
+    padding: 8px 14px;
+    border-radius: 30px;
 
     box-shadow: var(--shadow-sm);
 }
 
+/* 화살표는 배너 좌우 끝에 겹치지 않게 배치, 평소엔 숨김 */
+.arrow-btn.prev-btn,
+.arrow-btn.next-btn{
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+
+    opacity: 0;
+    pointer-events: none;
+
+    transition: opacity 0.25s, transform 0.25s;
+    z-index: 2;
+}
+
+.arrow-btn.prev-btn{
+    left: 15px;
+}
+
+.arrow-btn.next-btn{
+    right: 15px;
+}
+
+.banner:hover .arrow-btn.prev-btn,
+.banner:hover .arrow-btn.next-btn{
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.arrow-btn.prev-btn:hover,
+.arrow-btn.next-btn:hover{
+    transform: translateY(-50%) scale(1.08);
+}
+
+/* 점(dot) 페이지 인디케이터 */
+.banner-dots{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.dot{
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+
+    background: rgba(255,255,255,0.55);
+    cursor: pointer;
+    transition: 0.25s;
+}
+
+.dot.active{
+    width: 22px;
+    border-radius: 6px;
+    background: var(--mint-500);
+}
+
 .arrow-btn{
-    width: 42px;
-    height: 42px;
+    width: 36px;
+    height: 36px;
 
     border: none;
     border-radius: 50%;
-    background: white;
+    background: rgba(255,255,255,0.85);
 
-    font-size: 18px;
+    font-size: 16px;
     font-weight: bold;
+    color: var(--navy-800);
 
     cursor: pointer;
     transition: 0.2s;
 }
 
 .arrow-btn:hover{
-    transform: scale(1.05);
+    transform: scale(1.08);
+    background: #fff;
 }
 
 /* ==========================
@@ -119,6 +188,18 @@ body{
 
     font-size: 35px;
     font-weight: 700;
+    color: var(--navy-800);
+    position: relative;
+}
+
+.event-title::after{
+    content: "";
+    display: block;
+    width: 60px;
+    height: 4px;
+    margin: 14px auto 0;
+    border-radius: 4px;
+    background: var(--mint-500);
 }
 
 .event-grid{
@@ -127,24 +208,28 @@ body{
     gap: 30px;
 }
 
-/* 카드 */
+/* 카드 - 글래스모피즘 */
 
 .event-card{
-    background: white;
-    border: 1px solid #ddd;
-    border-radius: 12px;
+    background: var(--glass-bg);
+    border: 1px solid var(--glass-border);
+    border-radius: 16px;
+
+    backdrop-filter: blur(8px);
+    -webkit-backdrop-filter: blur(8px);
 
     padding: 18px;
 
     min-height: 520px;
 
     box-shadow: var(--shadow-sm);
-    transition: 0.2s;
+    transition: 0.25s;
 }
 
 .event-card:hover{
-    transform: translateY(-5px);
+    transform: translateY(-6px);
     box-shadow: var(--shadow-md);
+    border-color: var(--mint-500);
 }
 
 .event-card img{
@@ -153,13 +238,14 @@ body{
 
     object-fit: cover;
 
-    border-radius: 8px;
+    border-radius: 10px;
     margin-bottom: 20px;
 }
 
 .event-card h3{
     font-size: 18px;
     margin-bottom: 15px;
+    color: var(--navy-800);
 }
 
 .event-card p{
@@ -171,29 +257,41 @@ body{
 .progress-btn{
     margin-top: 15px;
 
-    border: 2px solid #4A6FA5;
-    color: #4A6FA5;
-    background: white;
+    border: 2px solid var(--mint-500);
+    color: var(--mint-600);
+    background: var(--mint-100);
 
     padding: 8px 18px;
-    border-radius: 8px;
+    border-radius: 10px;
 
     font-weight: bold;
     cursor: pointer;
+    transition: 0.2s;
+}
+
+.progress-btn:hover{
+    background: var(--mint-500);
+    color: #fff;
 }
 
 .result-btn{
     margin-top: 15px;
 
-    border: 2px solid #E24B4A;
-    color: #E24B4A;
-    background: white;
+    border: 2px solid var(--navy-600);
+    color: var(--navy-800);
+    background: #EAF0F7;
 
     padding: 8px 18px;
-    border-radius: 8px;
+    border-radius: 10px;
 
     font-weight: bold;
     cursor: pointer;
+    transition: 0.2s;
+}
+
+.result-btn:hover{
+    background: var(--navy-600);
+    color: #fff;
 }
 
 .pagination{
@@ -202,6 +300,7 @@ body{
 
     font-size: 18px;
     font-weight: bold;
+    color: var(--navy-800);
 }
 
 .event-link {

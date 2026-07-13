@@ -284,6 +284,33 @@ body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: va
 /* 첨부파일 존 — 더 컴팩트 */
 .attach-zone .upload-placeholder { padding: 24px; }
 
+/* 썸네일 업로드 존 — 16:9 비율 */
+.thumb-zone .upload-placeholder { padding: 28px 24px; }
+
+.thumb-preview {
+  padding: 12px;
+  position: relative;
+}
+
+.thumb-preview-img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 10px;
+  display: block;
+  background: var(--border);
+}
+
+.existing-thumb-img {
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+  border-radius: 10px;
+  margin-top: 8px;
+  display: block;
+  background: var(--border);
+}
+
 /* 비디오 프리뷰 */
 .upload-preview {
   padding: 16px;

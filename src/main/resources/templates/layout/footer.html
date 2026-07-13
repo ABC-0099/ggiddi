@@ -21,8 +21,7 @@
       <!-- 브랜드 -->
       <div class="footer-brand">
         <a class="footer-logo" th:href="@{/}">
-          <span class="logo-pixel">끼</span>
-          <span class="logo-text">끼역띠귿</span>
+          <img th:src="@{/images/logo-admin.png}" alt="끼역띠귿" class="footer-logo-img" />
         </a>
         <p class="footer-tagline">외국인과 다문화 가족을 위한<br>한국어 학습 플랫폼</p>
         <div class="footer-sns">
@@ -48,7 +47,7 @@
         <div class="footer-col">
           <h4>학습</h4>
           <ul>
-            <li><a th:href="@{/lectures}">동영상 강의</a></li>
+            <li><a th:href="@{/category/list}">동영상 강의</a></li>
             <li><a th:href="@{/game}">학습 게임</a></li>
             <li><a th:href="@{/pricing}">구독 안내</a></li>
           </ul>
@@ -57,10 +56,10 @@
         <div class="footer-col">
           <h4>커뮤니티</h4>
           <ul>
-            <li><a th:href="@{/notices}">공지사항</a></li>
+            <li><a th:href="@{/notice/list}">공지사항</a></li>
             <li><a th:href="@{/community}">커뮤니티</a></li>
-            <li><a th:href="@{/faq}">자주 묻는 질문</a></li>
-            <li><a th:href="@{/qna}">1:1 질문하기</a></li>
+            <li><a th:href="@{/faq/list}">자주 묻는 질문</a></li>
+            <li><a th:href="@{/qna/write}">1:1 질문하기</a></li>
           </ul>
         </div>
 
@@ -69,7 +68,7 @@
           <ul>
             <li><a th:href="@{/terms}">이용약관</a></li>
             <li><a th:href="@{/privacy}">개인정보처리방침</a></li>
-            <li><a th:href="@{/mypage}">마이페이지</a></li>
+            <li><a th:href="@{/siteUser/mypage}">마이페이지</a></li>
           </ul>
         </div>
 
@@ -81,8 +80,8 @@
 
     <!-- 하단: 카피라이트 -->
     <div class="footer-bottom">
-      <p class="copyright">© 2025 끼역띠귿. All rights reserved.</p>
-      <p class="footer-info">사업자등록번호 123-45-67890 &nbsp;|&nbsp; 대표자 홍길동 &nbsp;|&nbsp; 이메일 help@kkiyeok.com</p>
+      <p class="copyright">© 2026 끼역띠귿. All rights reserved.</p>
+      <p class="footer-info">사업자등록번호 123-45-67890 &nbsp;|&nbsp; 대표자 봄글 &nbsp;|&nbsp; 이메일 help@kkiyeok.com</p>
     </div>
 
   </div>

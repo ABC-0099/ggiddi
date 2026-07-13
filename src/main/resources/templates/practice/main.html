@@ -151,6 +151,36 @@
     </div>
   </section>
 
+  <!-- 오답노트 -->
+  <section class="pl-section" sec:authorize="isAuthenticated()">
+    <div class="pl-section-head pl-section-head-row">
+      <div>
+        <p class="pl-section-tag">오답노트</p>
+        <h2>틀린 문제, 다시 짚고 가요</h2>
+      </div>
+      <a th:href="@{/practice/wrong-notes}" class="pl-wrongnote-more">전체보기 →</a>
+    </div>
+
+    <div class="pl-wrongnote-summary" th:if="${wrongNoteCount != null and wrongNoteCount > 0}">
+      아직 복습 안 한 오답이 <strong th:text="${wrongNoteCount}">5</strong>개 있어요.
+    </div>
+
+    <div class="pl-history-list">
+      <a th:each="note : ${recentWrongNotes}" th:href="@{/practice/wrong-notes}" class="pl-history-row pl-wrongnote-row">
+        <div class="pl-history-main">
+          <span class="pl-history-title" th:text="${note.questionText}">문제 내용</span>
+          <span class="pl-history-date"
+                th:text="${note.category} + ' · ' + ${#temporals.format(note.createdDate, 'MM.dd')}">카테고리 · 날짜</span>
+        </div>
+        <span class="pl-wrongnote-badge" th:text="${note.sourceType.description}">연습퀴즈</span>
+      </a>
+
+      <div class="pl-history-empty" th:if="${recentWrongNotes == null or #lists.isEmpty(recentWrongNotes)}">
+        아직 틀린 문제가 없어요. 이대로만 쭉 가요! 🎉
+      </div>
+    </div>
+  </section>
+
 </div>
 
 <div th:replace="~{layout/footer :: footer}"></div>

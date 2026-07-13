@@ -233,7 +233,10 @@
                    th:classappend="${myProgress.first} ? 'disabled'"
                    class="page-btn page-prev">‹</a>
 
-                <a th:each="i : ${#numbers.sequence(0, myProgress.totalPages - 1)}"
+                <a th:each="i : ${#numbers.sequence(
+                        (myProgress.number / 5) * 5,
+                        T(java.lang.Math).min((myProgress.number / 5) * 5 + 4, myProgress.totalPages - 1)
+                    )}"
                    th:href="@{/siteUser/mypage(progressPage=${i}, tab='study')}"
                    th:text="${i + 1}"
                    th:classappend="${i == myProgress.number} ? 'active'"
@@ -293,7 +296,10 @@
                    th:classappend="${myPurchases.first} ? 'disabled'"
                    class="page-btn page-prev">‹</a>
 
-                <a th:each="i : ${#numbers.sequence(0, myPurchases.totalPages - 1)}"
+                <a th:each="i : ${#numbers.sequence(
+                        (myPurchases.number / 5) * 5,
+                        T(java.lang.Math).min((myPurchases.number / 5) * 5 + 4, myPurchases.totalPages - 1)
+                    )}"
                    th:href="@{/siteUser/mypage(purchasePage=${i}, tab='purchase')}"
                    th:text="${i + 1}"
                    th:classappend="${i == myPurchases.number} ? 'active'"
@@ -344,7 +350,10 @@
                        th:classappend="${myPosts.first} ? 'disabled'"
                        class="page-btn page-prev">‹</a>
 
-                    <a th:each="i : ${#numbers.sequence(0, myPosts.totalPages - 1)}"
+                    <a th:each="i : ${#numbers.sequence(
+                            (myPosts.number / 5) * 5,
+                            T(java.lang.Math).min((myPosts.number / 5) * 5 + 4, myPosts.totalPages - 1)
+                        )}"
                        th:href="@{/siteUser/mypage(postPage=${i}, tab='posts', subtab='myposts')}"
                        th:text="${i + 1}"
                        th:classappend="${i == myPosts.number} ? 'active'"
@@ -381,7 +390,10 @@
                        th:classappend="${myComments.first} ? 'disabled'"
                        class="page-btn page-prev">‹</a>
 
-                    <a th:each="i : ${#numbers.sequence(0, myComments.totalPages - 1)}"
+                    <a th:each="i : ${#numbers.sequence(
+                            (myComments.number / 5) * 5,
+                            T(java.lang.Math).min((myComments.number / 5) * 5 + 4, myComments.totalPages - 1)
+                        )}"
                        th:href="@{/siteUser/mypage(commentPage=${i}, tab='posts', subtab='mycomments')}"
                        th:text="${i + 1}"
                        th:classappend="${i == myComments.number} ? 'active'"
@@ -429,7 +441,10 @@
                        th:classappend="${myInquiries.first} ? 'disabled'"
                        class="page-btn page-prev">‹</a>
 
-                    <a th:each="i : ${#numbers.sequence(0, myInquiries.totalPages - 1)}"
+                    <a th:each="i : ${#numbers.sequence(
+                            (myInquiries.number / 5) * 5,
+                            T(java.lang.Math).min((myInquiries.number / 5) * 5 + 4, myInquiries.totalPages - 1)
+                        )}"
                        th:href="@{/siteUser/mypage(inquiryPage=${i}, tab='posts', subtab='myinquiry')}"
                        th:text="${i + 1}"
                        th:classappend="${i == myInquiries.number} ? 'active'"

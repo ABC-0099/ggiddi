@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ko"
+      xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>오답노트 — 끼역띠귿</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@400;500;700;900&amp;display=swap" rel="stylesheet" />
+  <link rel="stylesheet" th:href="@{/css/layout/navbar.css}" />
+  <link rel="stylesheet" th:href="@{/css/layout/footer.css}" />
+  <link rel="stylesheet" th:href="@{/css/practice/wrong-notes.css}" />
+  <meta name="_csrf" th:content="${_csrf.token}" />
+  <meta name="_csrf_header" th:content="${_csrf.headerName}" />
+</head>
+<body>
+
+<div class="bg-orbs"><div class="orb o1"></div><div class="orb o2"></div></div>
+
+<div th:replace="~{layout/navbar :: navbar(currentMenu='practiceWrong')}"></div>
+
+<!-- 헤더 -->
+<div class="wn-header">
+  <div class="wn-header-inner">
+    <a th:href="@{/practice/main}" class="wn-back">← 배움터</a>
+    <div class="wn-title-row">
+      <span class="wn-title-badge">오답노트</span>
+      <h1>틀린 문제, 다시 짚고 가요</h1>
+    </div>
+    <p class="wn-sub">
+      연습퀴즈와 모의고사에서 틀린 문제들을 한곳에 모아뒀어요.
+      <span th:if="${wrongNoteCount != null and wrongNoteCount > 0}">
+        아직 복습 안 한 문제가 <strong th:text="${wrongNoteCount}">5</strong>개 있어요.
+      </span>
+    </p>
+  </div>
+</div>
+
+<main class="wn-wrap">
+
+  <!-- 필터 탭 -->
+  <div class="wn-filter-bar">
+    <a th:href="@{/practice/wrong-notes}"
+       th:classappend="${selectedSourceType == null} ? 'active'"
+       class="wn-filter-tab">전체</a>
+    <a th:href="@{/practice/wrong-notes(sourceType='PRACTICE_QUIZ')}"
+       th:classappend="${selectedSourceType != null and selectedSourceType.name() == 'PRACTICE_QUIZ'} ? 'active'"
+       class="wn-filter-tab">연습퀴즈</a>
+    <a th:href="@{/practice/wrong-notes(sourceType='MOCK_EXAM')}"
+       th:classappend="${selectedSourceType != null and selectedSourceType.name() == 'MOCK_EXAM'} ? 'active'"
+       class="wn-filter-tab">실전모의고사</a>
+  </div>
+
+  <!-- 오답 목록 -->
+  <div class="wn-list">
+
+    <div class="wn-card" th:each="note : ${notes.content}" th:classappend="${note.reviewed} ? 'is-reviewed'">
+      <div class="wn-card-top">
+        <span class="wn-source-badge"
+              th:classappend="${note.sourceType.name() == 'MOCK_EXAM'} ? 'is-mock'"
+              th:text="${note.sourceType.description}">연습퀴즈</span>
+        <span class="wn-category" th:text="${note.category}">테마</span>
+        <span class="wn-set-title" th:text="${note.quizSetTitle}">세트명</span>
+        <span class="wn-date" th:text="${#temporals.format(note.createdDate, 'yyyy.MM.dd')}">2026.07.10</span>
+      </div>
+
+      <div class="wn-question" th:text="${note.questionText}">문제 내용이 여기에 표시됩니다.</div>
+
+      <div class="wn-answer-row">
+        <div class="wn-answer-box wn-answer-wrong">
+          <span class="wn-answer-label">내가 고른 답</span>
+          <span class="wn-answer-text" th:text="${note.userAnswer} ?: '미응답'">틀린 보기</span>
+        </div>
+        <div class="wn-answer-box wn-answer-correct">
+          <span class="wn-answer-label">정답</span>
+          <span class="wn-answer-text" th:text="${note.correctAnswer}">정답 보기</span>
+        </div>
+      </div>
+
+      <div class="wn-explanation" th:if="${note.explanation != null and !note.explanation.isEmpty()}">
+        <span class="wn-explanation-label">💡 해설</span>
+        <p th:text="${note.explanation}">해설 내용</p>
+      </div>
+
+      <label class="wn-reviewed-toggle">
+        <input type="checkbox" th:checked="${note.reviewed}"
+               th:attr="data-id=${note.id}" onchange="toggleReviewed(this)" />
+        <span>이해했어요, 복습 완료</span>
+      </label>
+    </div>
+
+    <div class="wn-empty" th:if="${notes.content.isEmpty()}">
+      <div class="wn-empty-emoji">🎉</div>
+      <p>아직 틀린 문제가 없어요. 이대로만 쭉 가요!</p>
+    </div>
+  </div>
+
+  <!-- 페이지네이션 -->
+  <div class="wn-pagination" th:if="${notes.totalPages > 1}">
+    <a th:each="i : ${#numbers.sequence(0, notes.totalPages - 1)}"
+       th:href="@{/practice/wrong-notes(page=${i}, sourceType=${selectedSourceType != null ? selectedSourceType.name() : null})}"
+       th:text="${i + 1}"
+       th:classappend="${i == notes.number} ? 'active'"
+       class="wn-page-btn">1</a>
+  </div>
+
+</main>
+
+<div th:replace="~{layout/footer :: footer}"></div>
+<div th:replace="~{layout/drag-translate :: dragTranslate}"></div>
+
+<script>
+  function getCsrfMeta() {
+    return {
+      token: document.querySelector('meta[name="_csrf"]')?.content,
+      header: document.querySelector('meta[name="_csrf_header"]')?.content
+    };
+  }
+
+  function toggleReviewed(checkbox) {
+    const id = checkbox.dataset.id;
+    const { token, header } = getCsrfMeta();
+    const headers = {};
+    if (header && token) headers[header] = token;
+
+    checkbox.disabled = true;
+
+    fetch('/api/wrong-notes/' + id + '/review', {
+      method: 'POST',
+      headers: headers
+    })
+      .then(res => res.json())
+      .then(data => {
+        checkbox.disabled = false;
+        if (data.success) {
+          checkbox.closest('.wn-card').classList.toggle('is-reviewed', data.reviewed);
+        } else {
+          checkbox.checked = !checkbox.checked; // 실패하면 원상복구
+          alert('처리 중 오류가 발생했어요.');
+        }
+      })
+      .catch(() => {
+        checkbox.disabled = false;
+        checkbox.checked = !checkbox.checked;
+        alert('처리 중 오류가 발생했어요.');
+      });
+  }
+</script>
+
+</body>
+</html>

@@ -13,6 +13,7 @@ import com.meta12.SS8911.repository.SiteUserRepository;
 import com.meta12.SS8911.service.CategoryService;
 import com.meta12.SS8911.service.ContentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.multipart.MultipartFile;
@@ -224,6 +225,17 @@ public class CategoryController {
         }
         categoryService.sakjeProc(categoryDTO);
         return "redirect:/category/list";
+    }
+
+    // 🌟 [추가]: list.html의 삭제 버튼이 호출하는 DELETE /category/delete/{id} 엔드포인트
+    @DeleteMapping("/category/delete/{id}")
+    @ResponseBody
+    public ResponseEntity<Void> deleteById(@PathVariable("id") Long id) {
+        if (categoryService.view(id) == null) {
+            return ResponseEntity.notFound().build();
+        }
+        categoryService.delete(id);
+        return ResponseEntity.ok().build();
     }
 
     @GetMapping("/category/{id}/content/add")

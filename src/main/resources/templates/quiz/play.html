@@ -107,6 +107,7 @@
   let answered    = false;
   let score       = 0;
   let results     = []; // {correct}
+  let quizFinished = false; // ★ 정상 종료(결과 화면 도달) 여부 - 이탈 감지에 사용
 
   function getCsrfToken() {
     const match = document.cookie.match(/(^|;\s*)XSRF-TOKEN=([^;]*)/);
@@ -254,6 +255,7 @@
       `<div class="rc-cell ${r.correct ? 'ok' : 'no'}">${i + 1}</div>`
     ).join('');
 
+    quizFinished = true; // ★ 정상 종료 표시 - 이후 페이지 이탈은 자동저장 대상 아님
     saveFinish(score, total);
   }
 
@@ -267,6 +269,25 @@
       body: JSON.stringify({ score, total })
     }).catch(e => console.warn('결과 저장 실패:', e));
   }
+
+  // ── 중도 이탈 시 자동 부분저장 ──
+  // 탭을 닫거나 다른 페이지로 이동할 때(pagehide), 아직 결과 화면까지 못 갔는데
+  // 이미 채점된 문항이 하나라도 있으면 그때까지의 점수로 QuizBox를 기록해서
+  // "중간에 나가면 아무 기록도 안 남는" 문제를 방지함.
+  // keepalive:true로 페이지가 사라져도 요청이 끝까지 전송되도록 함.
+  window.addEventListener('pagehide', function () {
+    if (!quizFinished && results.length > 0) {
+      fetch('/api/quiz/' + QUIZ_ID + '/finish', {
+        method: 'POST',
+        keepalive: true,
+        headers: {
+          'Content-Type': 'application/json',
+          [CSRF_HEADER]: getCsrfToken()
+        },
+        body: JSON.stringify({ score: score, total: results.length })
+      }).catch(() => {});
+    }
+  });
 
   // ── 초기 실행 ──
   startQuiz();

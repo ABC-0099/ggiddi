@@ -67,7 +67,7 @@
                     <td>
                         <span class="badge"
                               th:classappend="${c.status == 'PUBLISHED' ? 'badge-success' : (c.status == 'SCHEDULED' ? 'badge-info' : 'badge-gray')}"
-                              th:text="${c.status != null ? c.status : 'DRAFT'}">DRAFT</span>
+                              th:text="${c.status == 'PUBLISHED' ? '공개' : (c.status == 'SCHEDULED' ? '예약공개' : '임시저장')}">임시저장</span>
                     </td>
                     <td th:text="${c.createdDate != null ? #temporals.format(c.createdDate, 'yyyy-MM-dd') : '-'}">-</td>
                     <td style="text-align:center;">

@@ -135,6 +135,31 @@
             </div>
           </section>
 
+          <!-- 썸네일 -->
+          <section class="form-card">
+            <div class="card-header">
+              <span class="card-icon">🖼</span>
+              <span class="card-title">썸네일 이미지</span>
+              <span class="card-badge-opt">선택</span>
+            </div>
+
+            <div class="upload-zone thumb-zone" id="thumb-zone">
+              <input type="file" id="thumbnailFile" name="thumbFile"
+                     accept="image/jpeg,image/png,image/webp"
+                     class="upload-input" />
+              <div class="upload-placeholder" id="thumb-placeholder">
+                <div class="upload-icon" style="font-size:28px;">🖼</div>
+                <div class="upload-text">썸네일 이미지를 드래그하거나 클릭해서 업로드</div>
+                <div class="upload-sub">JPG, PNG, WEBP · 16:9 권장 · 최대 5MB</div>
+              </div>
+              <div class="thumb-preview" id="thumb-preview" style="display:none;">
+                <img id="thumb-preview-img" class="thumb-preview-img" alt="썸네일 미리보기" />
+                <button type="button" class="preview-remove" onclick="removeFile('thumb')">✕ 제거</button>
+              </div>
+            </div>
+            <span class="field-hint">비워두면 기본 썸네일이 사용돼요.</span>
+          </section>
+
           <!-- 첨부파일 -->
           <section class="form-card">
             <div class="card-header">
@@ -218,6 +243,10 @@
                 <span class="sv" id="summary-video">미선택</span>
               </li>
               <li>
+                <span class="sl">썸네일</span>
+                <span class="sv" id="summary-thumb">기본 이미지</span>
+              </li>
+              <li>
                 <span class="sl">첨부</span>
                 <span class="sv" id="summary-attach">0개</span>
               </li>
@@ -291,7 +320,38 @@
        actionHint.style.display = 'block';
        summaryVideo.textContent = '미선택';
      }
+     if (type === 'thumb') {
+       thumbInput.value = '';
+       thumbPreviewImg.src = '';
+       thumbPlaceholder.style.display = 'flex';
+       thumbPreview.style.display = 'none';
+       summaryThumb.textContent = '기본 이미지';
+     }
    };
+
+   // ── 썸네일 업로드 처리 ──
+   const thumbInput = document.getElementById('thumbnailFile');
+   const thumbZone = document.getElementById('thumb-zone');
+   const thumbPlaceholder = document.getElementById('thumb-placeholder');
+   const thumbPreview = document.getElementById('thumb-preview');
+   const thumbPreviewImg = document.getElementById('thumb-preview-img');
+   const summaryThumb = document.getElementById('summary-thumb');
+
+   thumbInput.addEventListener('change', function () {
+     const file = this.files[0];
+     if (!file) return;
+
+     if (file.size > 5 * 1024 * 1024) {
+       alert('썸네일 이미지는 5MB를 초과할 수 없어요.');
+       this.value = '';
+       return;
+     }
+
+     thumbPreviewImg.src = URL.createObjectURL(file);
+     thumbPlaceholder.style.display = 'none';
+     thumbPreview.style.display = 'block';
+     summaryThumb.textContent = file.name;
+   });
 
    // ── 키워드 태그 ──
    const keywordInput = document.getElementById('keyword-input');

@@ -1,17 +1,27 @@
 package com.meta12.SS8911.controller;
 
+import com.meta12.SS8911.config.SourceType;
 import com.meta12.SS8911.entity.Category;
 import com.meta12.SS8911.entity.MockExamBox;
 import com.meta12.SS8911.entity.SiteUser;
+import com.meta12.SS8911.entity.WrongAnswerNote;
 import com.meta12.SS8911.repository.MockExamBoxRepository;
 import com.meta12.SS8911.repository.QuizRepository;
 import com.meta12.SS8911.repository.SiteUserRepository;
+import com.meta12.SS8911.repository.WrongAnswerNoteRepository;
 import com.meta12.SS8911.service.CategoryService;
 import com.meta12.SS8911.service.QuizService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.ResponseBody;
 
 import java.security.Principal;
 import java.util.HashMap;
@@ -28,6 +38,7 @@ public class PracticeController {
     private final CategoryService categoryService;
     private final QuizRepository quizRepository;
     private final QuizService quizService;
+    private final WrongAnswerNoteRepository wrongAnswerNoteRepository; // ★ 오답노트 요약용
 
     /**
      * 배움터 메인 (연습퀴즈 카테고리 목록 + 실전모의고사 최근 응시 이력).
@@ -90,9 +101,84 @@ public class PracticeController {
                 Double avgAccuracy = mockExamBoxRepository.findAvgAccuracyByUserId(user.getId());
                 int avgAccuracyPercent = (int) Math.round((avgAccuracy != null ? avgAccuracy : 0) * 100);
                 model.addAttribute("avgAccuracy", avgAccuracyPercent + "%");
+
+                // ★ 오답노트 요약 - 미복습 개수 + 최근 3개 미리보기
+                long wrongNoteCount = wrongAnswerNoteRepository.countBySiteUserAndReviewedFalse(user);
+                model.addAttribute("wrongNoteCount", wrongNoteCount);
+
+                List<WrongAnswerNote> recentWrongNotes = wrongAnswerNoteRepository
+                        .findBySiteUserOrderByCreatedDateDesc(user, PageRequest.of(0, 3))
+                        .getContent();
+                model.addAttribute("recentWrongNotes", recentWrongNotes);
             }
         }
 
         return "practice/main";
+    }
+
+    /**
+     * 오답노트 전체 목록 - 출처(연습퀴즈/모의고사)별 필터링 + 페이지네이션.
+     */
+    @GetMapping("/practice/wrong-notes")
+    public String wrongNotes(@RequestParam(required = false) String sourceType,
+                             @RequestParam(defaultValue = "0") int page,
+                             Model model, Principal principal) {
+        if (principal == null) return "redirect:/siteUser/login";
+
+        SiteUser user = siteUserRepository.findByUsername(principal.getName()).orElse(null);
+        if (user == null) return "redirect:/siteUser/login";
+
+        Pageable pageable = PageRequest.of(page, 10);
+        Page<WrongAnswerNote> notes;
+
+        SourceType type = null;
+        if (sourceType != null && !sourceType.isBlank()) {
+            try {
+                type = SourceType.valueOf(sourceType);
+            } catch (IllegalArgumentException ignored) {
+                // 잘못된 값이면 전체 조회로 폴백
+            }
+        }
+
+        notes = (type != null)
+                ? wrongAnswerNoteRepository.findBySiteUserAndSourceTypeOrderByCreatedDateDesc(user, type, pageable)
+                : wrongAnswerNoteRepository.findBySiteUserOrderByCreatedDateDesc(user, pageable);
+
+        model.addAttribute("notes", notes);
+        model.addAttribute("selectedSourceType", type);
+        model.addAttribute("wrongNoteCount", wrongAnswerNoteRepository.countBySiteUserAndReviewedFalse(user));
+
+        return "practice/wrong-notes";
+    }
+
+    /**
+     * 오답 하나를 복습완료/미완료로 토글 (체크박스 클릭 시 AJAX 호출).
+     */
+    @PostMapping("/api/wrong-notes/{id}/review")
+    @ResponseBody
+    public Map<String, Object> toggleReviewed(@PathVariable Long id, Principal principal) {
+        Map<String, Object> result = new HashMap<>();
+
+        if (principal == null) {
+            result.put("success", false);
+            return result;
+        }
+
+        SiteUser user = siteUserRepository.findByUsername(principal.getName()).orElse(null);
+        WrongAnswerNote note = wrongAnswerNoteRepository.findById(id).orElse(null);
+
+        // 본인 소유의 오답노트만 토글 가능 (다른 사람 것 조작 방지)
+        if (user == null || note == null || note.getSiteUser() == null
+                || !note.getSiteUser().getId().equals(user.getId())) {
+            result.put("success", false);
+            return result;
+        }
+
+        note.setReviewed(!note.isReviewed());
+        wrongAnswerNoteRepository.save(note);
+
+        result.put("success", true);
+        result.put("reviewed", note.isReviewed());
+        return result;
     }
 }

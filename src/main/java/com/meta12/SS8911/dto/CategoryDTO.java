@@ -16,4 +16,6 @@ public class CategoryDTO {
     private MultipartFile attachFile;
     private String fileName;
     private String fileOrigin;
+
+    private Integer orderNum;
 }

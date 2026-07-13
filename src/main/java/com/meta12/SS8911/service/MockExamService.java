@@ -3,6 +3,7 @@ package com.meta12.SS8911.service;
 import com.meta12.SS8911.dto.*;
 import com.meta12.SS8911.entity.*;
 import com.meta12.SS8911.repository.*;
+import com.meta12.SS8911.config.SourceType;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class MockExamService {
     private final MockExamBoxRepository mockExamBoxRepository;
     private final CategoryRepository categoryRepository;
     private final SiteUserRepository siteUserRepository;
+    private final WrongAnswerNoteRepository wrongAnswerNoteRepository; // ★ 오답노트 저장용
 
     /**
      * /practice/mock 목록용 - 테마(카테고리)별로 회차 그룹핑.
@@ -121,7 +123,11 @@ public class MockExamService {
         for (MockExamQuestion q : questions) {
             Integer selected = selectedByQuestionId.get(q.getId());
             boolean correct = selected != null && selected.equals(q.getAnswer());
-            if (correct) score++;
+            if (correct) {
+                score++;
+            } else {
+                saveWrongAnswer(exam, q, selected, user);
+            }
 
             results.add(MockExamResultDTO.QuestionResult.builder()
                     .questionId(q.getId())
@@ -152,6 +158,37 @@ public class MockExamService {
                 .total(total)
                 .questionResults(results)
                 .build();
+    }
+
+    /**
+     * 모의고사 오답을 스냅샷으로 저장 (원본 문항이 나중에 수정/삭제돼도 내용은 그대로 보존됨).
+     */
+    private void saveWrongAnswer(MockExam exam, MockExamQuestion q, Integer selected, SiteUser user) {
+        WrongAnswerNote note = new WrongAnswerNote();
+        note.setSiteUser(user);
+        note.setSourceType(SourceType.MOCK_EXAM);
+        note.setSourceQuestionId(q.getId());
+        note.setQuestionText(q.getQuestion());
+        note.setUserAnswer(optionText(q, selected));
+        note.setCorrectAnswer(optionText(q, q.getAnswer()));
+        note.setExplanation(q.getExplanation());
+        note.setQuizSetId(exam.getId());
+        note.setQuizSetTitle(exam.getTitle());
+        note.setCategory(exam.getCategory().getTitle());
+
+        wrongAnswerNoteRepository.save(note);
+    }
+
+    // 선택 번호(1~4)를 실제 보기 텍스트로 변환 (null이면 미답)
+    private String optionText(MockExamQuestion q, Integer optionNumber) {
+        if (optionNumber == null) return null;
+        return switch (optionNumber) {
+            case 1 -> q.getOption1();
+            case 2 -> q.getOption2();
+            case 3 -> q.getOption3();
+            case 4 -> q.getOption4();
+            default -> null;
+        };
     }
 
     /**

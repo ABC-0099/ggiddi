@@ -17,7 +17,9 @@ import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.*;
 
 import java.security.Principal;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Controller
 @RequestMapping("/community")
@@ -41,6 +43,14 @@ public class CommunityController {
         model.addAttribute("category", category);
         model.addAttribute("sort", sort);
         model.addAttribute("kw", kw);
+
+        // 페이지 이동 시 카테고리/정렬/검색어 조건을 그대로 유지하기 위한 파라미터
+        Map<String, Object> extraParams = new HashMap<>();
+        extraParams.put("category", category);
+        extraParams.put("sort", sort);
+        extraParams.put("kw", kw);
+        model.addAttribute("extraParams", extraParams);
+
         return "community/list";
     }
 

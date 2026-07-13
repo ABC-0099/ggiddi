@@ -26,7 +26,9 @@ document.addEventListener('DOMContentLoaded', function () {
     let unreadCount = 0;
     let isConnected = false;
     let currentRoomId = null;
+    let currentRoomCapacity = null;
     let currentSubscription = null;
+    let currentCountSubscription = null;
 
     // ───────── 패널 열기/닫기 ─────────
     window.toggleChat = function () {
@@ -101,13 +103,13 @@ document.addEventListener('DOMContentLoaded', function () {
     // ───────── 방 입장/퇴장 ─────────
     function enterRoom(roomId, roomName, currentCount, capacity) {
         currentRoomId = roomId;
+        currentRoomCapacity = (typeof capacity === 'number') ? capacity : null;
         roomNameEl.textContent = roomName;
 
         if (roomCountBadgeEl) {
             if (typeof currentCount === 'number' && typeof capacity === 'number') {
-                roomCountBadgeEl.textContent = currentCount + ' / ' + capacity;
+                updateRoomCountBadge(currentCount);
                 roomCountBadgeEl.style.display = 'inline-block';
-                roomCountBadgeEl.classList.toggle('is-full', currentCount >= capacity);
             } else {
                 roomCountBadgeEl.style.display = 'none';
             }
@@ -139,6 +141,10 @@ document.addEventListener('DOMContentLoaded', function () {
         if (currentSubscription) {
             currentSubscription.unsubscribe();
             currentSubscription = null;
+        }
+        if (currentCountSubscription) {
+            currentCountSubscription.unsubscribe();
+            currentCountSubscription = null;
         }
         if (stompClient) {
             stompClient.deactivate();
@@ -205,6 +211,17 @@ document.addEventListener('DOMContentLoaded', function () {
         chatMessages.scrollTop = chatMessages.scrollHeight;
     }
 
+    // ───────── 실시간 인원수 배지 갱신 ─────────
+    function updateRoomCountBadge(count) {
+        if (!roomCountBadgeEl) return;
+        if (typeof currentRoomCapacity === 'number') {
+            roomCountBadgeEl.textContent = count + ' / ' + currentRoomCapacity;
+            roomCountBadgeEl.classList.toggle('is-full', count >= currentRoomCapacity);
+        } else {
+            roomCountBadgeEl.textContent = count + '명';
+        }
+    }
+
     function updateUnreadBadge() {
         if (unreadCount > 0) {
             unreadBadge.style.display = 'flex';
@@ -238,6 +255,11 @@ document.addEventListener('DOMContentLoaded', function () {
                 currentSubscription = stompClient.subscribe('/topic/chat/' + roomId, (frame) => {
                     const body = JSON.parse(frame.body);
                     appendMessage(body);
+                });
+                // ★ 실시간 인원수 구독 - 다른 사람이 입장/퇴장할 때마다 서버가 최신 값을 보내줌
+                currentCountSubscription = stompClient.subscribe('/topic/chat/' + roomId + '/count', (frame) => {
+                    const count = JSON.parse(frame.body);
+                    updateRoomCountBadge(count);
                 });
                 // 서버 메모리(ChatPresenceService)에 입장 등록 -> 로비 인원수 반영
                 stompClient.publish({

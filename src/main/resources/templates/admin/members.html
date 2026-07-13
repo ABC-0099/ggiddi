@@ -43,7 +43,7 @@
                     </td>
                 </tr>
                 <tr th:each="user, stat : ${users}">
-                    <td th:text="${stat.count}"></td>
+                    <td th:text="${users.totalElements - (users.number * users.size) - stat.index}"></td>
                     <td th:text="${user.username}"></td>
                     <td th:text="${user.name}"></td>
                     <td th:text="${user.email}"></td>

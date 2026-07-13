@@ -21,7 +21,7 @@
   <div class="qna-card">
 
         <span class="qna-status-badge"
-              th:text="${qna.status.description}"
+              th:text="${qna.status.name() == 'ANSWERED'} ? '답변완료' : '답변대기'"
               th:classappend="${qna.status.name() == 'ANSWERED'} ? 'answered' : 'pending'"></span>
 
     <h1 class="qna-title" th:text="${qna.title}">제목</h1>
@@ -113,7 +113,7 @@
     </div>
 
     <div class="qna-back">
-      <a th:href="@{/siteUser/mypage(tab='posts',subtab='myinquiry')}" class="btn-back">← 돌아가기</a>
+      <a th:href="@{/admin/board}" class="btn-back">← 돌아가기</a>
     </div>
   </div>
 </div>

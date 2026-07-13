@@ -18,6 +18,7 @@
 <div th:fragment="dragTranslate">
   <link th:href="@{/css/layout/drag-translate.css}" rel="stylesheet" />
 
+
   <!-- 드래그 시 뜨는 작은 "번역" 트리거 버튼 -->
   <button id="dtTriggerBtn" class="dt-trigger-btn" type="button">
     <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -172,6 +173,7 @@
 
       langToggle.addEventListener('click', (e) => {
         e.stopPropagation();
+        if (dragMoved) { dragMoved = false; return; }
         langMenu.hidden = !langMenu.hidden;
       });
 
@@ -190,6 +192,94 @@
 
       // 초기 언어 표시 동기화
       setTargetLang(getTargetLang());
+
+      // ── 언어 위젯 드래그 이동 ──
+      const widget = document.getElementById('dtLangWidget');
+      const DRAG_POS_KEY = 'kkyd_translate_widget_pos';
+      const DRAG_THRESHOLD = 4;
+
+      let dragging = false;
+      let dragMoved = false;
+      let pointerId = null;
+      let startX = 0, startY = 0;
+      let widgetStartLeft = 0, widgetStartTop = 0;
+
+      function clampToViewport(left, top) {
+        const rect = widget.getBoundingClientRect();
+        const maxLeft = window.innerWidth - rect.width - 4;
+        const maxTop = window.innerHeight - rect.height - 4;
+        return {
+          left: Math.min(Math.max(4, left), Math.max(4, maxLeft)),
+          top: Math.min(Math.max(4, top), Math.max(4, maxTop))
+        };
+      }
+
+      function pinWidget(left, top) {
+        widget.style.left = `${left}px`;
+        widget.style.top = `${top}px`;
+        widget.style.right = 'auto';
+        widget.style.bottom = 'auto';
+      }
+
+      function applyStoredPosition() {
+        const saved = localStorage.getItem(DRAG_POS_KEY);
+        if (!saved) return;
+        try {
+          const { left, top } = JSON.parse(saved);
+          const clamped = clampToViewport(left, top);
+          pinWidget(clamped.left, clamped.top);
+        } catch (e) { /* 저장된 값이 이상하면 기본 위치 유지 */ }
+      }
+
+      langToggle.addEventListener('pointerdown', (e) => {
+        dragging = true;
+        dragMoved = false;
+        pointerId = e.pointerId;
+        const rect = widget.getBoundingClientRect();
+        widgetStartLeft = rect.left;
+        widgetStartTop = rect.top;
+        startX = e.clientX;
+        startY = e.clientY;
+        langToggle.setPointerCapture(pointerId);
+      });
+
+      langToggle.addEventListener('pointermove', (e) => {
+        if (!dragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+        if (!dragMoved && (Math.abs(dx) > DRAG_THRESHOLD || Math.abs(dy) > DRAG_THRESHOLD)) {
+          dragMoved = true;
+          widget.classList.add('dt-dragging');
+          langMenu.hidden = true;
+        }
+        if (!dragMoved) return;
+        const clamped = clampToViewport(widgetStartLeft + dx, widgetStartTop + dy);
+        pinWidget(clamped.left, clamped.top);
+      });
+
+      function endDrag(e) {
+        if (!dragging) return;
+        dragging = false;
+        widget.classList.remove('dt-dragging');
+        if (dragMoved) {
+          const rect = widget.getBoundingClientRect();
+          localStorage.setItem(DRAG_POS_KEY, JSON.stringify({ left: rect.left, top: rect.top }));
+        }
+      }
+
+      langToggle.addEventListener('pointerup', endDrag);
+      langToggle.addEventListener('pointercancel', endDrag);
+
+      // 화면 크기 바뀔 때 위젯이 화면 밖으로 나가지 않게 보정
+      window.addEventListener('resize', () => {
+        const rect = widget.getBoundingClientRect();
+        const clamped = clampToViewport(rect.left, rect.top);
+        if (clamped.left !== rect.left || clamped.top !== rect.top) {
+          pinWidget(clamped.left, clamped.top);
+        }
+      });
+
+      applyStoredPosition();
     })();
   </script>
 </div>

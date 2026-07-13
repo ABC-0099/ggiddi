@@ -285,6 +285,32 @@
     window.scrollTo({ top: 0, behavior: 'smooth' });
   }
 
+  // ── 중도 이탈 시 자동 제출/채점 ──
+  // 탭을 닫거나 다른 페이지로 이동할 때(pagehide), 아직 제출 안 했는데
+  // 하나라도 답을 골랐으면 그 상태 그대로 자동 제출해서
+  // "중간에 나가면 채점 자체가 안 되는" 문제를 방지함.
+  // keepalive:true로 페이지가 사라져도 요청이 끝까지 전송되도록 함.
+  window.addEventListener('pagehide', function () {
+    if (submitted || Object.keys(answers).length === 0) return;
+    submitted = true;
+    if (timerInterval) clearInterval(timerInterval);
+
+    const answerList = questions.map(q => ({
+      questionId: q.id,
+      selectedOption: answers[q.id] || null
+    }));
+
+    fetch('/api/mock/' + EXAM_ID + '/submit', {
+      method: 'POST',
+      keepalive: true,
+      headers: {
+        'Content-Type': 'application/json',
+        [CSRF_HEADER]: getCsrfToken()
+      },
+      body: JSON.stringify({ examId: EXAM_ID, answers: answerList })
+    }).catch(() => {});
+  });
+
   startExam();
 </script>
 

@@ -119,6 +119,8 @@ public class ContentService {
         if (contentDTO.getThumbFile() != null && !contentDTO.getThumbFile().isEmpty()) {
             String thumbUrl = uploadToCloudinary(contentDTO.getThumbFile(), "image");
             content.setThumbFileName(thumbUrl);
+        } else if (contentDTO.isDeleteThumb()) {
+            content.setThumbFileName(null);
         }
 
         // 첨부 파일: 새 파일이 들어오면 교체, 삭제 체크면 비우고, 둘 다 아니면 기존 유지

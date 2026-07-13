@@ -36,8 +36,8 @@ a { text-decoration: none; color: inherit; }
     display: inline-block; font-size: 11px; font-weight: 700;
     padding: 3px 12px; border-radius: 20px; margin-bottom: 14px;
 }
-.qna-status-badge.pending { background: #FEF3C7; color: #B45309; }
-.qna-status-badge.answered { background: var(--mint-pale); color: var(--mint-dark); }
+.qna-status-badge.pending { background: #FCE4A1; color: #92400E; }
+.qna-status-badge.answered { background: #CFF3E4; color: #146B52; }
 
 .qna-title { font-size: 21px; font-weight: 700; margin-bottom: 8px; color: var(--ink); }
 .qna-meta { font-size: 12px; color: var(--ink-soft); margin-bottom: 24px; }
@@ -96,22 +96,25 @@ a { text-decoration: none; color: inherit; }
     .qna-card { padding: 24px 20px; }
 }
 
-.qna-owner-actions {
-    display: flex; justify-content: flex-end; gap: 8px;
-    margin-top: 20px; padding-top: 20px;
-    border-top: 1px solid #f3f4f6;
-}
-.qna-owner-actions .btn-edit {
+.btn-edit {
     padding: 8px 18px; border-radius: 8px;
     border: 1.5px solid var(--navy); background: #fff; color: var(--navy);
     font-size: 13px; font-weight: 500; text-decoration: none;
+    font-family: inherit; cursor: pointer;
+    display: inline-block;
     transition: all .18s;
 }
-.qna-owner-actions .btn-edit:hover { background: var(--navy); color: #fff; }
-.qna-owner-actions .btn-delete {
+.btn-edit:hover { background: var(--navy); color: #fff; }
+.btn-delete {
     padding: 8px 18px; border-radius: 8px;
     border: 1.5px solid #ef4444; background: #fff; color: #ef4444;
     font-size: 13px; font-weight: 500; cursor: pointer;
     font-family: inherit; transition: all .18s;
 }
-.qna-owner-actions .btn-delete:hover { background: #ef4444; color: #fff; }
+.btn-delete:hover { background: #ef4444; color: #fff; }
+
+.qna-owner-actions {
+    display: flex; justify-content: flex-end; gap: 8px;
+    margin-top: 20px; padding-top: 20px;
+    border-top: 1px solid #f3f4f6;
+}

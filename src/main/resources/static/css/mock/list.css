@@ -1,8 +1,7 @@
 /* ── 모의고사 목록 ── */
 
-*, *::before, *::after {
-    box-sizing: border-box;
-}
+*, *::before, *::after { box-sizing: border-box; }
+body { margin: 0; padding: 0; }
 
 /* 히어로 */
 .mk-hero {
