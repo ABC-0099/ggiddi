@@ -42,6 +42,7 @@
         <tr>
           <th style="width:40px">#</th>
           <th>퀴즈 세트</th>
+          <th>테마</th>
           <th>소속 강의</th>
           <th style="text-align:center">문항 수</th>
           <th style="text-align:center; width:190px">작업</th>
@@ -56,6 +57,7 @@
               <div class="content-name" th:text="${quiz.title}">1강 연습퀴즈</div>
             </div>
           </td>
+          <td th:text="${quiz.categoryName}">케이팝</td>
           <td th:text="${quiz.contentTitle}">1강. 한글 자음 기초</td>
           <td style="text-align:center"
               th:text="${quiz.questions.size()} + '개 중 ' + (${quiz.questionCount} ?: ${quiz.questions.size()}) + '문항 출제'">40개 중 5문항 출제</td>
@@ -76,7 +78,7 @@
 
         <!-- 데이터 없을 때 -->
         <tr th:if="${quizzes == null or #lists.isEmpty(quizzes)}">
-          <td colspan="5" style="text-align:center; color:var(--gray-400); padding:32px;">
+          <td colspan="6" style="text-align:center; color:var(--gray-400); padding:32px;">
             아직 등록된 연습퀴즈가 없어요. "새 퀴즈 등록"으로 첫 세트를 만들어보세요.
           </td>
         </tr>

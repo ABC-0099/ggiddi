@@ -55,7 +55,7 @@ public class OrderPayService {
         mainOrder.setPrice(price);
         mainOrder.setPayType(payType);
         mainOrder.setCardNumber(cardNumber);
-        mainOrder.setInstructorName(planName); // 구매 내역 화면에 플랜명으로 표시됨
+        mainOrder.setPlanType(planName); // ★ 플랜명은 planType에 저장 (instructorName은 실제 강사용 필드라 건드리지 않음)
         mainOrder.setPayday(LocalDateTime.now());
         orderPayRepository.save(mainOrder);
 
@@ -73,7 +73,7 @@ public class OrderPayService {
             orderPay.setPrice(price);
             orderPay.setPayType(SUBSCRIPTION_ACCESS_MARKER); // 실제 결제수단 대신 마커를 저장
             orderPay.setCardNumber(cardNumber);
-            orderPay.setInstructorName(planName);
+            orderPay.setPlanType(planName); // ★ instructorName 대신 planType에 저장
             orderPay.setPayday(LocalDateTime.now());
 
             orderPayRepository.save(orderPay);

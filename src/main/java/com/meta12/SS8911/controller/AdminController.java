@@ -409,19 +409,27 @@ public class AdminController {
         model.addAttribute("activeMenu", "payment");
         model.addAttribute("pageTitle", "결제/수강 관리");
 
-        Page<OrderPay> orders = orderPayRepository.findAll(
+        // ★ 구독 카테고리 접근권 레코드("구독 강의 접근")와 강사 칭찬 도장 레코드("강사 칭찬 도장")는
+        //   진짜 결제 건이 아니라서 관리자 화면에서도 제외하고 대표 결제 건만 보여줌.
+        Page<OrderPay> orders = orderPayRepository.findRealPayments(
                 PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "payday"))
         );
         model.addAttribute("orders", orders);
-        model.addAttribute("totalOrderCount", orderPayRepository.count());
 
         List<OrderPay> allOrders = orderPayService.listAll();
+        List<OrderPay> realOrders = allOrders.stream()
+                .filter(o -> o.getPayType() == null ||
+                        (!o.getPayType().trim().equals("구독 강의 접근")
+                                && !o.getPayType().trim().equals("강사 칭찬 도장")))
+                .collect(Collectors.toList());
 
-        long successCount = allOrders.stream().filter(o -> o.getStatus() == OrderPayStatus.SUCCESS).count();
-        long cancelCount = allOrders.stream().filter(o -> o.getStatus() == OrderPayStatus.CANCEL).count();
-        long failedCount = allOrders.stream().filter(o -> o.getStatus() == OrderPayStatus.FAILED).count();
+        model.addAttribute("totalOrderCount", realOrders.size());
 
-        long totalRevenue = allOrders.stream()
+        long successCount = realOrders.stream().filter(o -> o.getStatus() == OrderPayStatus.SUCCESS).count();
+        long cancelCount = realOrders.stream().filter(o -> o.getStatus() == OrderPayStatus.CANCEL).count();
+        long failedCount = realOrders.stream().filter(o -> o.getStatus() == OrderPayStatus.FAILED).count();
+
+        long totalRevenue = realOrders.stream()
                 .filter(o -> o.getStatus() == OrderPayStatus.SUCCESS)
                 .mapToLong(this::parsePrice)
                 .sum();

@@ -79,7 +79,8 @@
         <!-- 마지막 강의 -->
         <div class="llb-header">🕐 마지막으로 본 강의</div>
 
-        <div th:if="${lastProgress != null}">
+        <div th:if="${lastProgress != null}"
+             th:with="continuePayOrFree=(${paidMap.get(lastProgress.content.category.id)} or ${lastProgress.content.free})">
             <div class="llb-card">
                 <div class="llb-thumb">📖</div>
                 <div class="llb-info">
@@ -94,7 +95,10 @@
                 <span class="llb-prog-label">전체 진도율</span>
                 <span class="llb-prog-pct" th:text="${avgProgress} + '%'">30%</span>
             </div>
-            <a th:href="@{/content/view/{id}(id=${continueContent.id})}" class="llb-btn">이어보기 →</a>
+            <a th:if="${continuePayOrFree}"
+               th:href="@{/content/view/{id}(id=${continueContent.id})}" class="llb-btn">이어보기 →</a>
+            <a th:if="${!continuePayOrFree}"
+               th:href="@{/orderPay/list(categoryId=${lastProgress.content.category.id})}" class="llb-btn">결제하러 가기 →</a>
         </div>
 
         <div th:if="${lastProgress == null}">

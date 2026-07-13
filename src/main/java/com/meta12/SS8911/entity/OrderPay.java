@@ -28,6 +28,7 @@ public class OrderPay {
         private String cardNumber; // 카드번호
         private String payType; // 결제수단 (ex: 카드)
         private String instructorName; // 강사이름
+        private String planType; // 구독 플랜 (월구독 / 연구독 / 평생) - 개별 강좌 구매는 null
 
         @ManyToOne(fetch = FetchType.LAZY)
         @JoinColumn(name = "siteUser_id")
@@ -42,7 +43,4 @@ public class OrderPay {
         @Enumerated(EnumType.STRING)
         private OrderPayStatus status; // 결제 상태 (SUCCESS, CANCEL, FAILED)
 
-        }
-
-
-
+}

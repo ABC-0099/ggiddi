@@ -33,10 +33,12 @@
       <div class="qa-field">
         <label class="qa-label">소속 강의</label>
         <select class="qa-select" id="contentId">
-          <option th:each="content : ${contents}"
-                  th:value="${content.id}"
-                  th:text="${content.title}"
-                  th:selected="${content.id == quiz.contentId}">1강. 한글 자음 기초</option>
+          <optgroup th:each="entry : ${groupedContents}" th:label="${entry.key}">
+            <option th:each="content : ${entry.value}"
+                    th:value="${content.id}"
+                    th:text="${content.title}"
+                    th:selected="${content.id == quiz.contentId}">1강. 한글 자음 기초</option>
+          </optgroup>
         </select>
       </div>
       <div class="qa-field">

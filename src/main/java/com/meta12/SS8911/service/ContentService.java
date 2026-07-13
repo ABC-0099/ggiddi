@@ -31,6 +31,20 @@ public class ContentService {
     private final Cloudinary cloudinary; // ← 로컬 uploadPath/thumbPath 대신 이걸로 업로드
 
 
+    // 관리자 드롭다운(연습퀴즈/모의고사 등록·수정)용 - 테마별로 그룹핑된 강의 목록
+    // LinkedHashMap이라 카테고리 id 순서가 그대로 유지됨 (테마1~4 순서)
+    public java.util.LinkedHashMap<String, List<Content>> getAllContentGroupedByCategory() {
+        List<Category> categories = categoryRepository.findAll();
+        categories.sort(java.util.Comparator.comparing(Category::getId));
+
+        java.util.LinkedHashMap<String, List<Content>> grouped = new java.util.LinkedHashMap<>();
+        for (Category category : categories) {
+            List<Content> contents = contentRepository.findByCategoryIdOrderBySequenceAsc(category.getId());
+            grouped.put(category.getTitle(), contents);
+        }
+        return grouped;
+    }
+
     public List<Content> list(Long categoryId, SiteUser user) {
         List<Content> contentList = contentRepository.findByCategoryIdOrderBySequenceAsc(categoryId);
 
@@ -148,15 +162,11 @@ public class ContentService {
         }
     }
 
-    @Transactional
     public void sakjeProc(ContentDTO contentDTO) {
         Category category = categoryRepository.findById(contentDTO.getCategoryId())
                 .orElseThrow(() -> new IllegalArgumentException("해당 강의가 없습니다."));
 
         Content content = createEntity(contentDTO, category);
-
-        // FK 자식(progress) 먼저 삭제 후 content 삭제
-        progressRepository.deleteByContentId(content.getId());
         contentRepository.delete(content);
     }
 
@@ -370,8 +380,6 @@ public class ContentService {
                 .orElseThrow(() ->
                         new IllegalArgumentException("콘텐츠가 없습니다."));
 
-        // FK 자식(progress) 먼저 삭제 후 content 삭제
-        progressRepository.deleteByContentId(id);
         contentRepository.delete(content);
     }
 

@@ -13,6 +13,7 @@ import com.meta12.SS8911.repository.MockExamRepository;
 import com.meta12.SS8911.repository.MockExamBoxRepository;
 import com.meta12.SS8911.repository.MockExamQuestionRepository;
 import com.meta12.SS8911.service.QuizService;
+import com.meta12.SS8911.service.ContentService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -36,6 +37,7 @@ import java.util.stream.Collectors;
 public class AdminQuizController {
 
     private final QuizService quizService;
+    private final ContentService contentService;
     private final ContentRepository contentRepository;
 
     private final QuizRepository quizRepository;
@@ -59,7 +61,7 @@ public class AdminQuizController {
     public String chuga(Model model) {
         model.addAttribute("activeMenu", "quiz");
         model.addAttribute("pageTitle", "연습퀴즈 등록");
-        model.addAttribute("contents", contentRepository.findAll());
+        model.addAttribute("groupedContents", contentService.getAllContentGroupedByCategory());
         return "quiz/admin/chuga";
     }
 
@@ -69,7 +71,7 @@ public class AdminQuizController {
         model.addAttribute("activeMenu", "quiz");
         model.addAttribute("pageTitle", "연습퀴즈 수정");
         model.addAttribute("quiz", quizService.getForAdmin(id));
-        model.addAttribute("contents", contentRepository.findAll());
+        model.addAttribute("groupedContents", contentService.getAllContentGroupedByCategory());
         return "quiz/admin/sujung";
     }
 

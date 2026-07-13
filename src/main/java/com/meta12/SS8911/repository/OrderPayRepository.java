@@ -3,7 +3,10 @@ package com.meta12.SS8911.repository;
 import com.meta12.SS8911.entity.Category;
 import com.meta12.SS8911.entity.OrderPay;
 import com.meta12.SS8911.entity.SiteUser;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.jpa.repository.JpaRepository;
+import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 import java.util.Optional;
@@ -29,4 +32,10 @@ public interface OrderPayRepository extends JpaRepository<OrderPay, Long> {
     Optional<OrderPay> findBySiteUserAndCategory(SiteUser siteUser, Category category);
 
     void deleteByCategoryId(Long categoryId);
+
+    // ★ 관리자 결제 내역 화면(/admin/payment)용 - 구독 카테고리 접근권 레코드(payType == "구독 강의 접근")와
+    //   강사 칭찬 도장 레코드(payType == "강사 칭찬 도장")는 제외하고 "진짜 결제 건"만 페이징 조회.
+    //   payType이 null인 정상 결제도 있으므로 반드시 포함되도록 조건 구성.
+    @Query("SELECT o FROM OrderPay o WHERE o.payType IS NULL OR o.payType NOT IN ('구독 강의 접근', '강사 칭찬 도장')")
+    Page<OrderPay> findRealPayments(Pageable pageable);
 }

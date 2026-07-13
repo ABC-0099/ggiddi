@@ -20,6 +20,7 @@ public class QuizAdminDTO {
     private Long id;
     private Long contentId;
     private String contentTitle;
+    private String categoryName; // ★ 소속 테마명 (예: "케이팝") - 관리자 목록에서 테마 구분용
     private String title;
     private Integer questionCount; // ★ 문제은행에서 매 시도마다 뽑을 문항 수
     private List<QuizQuestionAdminDTO> questions;
@@ -29,6 +30,7 @@ public class QuizAdminDTO {
                 .id(quiz.getId())
                 .contentId(quiz.getContent().getId())
                 .contentTitle(quiz.getContent().getTitle())
+                .categoryName(quiz.getContent().getCategory().getTitle())
                 .title(quiz.getTitle())
                 .questionCount(quiz.getQuestionCount())
                 .questions(quiz.getQuestions().stream()
