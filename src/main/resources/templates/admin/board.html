@@ -7,6 +7,115 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
     <link rel="stylesheet" th:href="@{/css/admin/common.css}">
     <link rel="stylesheet" th:href="@{/css/admin/board.css}">
+    <style>
+        .btn-answer {
+            border: 1px solid var(--gray-300, #d1d5db);
+            background: #fff;
+            border-radius: 6px;
+            padding: 4px 10px;
+            font-size: 13px;
+            cursor: pointer;
+        }
+        .btn-answer:hover { background: var(--gray-100, #f3f4f6); }
+
+        .answer-modal-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.45);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+        }
+        .answer-modal-overlay.open { display: flex; }
+
+        .answer-modal {
+            background: #fff;
+            width: 520px;
+            max-width: 90vw;
+            max-height: 85vh;
+            overflow-y: auto;
+            border-radius: 10px;
+            padding: 24px;
+        }
+        .answer-modal h3 {
+            margin: 0 0 16px;
+            font-size: 17px;
+        }
+        .answer-modal .qna-title {
+            font-weight: 600;
+            margin-bottom: 4px;
+        }
+        .answer-modal .qna-content {
+            color: var(--gray-500, #6b7280);
+            font-size: 13px;
+            margin-bottom: 16px;
+            white-space: pre-line;
+        }
+        .answer-list {
+            margin-bottom: 16px;
+        }
+        .answer-item {
+            border: 1px solid var(--gray-200, #e5e7eb);
+            border-radius: 8px;
+            padding: 12px;
+            margin-bottom: 10px;
+        }
+        .answer-item-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 12px;
+            color: var(--gray-400, #9ca3af);
+            margin-bottom: 6px;
+        }
+        .answer-item-content {
+            font-size: 14px;
+            white-space: pre-line;
+            margin-bottom: 8px;
+        }
+        .answer-item-actions button {
+            border: none;
+            background: none;
+            color: var(--gray-500, #6b7280);
+            font-size: 12px;
+            cursor: pointer;
+            margin-right: 8px;
+            padding: 0;
+        }
+        .answer-item-actions button:hover { text-decoration: underline; }
+
+        .answer-form textarea {
+            width: 100%;
+            min-height: 100px;
+            resize: vertical;
+            border: 1px solid var(--gray-300, #d1d5db);
+            border-radius: 8px;
+            padding: 10px;
+            font-size: 14px;
+            box-sizing: border-box;
+        }
+        .answer-modal-footer {
+            display: flex;
+            justify-content: flex-end;
+            gap: 8px;
+            margin-top: 12px;
+        }
+        .btn-cancel {
+            border: 1px solid var(--gray-300, #d1d5db);
+            background: #fff;
+            border-radius: 6px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+        .btn-submit {
+            border: none;
+            background: var(--primary, #4f46e5);
+            color: #fff;
+            border-radius: 6px;
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+    </style>
 </head>
 <body>
 
@@ -102,6 +211,7 @@
                     <th>작성자</th>
                     <th>등록일</th>
                     <th>상태</th>
+                    <th>답변</th>
                 </tr>
                 </thead>
 
@@ -109,7 +219,7 @@
                 <tbody>
 
                 <tr th:if="${#lists.isEmpty(qnas.content)}">
-                    <td colspan="5"
+                    <td colspan="6"
                         style="text-align: center; color: var(--gray-400); padding: 50px 0;">
                         해당 카테고리 내역 중 조건에 일치하는 Q&amp;A 데이터가 존재하지 않습니다.
                     </td>
@@ -146,11 +256,95 @@
                         </span>
                     </td>
 
+                    <td>
+                        <button type="button"
+                                class="btn-answer"
+                                th:attr="onclick=|openAnswerModal('answer-modal-${qna.id}')|"
+                                th:text="${qna.status == 'COMPLETED' ? '답변보기' : '답변하기'}">
+                            답변하기
+                        </button>
+                    </td>
+
                 </tr>
 
                 </tbody>
 
             </table>
+
+            <!-- 문의별 답변 모달 -->
+            <div th:each="qna : ${qnas.content}"
+                 class="answer-modal-overlay"
+                 th:id="|answer-modal-${qna.id}|">
+
+                <div class="answer-modal">
+
+                    <h3>Q&amp;A 답변</h3>
+
+                    <div class="qna-title" th:text="${qna.title}">문의 제목</div>
+                    <div class="qna-content" th:text="${qna.content}">문의 내용</div>
+
+                    <!-- 기존 답변 목록 -->
+                    <div class="answer-list" th:if="${qna.answers != null and !#lists.isEmpty(qna.answers)}">
+
+                        <div class="answer-item" th:each="answer : ${qna.answers}">
+
+                            <div class="answer-item-meta">
+                                <span th:text="${(answer.admin != null ? answer.admin.username : '관리자') + ' · ' + #temporals.format(answer.createdDate, 'yyyy-MM-dd HH:mm')}">
+                                    관리자 · 2024-01-01 00:00
+                                </span>
+                            </div>
+
+                            <div class="answer-item-content" th:text="${answer.content}">
+                                답변 내용
+                            </div>
+
+                            <div class="answer-item-actions">
+
+                                <form th:action="@{'/answer/' + ${answer.id} + '/edit'}"
+                                      method="post"
+                                      style="display:inline;">
+                                    <input type="hidden" name="qnaId" th:value="${qna.id}">
+                                    <input type="hidden" name="content" th:value="${answer.content}">
+                                    <button type="button"
+                                            th:attr="onclick=|editAnswer(this, ${answer.id}, ${qna.id})|">
+                                        수정
+                                    </button>
+                                </form>
+
+                                <form th:action="@{'/answer/' + ${answer.id} + '/delete'}"
+                                      method="post"
+                                      style="display:inline;"
+                                      onsubmit="return confirm('답변을 삭제하시겠습니까?');">
+                                    <input type="hidden" name="qnaId" th:value="${qna.id}">
+                                    <button type="submit">삭제</button>
+                                </form>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <!-- 새 답변 작성 -->
+                    <form class="answer-form"
+                          th:action="@{'/qna/' + ${qna.id} + '/answer'}"
+                          method="post">
+                        <input type="hidden" name="qnaId" th:value="${qna.id}">
+                        <input type="hidden" name="returnTo" th:value="${#httpServletRequest.requestURI + (#httpServletRequest.queryString != null ? '?' + #httpServletRequest.queryString : '')}">
+                        <textarea name="content" placeholder="답변 내용을 입력해 주세요..." required></textarea>
+
+                        <div class="answer-modal-footer">
+                            <button type="button" class="btn-cancel"
+                                    th:attr="onclick=|closeAnswerModal('answer-modal-${qna.id}')|">
+                                닫기
+                            </button>
+                            <button type="submit" class="btn-submit">답변 등록</button>
+                        </div>
+                    </form>
+
+                </div>
+
+            </div>
 
 
             <!-- 페이지네이션 -->
@@ -206,6 +400,41 @@
     </div>
 
 </div>
+
+<script th:inline="javascript">
+    function openAnswerModal(modalId) {
+        document.getElementById(modalId).classList.add('open');
+    }
+
+    function closeAnswerModal(modalId) {
+        document.getElementById(modalId).classList.remove('open');
+    }
+
+    // 답변 수정 클릭 시, 새 답변 작성 폼에 기존 내용을 채우고
+    // 제출 대상을 수정 엔드포인트로 변경한다.
+    function editAnswer(btn, answerId, qnaId) {
+        var modal = btn.closest('.answer-modal');
+        var editForm = btn.closest('form');
+        var content = editForm.querySelector('input[name="content"]').value;
+
+        var writeForm = modal.querySelector('.answer-form');
+        var textarea = writeForm.querySelector('textarea[name="content"]');
+
+        textarea.value = content;
+        writeForm.setAttribute('action', '/answer/' + answerId + '/edit');
+        writeForm.querySelector('.btn-submit').textContent = '답변 수정 완료';
+        textarea.focus();
+    }
+
+    // 모달 바깥 영역 클릭 시 닫기
+    document.querySelectorAll('.answer-modal-overlay').forEach(function (overlay) {
+        overlay.addEventListener('click', function (e) {
+            if (e.target === overlay) {
+                overlay.classList.remove('open');
+            }
+        });
+    });
+</script>
 
 </body>
 </html>
