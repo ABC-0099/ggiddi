@@ -67,8 +67,8 @@
 
 
 
-        <!-- 이벤트 참여 버튼 -->
-        <div class="participate-wrap">
+        <!-- 이벤트 참여 버튼 (진행중일 때만 노출) -->
+        <div class="participate-wrap" th:if="${event.status == 'ONGOING'}">
 
             <button class="participate-btn"
                     onclick="openModal()">

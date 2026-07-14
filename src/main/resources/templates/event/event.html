@@ -63,15 +63,11 @@
                     <span th:text="${event.endDate}"></span>
                 </p>
 
-                <p>
-                    참여자 :
-                    <span th:text="${event.participantCount}"></span>명
-                </p>
-
                 <button
-                        th:classappend="${event.status == 'ONGOING'} ? 'progress-btn' : 'result-btn'"
+                        th:classappend="${event.status == 'ONGOING'} ? 'progress-btn' :
+                             (${event.status == 'UPCOMING'} ? 'upcoming-btn' : 'result-btn')"
                         th:text="${event.status == 'ONGOING'} ? '진행중' :
-                             (${event.status == 'UPCOMING'} ? '예정' : '발표 확인')">
+                             (${event.status == 'UPCOMING'} ? '예정' : '종료')">
                 </button>
 
             </div>

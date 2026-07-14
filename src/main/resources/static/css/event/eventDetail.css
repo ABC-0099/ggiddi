@@ -88,7 +88,7 @@ body{
 .participate-wrap{
 
     text-align:center;
-    margin:45px 0;
+    margin-top:45px;
 }
 
 .participate-btn{
@@ -118,6 +118,8 @@ body{
 /* 댓글 */
 
 .comment-section{
+
+    margin-top:45px;
 
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);

@@ -283,7 +283,7 @@ body{
     color: #fff;
 }
 
-.result-btn{
+.upcoming-btn{
     margin-top: 15px;
 
     border: 2px solid var(--navy-600);
@@ -294,13 +294,21 @@ body{
     border-radius: 10px;
 
     font-weight: bold;
-    cursor: pointer;
-    transition: 0.2s;
+    cursor: default;
 }
 
-.result-btn:hover{
-    background: var(--navy-600);
-    color: #fff;
+.result-btn{
+    margin-top: 15px;
+
+    border: 2px solid #D8D8D5;
+    color: var(--gray-600);
+    background: #F0F0EE;
+
+    padding: 8px 18px;
+    border-radius: 10px;
+
+    font-weight: bold;
+    cursor: default;
 }
 
 .pagination{
