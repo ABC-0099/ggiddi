@@ -52,6 +52,31 @@
         .pagination .page-btn i {
             font-size: 16px;
         }
+
+        /* ── 게시글 내용: 엔터(줄바꿈) 유지 + 길면 3줄만 보이고 더보기 ── */
+        .post-text {
+            white-space: pre-wrap;
+            word-break: break-word;
+            overflow: hidden;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+        }
+        .post.expanded .post-text {
+            -webkit-line-clamp: unset;
+            display: block;
+        }
+        .post-more {
+            display: none;
+            margin-top: 4px;
+            font-size: 12.5px;
+            font-weight: 600;
+            color: var(--mint-dark, #1D9E75);
+            cursor: pointer;
+        }
+        .post-more:hover {
+            text-decoration: underline;
+        }
     </style>
 </head>
 <body th:attr="data-current-user=${#authentication.name != null and #authentication.name != 'anonymousUser'} ? ${#authentication.name} : ''">
@@ -132,6 +157,7 @@
         <a th:href="@{/community/{id}(id=${post.id})}">
             <div class="post-title" th:text="${post.title}">제목</div>
             <div class="post-text" th:text="${post.content}">내용</div>
+            <span class="post-more" onclick="toggleMore(event, this)">더보기</span>
 
             <!-- 대표 이미지 (첫 번째 첨부 이미지) -->
             <div class="post-image-wrap"
@@ -314,6 +340,29 @@
     }
 
     document.addEventListener('click', () => closeAllTranslateMenus(null));
+
+    // ── 게시글 내용 "더보기" ──
+    function toggleMore(evt, btnEl) {
+        evt.preventDefault();
+        evt.stopPropagation();
+        const post = btnEl.closest('.post');
+        const expanded = post.classList.toggle('expanded');
+        btnEl.textContent = expanded ? '접기' : '더보기';
+    }
+
+    // 내용이 3줄을 넘는 게시글에만 "더보기" 버튼 표시
+    function initPostMoreButtons() {
+        document.querySelectorAll('.post').forEach(post => {
+            const textEl = post.querySelector('.post-text');
+            const moreBtn = post.querySelector('.post-more');
+            if (!textEl || !moreBtn) return;
+            if (textEl.scrollHeight > textEl.clientHeight + 1) {
+                moreBtn.style.display = 'inline-block';
+            }
+        });
+    }
+    document.addEventListener('DOMContentLoaded', initPostMoreButtons);
+    window.addEventListener('load', initPostMoreButtons);
 
     function requestTranslate(evt, btnEl, targetLang) {
         evt.stopPropagation();
