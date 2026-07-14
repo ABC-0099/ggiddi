@@ -42,7 +42,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 
 .form-wrap {
   position: relative; z-index: 1;
-  max-width: 1300px; margin: 0 auto;
+  max-width: 1100px; margin: 0 auto;
   padding: 40px 32px 100px;
 }
 
@@ -53,6 +53,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
   border-radius: 20px;
   box-shadow: 0 4px 24px rgba(29,158,117,.08);
   overflow: hidden;
+  max-width: 1000px; margin: 0 auto;
 }
 
 .form-header {
