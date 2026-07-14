@@ -22,9 +22,12 @@
 <div class="view-container">
   <div class="view-card">
 
-    <!-- 상단: 카테고리 태그 + 제목 -->
+    <!-- 상단: 카테고리 태그 + 목록으로 버튼 + 제목 -->
     <div class="view-header">
-      <span class="post-tag" th:text="${post.category.description}">태그</span>
+      <div class="view-header-top">
+        <span class="post-tag" th:text="${post.category.description}">태그</span>
+        <a th:href="@{/community}" class="btn-back">← 목록으로</a>
+      </div>
       <h1 class="view-title" th:text="${post.title}">제목</h1>
 
       <!-- 작성자 정보 -->
@@ -132,11 +135,6 @@
           삭제
         </button>
       </form>
-    </div>
-
-    <!-- 목록으로 -->
-    <div class="view-back">
-      <a th:href="@{/community}" class="btn-back">← 목록으로</a>
     </div>
 
     <!-- 댓글 섹션 -->

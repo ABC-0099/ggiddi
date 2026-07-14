@@ -62,7 +62,7 @@
       <a class="tab" th:classappend="${category == 'system'} ? 'active'" th:href="@{/notice/list(category='system', keyword=${keyword})}">시스템</a>
       <a class="tab" th:classappend="${category == 'update'} ? 'active'" th:href="@{/notice/list(category='update', keyword=${keyword})}">업데이트</a>
     </div>
-    <form class="search-box" th:action="@{/notice/list}" method="get" style="display:flex; align-items:center;">
+    <form class="search-box" id="searchForm" th:action="@{/notice/list}" method="get" style="display:flex; align-items:center;">
       <input type="hidden" name="category" th:value="${category}" />
       <span class="search-icon">
         <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -70,7 +70,7 @@
           <line x1="21" y1="21" x2="16.65" y2="16.65"/>
         </svg>
       </span>
-      <input type="text" name="keyword" th:value="${keyword}" placeholder="제목으로 검색" />
+      <input type="text" id="searchKeyword" name="keyword" th:value="${keyword}" placeholder="제목으로 검색" />
     </form>
   </div>
 
@@ -139,5 +139,20 @@
 <!-- 푸터 -->
 <div th:replace="~{layout/footer :: footer}"></div>
 <div th:replace="~{layout/drag-translate :: dragTranslate}"></div>
+
+<script>
+  // 엔터 없이 입력이 멈추면(0.5초) 자동으로 검색 폼 제출
+  (function () {
+    const input = document.getElementById('searchKeyword');
+    const form = document.getElementById('searchForm');
+    if (!input || !form) return;
+
+    let timer = null;
+    input.addEventListener('input', () => {
+      clearTimeout(timer);
+      timer = setTimeout(() => form.submit(), 500);
+    });
+  })();
+</script>
 </body>
 </html>

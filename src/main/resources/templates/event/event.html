@@ -14,48 +14,26 @@
 <!-- 배너 -->
 <section class="banner">
 
-    <div class="banner-slide active">
-        <img th:src="@{/images/banner1.png}" class="banner-image">
-
-        <button class="arrow-btn prev-btn">&lt;</button>
-        <button class="arrow-btn next-btn">&gt;</button>
-
-        <div class="banner-controls">
-            <div class="banner-dots">
-                <span class="dot active" data-index="0"></span>
-                <span class="dot" data-index="1"></span>
-                <span class="dot" data-index="2"></span>
-            </div>
+    <div class="banner-track" id="bannerTrack">
+        <div class="banner-slide">
+            <img th:src="@{/images/banner1.png}" class="banner-image">
+        </div>
+        <div class="banner-slide">
+            <img th:src="@{/images/banner2.png}" class="banner-image">
+        </div>
+        <div class="banner-slide">
+            <img th:src="@{/images/banner3.png}" class="banner-image">
         </div>
     </div>
 
-    <div class="banner-slide">
-        <img th:src="@{/images/banner2.png}" class="banner-image">
+    <button class="arrow-btn prev-btn">&lt;</button>
+    <button class="arrow-btn next-btn">&gt;</button>
 
-        <button class="arrow-btn prev-btn">&lt;</button>
-        <button class="arrow-btn next-btn">&gt;</button>
-
-        <div class="banner-controls">
-            <div class="banner-dots">
-                <span class="dot" data-index="0"></span>
-                <span class="dot active" data-index="1"></span>
-                <span class="dot" data-index="2"></span>
-            </div>
-        </div>
-    </div>
-
-    <div class="banner-slide">
-        <img th:src="@{/images/banner3.png}" class="banner-image">
-
-        <button class="arrow-btn prev-btn">&lt;</button>
-        <button class="arrow-btn next-btn">&gt;</button>
-
-        <div class="banner-controls">
-            <div class="banner-dots">
-                <span class="dot" data-index="0"></span>
-                <span class="dot" data-index="1"></span>
-                <span class="dot active" data-index="2"></span>
-            </div>
+    <div class="banner-controls">
+        <div class="banner-dots">
+            <span class="dot active" data-index="0"></span>
+            <span class="dot" data-index="1"></span>
+            <span class="dot" data-index="2"></span>
         </div>
     </div>
 
@@ -106,24 +84,27 @@
 
 </section>
 
+<div th:replace="~{layout/footer :: footer}"></div>
+
 <script th:src="@{/js/event.js}"></script>
 
 <script>
-    // 배너 슬라이드 + 점(dot) 인디케이터 로직
+    // 배너 슬라이드 + 점(dot) 인디케이터 로직 (실제로 옆으로 슬라이드되는 캐러셀)
     (function () {
+        const track = document.getElementById('bannerTrack');
         const slides = document.querySelectorAll('.banner-slide');
+        const dots = document.querySelectorAll('.dot');
+        const slideCount = slides.length;
         let current = 0;
 
         function showSlide(index) {
-            if (index < 0) index = slides.length - 1;
-            if (index >= slides.length) index = 0;
+            if (index < 0) index = slideCount - 1;
+            if (index >= slideCount) index = 0;
 
-            slides.forEach((slide, i) => {
-                slide.classList.toggle('active', i === index);
+            track.style.transform = `translateX(-${index * (100 / slideCount)}%)`;
 
-                slide.querySelectorAll('.dot').forEach(dot => {
-                    dot.classList.toggle('active', Number(dot.dataset.index) === index);
-                });
+            dots.forEach(dot => {
+                dot.classList.toggle('active', Number(dot.dataset.index) === index);
             });
 
             current = index;
@@ -137,9 +118,39 @@
             btn.addEventListener('click', () => showSlide(current - 1));
         });
 
-        document.querySelectorAll('.dot').forEach(dot => {
-            dot.addEventListener('click', () => showSlide(Number(dot.dataset.index)));
+        dots.forEach(dot => {
+            dot.addEventListener('click', () => {
+                showSlide(Number(dot.dataset.index));
+                resetAutoplay();
+            });
         });
+
+        document.querySelectorAll('.next-btn').forEach(btn => {
+            btn.addEventListener('click', resetAutoplay);
+        });
+        document.querySelectorAll('.prev-btn').forEach(btn => {
+            btn.addEventListener('click', resetAutoplay);
+        });
+
+        // ── 자동 슬라이드 (5초마다, 마우스 올리면 멈춤) ──
+        const banner = track.closest('.banner');
+        let autoplayTimer = null;
+
+        function startAutoplay() {
+            autoplayTimer = setInterval(() => showSlide(current + 1), 5000);
+        }
+        function stopAutoplay() {
+            clearInterval(autoplayTimer);
+        }
+        function resetAutoplay() {
+            stopAutoplay();
+            startAutoplay();
+        }
+
+        banner.addEventListener('mouseenter', stopAutoplay);
+        banner.addEventListener('mouseleave', startAutoplay);
+
+        startAutoplay();
     })();
 </script>
 

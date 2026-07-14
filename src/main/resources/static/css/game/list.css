@@ -32,8 +32,8 @@
 
     .page-header {
       position: relative; z-index: 1;
-      padding: 50px 6% 30px;
-      max-width: 1440px; margin: 0 auto;
+      padding: 50px 32px 30px;
+      max-width: 1100px; margin: 0 auto;
       display: flex; align-items: flex-start; justify-content: space-between; gap: 24px;
     }
     .page-header-text .eyebrow {
@@ -96,7 +96,7 @@
       font-family: inherit; outline: none; cursor: pointer;
     }
 
-    .game-wrap { position: relative; z-index: 1; padding: 0 6% 100px; max-width: 1440px; margin: 0 auto; }
+    .game-wrap { position: relative; z-index: 1; padding: 0 32px 100px; max-width: 1000px; margin: 0 auto; }
     .stage-section { margin-bottom: 56px; }
     .stage-header {
       display: flex; align-items: center; gap: 12px;

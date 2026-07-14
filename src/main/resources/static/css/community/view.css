@@ -51,11 +51,17 @@ a { text-decoration: none; color: inherit; }
     margin-bottom: 32px;
 }
 
+.view-header-top {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
 .post-tag {
     display: inline-block;
     font-size: 11px; font-weight: 700;
     padding: 2px 10px; border-radius: 20px;
-    margin-bottom: 8px;
     background: var(--mint-pale); color: var(--mint-dark);
 }
 
@@ -309,21 +315,22 @@ a { text-decoration: none; color: inherit; }
     color: #fff;
 }
 
-/* 목록으로 버튼 */
-.view-back {
-    margin-top: 8px;
-    margin-bottom: 40px;
-}
+/* 목록으로 버튼은 이제 상단 헤더로 이동됨 (.view-header-top .btn-back) */
 
 .btn-back {
-    font-size: 13px;
-    color: #9ca3af;
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #fff;
+    background: var(--mint-dark);
+    padding: 6px 14px;
+    border-radius: 20px;
     text-decoration: none;
-    transition: color 0.18s;
+    transition: background 0.18s;
+    flex-shrink: 0;
 }
 
 .btn-back:hover {
-    color: #1D9E75;
+    background: var(--mint);
 }
 
 /* =====================

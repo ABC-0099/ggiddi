@@ -146,10 +146,9 @@
 
     </div>
     <div style="display:flex; align-items:center; gap:10px;">
-        <select class="sort-select">
-            <option>순서대로</option>
-            <option>최신순</option>
-            <option>인기순</option>
+        <select class="sort-select" id="sortSelect">
+            <option value="sequence">순서대로</option>
+            <option value="latest">최신순</option>
         </select>
     </div>
 </div>
@@ -157,7 +156,7 @@
 <!-- 강의 목록 -->
 <div class="lecture-wrap" id="lecture-wrap">
 
-    <div class="stage-section" th:each="category, catStat : ${list}">
+    <div class="stage-section" th:each="category, catStat : ${list}" th:attr="data-cat-id=${category.id}">
         <div class="stage-header">
             <span class="stage-badge" th:classappend="'sb-' + ${catStat.count}" th:text="${catStat.count} + '단계'"></span>
             <h2 th:text="${category.title}"></h2>
@@ -173,6 +172,7 @@
                         needsPayment=(!${isAdmin} and ${isPublished} and !${payOrFree})"
                th:href="${unlocked} ? @{/content/view/{id}(id=${content.id})} : (${needsPayment} ? @{/orderPay/list(categoryId=${category.id})} : '#')"
                th:classappend="${unlocked} ? '' : (${needsPayment} ? 'locked' : 'locked unavailable')"
+               th:attr="data-content-id=${content.id}, data-sequence=${content.sequence}"
                class="lc">
                 <button type="button" class="lc-edit-btn" sec:authorize="hasRole('ADMIN')" title="강의 수정"
                         th:attr="data-id=${content.id}, data-title=${content.title}, data-sequence=${content.sequence}, data-cat-id=${category.id}">
@@ -312,6 +312,28 @@
       tab.addEventListener('click', () => {
         document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
         tab.classList.add('active');
+
+        const selectedCatId = tab.dataset.catId;
+        document.querySelectorAll('.stage-section').forEach(section => {
+          const matches = selectedCatId === 'all' || section.dataset.catId === selectedCatId;
+          section.style.display = matches ? '' : 'none';
+        });
+      });
+    });
+
+    // ── 정렬(순서대로 / 최신순) ──
+    document.getElementById('sortSelect')?.addEventListener('change', function () {
+      const sortBy = this.value;
+      document.querySelectorAll('.lecture-grid').forEach(grid => {
+        const cards = Array.from(grid.querySelectorAll('.lc'));
+        cards.sort((a, b) => {
+          if (sortBy === 'latest') {
+            return Number(b.dataset.contentId) - Number(a.dataset.contentId);
+          }
+          // 기본: 순서대로 (sequence 오름차순)
+          return Number(a.dataset.sequence) - Number(b.dataset.sequence);
+        });
+        cards.forEach(card => grid.appendChild(card));
       });
     });
 

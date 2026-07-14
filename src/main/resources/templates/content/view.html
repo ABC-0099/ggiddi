@@ -109,7 +109,7 @@
             </div>
 
             <a th:each="c : ${contentList}"
-               th:href="@{/content/view/{id}(id=${c.id})}"
+               th:href="${isPaid} ? @{/content/view/{id}(id=${c.id})} : @{/orderPay/list(categoryId=${content.category.id})}"
                th:classappend="${c.id == content.id} ? 'active' : ''"
                style="text-decoration:none;color:inherit;display:flex;">
                 <div class="sl-item" th:classappend="${c.id == content.id} ? 'active' : ''" style="width:100%;">
@@ -269,6 +269,7 @@
     const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
 
     let completedFired = false;
+    let maxWatchedTime = 0; // 실제로 시청한 최대 지점 (이 지점보다 앞으로는 못 건너뛰게 막기 위함)
 
     function secToStr(s) {
       if (!isFinite(s) || s < 0) s = 0;
@@ -299,6 +300,7 @@
     video.addEventListener('loadedmetadata', function () {
       if (savedTime > 0 && savedTime < video.duration) {
         video.currentTime = savedTime;
+        maxWatchedTime = savedTime;
       }
       updateProgressUI(video.duration > 0 ? (video.currentTime / video.duration * 100) : 0);
     });
@@ -325,6 +327,12 @@
     let lastSent = 0;
     video.addEventListener('timeupdate', function () {
       if (!video.duration) return;
+
+      // 정상 재생으로 도달한 지점까지만 "시청한 지점"으로 인정 (되감기 후 다시 보는 건 갱신 안 함)
+      if (video.currentTime > maxWatchedTime) {
+        maxWatchedTime = video.currentTime;
+      }
+
       const pct = (video.currentTime / video.duration) * 100;
       updateProgressUI(pct);
       if (pct >= 100) unlockQuiz();
@@ -368,12 +376,20 @@
       }).catch(function () {});
     }
 
-    // 진행 바 클릭으로 탐색
+    // 진행 바 클릭으로 탐색 (되감기는 자유롭게, 안 본 구간으로 건너뛰기는 막음)
     progressTrack.addEventListener('click', function (e) {
       if (!video.duration) return;
       const rect = this.getBoundingClientRect();
       const pct  = Math.max(0, Math.min(100, (e.clientX - rect.left) / rect.width * 100));
-      video.currentTime = video.duration * (pct / 100);
+      const targetTime = video.duration * (pct / 100);
+      video.currentTime = Math.min(targetTime, maxWatchedTime);
+    });
+
+    // 혹시 다른 경로(모바일 제스처 등)로 탐색이 발생해도 안 본 구간으로는 못 넘어가게 이중 방어
+    video.addEventListener('seeking', function () {
+      if (video.currentTime > maxWatchedTime + 0.5) {
+        video.currentTime = maxWatchedTime;
+      }
     });
 
     // 재생 버튼 / 플레이어 화면 클릭

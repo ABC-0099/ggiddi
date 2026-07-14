@@ -99,7 +99,7 @@ public class ContentController {
         //    강의 목록(카테고리 화면)으로 redirect하고 알림 메시지만 전달)
         if (!hasAccess) {
             redirectAttributes.addFlashAttribute("alertMsg", "이 강의는 수강 신청을 하셔야 보실 수 있어요 어르신!");
-            return "redirect:/category/view/" + category.getId();
+            return "redirect:/orderPay/list?categoryId=" + category.getId();
         }
 
         // 5. 권한 있을 때

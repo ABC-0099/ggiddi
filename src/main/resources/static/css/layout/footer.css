@@ -20,6 +20,49 @@
     color: #ffffff;
   }
 
+  /* ── 게임 페이지 전용 테마: 나무색 배경 + 골드 포인트 (navbar-game과 통일) ── */
+  .site-footer.footer-game {
+    background: #4A2F1F;
+  }
+
+  .site-footer.footer-game .footer-col h4 {
+    color: #E8C468;
+  }
+
+  .site-footer.footer-game .footer-tagline {
+    color: rgba(232, 196, 104, 0.55);
+  }
+
+  .site-footer.footer-game .footer-col ul li a {
+    color: rgba(232, 196, 104, 0.65);
+  }
+
+  .site-footer.footer-game .footer-col ul li a:hover {
+    color: #E8C468;
+  }
+
+  .site-footer.footer-game .sns-btn {
+    border-color: rgba(232, 196, 104, 0.2);
+    color: rgba(232, 196, 104, 0.6);
+  }
+
+  .site-footer.footer-game .sns-btn:hover {
+    border-color: #E8C468;
+    color: #E8C468;
+  }
+
+  .site-footer.footer-game .footer-divider {
+    border-top-color: rgba(232, 196, 104, 0.12);
+  }
+
+  .site-footer.footer-game .copyright {
+    color: rgba(232, 196, 104, 0.55);
+  }
+
+  .site-footer.footer-game .footer-info {
+    color: rgba(232, 196, 104, 0.3);
+  }
+
   .footer-inner {
     max-width: 1300px;
     margin: 0 auto;
@@ -52,10 +95,12 @@
     display: block;
   }
 
-  /* 관리자 테마에서는 민트색 버전으로 전환 (navbar와 동일한 방식) */
-  .footer-logo-img-admin { display: none; }
+  /* 관리자 테마에서는 민트색 버전, 게임 테마에서는 골드 버전으로 전환 (navbar와 동일한 방식) */
+  .footer-logo-img-admin, .footer-logo-img-game { display: none; }
   .site-footer.footer-admin .footer-logo-img-default { display: none; }
   .site-footer.footer-admin .footer-logo-img-admin { display: block; }
+  .site-footer.footer-game .footer-logo-img-default { display: none; }
+  .site-footer.footer-game .footer-logo-img-game { display: block; }
 
   .footer-tagline {
     font-size: 12.5px;

@@ -523,7 +523,7 @@
     .lc-prog-fill.ing { background: linear-gradient(90deg, var(--navy), #4A9FE0); }
 
     /* 잠김 카드 */
-    .lc.locked { opacity: .55; cursor: default; }
+    .lc.locked { opacity: .55; cursor: pointer; }
     .lc.locked:hover { transform: none; box-shadow: 0 4px 16px rgba(29,158,117,.06); }
     /* 아직 공개 전(임시/예약) — 결제해도 못 들어가므로 클릭 자체를 막음 */
     .lc.unavailable { pointer-events: none; }
@@ -697,7 +697,7 @@
       color: #fff; font-size: 13px; font-weight: 700; cursor: pointer;
       font-family: inherit;
     }
-    .cat-add-actions .btn-submit:disabled { opacity: .6; cursor: default; }
+    .cat-add-actions .btn-submit:disabled { opacity: .6; cursor: pointer; }
 
     .cat-add-head-left { display: flex; align-items: center; gap: 8px; }
     .cat-add-head-icon {

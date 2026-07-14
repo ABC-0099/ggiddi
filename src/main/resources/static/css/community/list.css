@@ -29,8 +29,8 @@ a { text-decoration: none; color: inherit; }
 /* 페이지 헤더 */
 .page-header {
     position: relative; z-index: 1;
-    padding: 44px 6% 24px;
-    max-width: 1300px; margin: 0 auto;
+    padding: 44px 32px 24px;
+    max-width: 1100px; margin: 0 auto;
 }
 .page-header-title-row {
     display: flex; align-items: center; gap: 10px;
@@ -49,8 +49,8 @@ a { text-decoration: none; color: inherit; }
 /* 태그 탭 */
 .filter-bar {
     position: relative; z-index: 1;
-    padding: 0 6% 20px;
-    max-width: 1300px; margin: 0 auto;
+    padding: 0 32px 20px;
+    max-width: 1000px; margin: 0 auto;
     display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
 }
 .tabs { display: flex; gap: 4px; flex-wrap: wrap; }
@@ -66,8 +66,8 @@ a { text-decoration: none; color: inherit; }
 /* 검색/정렬/글쓰기 바 */
 .toolbar {
     position: relative; z-index: 1;
-    padding: 0 6% 24px;
-    max-width: 1300px; margin: 0 auto;
+    padding: 0 32px 24px;
+    max-width: 1000px; margin: 0 auto;
     display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
 }
 .search-area {
@@ -115,8 +115,8 @@ a { text-decoration: none; color: inherit; }
 /* 게시글 목록 */
 .post-wrap {
     position: relative; z-index: 1;
-    padding: 0 6% 80px;
-    max-width: 1300px; margin: 0 auto;
+    padding: 0 32px 80px;
+    max-width: 1000px; margin: 0 auto;
     display: flex; flex-direction: column; gap: 14px;
 }
 .post {

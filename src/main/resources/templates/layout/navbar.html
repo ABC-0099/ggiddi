@@ -14,16 +14,17 @@
 -->
 
 <nav th:fragment="navbar(currentMenu)" class="navbar"
-     th:classappend="${#authorization.expression('hasRole(''ADMIN'') or authentication.name == ''admin888''')} ? 'navbar-admin'">
+     th:classappend="${(#authorization.expression('hasRole(''ADMIN'') or authentication.name == ''admin888''') ? 'navbar-admin ' : '') + (currentMenu == 'game' ? 'navbar-game' : '')}">
   <meta name="_csrf" th:content="${_csrf.token}" />
   <meta name="_csrf_header" th:content="${_csrf.headerName}" />
   <link th:href="@{/css/layout/navbar.css}" rel="stylesheet">
   <div class="navbar-inner">
 
-    <!-- 로고: 일반 테마 / 관리자 테마 두 버전을 넣고 CSS에서 navbar-admin 클래스로 전환 -->
+    <!-- 로고: 일반 / 관리자 / 게임 테마 세 버전을 넣고 CSS에서 클래스로 전환 -->
     <a class="navbar-logo" th:href="@{/}">
       <img th:src="@{/images/logo.png}" alt="끼역띠귿" class="logo-img logo-img-default" />
       <img th:src="@{/images/logo-admin.png}" alt="끼역띠귿" class="logo-img logo-img-admin" />
+      <img th:src="@{/images/logo-gold.png}" alt="끼역띠귿" class="logo-img logo-img-game" />
     </a>
 
     <!-- 햄버거 (모바일) -->
@@ -85,7 +86,7 @@
               </span>
               <div>
                 <strong>학습 게임</strong>
-                <small>픽셀 RPG로 배우기</small>
+                <small>퀴즈 & 액션 게임</small>
               </div>
             </a>
           </li>
