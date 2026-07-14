@@ -18,6 +18,14 @@ public interface WrongAnswerNoteRepository extends JpaRepository<WrongAnswerNote
     Page<WrongAnswerNote> findBySiteUserAndSourceTypeOrderByCreatedDateDesc(
             SiteUser siteUser, SourceType sourceType, Pageable pageable);
 
+    // 복습 여부만 필터링 (전체 소스타입 대상)
+    Page<WrongAnswerNote> findBySiteUserAndReviewedOrderByCreatedDateDesc(
+            SiteUser siteUser, boolean reviewed, Pageable pageable);
+
+    // 출처 + 복습 여부 둘 다 필터링
+    Page<WrongAnswerNote> findBySiteUserAndSourceTypeAndReviewedOrderByCreatedDateDesc(
+            SiteUser siteUser, SourceType sourceType, boolean reviewed, Pageable pageable);
+
     // 관리자 통계용: 전체 오답 목록 (카테고리/단계별 집계에 사용)
     List<WrongAnswerNote> findBySourceType(SourceType sourceType);
 

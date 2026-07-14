@@ -70,11 +70,20 @@ body { margin: 0; padding: 0; }
   padding: 32px 24px 96px;
 }
 
-/* 필터 탭 */
+/* 필터 영역: 출처 필터(왼쪽) + 복습여부 필터(오른쪽) 한 줄 배치 */
+.wn-filter-row {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin-bottom: 24px;
+}
+
 .wn-filter-bar {
   display: flex;
   gap: 8px;
-  margin-bottom: 24px;
+  margin-bottom: 0;
 }
 
 .wn-filter-tab {
@@ -99,6 +108,37 @@ body { margin: 0; padding: 0; }
   background: #185FA5;
   border-color: #185FA5;
   color: #ffffff;
+}
+
+/* 복습 여부 탭 - 세그먼트 컨트롤 스타일 (출처 필터와 위계 구분) */
+.wn-filter-bar-reviewed {
+  display: inline-flex;
+  gap: 2px;
+  padding: 4px;
+  margin-bottom: 0;
+  background: #eef2f7;
+  border-radius: 14px;
+  border: none;
+}
+
+.wn-filter-bar-reviewed .wn-filter-tab {
+  padding: 7px 16px;
+  border-radius: 10px;
+  border: none;
+  background: transparent;
+  font-size: 12.5px;
+  color: #6b7b8f;
+}
+
+.wn-filter-bar-reviewed .wn-filter-tab:hover {
+  color: #0d5a41;
+}
+
+.wn-filter-bar-reviewed .wn-filter-tab.active {
+  background: #ffffff;
+  color: #185FA5;
+  font-weight: 700;
+  box-shadow: 0 2px 6px rgba(24, 95, 165, 0.15);
 }
 
 /* 오답 카드 목록 */

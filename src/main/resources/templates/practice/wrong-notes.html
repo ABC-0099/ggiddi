@@ -40,17 +40,32 @@
 
 <main class="wn-wrap">
 
-  <!-- 필터 탭 -->
-  <div class="wn-filter-bar">
-    <a th:href="@{/practice/wrong-notes}"
-       th:classappend="${selectedSourceType == null} ? 'active'"
-       class="wn-filter-tab">전체</a>
-    <a th:href="@{/practice/wrong-notes(sourceType='PRACTICE_QUIZ')}"
-       th:classappend="${selectedSourceType != null and selectedSourceType.name() == 'PRACTICE_QUIZ'} ? 'active'"
-       class="wn-filter-tab">연습퀴즈</a>
-    <a th:href="@{/practice/wrong-notes(sourceType='MOCK_EXAM')}"
-       th:classappend="${selectedSourceType != null and selectedSourceType.name() == 'MOCK_EXAM'} ? 'active'"
-       class="wn-filter-tab">실전모의고사</a>
+  <!-- 필터 영역 -->
+  <div class="wn-filter-row">
+    <div class="wn-filter-bar">
+      <a th:href="@{/practice/wrong-notes}"
+         th:classappend="${selectedSourceType == null} ? 'active'"
+         class="wn-filter-tab">전체</a>
+      <a th:href="@{/practice/wrong-notes(sourceType='PRACTICE_QUIZ')}"
+         th:classappend="${selectedSourceType != null and selectedSourceType.name() == 'PRACTICE_QUIZ'} ? 'active'"
+         class="wn-filter-tab">연습퀴즈</a>
+      <a th:href="@{/practice/wrong-notes(sourceType='MOCK_EXAM')}"
+         th:classappend="${selectedSourceType != null and selectedSourceType.name() == 'MOCK_EXAM'} ? 'active'"
+         class="wn-filter-tab">실전모의고사</a>
+    </div>
+
+    <!-- 복습 여부 탭 -->
+    <div class="wn-filter-bar wn-filter-bar-reviewed">
+      <a th:href="@{/practice/wrong-notes(sourceType=${selectedSourceType != null ? selectedSourceType.name() : null})}"
+         th:classappend="${selectedReviewed == null} ? 'active'"
+         class="wn-filter-tab">전체</a>
+      <a th:href="@{/practice/wrong-notes(sourceType=${selectedSourceType != null ? selectedSourceType.name() : null}, reviewed=false)}"
+         th:classappend="${selectedReviewed != null and selectedReviewed == false} ? 'active'"
+         class="wn-filter-tab">복습 전</a>
+      <a th:href="@{/practice/wrong-notes(sourceType=${selectedSourceType != null ? selectedSourceType.name() : null}, reviewed=true)}"
+         th:classappend="${selectedReviewed != null and selectedReviewed == true} ? 'active'"
+         class="wn-filter-tab">복습 완료</a>
+    </div>
   </div>
 
   <!-- 오답 목록 -->
@@ -100,7 +115,7 @@
   <!-- 페이지네이션 -->
   <div class="wn-pagination" th:if="${notes.totalPages > 1}">
     <a th:each="i : ${#numbers.sequence(0, notes.totalPages - 1)}"
-       th:href="@{/practice/wrong-notes(page=${i}, sourceType=${selectedSourceType != null ? selectedSourceType.name() : null})}"
+       th:href="@{/practice/wrong-notes(page=${i}, sourceType=${selectedSourceType != null ? selectedSourceType.name() : null}, reviewed=${selectedReviewed})}"
        th:text="${i + 1}"
        th:classappend="${i == notes.number} ? 'active'"
        class="wn-page-btn">1</a>

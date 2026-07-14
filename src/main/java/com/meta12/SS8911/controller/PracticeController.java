@@ -121,6 +121,7 @@ public class PracticeController {
      */
     @GetMapping("/practice/wrong-notes")
     public String wrongNotes(@RequestParam(required = false) String sourceType,
+                             @RequestParam(required = false) Boolean reviewed,
                              @RequestParam(defaultValue = "0") int page,
                              Model model, Principal principal) {
         if (principal == null) return "redirect:/siteUser/login";
@@ -140,12 +141,23 @@ public class PracticeController {
             }
         }
 
-        notes = (type != null)
-                ? wrongAnswerNoteRepository.findBySiteUserAndSourceTypeOrderByCreatedDateDesc(user, type, pageable)
-                : wrongAnswerNoteRepository.findBySiteUserOrderByCreatedDateDesc(user, pageable);
+        // 타입 필터 + 복습 여부 필터를 조합해서 쿼리 분기
+        if (type != null && reviewed != null) {
+            notes = wrongAnswerNoteRepository
+                    .findBySiteUserAndSourceTypeAndReviewedOrderByCreatedDateDesc(user, type, reviewed, pageable);
+        } else if (type != null) {
+            notes = wrongAnswerNoteRepository
+                    .findBySiteUserAndSourceTypeOrderByCreatedDateDesc(user, type, pageable);
+        } else if (reviewed != null) {
+            notes = wrongAnswerNoteRepository
+                    .findBySiteUserAndReviewedOrderByCreatedDateDesc(user, reviewed, pageable);
+        } else {
+            notes = wrongAnswerNoteRepository.findBySiteUserOrderByCreatedDateDesc(user, pageable);
+        }
 
         model.addAttribute("notes", notes);
         model.addAttribute("selectedSourceType", type);
+        model.addAttribute("selectedReviewed", reviewed);
         model.addAttribute("wrongNoteCount", wrongAnswerNoteRepository.countBySiteUserAndReviewedFalse(user));
 
         return "practice/wrong-notes";
