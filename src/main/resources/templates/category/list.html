@@ -35,7 +35,13 @@
             </div>
             <h1>강의 목록</h1>
         </div>
-        <p>단계별로 한국어를 배워봐요. 현재 2단계 단어 월드 진행 중이에요 🗺️</p>
+        <p th:if="${lastProgress != null}"
+           th:text="'단계별로 한국어를 배워봐요. 현재 ' + ${lastProgress.content.category.title} + ' 진행 중이에요 🗺️'">
+            단계별로 한국어를 배워봐요. 현재 2단계 단어 월드 진행 중이에요 🗺️
+        </p>
+        <p th:if="${lastProgress == null}">
+            단계별로 한국어를 배워봐요. 첫 강의를 시작해보세요 🗺️
+        </p>
     </div>
 
     <!-- 관리자: 카테고리 관리 패널 (통계 박스 대신 노출) -->
@@ -158,7 +164,7 @@
 
     <div class="stage-section" th:each="category, catStat : ${list}" th:attr="data-cat-id=${category.id}">
         <div class="stage-header">
-            <span class="stage-badge" th:classappend="'sb-' + ${catStat.count}" th:text="${catStat.count} + '단계'"></span>
+            <span class="stage-badge" th:classappend="'sb-' + ${catStat.count}" th:text="'테마 ' + ${catStat.count}"></span>
             <h2 th:text="${category.title}"></h2>
             <span class="stage-count" th:text="${category.instructor}"></span>
         </div>
@@ -187,7 +193,12 @@
                     <div th:unless="${content.thumbFileName != null and !content.thumbFileName.isEmpty()}"
                          class="lc-thumb-icon">📖</div>
                     <div class="lc-play" th:if="${unlocked}"><div class="play-btn">▶</div></div>
-                    <div class="lc-lock" th:unless="${unlocked}">🔒</div>
+                    <div class="lc-lock" th:unless="${unlocked}">
+                        <svg viewBox="0 0 24 24" width="40" height="40" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                            <rect x="5" y="11" width="14" height="9" rx="2"/>
+                            <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+                        </svg>
+                    </div>
 
                     <!-- 공개 상태 뱃지: 임시저장 / 예약공개가 완료·진행중 뱃지보다 우선 -->
                     <span th:if="${content.status == 'DRAFT'}" class="lc-status ls-draft">임시</span>
@@ -206,8 +217,16 @@
                         <div class="lc-prog-header">
                             <span class="lc-prog-label">진행률</span>
                             <span class="lc-prog-pct"
-                                  th:classappend="${unlocked} ? (${content.progressPercent} == 100 ? 'done' : (${content.progressPercent} > 0 ? 'ing' : 'none')) : 'none'"
-                                  th:text="${unlocked} ? (${content.progressPercent} == 100 ? '100% 완료 ✓' : ${content.progressPercent} + '%') : (${needsPayment} ? '🔒 잠김' : '🔒 준비중')">
+                                  th:if="${unlocked}"
+                                  th:classappend="${content.progressPercent} == 100 ? 'done' : (${content.progressPercent} > 0 ? 'ing' : 'none')"
+                                  th:text="${content.progressPercent} == 100 ? '100% 완료 ✓' : ${content.progressPercent} + '%'">
+                            </span>
+                            <span class="lc-prog-pct none" th:unless="${unlocked}" style="display:inline-flex;align-items:center;gap:3px;">
+                                <svg viewBox="0 0 24 24" width="14" height="14" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <rect x="5" y="11" width="14" height="9" rx="2"/>
+                                    <path d="M8 11V7a4 4 0 0 1 8 0v4"/>
+                                </svg>
+                                <span th:text="${needsPayment} ? '잠김' : '준비중'"></span>
                             </span>
                         </div>
                         <div class="lc-prog-bar">
@@ -220,7 +239,7 @@
                 </div>
             </a>
 
-            <p th:if="${#lists.isEmpty(contentMap.get(category.id))}" style="padding:20px;color:var(--ink-faint);">
+            <p th:if="${#lists.isEmpty(contentMap.get(category.id))}" class="lecture-empty-msg">
                 아직 등록된 강의가 없어요.
             </p>
 
@@ -282,7 +301,7 @@
 
             <div class="field">
                 <label for="catName">카테고리명 <span class="required">*</span></label>
-                <input type="text" id="catName" name="title" placeholder="예: 5단계 발음" maxlength="20" required />
+                <input type="text" id="catName" name="title" placeholder="예: 테마 5" maxlength="20" required />
             </div>
 
             <div class="field">

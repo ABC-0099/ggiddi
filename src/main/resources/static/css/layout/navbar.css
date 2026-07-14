@@ -181,6 +181,10 @@
   .navbar.navbar-game .logo-img-default { display: none; }
   .navbar.navbar-game .logo-img-game { display: block; }
 
+  /* 게임 페이지에서 관리자로 로그인한 경우, 두 테마 클래스가 동시에 붙어서
+     관리자 로고와 게임 로고가 같이 보이는 문제 방지 (게임 테마가 우선) */
+  .navbar.navbar-game .logo-img-admin { display: none; }
+
   /* 메뉴 */
   .navbar-menu {
     display: flex;

@@ -22,7 +22,7 @@
     <!-- 페이지 헤더 -->
     <div class="page-header">
         <div class="page-header-inner">
-            <a th:href="@{/category/view/{id}(id=${lectureForm.categoryId})}" class="back-btn">← 강의 목록으로</a>
+            <a th:href="@{/category/list} + '#stage-' + ${lectureForm.categoryId}" class="back-btn">← 강의 목록으로</a>
             <div class="page-title-row">
                 <h1 class="page-title">강의 수정</h1>
                 <span class="page-badge">관리자</span>

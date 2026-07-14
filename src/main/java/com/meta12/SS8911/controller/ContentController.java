@@ -83,16 +83,15 @@ public class ContentController {
         boolean isPaid = false;
 
         // 3. 권한 체크 (무료 콘텐츠는 결제 여부와 상관없이 열람 가능)
-        if (content.isFree()) {
-            hasAccess = true;
+        //    isPaid는 "이 카테고리를 실제로 결제/구독했는지"만 나타내야 함
+        //    (사이드바 강의 목록에서 다른 차시들의 잠금 여부를 이 값으로 판단하기 때문)
+        if (currentUser != null && currentUser.getRole() == Role.ADMIN) {
+            isPaid = true;
         } else if (currentUser != null) {
-            if (currentUser.getRole() == Role.ADMIN) {
-                hasAccess = true;
-            } else {
-                isPaid = orderPayRepository.existsBySiteUserAndCategory(currentUser, category);
-                hasAccess = isPaid;
-            }
+            isPaid = orderPayRepository.existsBySiteUserAndCategory(currentUser, category);
         }
+
+        hasAccess = isPaid || content.isFree();
         System.out.println("[DEBUG-4] hasAccess = " + hasAccess); // 추가
 
         // 4. 권한 없을 때 (존재하지 않는 템플릿으로 forward하면 500 에러가 나므로,
@@ -103,11 +102,13 @@ public class ContentController {
         }
 
         // 5. 권한 있을 때
-        Progress progress = progressRepository.findBySiteUserAndContent(currentUser, content).orElse(null);
+        Progress progress = (currentUser != null)
+                ? progressRepository.findBySiteUserAndContent(currentUser, content).orElse(null)
+                : null;
         model.addAttribute("savedTime", (progress != null) ? progress.getLastWatchedTime() : 0);
         model.addAttribute("content", content);
         model.addAttribute("contentList", contentService.list(category.getId(), currentUser));
-        model.addAttribute("isPaid", true);
+        model.addAttribute("isPaid", isPaid);
 
         // ── 영상 완료 후 임베드 퀴즈 ──
         Quiz quiz = quizService.getQuizEntityForContent(id);
