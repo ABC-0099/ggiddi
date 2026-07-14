@@ -28,6 +28,7 @@
     border: 1px solid #dbe3ef;
     border-radius: 10px;
     font-size: 14px;
+    font-family: inherit;
     background: #fff;
     transition: all .2s ease;
     box-sizing: border-box;
@@ -38,7 +39,7 @@
     outline: none;
     box-shadow: 0 0 0 3px rgba(24,95,165,.12);
 }
-.form-textarea { resize: vertical; min-height: 220px; font-family: inherit; line-height: 1.6; }
+.form-textarea { resize: vertical; min-height: 220px; line-height: 1.6; }
 
 .poster-upload {
     border: 2px dashed #d5dce8;
@@ -60,4 +61,3 @@
     .form-row { grid-template-columns: 1fr; }
     .event-btn-wrap { flex-direction: column; }
 }
-
