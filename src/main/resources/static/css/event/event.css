@@ -213,6 +213,7 @@ body{
     display: grid;
     grid-template-columns: repeat(3, 1fr);
     gap: 30px;
+    align-items: start;
 }
 
 /* 카드 - 글래스모피즘 */
@@ -227,8 +228,6 @@ body{
 
     padding: 18px;
 
-    min-height: 520px;
-
     box-shadow: var(--shadow-sm);
     transition: 0.25s;
 }
@@ -240,9 +239,11 @@ body{
 }
 
 .event-card img{
+    display: block;
     width: 100%;
-    height: 280px;
+    height: auto;
 
+    /* 고정 높이 대신 이미지 자체 비율대로 보여줘서 위아래 빈 여백이 안 생기게 함 */
     object-fit: contain;
     background: rgba(255,255,255,0.5);
 

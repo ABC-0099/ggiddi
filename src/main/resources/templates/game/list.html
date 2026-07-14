@@ -46,23 +46,19 @@
 <div class="game-wrap" style="padding-top:40px;">
     <div style="display:flex; flex-wrap:wrap; justify-content:center; gap:28px; min-height:340px; padding-bottom:20px;">
 
-        <!-- 단어 맞추기 -->
+        <!-- 퀴즈 게임 -->
         <div style="flex:1 1 320px; max-width:480px; display:flex; flex-direction:column; align-items:center; justify-content:center; text-align:center; gap:20px; padding:36px 24px; border:2px solid var(--wood-deep, #7a5230); border-radius:16px; background:rgba(255,255,255,0.55);">
             <div style="width:52px; height:52px; color:var(--wood-deep);">
                 <svg viewBox="0 0 24 24" width="52" height="52" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">
-                    <path d="M4 5.5c0-.83.67-1.5 1.5-1.5H11a1 1 0 0 1 1 1v14a1 1 0 0 0-1-1H5.5A1.5 1.5 0 0 0 4 19.5v-14z"/>
-                    <path d="M20 5.5c0-.83-.67-1.5-1.5-1.5H13a1 1 0 0 0-1 1v14a1 1 0 0 1 1-1h5.5a1.5 1.5 0 0 1 1.5 1.5v-14z"/>
-                    <line x1="7" y1="8" x2="9.3" y2="8"/>
-                    <line x1="7" y1="11" x2="9.3" y2="11"/>
-                    <line x1="14.7" y1="8" x2="17" y2="8"/>
-                    <line x1="14.7" y1="11" x2="17" y2="11"/>
+                    <path d="M9 11.5l1.8 1.8L15 9"/>
+                    <path d="M12 3 4.5 5.5v5c0 5 3.2 8.4 7.5 10.5 4.3-2.1 7.5-5.5 7.5-10.5v-5L12 3z"/>
                 </svg>
             </div>
             <div>
-                <h2 class="serif-font" style="font-size:19px; font-weight:900; margin-bottom:10px; color:var(--wood-deep);">단어 맞추기</h2>
-                <p style="font-size:13.5px; color:var(--ink-soft); line-height:1.6;">뜻과 발음을 보고<br>알맞은 단어를 맞혀보세요.</p>
+                <h2 class="serif-font" style="font-size:19px; font-weight:900; margin-bottom:10px; color:var(--wood-deep);">퀴즈 게임</h2>
+                <p style="font-size:13.5px; color:var(--ink-soft); line-height:1.6;">띄어쓰기, 맞춤법, 올바른 단어 찾기,<br>OX 문제로 실력을 시험해보세요.</p>
             </div>
-            <button class="gc-start-btn" style="width:auto; padding:14px 32px; font-size:13px;" data-game="단어 맞추기" data-path="/games/word/index.html" onclick="startAdventure(this)">모험을 떠나요 →</button>
+            <button class="gc-start-btn" style="width:auto; padding:14px 32px; font-size:13px;" data-game="퀴즈 게임" data-path="/games/quiz/index.html" onclick="startAdventure(this)">지혜의 관문으로 →</button>
         </div>
 
         <!-- 액션 게임 -->
@@ -123,7 +119,10 @@
       var gamePath = el.getAttribute('data-path');
       if (!gameName) return;
       var overlay = document.getElementById('portalOverlay');
-      document.getElementById('portalGameName').textContent = gameName + ' 모험을 떠나는 중';
+      var portalText = (gameName === '퀴즈 게임')
+        ? gameName + ' 지혜의 관문으로 들어가는 중'
+        : gameName + ' 모험을 떠나는 중';
+      document.getElementById('portalGameName').textContent = portalText;
       overlay.classList.add('active');
       overlay.setAttribute('aria-hidden', 'false');
       setTimeout(function () {
