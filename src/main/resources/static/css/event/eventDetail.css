@@ -39,6 +39,7 @@ body{
     font-weight:700;
     color: var(--navy-800);
     margin-bottom:15px;
+    white-space: pre-line;
 }
 
 /* 기간 */
