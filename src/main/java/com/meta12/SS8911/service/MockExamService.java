@@ -104,14 +104,13 @@ public class MockExamService {
         SiteUser user = siteUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
 
-        Map<Long, Integer> selectedByQuestionId = submit.getAnswers() == null
-                ? Collections.emptyMap()
-                : submit.getAnswers().stream()
-                .collect(Collectors.toMap(
-                        MockExamSubmitDTO.AnswerEntry::getQuestionId,
-                        MockExamSubmitDTO.AnswerEntry::getSelectedOption,
-                        (a, b) -> a
-                ));
+        Map<Long, Integer> selectedByQuestionId = new HashMap<>();
+        if (submit.getAnswers() != null) {
+            for (MockExamSubmitDTO.AnswerEntry entry : submit.getAnswers()) {
+                // put()은 value가 null이어도 안전함 (Collectors.toMap은 내부적으로 merge()를 써서 null이면 NPE 발생)
+                selectedByQuestionId.put(entry.getQuestionId(), entry.getSelectedOption());
+            }
+        }
 
         // 제출된 답안에 포함된 문항들만 채점 대상 (매번 랜덤 출제된 문항 기준)
         List<Long> questionIds = new ArrayList<>(selectedByQuestionId.keySet());

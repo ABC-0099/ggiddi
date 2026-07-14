@@ -34,7 +34,7 @@
     /* 페이지 헤더 */
     .page-header {
       position: relative; z-index: 1;
-      padding: 48px 6% 28px;
+      padding: 48px 32px 28px;
       max-width: 1300px; margin: 0 auto;
       display: flex; align-items: flex-start; justify-content: space-between; gap: 24px;
     }
@@ -82,7 +82,7 @@
     .board-wrap {
       position: relative; z-index: 1;
       max-width: 1300px; margin: 0 auto;
-      padding: 0 6% 100px;
+      padding: 0 32px 100px;
     }
 
     /* 검색 + 필터 바 */

@@ -28,7 +28,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 
 .view-wrap {
   position: relative; z-index: 1;
-  max-width: 700px; margin: 40px auto 80px; padding: 0 20px;
+  max-width: 1300px; margin: 40px auto 80px; padding: 0 32px;
 }
 
 .back-btn {

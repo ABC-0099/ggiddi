@@ -66,12 +66,12 @@ a { text-decoration: none; color: inherit; }
    HERO
 ══════════════════ */
 .hero {
-  padding: 88px 6% 80px;
+  padding: 88px 32px 80px;
   display: grid;
   grid-template-columns: 1fr 1fr;
   gap: 60px;
   align-items: center;
-  max-width: 1440px;
+  max-width: 1300px;
   margin: 0 auto;
   min-height: 560px;
 }
@@ -170,12 +170,12 @@ a { text-decoration: none; color: inherit; }
 /* ── STATS 띠 ── */
 .stats-strip {
   background: var(--navy);
-  padding: 52px 6%;
+  padding: 52px 32px;
 }
 
 .stats-inner {
   display: grid; grid-template-columns: repeat(3,1fr);
-  text-align: center; max-width: 1440px; margin: 0 auto;
+  text-align: center; max-width: 1300px; margin: 0 auto;
 }
 
 .stat-item {
@@ -194,8 +194,8 @@ a { text-decoration: none; color: inherit; }
 .stat-label { font-size: 15px; color: rgba(255,255,255,.7); }
 
 /* ── WHY (문제 인식 & 해결책) ── */
-.why { background: var(--white); padding: 88px 6%; }
-.why-inner { max-width: 1440px; margin: 0 auto; }
+.why { background: var(--white); padding: 88px 32px; }
+.why-inner { max-width: 1300px; margin: 0 auto; }
 
 .why-cards {
   display: grid;
@@ -257,10 +257,10 @@ a { text-decoration: none; color: inherit; }
 /* ── CURRICULUM ── */
 .curriculum {
   background: var(--bg);
-  padding: 88px 6%;
+  padding: 88px 32px;
 }
 
-.curriculum-inner { max-width: 1440px; margin: 0 auto; }
+.curriculum-inner { max-width: 1300px; margin: 0 auto; }
 
 .section-tag {
   font-size: 12px; font-weight: 600;
@@ -324,8 +324,8 @@ a { text-decoration: none; color: inherit; }
 .stage-card p  { font-size: 14px; color: var(--ink-soft); line-height: 1.65; }
 
 /* ── FEATURES ── */
-.features { padding: 88px 6%; }
-.features-inner { max-width: 1440px; margin: 0 auto; }
+.features { padding: 88px 32px; }
+.features-inner { max-width: 1300px; margin: 0 auto; }
 
 .features-grid {
   display: grid; grid-template-columns: repeat(4,1fr); gap: 20px;
@@ -356,8 +356,8 @@ a { text-decoration: none; color: inherit; }
 .feature-card p  { font-size: 14px; color: var(--ink-soft); line-height: 1.65; }
 
 /* ── REVIEWS ── */
-.reviews { background: var(--bg); padding: 88px 6%; }
-.reviews-inner { max-width: 1440px; margin: 0 auto; }
+.reviews { background: var(--bg); padding: 88px 32px; }
+.reviews-inner { max-width: 1300px; margin: 0 auto; }
 
 .reviews-grid {
   display: grid; grid-template-columns: repeat(3,1fr); gap: 16px;
@@ -399,10 +399,16 @@ a { text-decoration: none; color: inherit; }
 .cta-box {
   background: #071510;
   border-radius: 0;
-  padding: 72px 10%;
+  position: relative; overflow: hidden;
+}
+
+.cta-box-inner {
+  max-width: 1300px;
+  margin: 0 auto;
+  padding: 72px 32px;
   display: flex; align-items: center;
   justify-content: space-between; gap: 48px;
-  position: relative; overflow: hidden;
+  position: relative; z-index: 1;
 }
 
 .cta-box::before {
@@ -457,7 +463,7 @@ a { text-decoration: none; color: inherit; }
   .curriculum-grid { grid-template-columns: repeat(2,1fr); }
   .features-grid { grid-template-columns: repeat(2,1fr); }
   .reviews-grid { grid-template-columns: 1fr 1fr; }
-  .cta-box { flex-direction: column; text-align: center; padding: 56px 8%; }
+  .cta-box-inner { flex-direction: column; text-align: center; padding: 56px 8%; }
   .cta-actions { justify-content: center; }
 }
 
@@ -477,10 +483,10 @@ a { text-decoration: none; color: inherit; }
 .dash-card {
   background: rgba(255,255,255,.68);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,.9);
+  border: 2px solid var(--mint-light);
   border-radius: 24px;
-  padding: 28px 26px;
-  width: 100%; max-width: 360px;
+  padding: 32px 28px;
+  width: 100%; max-width: 400px;
   box-shadow: 0 8px 40px rgba(29,158,117,.1);
 }
 
@@ -547,10 +553,10 @@ a { text-decoration: none; color: inherit; }
 .login-card {
   background: rgba(255,255,255,.68);
   backdrop-filter: blur(20px);
-  border: 1px solid rgba(255,255,255,.9);
+  border: 2px solid var(--mint-light);   /* 민트 톤 */
   border-radius: 24px;
   padding: 32px 28px;
-  width: 100%; max-width: 360px;
+  width: 100%; max-width: 400px;
   box-shadow: 0 8px 40px rgba(29,158,117,.08);
 }
 
