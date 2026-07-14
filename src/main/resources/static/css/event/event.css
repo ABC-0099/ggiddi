@@ -219,6 +219,9 @@ body{
 /* 카드 - 글래스모피즘 */
 
 .event-card{
+    display: flex;
+    flex-direction: column;
+
     background: var(--glass-bg);
     border: 1px solid var(--glass-border);
     border-radius: 16px;
@@ -227,6 +230,8 @@ body{
     -webkit-backdrop-filter: blur(8px);
 
     padding: 18px;
+
+    min-height: 420px;
 
     box-shadow: var(--shadow-sm);
     transition: 0.25s;
@@ -264,7 +269,8 @@ body{
 }
 
 .progress-btn{
-    margin-top: 15px;
+    margin-top: auto;
+    align-self: flex-start;
 
     border: 2px solid var(--mint-500);
     color: var(--mint-600);
@@ -284,7 +290,8 @@ body{
 }
 
 .upcoming-btn{
-    margin-top: 15px;
+    margin-top: auto;
+    align-self: flex-start;
 
     border: 2px solid var(--navy-600);
     color: var(--navy-800);
@@ -298,7 +305,8 @@ body{
 }
 
 .result-btn{
-    margin-top: 15px;
+    margin-top: auto;
+    align-self: flex-start;
 
     border: 2px solid #D8D8D5;
     color: var(--gray-600);
