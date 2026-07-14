@@ -19,27 +19,31 @@
 <div class="paper-texture"></div>
 
 <nav>
-    <a th:href="@{/}" class="logo">끼역띠귿<div class="logo-dot"></div></a>
-    <ul class="nav-links">
-        <li><a th:href="@{/notice/list}">공지사항</a></li>
-        <li><a th:href="@{/community}">커뮤니티</a></li>
-        <li><a th:href="@{/event}">이벤트</a></li>
-        <li><a th:href="@{/category/list}">강의</a></li>
-        <li><a th:href="@{/game}" class="active">게임</a></li>
-        <li><a th:href="@{/faq/list}">FAQ</a></li>
-        <li><a th:href="@{/qna/write}">1:1 질문하기</a></li>
-        <li sec:authorize="!(hasRole('ADMIN') or authentication.name == 'admin888')">
-            <a th:href="@{/siteUser/mypage}">마이페이지</a>
-        </li>
-    </ul>
-    <div sec:authorize="isAuthenticated()" class="nav-user-box">
-        <div class="avatar" sec:authentication="name" th:text="${#strings.substring(#authentication.name,0,1)}">유</div>
-        <form th:action="@{/logout}" method="post" style="margin:0;">
-            <button type="submit" class="nav-logout-btn">로그아웃</button>
-        </form>
-    </div>
-    <div sec:authorize="isAnonymous()">
-        <a th:href="@{/siteUser/login}" class="avatar" style="font-size:11px; text-decoration:none;">로그인</a>
+    <div class="nav-inner">
+        <a th:href="@{/}" class="logo">
+            <img th:src="@{/images/logo-gold.png}" alt="끼역띠귿" style="height:34px;display:block;" />
+        </a>
+        <ul class="nav-links">
+            <li><a th:href="@{/notice/list}">공지사항</a></li>
+            <li><a th:href="@{/community}">커뮤니티</a></li>
+            <li><a th:href="@{/event}">이벤트</a></li>
+            <li><a th:href="@{/category/list}">강의</a></li>
+            <li><a th:href="@{/game}" class="active">게임</a></li>
+            <li><a th:href="@{/faq/list}">FAQ</a></li>
+            <li><a th:href="@{/qna/write}">1:1 질문하기</a></li>
+            <li sec:authorize="!(hasRole('ADMIN') or authentication.name == 'admin888')">
+                <a th:href="@{/siteUser/mypage}">마이페이지</a>
+            </li>
+        </ul>
+        <div sec:authorize="isAuthenticated()" class="nav-user-box">
+            <div class="avatar" sec:authentication="name" th:text="${#strings.substring(#authentication.name,0,1)}">유</div>
+            <form th:action="@{/logout}" method="post" style="margin:0;">
+                <button type="submit" class="nav-logout-btn">로그아웃</button>
+            </form>
+        </div>
+        <div sec:authorize="isAnonymous()">
+            <a th:href="@{/siteUser/login}" class="avatar" style="font-size:11px; text-decoration:none;">로그인</a>
+        </div>
     </div>
 </nav>
 
@@ -239,7 +243,7 @@
         <div class="game-footer-top">
 
             <div class="game-footer-brand">
-                <div class="game-footer-logo pixel-font">끼역띠귿</div>
+                <img th:src="@{/images/logo-gold.png}" alt="끼역띠귿" style="height:28px;display:block;margin-bottom:14px;" />
                 <p class="game-footer-tagline">외국인 학습자를 위한<br>한국어 학습 플랫폼</p>
                 <div class="game-footer-sns">
                     <a th:href="@{/}" class="game-sns-btn" aria-label="인스타그램">

@@ -32,7 +32,7 @@
           padding: 16px 6% 0;
           font-size: 13px; color: var(--ink-faint);
           display: flex; align-items: center; gap: 6px;
-          max-width: 1440px; margin: 0 auto;
+          max-width: 1500px; margin: 0 auto;
         }
 
         .breadcrumb a { color: var(--mint-dark); }
@@ -43,7 +43,7 @@
         .main {
           position: relative; z-index: 1;
           padding: 20px 6% 80px;
-          max-width: 1440px; margin: 0 auto;
+          max-width: 1500px; margin: 0 auto;
           display: grid;
           grid-template-columns: 1fr 360px;
           gap: 28px;

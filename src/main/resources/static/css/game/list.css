@@ -373,16 +373,23 @@
 /* ── 게임 전용 NAV ── */
 nav {
   position: sticky; top: 0; z-index: 50;
-  height: 68px; padding: 0 6%;
-  display: flex; align-items: center; justify-content: space-between;
+  height: 68px;
   background: var(--wood-deep);
   border-bottom: 4px solid var(--gold);
   box-shadow: 0 4px 12px rgba(0,0,0,.25);
+}
+.nav-inner {
+  max-width: 1440px;
+  margin: 0 auto;
+  padding: 0 32px;
+  height: 100%;
+  display: flex; align-items: center; justify-content: space-between;
 }
 .logo {
   font-size: 14px; font-weight: 700; color: var(--gold-light);
   display: flex; align-items: center; gap: 9px;
   font-family: 'Galmuri11', sans-serif;
+  margin-right: 40px;
 }
 .logo-dot { width: 8px; height: 8px; background: var(--crimson); border-radius: 50%; box-shadow: 0 0 8px rgba(139,58,58,.7); }
 .nav-links { display: flex; gap: 28px; list-style: none; font-size: 13px; font-weight: 700; color: rgba(232,196,104,.55); }

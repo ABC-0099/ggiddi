@@ -42,7 +42,7 @@ button { font-family: inherit; cursor: pointer; border: none; background: none; 
 
 .form-wrap {
   position: relative; z-index: 1;
-  max-width: 760px; margin: 0 auto;
+  max-width: 900px; margin: 0 auto;
   padding: 40px 6% 100px;
 }
 
