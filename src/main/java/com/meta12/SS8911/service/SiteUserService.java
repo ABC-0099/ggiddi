@@ -44,9 +44,6 @@ public class SiteUserService implements UserDetailsService {
         if (siteUserRepository.existsByUsername(dto.getUsername())) {
             throw new IllegalStateException("이미 존재하는 아이디입니다.");
         }
-        if (siteUserRepository.existsByPhone(dto.getPhone())) {
-            throw new IllegalStateException("이미 등록된 전화번호입니다.");
-        }
 
         SiteUser user = new SiteUser();
         user.setUsername(dto.getUsername());
