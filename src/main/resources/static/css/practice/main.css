@@ -38,9 +38,9 @@
 }
 
 .pl-wrap {
-    max-width: 1200px;
+    max-width: 1300px;
     margin: 0 auto;
-    padding: 64px 24px 96px;
+    padding: 64px 0 96px;
 }
 
 /* ── 히어로 (풀블리드 다크 그라디언트) ── */

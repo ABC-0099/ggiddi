@@ -31,6 +31,9 @@ public class NoticeController {
                        @RequestParam(required = false) String category,
                        @RequestParam(required = false) String keyword,
                        Model model) {
+        if (category != null && category.isBlank()) {
+            category = null;
+        }
         Page<NoticeDTO> noticePage = noticeService.getNoticePage(page, category, keyword);
         model.addAttribute("list", noticePage.getContent());
         model.addAttribute("currentPage", page);

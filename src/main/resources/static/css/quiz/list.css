@@ -130,9 +130,8 @@ body { margin: 0; padding: 0; }
 
 /* 본문 */
 .ql-wrap {
-    max-width: 880px;
     margin: 0 auto;
-    padding: 48px 24px 96px;
+    padding: 48px 0 96px;
     font-family: 'Noto Sans KR', sans-serif;
     background: #F7FAFC;
 }
@@ -243,6 +242,8 @@ body { margin: 0; padding: 0; }
     background: #ffffff;
     border: 1.5px dashed #dce6f0;
     border-radius: 16px;
+    max-width: 1300px;
+    margin: 0 auto;
 }
 
 /* 모바일 */

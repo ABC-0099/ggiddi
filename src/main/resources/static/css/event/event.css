@@ -28,6 +28,7 @@ body{
     font-family: 'Noto Sans KR', 'Pretendard', sans-serif;
     background: var(--gray-50);
     color: var(--gray-800);
+    line-height: 1.6;
 }
 
 /* ==========================
@@ -36,10 +37,10 @@ body{
 
 .banner{
     position: relative;
-    width: 90%;
-    max-width: 1200px;
+    width: 100%;
+    max-width: 1300px;
     aspect-ratio: 1920 / 400;
-    margin: 20px auto;
+    margin: 32px auto;
     overflow: hidden;
     border-radius: 16px;
     box-shadow: var(--shadow-md);
@@ -184,8 +185,8 @@ body{
 ========================== */
 
 .event-section{
-    width: 90%;
-    max-width: 1200px;
+    width: 100%;
+    max-width: 1300px;
     margin: auto;
 }
 
@@ -270,9 +271,10 @@ body{
 }
 
 .event-card p{
-    font-size: 13px;
+    font-size: 13.5px;
     color: var(--gray-600);
     margin-bottom: 8px;
+    line-height: 1.6;
 }
 
 .progress-btn{

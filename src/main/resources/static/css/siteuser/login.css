@@ -43,10 +43,10 @@
       position: relative; z-index: 1;
       display: grid;
       grid-template-columns: 1fr 1.1fr;
-      max-width: 1200px;
+      max-width: 1300px;
       margin: 0 auto;
       width: 100%;
-      padding: 48px 6%;
+      padding: 48px 0;
       gap: 72px;
       align-items: center;
     }
@@ -58,8 +58,9 @@
       display: inline-flex; align-items: center; gap: 7px;
       padding: 5px 14px; border-radius: 20px;
       font-size: 12px; font-weight: 600;
-      color: var(--navy); background: var(--navy-light);
-      border: 1px solid rgba(24,95,165,.2);
+      background: var(--mint-pale);
+      border: 1px solid rgba(93, 202, 165, .3);
+      color: var(--mint-dark);
       margin-bottom: 24px;
     }
 
@@ -109,10 +110,13 @@
       background: rgba(255,255,255,.68);
       backdrop-filter: blur(28px);
       -webkit-backdrop-filter: blur(28px);
-      border: 1px solid rgba(255,255,255,.9);
+      border: 2px solid var(--mint-light);
       border-radius: 24px;
       padding: 40px 36px;
-      box-shadow: 0 2px 0 rgba(255,255,255,.9), 0 20px 60px rgba(29,158,117,.1);
+      box-shadow: 0 8px 40px rgba(29, 158, 117, .08);
+      max-width: 400px;
+      width: 100%;
+      justify-self: end;
     }
 
     .card-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; letter-spacing: -.4px; }

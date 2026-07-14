@@ -15,7 +15,7 @@
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-    body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--ink); }
+    body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--ink); line-height: 1.6; }
     a { text-decoration: none; color: inherit; }
 
     .bg-orbs { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
@@ -29,8 +29,9 @@
     /* 페이지 헤더 */
     .page-header {
       position: relative; z-index: 1;
-      padding: 48px 6% 32px;
-      max-width: 1300px; margin: 0 auto;
+      padding: 48px 0 32px;
+      max-width: 1300px;
+      margin: 0 auto;
       display: flex;
       align-items: flex-start;
       justify-content: space-between;
@@ -38,7 +39,7 @@
     }
     .page-header-title-row {
       display: flex; align-items: center; gap: 10px;
-      margin-bottom: 6px;
+      margin-bottom: 10px;
     }
     .page-header-badge {
       display: inline-flex; align-items: center; justify-content: center;
@@ -48,7 +49,7 @@
       flex-shrink: 0;
     }
     .page-header-text h1 { font-size: 32px; font-weight: 700; letter-spacing: -.5px; margin-bottom: 0; }
-    .page-header-text p  { font-size: 15px; color: var(--ink-soft); font-weight: 300; }
+    .page-header-text p  { font-size: 15.5px; color: var(--ink-soft); font-weight: 400; line-height: 1.7; }
 
     /* 마지막 강의 작은 박스 */
     .last-lecture-box {
@@ -306,7 +307,7 @@
     /* 탭 */
     .filter-bar {
       position: relative; z-index: 1;
-      padding: 0 6% 28px;
+      padding-bottom: 32px;
       max-width: 1300px; margin: 0 auto;
       display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
     }
@@ -330,7 +331,7 @@
     /* ── 강의 목록 ── */
     .lecture-wrap {
       position: relative; z-index: 1;
-      padding: 0 6% 80px;
+      padding-bottom: 50px;
       max-width: 1300px; margin: 0 auto;
     }
 
@@ -481,12 +482,12 @@
     }
 
     .lc-title {
-      font-size: 15px; font-weight: 700;
+      font-size: 15.5px; font-weight: 700;
       color: var(--ink); line-height: 1.45;
       white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
     }
 
-    .lc-meta { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--ink-faint); }
+    .lc-meta { display: flex; align-items: center; gap: 10px; font-size: 12.5px; color: var(--ink-faint); }
 
     /* ── 진행률 강조 영역 ── */
     .lc-progress-wrap {

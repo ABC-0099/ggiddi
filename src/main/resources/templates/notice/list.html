@@ -18,7 +18,7 @@
 <div class="bg-orbs"><div class="orb o1"></div><div class="orb o2"></div></div>
 
 <!-- NAV -->
-<div th:replace="~{layout/navbar :: navbar(currentMenu='quiz')}"></div>
+<div th:replace="~{layout/navbar :: navbar(currentMenu='notice')}"></div>
 
 <!-- 헤더 -->
 <div class="page-header">
@@ -56,7 +56,7 @@
 
   <div class="board-controls">
     <div class="filter-tabs">
-      <a class="tab" th:classappend="${category == null} ? 'active'" th:href="@{/notice/list(keyword=${keyword})}">전체</a>
+      <a class="tab" th:classappend="${#strings.isEmpty(category)} ? 'active'" th:href="@{/notice/list(keyword=${keyword})}">전체</a>
       <a class="tab" th:classappend="${category == 'notice'} ? 'active'" th:href="@{/notice/list(category='notice', keyword=${keyword})}">공지</a>
       <a class="tab" th:classappend="${category == 'event'} ? 'active'" th:href="@{/notice/list(category='event', keyword=${keyword})}">이벤트</a>
       <a class="tab" th:classappend="${category == 'system'} ? 'active'" th:href="@{/notice/list(category='system', keyword=${keyword})}">시스템</a>

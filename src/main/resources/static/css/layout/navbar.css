@@ -7,6 +7,7 @@
     border-bottom: 1px solid #dce6f0;
     box-shadow: 0 2px 12px rgba(24, 95, 165, 0.06);
     transition: background 0.25s, box-shadow 0.25s;
+    padding: 0 32px;
   }
 
 /* ── 관리자 로그인 시 전용 스타일: 배경 전체를 초록(딥그린)으로, 아래쪽에 은은한 조명 효과 ── */
@@ -152,7 +153,6 @@
   .navbar-inner {
     max-width: 1300px;
     margin: 0 auto;
-    padding: 0 32px;
     height: 64px;
     display: flex;
     align-items: center;
@@ -484,7 +484,7 @@
   @media (max-width: 768px) {
     .navbar-toggle { display: flex; }
 
-    .navbar-inner { flex-wrap: wrap; height: auto; padding: 14px 20px; }
+    .navbar-inner { flex-wrap: wrap; height: auto; padding: 14px 0; }
 
     .navbar-menu {
       display: none;

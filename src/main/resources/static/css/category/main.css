@@ -84,7 +84,7 @@
       font-size: clamp(36px, 6vw, 72px);
       font-weight: 900;
       color: var(--white);
-      line-height: 1.1;
+      line-height: 1.5;
       letter-spacing: -2px;
       margin-bottom: 20px;
     }

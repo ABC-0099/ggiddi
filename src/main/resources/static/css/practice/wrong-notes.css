@@ -9,7 +9,7 @@ body { margin: 0; padding: 0; }
 }
 
 .wn-header-inner {
-  max-width: 900px;
+  max-width: 1300px;
   margin: 0 auto;
 }
 
@@ -65,9 +65,9 @@ body { margin: 0; padding: 0; }
 }
 
 .wn-wrap {
-  max-width: 900px;
+  max-width: 1300px;
   margin: 0 auto;
-  padding: 32px 24px 96px;
+  padding: 32px 0 96px;
 }
 
 /* 필터 영역: 출처 필터(왼쪽) + 복습여부 필터(오른쪽) 한 줄 배치 */

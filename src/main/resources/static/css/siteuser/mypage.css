@@ -35,9 +35,9 @@ html, body {
 .o2 { width:400px; height:400px; bottom:-80px; right:-80px; background:#B5D4F4; opacity:.35; }
 
 .mypage-container {
-    max-width: 1100px;
+    max-width: 1300px;
     margin: 40px auto 80px;
-    padding: 0 24px;
+    padding: 0;
     display: flex;
     gap: 24px;
     position: relative;

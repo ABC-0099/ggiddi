@@ -26,8 +26,8 @@ body{
 /* 전체 */
 
 .event-detail{
-    width:90%;
-    max-width:1200px;
+    width:100%;
+    max-width:1300px;
     margin:60px auto;
 }
 

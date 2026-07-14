@@ -15,7 +15,7 @@
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--ink); }
+body { font-family: 'Noto Sans KR', sans-serif; background: var(--bg); color: var(--ink); line-height: 1.6; }
 a { text-decoration: none; color: inherit; }
 
 .bg-orbs { position: fixed; inset: 0; z-index: 0; pointer-events: none; }
@@ -28,13 +28,15 @@ a { text-decoration: none; color: inherit; }
 
 /* 페이지 헤더 */
 .page-header {
-    position: relative; z-index: 1;
-    padding: 44px 32px 24px;
-    max-width: 1100px; margin: 0 auto;
+    position: relative;
+    z-index: 1;
+    padding: 44px 0 32px;
+    max-width: 1300px;
+    margin: 0 auto;
 }
 .page-header-title-row {
     display: flex; align-items: center; gap: 10px;
-    margin-bottom: 6px;
+    margin-bottom: 10px;
 }
 .page-header-badge {
     display: inline-flex; align-items: center; justify-content: center;
@@ -44,19 +46,19 @@ a { text-decoration: none; color: inherit; }
     flex-shrink: 0;
 }
 .page-header h1 { font-size: 30px; font-weight: 700; letter-spacing: -.5px; margin-bottom: 0; }
-.page-header p  { font-size: 14.5px; color: var(--ink-soft); font-weight: 300; }
+.page-header p  { font-size: 15px; color: var(--ink-soft); font-weight: 400; line-height: 1.7; }
 
 /* 태그 탭 */
 .filter-bar {
     position: relative; z-index: 1;
-    padding: 0 32px 20px;
-    max-width: 1000px; margin: 0 auto;
+    padding-bottom: 32px;
+    max-width: 1300px; margin: 0 auto;
     display: flex; align-items: center; justify-content: space-between; gap: 16px; flex-wrap: wrap;
 }
 .tabs { display: flex; gap: 4px; flex-wrap: wrap; }
 .tab {
-    padding: 7px 16px; border-radius: 20px;
-    font-size: 13.5px; font-weight: 500; cursor: pointer;
+    padding: 8px 18px; border-radius: 20px;
+    font-size: 14px; font-weight: 500; cursor: pointer;
     border: 1px solid transparent; transition: all .15s;
     color: var(--ink-soft); background: transparent; font-family: inherit;
 }
@@ -66,8 +68,8 @@ a { text-decoration: none; color: inherit; }
 /* 검색/정렬/글쓰기 바 */
 .toolbar {
     position: relative; z-index: 1;
-    padding: 0 32px 24px;
-    max-width: 1000px; margin: 0 auto;
+    padding: 0 0 20px;
+    max-width: 1300px; margin: 0 auto;
     display: flex; align-items: center; justify-content: space-between; gap: 12px; flex-wrap: wrap;
 }
 .search-area {
@@ -115,8 +117,8 @@ a { text-decoration: none; color: inherit; }
 /* 게시글 목록 */
 .post-wrap {
     position: relative; z-index: 1;
-    padding: 0 32px 80px;
-    max-width: 1000px; margin: 0 auto;
+    padding: 0 0 50px;
+    max-width: 1300px; margin: 0 auto;
     display: flex; flex-direction: column; gap: 14px;
 }
 .post {
@@ -171,7 +173,7 @@ a { text-decoration: none; color: inherit; }
 .pt-review { background: #FFF1ED; color: #C24A2C; }
 .pt-free   { background: #F1EFE8; color: #6B6655; }
 .post-title { font-size: 16px; font-weight: 700; color: var(--ink); margin-bottom: 6px; line-height: 1.5; }
-.post-text  { font-size: 13.5px; color: var(--ink-soft); line-height: 1.7; margin-bottom: 12px; }
+.post-text  { font-size: 14px; color: var(--ink-soft); line-height: 1.7; margin-bottom: 12px; }
 .post-image {
     width: 100%; height: 160px; border-radius: 12px;
     margin-bottom: 12px;
@@ -254,7 +256,6 @@ a { text-decoration: none; color: inherit; }
     border: 1px solid var(--border);
     border-radius: 14px;
     padding: 16px 20px;
-    margin-bottom: 18px;
     font-size: 12.5px; color: var(--ink-soft);
     display: flex; align-items: center; gap: 10px;
 }

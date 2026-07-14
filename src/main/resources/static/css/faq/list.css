@@ -30,7 +30,7 @@ a:hover { text-decoration: underline; }
   position: relative; z-index: 1;
 }
 .faq-header-inner {
-  max-width: 1100px; margin: 0 auto; padding: 0 32px;
+  max-width: 1300px; margin: 0 auto; padding: 0;
 }
 .page-header-title-row {
   display: flex; align-items: center; justify-content: flex-start; gap: 10px;
@@ -50,7 +50,7 @@ a:hover { text-decoration: underline; }
   font-size: 15.5px; color: rgba(255,255,255,.6); margin-bottom: 28px;
 }
 
-.faq-search-wrap { position: relative; max-width: 1000px; margin-top: 20px; }
+.faq-search-wrap { position: relative; max-width: 1300px; margin-top: 20px; }
 .faq-search-input {
   width: 100%; padding: 16px 46px 16px 22px;
   border-radius: 14px; border: none;
@@ -67,12 +67,12 @@ a:hover { text-decoration: underline; }
 /* ── 본문 ── */
 .faq-main {
   position: relative; z-index: 1;
-  max-width: 1000px; margin: 0 auto; padding: 36px 32px 80px;
+  max-width: 1300px; margin: 0 auto; padding: 36px 0 80px;
 }
 
 /* 카테고리 탭 */
 .faq-tabs {
-  display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap;
+  display: flex; gap: 8px; margin-bottom: 30px; flex-wrap: wrap;
 }
 .faq-tab {
   padding: 10px 18px; border-radius: 20px; border: 1.5px solid var(--border);
@@ -84,7 +84,7 @@ a:hover { text-decoration: underline; }
 .faq-tab.active { background: var(--mint-dark); border-color: var(--mint-dark); color: #fff; }
 
 /* 아코디언 목록 */
-.faq-list { display: flex; flex-direction: column; gap: 12px; max-width: 1000px; margin: 0 auto; }
+.faq-list { display: flex; flex-direction: column; gap: 12px; max-width: 1300px; margin: 0 auto; }
 
 .faq-item {
   background: rgba(255,255,255,.72);
@@ -142,7 +142,7 @@ a:hover { text-decoration: underline; }
 /* 하단 CTA */
 .faq-cta {
   margin-top: 40px;
-  max-width: 1000px; margin-left: auto; margin-right: auto;
+  max-width: 1300px; margin-left: auto; margin-right: auto;
   display: flex; align-items: center; justify-content: space-between; gap: 16px;
   background: rgba(255,255,255,.72);
   backdrop-filter: blur(16px);

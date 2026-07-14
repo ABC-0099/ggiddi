@@ -51,7 +51,7 @@ body {
 /* ── 공통 페이지 헤더 ── */
 .page-header {
   position: relative; z-index: 1;
-  max-width: 760px; margin: 0 auto; padding: 56px 24px 28px;
+  max-width: 1300px; margin: 0 auto; padding: 56px 0 28px;
   text-align: center;
 }
 .page-header h1 {
