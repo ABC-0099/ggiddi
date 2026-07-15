@@ -248,6 +248,11 @@
       "login.no_account": "Don't have an account yet?",
       "login.go_signup2": "Sign Up",
       "login.terms.1": "By logging in, you agree to Kkiyeok-Tigeut's",
+
+      // drag-translate.html (번역 위젯 본체 - 온보딩 팝업은 항상 영어 고정이라 토글 대상 아님)
+      "dt.trigger_btn": "Translate",
+      "dt.popup_title": "Translation",
+      "dt.loading": "Translating...",
     },
   };
 
@@ -259,6 +264,8 @@
     localStorage.setItem(STORAGE_KEY, lang);
     applyLang(lang);
     updateButton(lang);
+    // 언어가 바뀔 때마다 다른 스크립트(예: 드래그 번역 온보딩)가 반응할 수 있게 이벤트 발행
+    document.dispatchEvent(new CustomEvent("kkyeoklangchange", { detail: { lang } }));
   }
 
   function applyLang(lang) {
