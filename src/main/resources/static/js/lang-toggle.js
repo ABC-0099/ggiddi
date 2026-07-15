@@ -229,6 +229,25 @@
       "signup.terms.2": "and",
       "signup.terms.privacy": "Privacy Policy",
       "signup.terms.3": ".",
+
+      // login.html
+      "login.tag": "Korean Learning Platform",
+      "login.h1.1": "Welcome",
+      "login.h1.2": "back",
+      "login.sub.1": "Pick up right where you left off with Kkiyeok-Tigeut —",
+      "login.sub.2": "your Korean adventure continues today!",
+      "login.card_title": "Log In",
+      "login.card_sub": "Log in to your account and keep learning",
+      "login.err_invalid": "Incorrect username or password.",
+      "login.msg_logout": "You've been logged out.",
+      "login.id_ph2": "Enter your username",
+      "login.pw_ph2": "Enter your password",
+      "login.remember": "Keep me logged in",
+      "login.find_link": "Find Username / Password",
+      "login.social_divider": "or log in with a social account",
+      "login.no_account": "Don't have an account yet?",
+      "login.go_signup2": "Sign Up",
+      "login.terms.1": "By logging in, you agree to Kkiyeok-Tigeut's",
     },
   };
 
