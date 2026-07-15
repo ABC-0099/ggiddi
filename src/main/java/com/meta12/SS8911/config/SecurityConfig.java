@@ -67,7 +67,6 @@ public class SecurityConfig {
                                 "/faq",
                                 "/lectures",
                                 "/lectures/**",
-                                "/game",
                                 "/games/**",         // ★ 유니티 WebGL 빌드 정적 파일 인증 없이 접근 허용
                                 "/practice/main",
                                 "/practice/mock",     // ★ 배움터 메인/모의고사 메인은 비로그인도 열람 가능
@@ -99,6 +98,8 @@ public class SecurityConfig {
                         // ★ 커뮤니티는 로그인한 회원(및 관리자)만 열람 가능하도록 명시적으로 인증 필요 처리
                         .requestMatchers("/api/ai-chat").authenticated()
                         .requestMatchers("/community/**").authenticated()
+                        // ★ /game 페이지는 비로그인 접근 차단 (로그인 필요) - 아래 anyRequest()로 처리됨
+                        //   /games/** 정적 파일(유니티 빌드)만 위에서 permitAll로 남겨둠
                         .anyRequest().authenticated()
                 )
                 .formLogin(form -> form
