@@ -198,6 +198,36 @@
       box-shadow: 0 4px 16px rgba(29,158,117,.05);
     }
 
+    /* ★ 토스 결제위젯(payment-method/agreement)을 감싸는 카드 - card-form과 톤 통일 */
+    .widget-card {
+      background: rgba(255,255,255,.65);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(255,255,255,.9);
+      border-radius: 16px;
+      padding: 20px 18px 8px;
+      margin-bottom: 28px;
+      box-shadow: 0 4px 16px rgba(29,158,117,.05);
+      overflow: hidden; /* 위젯 내부 요소가 둥근 모서리를 벗어나지 않도록 */
+    }
+
+    .widget-card #payment-method {
+      margin-bottom: 8px;
+    }
+
+    .widget-card #agreement {
+      border-top: 1px solid var(--border);
+      padding-top: 12px;
+      margin-top: 4px;
+    }
+
+    .widget-loading-text {
+      padding: 24px 4px;
+      color: var(--ink-faint);
+      font-size: 13px;
+      text-align: center;
+    }
+
     .card-form-title {
       font-size: 14px; font-weight: 600;
       color: var(--ink); margin-bottom: 16px;

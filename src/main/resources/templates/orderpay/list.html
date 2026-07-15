@@ -101,11 +101,12 @@
             결제 수단
         </div>
 
-        <!-- ★ 토스페이먼츠 결제위젯 렌더링 영역 -->
-        <div id="payment-method"></div>
-        <!-- ★ 토스페이먼츠 이용약관 위젯 렌더링 영역 -->
-        <div id="agreement"></div>
-        <div id="widget-loading" style="padding:16px;color:#8595a6;font-size:14px;">결제 UI를 불러오는 중...</div>
+        <!-- ★ 토스페이먼츠 결제위젯 + 약관위젯을 우리 디자인 톤의 카드로 감쌈 -->
+        <div class="widget-card">
+            <div id="payment-method"></div>
+            <div id="agreement"></div>
+            <div id="widget-loading" class="widget-loading-text">결제 UI를 불러오는 중...</div>
+        </div>
 
         <!-- 3. 쿠폰 -->
         <div class="section-title">
