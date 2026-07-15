@@ -319,6 +319,12 @@
                    th:classappend="${myPurchases.last} ? 'disabled'"
                    class="page-btn page-next">›</a>
             </div>
+
+            <!-- ★ 구독 해지 버튼 (UI만, 기능은 추후 구현) -->
+            <div class="danger-row">
+                <span class="danger-text">구독을 해지하면 다음 결제일부터 이용이 제한돼요.</span>
+                <button type="button" class="btn-withdraw" id="btnCancelSubscription">구독 해지</button>
+            </div>
         </section>
 
         <!-- 내 게시글 -->
