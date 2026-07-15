@@ -561,145 +561,43 @@
     </div>
 </div>
 
-<script>
+<script th:inline="javascript">
 
-    let currentCalendar = new Date();
+    let currentWeekOffset = 0;
 
-    function renderHeatmap() {
-        const rawData = /*[[${heatmapData}]]*/ [];
-        const grid = document.getElementById('calendarGrid');
-        }
+    function changeWeek(direction) {
+        const nextOffset = currentWeekOffset + direction;
 
-        let currentWeekOffset = 0;
+        // 미래 주는 막기
+        if (nextOffset > 0) return;
 
-        function renderWeekLabel(label, isCurrentWeek) {
-            const rangeEl = document.getElementById('weeklyRange');
-            const titleEl = document.querySelector('.weekly-title');
-            rangeEl.textContent = label;
-            titleEl.textContent = isCurrentWeek ? '이번 주 출석' : '주간 출석';
-        }
+        fetch(`/api/attendance/weekly?weekOffset=${nextOffset}`)
+            .then(res => res.json())
+            .then(data => {
+                currentWeekOffset = data.weekOffset;
 
-        function renderWeeklyGrid(weeklyAttendance) {
-            const grid = document.getElementById('weeklyGrid');
-            grid.innerHTML = '';
-            weeklyAttendance.forEach(attended => {
-                const box = document.createElement('div');
-                box.className = 'week-box' + (attended ? ' attended' : '');
-                grid.appendChild(box);
-            });
-        }
+                renderWeeklyGrid(data.weeklyAttendance);
+                renderWeekLabel(data.weekLabel, data.isCurrentWeek);
 
-        function changeWeek(direction) {
-            const nextOffset = currentWeekOffset + direction;
+                document.getElementById('weeklyCount').innerHTML =
+                    `<span>${data.attendedCount}</span> / 7일 출석`;
 
-            // 미래 주는 막기
-            if (nextOffset > 0) return;
+                document.getElementById('weeklyRateBadge').textContent =
+                    `출석률 ${Math.round(data.attendedCount * 100 / 7)}%`;
 
-            fetch(`/api/attendance/weekly?weekOffset=${nextOffset}`)
-                .then(res => res.json())
-                .then(data => {
-                    currentWeekOffset = data.weekOffset;
+                document.getElementById('weeklyNextBtn').disabled = data.isCurrentWeek;
+            })
+            .catch(err => console.error('주간 출석 데이터를 불러오지 못했어요:', err));
+    }
 
-                    renderWeeklyGrid(data.weeklyAttendance);
-                    renderWeekLabel(data.weekLabel, data.isCurrentWeek);
+    function openWithdrawModal() {
+        document.getElementById('withdrawOverlay').style.display = 'flex';
+    }
 
-                    document.getElementById('weeklyCount').innerHTML =
-                        `<span>${data.attendedCount}</span> / 7일 출석`;
-                    document.getElementById('weeklyRateBadge').textContent =
-                        `출석률 ${Math.round(data.attendedCount * 100 / 7)}%`;
+    function closeWithdrawModal() {
+        document.getElementById('withdrawOverlay').style.display = 'none';
+    }
 
-                    document.getElementById('weeklyNextBtn').disabled = data.isCurrentWeek;
-                })
-                .catch(err => console.error('주간 출석 데이터를 불러오지 못했어요:', err));
-        }
-
-        function openWithdrawModal() {
-            document.getElementById('withdrawOverlay').style.display = 'flex';
-        }
-        function closeWithdrawModal() {
-            document.getElementById('withdrawOverlay').style.display = 'none';
-        }
-
-        document.addEventListener('DOMContentLoaded', function () {
-            const menuItems = document.querySelectorAll('.menu-item');
-            const subtabItems = document.querySelectorAll('.subtab-item');
-            const subtabPanels = document.querySelectorAll('.subtab-panel');
-
-            function activateMenu(tab) {
-                menuItems.forEach(m => m.classList.remove('active'));
-                const menuBtn = document.querySelector(`.menu-item[data-tab="${tab}"]`);
-                if (menuBtn) menuBtn.classList.add('active');
-            }
-
-            function activateSubtab(sub) {
-                subtabItems.forEach(s => s.classList.remove('active'));
-                subtabPanels.forEach(p => p.classList.remove('active'));
-                const subBtn = document.querySelector(`.subtab-item[data-subtab="${sub}"]`);
-                const subPanel = document.getElementById('subtab-' + sub);
-                if (subBtn) subBtn.classList.add('active');
-                if (subPanel) subPanel.classList.add('active');
-            }
-
-            function renderHeatmap() {
-                const rawData = /*[[${heatmapData}]]*/ [];
-                const grid = document.getElementById('calendarGrid');
-                if (!grid) return;
-
-                grid.innerHTML = "";
-
-                const attendanceMap = new Set(rawData.map(r => r.date));
-
-                const year = currentCalendar.getFullYear();
-                const month = currentCalendar.getMonth();
-                const daysInMonth = new Date(year, month + 1, 0).getDate();
-                const firstDayOfWeek = new Date(year, month, 1).getDay(); // 0=일요일
-
-                // ★ 1일이 시작하는 요일만큼 빈 칸 채우기 (요일 정렬 맞추기용)
-                for (let i = 0; i < firstDayOfWeek; i++) {
-                    const emptyBox = document.createElement('div');
-                    emptyBox.className = 'calendar-day empty';
-                    grid.appendChild(emptyBox);
-                }
-
-                for (let i = 1; i <= daysInMonth; i++) {
-                    let dayBox = document.createElement('div');
-                    dayBox.className = 'calendar-day';
-
-                    const mm = String(month + 1).padStart(2, '0');
-                    const dd = String(i).padStart(2, '0');
-                    const dateStr = `${year}-${mm}-${dd}`;
-
-                    if (attendanceMap.has(dateStr)) {
-                        dayBox.classList.add('active');
-                    }
-
-                    dayBox.innerText = i;
-                    grid.appendChild(dayBox);
-                }
-            }
-
-            renderHeatmap();
-
-            fetch('/api/attendance/weekly?weekOffset=0')
-                .then(res => res.json())
-                .then(data => renderWeekLabel(data.weekLabel, data.isCurrentWeek))
-                .catch(err => console.error('이번 주 날짜 라벨을 불러오지 못했어요:', err));
-
-            menuItems.forEach(item => {
-                item.addEventListener('click', function () {
-                    const tab = this.getAttribute('data-tab');
-                    activateMenu(tab);
-                    const target = document.getElementById('panel-' + tab);
-                    if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                });
-            });
-
-            subtabItems.forEach(item => {
-                item.addEventListener('click', function () {
-                    activateSubtab(this.getAttribute('data-subtab'));
-                });
-            });
-        });
 </script>
 </body>
 </html>
