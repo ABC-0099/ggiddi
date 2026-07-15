@@ -41,10 +41,19 @@ public class OrderPayService {
     // 아래에서 생성하는 "대표 결제 레코드" 1건만 노출합니다.
     private static final String SUBSCRIPTION_ACCESS_MARKER = "구독 강의 접근";
 
-    // 구독 결제: 플랜을 사면 (1) "실제 결제 1건"을 나타내는 대표 레코드를 항상 새로 만들고,
-    // (2) 모든 카테고리에 대해 접근 권한용 레코드를 만들어줍니다. (이미 접근권한이 있는 카테고리는 건너뜀)
+    // 기존 호출부(레거시 /order/subscribe 등) 하위호환용 - orderId/paymentKey 없이 호출
     @Transactional
     public void subscribeAllCategories(String username, String planName, String price, String payType, String cardNumber) {
+        subscribeAllCategories(username, planName, price, payType, cardNumber, null, null);
+    }
+
+    // 구독 결제: 플랜을 사면 (1) "실제 결제 1건"을 나타내는 대표 레코드를 항상 새로 만들고,
+    // (2) 모든 카테고리에 대해 접근 권한용 레코드를 만들어줍니다. (이미 접근권한이 있는 카테고리는 건너뜀)
+    // ★ orderId/paymentKey: 토스 결제 연동 시 결제 고유 식별자 - 엔티티 전용 필드에 저장
+    //   (예전엔 paymentKey를 cardNumber 필드에 잘못 저장하고 있었음 → 전용 필드로 수정)
+    @Transactional
+    public void subscribeAllCategories(String username, String planName, String price, String payType,
+                                       String cardNumber, String orderId, String paymentKey) {
         SiteUser user = siteUserRepository.findByUsername(username)
                 .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
 
@@ -57,6 +66,8 @@ public class OrderPayService {
         mainOrder.setPayType(payType);
         mainOrder.setCardNumber(cardNumber);
         mainOrder.setPlanType(planName); // ★ 플랜명은 planType에 저장 (instructorName은 실제 강사용 필드라 건드리지 않음)
+        mainOrder.setOrderId(orderId);       // ★ 토스 주문번호 (토스 연동 아니면 null)
+        mainOrder.setPaymentKey(paymentKey); // ★ 토스 결제 고유 키 (토스 연동 아니면 null)
         mainOrder.setPayday(LocalDateTime.now());
         mainOrder.setStatus(OrderPayStatus.SUCCESS); // ★ 실제 결제가 승인된 시점이므로 SUCCESS로 표시 (안 하면 매출 집계에서 누락됨)
         orderPayRepository.save(mainOrder);
@@ -81,6 +92,32 @@ public class OrderPayService {
 
             orderPayRepository.save(orderPay);
         }
+    }
+
+    // ============================================================
+    // ★ 토스 결제 승인 실패 시 이력을 남기는 메서드.
+    // subscribeAllCategories()와 달리 카테고리 접근 권한은 부여하지 않고
+    // "실패했다"는 사실만 대표 레코드 1건으로 남김 (CS 대응/통계용).
+    // ★ status=FAILED로 저장되므로 findRealPayments()의 status 필터에 의해
+    //   관리자 매출 통계에서는 자동으로 제외됨.
+    // ============================================================
+    @Transactional
+    public void saveFailedPayment(String username, String planName, int amount, String payType,
+                                  String orderId, String failReason) {
+        SiteUser user = siteUserRepository.findByUsername(username)
+                .orElseThrow(() -> new RuntimeException("사용자를 찾을 수 없습니다."));
+
+        OrderPay failedOrder = new OrderPay();
+        failedOrder.setSiteUser(user);
+        failedOrder.setCategory(null);
+        failedOrder.setPrice(String.valueOf(amount));
+        failedOrder.setPayType(payType);
+        failedOrder.setOrderId(orderId); // ★ 토스 주문번호 - 전용 필드에 저장 (실패 사유 자체는 서버 로그로 확인)
+        failedOrder.setPlanType(planName);
+        failedOrder.setPayday(LocalDateTime.now());
+        failedOrder.setStatus(OrderPayStatus.FAILED);
+
+        orderPayRepository.save(failedOrder);
     }
 
     public List<OrderPay> list(String username) {

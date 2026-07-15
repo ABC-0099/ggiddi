@@ -11,7 +11,9 @@ import com.meta12.SS8911.service.CategoryService;
 import com.meta12.SS8911.service.ContentService;
 import com.meta12.SS8911.service.OrderPayService;
 import com.meta12.SS8911.service.SiteUserService;
+import com.meta12.SS8911.service.TossPaymentService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Controller;
 
 import lombok.RequiredArgsConstructor;
@@ -33,6 +35,10 @@ public class OrderPayController {
     private final SiteUserService siteUserService;
     private final ContentService contentService;
     private final CategoryService categoryService;
+    private final TossPaymentService tossPaymentService; // ★ 토스 결제 승인용 서비스 추가
+
+    @Value("${toss.payments.client-key}")
+    private String tossClientKey; // ★ 프론트에 넘길 클라이언트 키 (secret key는 절대 여기 안 씀)
 
 
     @GetMapping("/orderPay/list")
@@ -57,6 +63,8 @@ public class OrderPayController {
                 .filter(SubscriptionPlanDTO::isPopular)
                 .findFirst()
                 .orElse(plans.get(0)));
+
+        model.addAttribute("tossClientKey", tossClientKey); // ★ 결제창 호출용 클라이언트 키 전달
 
         return "orderPay/list";
     }
@@ -246,6 +254,8 @@ public class OrderPayController {
 
     // 결제 페이지(플랜 선택)에서 "결제하기" 누르면 호출되는 엔드포인트.
     // 새 주문 생성 + 결제 완료 처리를 한번에 합니다.
+    // ⚠️ 참고: 토스 연동 전 방식 (카드번호를 프론트에서 직접 받아 바로 저장).
+    // 토스 연동(/payment/toss/success)이 정상 동작 확인되면 이 엔드포인트는 제거해도 됩니다.
     @PostMapping("/order/subscribe")
     @ResponseBody
     public ResponseEntity<String> subscribe(@RequestBody Map<String, Object> params, Principal principal) {
@@ -265,6 +275,56 @@ public class OrderPayController {
             return ResponseEntity.status(500).body("결제 처리 중 오류: " + e.getMessage());
         }
     }
+
+    // ============================================================
+    // ★ 토스페이먼츠 연동 - 결제 승인 콜백
+    // 프론트에서 tossPayments.requestPayment(...) 호출 후,
+    // 토스 결제창에서 결제가 끝나면 여기 successUrl로 리다이렉트됨.
+    // paymentKey/orderId/amount는 토스가 자동으로 붙여서 보내주고,
+    // planName/payType은 successUrl 만들 때 우리가 쿼리파라미터로 미리 붙여둔 값.
+    // ============================================================
+    @GetMapping("/payment/toss/success")
+    public String tossSuccess(@RequestParam String paymentKey,
+                              @RequestParam String orderId,
+                              @RequestParam int amount,
+                              @RequestParam String planName,
+                              @RequestParam String payType,
+                              Principal principal,
+                              Model model) {
+        if (principal == null) return "redirect:/siteUser/login";
+
+        try {
+            // 1. 토스 서버에 실제 결제 승인 요청 (여기서 금액 위변조 등은 토스가 걸러냄)
+            tossPaymentService.confirmPayment(paymentKey, orderId, amount);
+
+            // 2. 승인 성공한 경우에만 구독/결제 내역을 DB에 반영
+            //    orderId/paymentKey는 엔티티 전용 필드에 저장 (cardNumber에는 넣지 않음 - 카드번호 입력 자체가 없음)
+            orderPayService.subscribeAllCategories(
+                    principal.getName(), planName, String.valueOf(amount), payType, null, orderId, paymentKey
+            );
+
+            model.addAttribute("planName", planName);
+            model.addAttribute("amount", amount);
+            return "payment/success";
+        } catch (Exception e) {
+            e.printStackTrace();
+            // ★ 승인 실패 시 이력을 남겨 CS 대응/통계에 활용
+            orderPayService.saveFailedPayment(principal.getName(), planName, amount, payType, orderId, e.getMessage());
+            model.addAttribute("error", e.getMessage());
+            return "payment/fail";
+        }
+    }
+
+    // 토스 결제창에서 사용자가 결제를 취소하거나 실패했을 때 리다이렉트되는 곳
+    @GetMapping("/payment/toss/fail")
+    public String tossFail(@RequestParam(required = false) String code,
+                           @RequestParam(required = false) String message,
+                           Model model) {
+        model.addAttribute("errorCode", code);
+        model.addAttribute("errorMessage", message);
+        return "payment/fail";
+    }
+
 
     // OrderPayController.java의 completeOrder 메서드 수정
     @PostMapping("/order/complete")
@@ -290,7 +350,7 @@ public class OrderPayController {
 
     @GetMapping("/information/list")
     public String showMyRoom(Model model, Principal principal) {
-        if (principal == null) return "redirect:/user/login";
+        if (principal == null) return "redirect:/siteUser/login";
 
         // 1. 서비스에서 사용자의 모든 내역(결제 + 도장 등)을 가져옵니다.
         List<OrderPay> allList = orderPayService.list(principal.getName());

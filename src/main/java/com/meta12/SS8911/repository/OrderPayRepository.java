@@ -36,6 +36,9 @@ public interface OrderPayRepository extends JpaRepository<OrderPay, Long> {
     // ★ 관리자 결제 내역 화면(/admin/payment)용 - 구독 카테고리 접근권 레코드(payType == "구독 강의 접근")와
     //   강사 칭찬 도장 레코드(payType == "강사 칭찬 도장")는 제외하고 "진짜 결제 건"만 페이징 조회.
     //   payType이 null인 정상 결제도 있으므로 반드시 포함되도록 조건 구성.
-    @Query("SELECT o FROM OrderPay o WHERE o.payType IS NULL OR o.payType NOT IN ('구독 강의 접근', '강사 칭찬 도장')")
+    //   ★ status도 SUCCESS(또는 레거시 null)만 통과시켜서, 토스 결제 실패(FAILED)/취소(CANCEL) 건이
+    //   매출 통계·도넛차트에 섞여 들어가지 않도록 함.
+    @Query("SELECT o FROM OrderPay o WHERE (o.payType IS NULL OR o.payType NOT IN ('구독 강의 접근', '강사 칭찬 도장')) " +
+            "AND (o.status IS NULL OR o.status = com.meta12.SS8911.config.OrderPayStatus.SUCCESS)")
     Page<OrderPay> findRealPayments(Pageable pageable);
 }

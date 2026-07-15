@@ -124,9 +124,12 @@
             </div>
         </div>
 
-        <!-- 카드 입력 -->
+        <!-- 카드 입력 (참고용 UI - 실제 카드정보는 토스 결제창에서 입력받음) -->
         <div class="card-form" id="card-form">
             <div class="card-form-title">💳 카드 정보 입력</div>
+            <p style="font-size:12px;color:#8595a6;margin:-4px 0 12px;">
+                * 실제 카드 정보는 다음 단계의 토스페이먼츠 결제창에서 안전하게 입력해요.
+            </p>
             <div class="field">
                 <label>카드 번호</label>
                 <input type="text" placeholder="0000 - 0000 - 0000 - 0000" maxlength="19"
@@ -228,6 +231,19 @@
 <!-- FOOTER -->
 <div th:replace="~{layout/footer :: footer}"></div>
 
+<!-- ★★★ 토스페이먼츠 SDK ★★★ -->
+<script src="https://js.tosspayments.com/v1/payment"></script>
+<script th:inline="javascript">
+    // 서버(OrderPayController)에서 넘겨준 토스 클라이언트 키
+    const tossClientKey = /*[[${tossClientKey}]]*/ "test_ck_xxx";
+
+    if (!tossClientKey || tossClientKey === "test_ck_xxx") {
+        console.error("[토스] tossClientKey가 정상적으로 주입되지 않았습니다. 컨트롤러에서 model.addAttribute(\"tossClientKey\", ...)가 실행되는지 확인하세요.");
+    }
+
+    const tossPayments = TossPayments(tossClientKey);
+</script>
+
 <script>
     // 플랜 선택
     const plans = {
@@ -319,7 +335,7 @@
       }
     }
 
-    // 결제
+    // 결제 (토스페이먼츠 결제창 호출)
     function handlePay() {
       if (!document.getElementById('agree').checked) {
         alert('약관에 동의해주세요.');
@@ -329,47 +345,41 @@
       const tag = selectedPlan.tag || '';
       const total = selectedPlan.price - couponDiscount;
 
-      const csrfToken = document.querySelector('meta[name="_csrf"]')?.content;
-      const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
-
       const payMethodEl = document.querySelector('.pay-method.selected span:nth-child(2)');
       const payType = payMethodEl ? payMethodEl.textContent.trim() : '신용/체크카드';
 
-      const cardNumberInput = document.querySelector('#card-form input[type="text"]');
-      const cardNumber = cardNumberInput ? cardNumberInput.value : '';
-
       const payBtn = document.querySelector('.pay-btn');
       payBtn.disabled = true;
-      payBtn.textContent = '결제 처리 중...';
+      payBtn.textContent = '결제창 여는 중...';
 
-      const headers = { 'Content-Type': 'application/json' };
-      if (csrfHeader && csrfToken) headers[csrfHeader] = csrfToken;
+      // 주문마다 고유해야 하는 orderId 생성
+      const orderId = 'order_' + Date.now() + '_' + Math.floor(Math.random() * 1000);
 
-      fetch('/order/subscribe', {
-        method: 'POST',
-        headers: headers,
-        body: JSON.stringify({
-          planName: tag,
-          price: total,
-          payType: payType,
-          cardNumber: cardNumber
-        })
-      })
-        .then(function (res) {
-          if (!res.ok) throw new Error('결제 실패');
+      // successUrl에 planName/payType을 미리 실어 보냄
+      // -> 토스가 리다이렉트할 때 paymentKey/orderId/amount를 자동으로 붙여줘서
+      //    /payment/toss/success 에서 5개 파라미터를 한번에 받을 수 있음
+      const successUrl = window.location.origin + '/payment/toss/success'
+        + '?planName=' + encodeURIComponent(tag)
+        + '&payType=' + encodeURIComponent(payType);
+      const failUrl = window.location.origin + '/payment/toss/fail';
 
-          const msg = tag === '평생'
-            ? '✅ 평생 소장 결제가 완료되었어요!\n이제 영구적으로 이용하실 수 있어요 🎉'
-            : '✅ 구독이 시작되었어요!\n한국어 학습을 시작해볼까요? 🎮';
-          alert(msg);
-          window.location.href = '/category/list';
-        })
-        .catch(function () {
-          alert('결제 처리 중 오류가 발생했어요. 다시 시도해주세요.');
-          payBtn.disabled = false;
-          const lbl = payBtn.dataset.label || '구독 시작하기';
-          payBtn.textContent = total.toLocaleString() + '원 ' + lbl;
-        });
+      tossPayments.requestPayment('카드', {
+        amount: total,
+        orderId: orderId,
+        orderName: '끼역띠귿 ' + (document.getElementById('summary-plan-name')?.textContent || tag),
+        successUrl: successUrl,
+        failUrl: failUrl,
+      }).catch(function (err) {
+        // 사용자가 결제창을 직접 닫은 경우(취소) 등은 여기서 잡힘
+        if (err.code === 'USER_CANCEL') {
+          alert('결제가 취소되었어요.');
+        } else {
+          alert('결제 요청 중 오류가 발생했어요: ' + (err.message || err));
+        }
+        payBtn.disabled = false;
+        const lbl = payBtn.dataset.label || '구독 시작하기';
+        payBtn.textContent = total.toLocaleString() + '원 ' + lbl;
+      });
     }
 </script>
 

@@ -1,0 +1,148 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>결제 실패 — 끼역띠귿</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+        --navy: #185FA5;
+        --mint-1: #9FE1CB;
+        --mint-2: #5DCAA5;
+        --coral: #ff6b6b;
+    }
+    * { box-sizing: border-box; }
+    body {
+        margin: 0;
+        font-family: 'Noto Sans KR', sans-serif;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #fff3f0 0%, #eef6ff 100%);
+        position: relative;
+        overflow: hidden;
+    }
+    .bg-orb {
+        position: absolute;
+        border-radius: 50%;
+        filter: blur(60px);
+        opacity: 0.3;
+        z-index: 0;
+    }
+    .orb1 { width: 320px; height: 320px; background: var(--coral); top: -80px; right: -80px; opacity: 0.18; }
+    .orb2 { width: 380px; height: 380px; background: var(--navy); bottom: -120px; left: -100px; opacity: 0.15; }
+
+    .card {
+        position: relative;
+        z-index: 1;
+        width: 100%;
+        max-width: 420px;
+        margin: 24px;
+        padding: 48px 36px 36px;
+        border-radius: 28px;
+        background: rgba(255, 255, 255, 0.65);
+        backdrop-filter: blur(18px);
+        -webkit-backdrop-filter: blur(18px);
+        border: 1px solid rgba(255, 255, 255, 0.6);
+        box-shadow: 0 20px 60px rgba(24, 95, 165, 0.12);
+        text-align: center;
+    }
+    .icon-circle {
+        width: 84px;
+        height: 84px;
+        margin: 0 auto 20px;
+        border-radius: 50%;
+        background: linear-gradient(135deg, #ffb3ab, var(--coral));
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 40px;
+        box-shadow: 0 10px 24px rgba(255, 107, 107, 0.3);
+    }
+    h1 {
+        margin: 0 0 8px;
+        font-size: 22px;
+        font-weight: 700;
+        color: #16324f;
+    }
+    .sub {
+        margin: 0 0 24px;
+        font-size: 14px;
+        color: #5b6b7a;
+        line-height: 1.6;
+    }
+    .detail-box {
+        background: rgba(255, 255, 255, 0.55);
+        border: 1px solid rgba(255, 107, 107, 0.18);
+        border-radius: 16px;
+        padding: 16px 20px;
+        margin-bottom: 28px;
+        text-align: left;
+        font-size: 13px;
+        color: #8a5555;
+        word-break: break-all;
+    }
+    .detail-box .row { padding: 4px 0; }
+    .detail-box .row .k { color: #b07a7a; margin-right: 6px; }
+
+    .btn-group { display: flex; flex-direction: column; gap: 10px; }
+    .btn {
+        display: block;
+        width: 100%;
+        padding: 14px;
+        border-radius: 14px;
+        font-size: 15px;
+        font-weight: 700;
+        text-decoration: none;
+        border: none;
+        cursor: pointer;
+    }
+    .btn-primary {
+        background: linear-gradient(135deg, var(--navy), #1c6fbf);
+        color: #fff;
+        box-shadow: 0 10px 24px rgba(24, 95, 165, 0.3);
+    }
+    .btn-secondary {
+        background: rgba(255, 255, 255, 0.7);
+        color: var(--navy);
+        border: 1px solid rgba(24, 95, 165, 0.2);
+    }
+  </style>
+</head>
+<body>
+
+<div class="bg-orb orb1"></div>
+<div class="bg-orb orb2"></div>
+
+<div class="card">
+  <div class="icon-circle">😥</div>
+  <h1>결제가 완료되지 않았어요</h1>
+  <p class="sub">
+    결제 진행 중 문제가 발생했어요.<br />
+    다시 시도하시거나, 계속 반복되면 고객센터로 문의해주세요.
+  </p>
+
+  <div class="detail-box" th:if="${errorMessage != null or error != null}">
+    <div class="row" th:if="${errorCode != null}">
+      <span class="k">코드</span><span th:text="${errorCode}">FAILURE</span>
+    </div>
+    <div class="row" th:if="${errorMessage != null}">
+      <span class="k">사유</span><span th:text="${errorMessage}"></span>
+    </div>
+    <div class="row" th:if="${error != null}">
+      <span class="k">사유</span><span th:text="${error}"></span>
+    </div>
+  </div>
+
+  <div class="btn-group">
+    <a class="btn btn-primary" href="/orderPay/list">다시 결제하기</a>
+    <a class="btn btn-secondary" href="/category/list">나중에 하기</a>
+  </div>
+</div>
+
+</body>
+</html>

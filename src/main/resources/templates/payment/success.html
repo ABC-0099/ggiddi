@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="ko" xmlns:th="http://www.thymeleaf.org"
+      xmlns:sec="http://www.thymeleaf.org/extras/spring-security">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>결제 완료 — 끼역띠귿</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700&display=swap" rel="stylesheet" />
+    <style>
+        :root {
+            --navy: #185FA5;
+            --mint-1: #9FE1CB;
+            --mint-2: #5DCAA5;
+        }
+        * { box-sizing: border-box; }
+        body {
+            margin: 0;
+            font-family: 'Noto Sans KR', sans-serif;
+            min-height: 100vh;
+            background: linear-gradient(135deg, #eef6ff 0%, #eafbf4 100%);
+            position: relative;
+            overflow-x: hidden;
+        }
+        .center-wrap {
+            position: relative;
+            z-index: 1;
+            min-height: calc(100vh - 72px); /* 네비바 높이만큼 빼고 남은 영역에서 카드 중앙정렬 */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .bg-orb {
+            position: absolute;
+            border-radius: 50%;
+            filter: blur(60px);
+            opacity: 0.35;
+            z-index: 0;
+        }
+        .orb1 { width: 320px; height: 320px; background: var(--mint-1); top: -80px; left: -80px; }
+        .orb2 { width: 380px; height: 380px; background: var(--navy); bottom: -120px; right: -100px; opacity: 0.2; }
+
+        .card {
+            position: relative;
+            z-index: 1;
+            width: 100%;
+            max-width: 420px;
+            margin: 24px;
+            padding: 48px 36px 36px;
+            border-radius: 28px;
+            background: rgba(255, 255, 255, 0.65);
+            backdrop-filter: blur(18px);
+            -webkit-backdrop-filter: blur(18px);
+            border: 1px solid rgba(255, 255, 255, 0.6);
+            box-shadow: 0 20px 60px rgba(24, 95, 165, 0.15);
+            text-align: center;
+        }
+        .icon-circle {
+            width: 84px;
+            height: 84px;
+            margin: 0 auto 20px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, var(--mint-1), var(--mint-2));
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            box-shadow: 0 10px 24px rgba(93, 202, 165, 0.35);
+        }
+        h1 {
+            margin: 0 0 8px;
+            font-size: 22px;
+            font-weight: 700;
+            color: #16324f;
+        }
+        .sub {
+            margin: 0 0 28px;
+            font-size: 14px;
+            color: #5b6b7a;
+            line-height: 1.6;
+        }
+        .detail-box {
+            background: rgba(255, 255, 255, 0.55);
+            border: 1px solid rgba(24, 95, 165, 0.12);
+            border-radius: 16px;
+            padding: 18px 20px;
+            margin-bottom: 28px;
+            text-align: left;
+        }
+        .detail-row {
+            display: flex;
+            justify-content: space-between;
+            font-size: 14px;
+            padding: 6px 0;
+            color: #33475b;
+        }
+        .detail-row .label { color: #8595a6; }
+        .detail-row .value { font-weight: 700; color: var(--navy); }
+
+        .btn-group { display: flex; flex-direction: column; gap: 10px; }
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 14px;
+            border-radius: 14px;
+            font-size: 15px;
+            font-weight: 700;
+            text-decoration: none;
+            border: none;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, var(--navy), #1c6fbf);
+            color: #fff;
+            box-shadow: 0 10px 24px rgba(24, 95, 165, 0.3);
+        }
+        .btn-secondary {
+            background: rgba(255, 255, 255, 0.7);
+            color: var(--navy);
+            border: 1px solid rgba(24, 95, 165, 0.2);
+        }
+    </style>
+</head>
+<body>
+
+<!-- NAV -->
+<div th:replace="~{layout/navbar :: navbar(currentMenu='')}"></div>
+
+<div class="center-wrap">
+    <div class="bg-orb orb1"></div>
+    <div class="bg-orb orb2"></div>
+
+    <div class="card">
+        <div class="icon-circle">🎉</div>
+        <h1>결제가 완료됐어요!</h1>
+        <p class="sub">
+            <span th:text="${planName}">플랜</span> 결제가 정상적으로 처리됐어요.<br />
+            바로 학습을 시작해볼까요?
+        </p>
+
+        <div class="detail-box">
+            <div class="detail-row">
+                <span class="label">플랜</span>
+                <span class="value" th:text="${planName}">연 구독</span>
+            </div>
+            <div class="detail-row" th:if="${amount != null}">
+                <span class="label">결제 금액</span>
+                <span class="value" th:text="${#numbers.formatInteger(amount, 0, 'COMMA')} + '원'">89,900원</span>
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <a class="btn btn-primary" href="/category/list">학습 시작하기</a>
+            <a class="btn btn-secondary" href="/information/list">결제 내역 보기</a>
+        </div>
+    </div>
+</div>
+
+<!-- FOOTER -->
+<div th:replace="~{layout/footer :: footer}"></div>
+
+</body>
+</html>
