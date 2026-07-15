@@ -22,6 +22,8 @@
   localStorage에 1회 노출 여부가 저장되므로 페이지마다 넣어도 유저 기준 1번만 뜸.
   ※ 노출 정책: 페이지 로드 시 사이트 언어가 한국어면 1번 노출 + 이후 언어 토글을 눌러서
     한국어로 "바뀔 때마다" 매번 다시 노출 (영어로 전환된 상태면 안 뜸)
+  ※ "4시간 동안 안 보기" 버튼을 누르면 4시간 동안은 위 조건을 만족해도 안 뜸
+    (localStorage에 만료 시각 저장, kkyd_dt_onboarding_snooze_until)
   ※ 팝업 내용 자체는 언어 토글과 무관하게 항상 영어로 고정 (아직 EN 버튼을 못 찾은
     외국인 유저에게 "드래그하면 번역된다"는 걸 영어로 알려주는 게 목적이라, 한국어일 땐
     안 만들어둠)
@@ -368,6 +370,18 @@
       cursor: pointer;
     }
     .dt-onboarding__btn:hover { opacity: 0.9; }
+    .dt-onboarding__snooze {
+      display: block;
+      margin: 12px auto 0;
+      background: none;
+      border: none;
+      color: #8fa0b3;
+      font-size: 12.5px;
+      text-decoration: underline;
+      cursor: pointer;
+      font-family: inherit;
+    }
+    .dt-onboarding__snooze:hover { color: #5a6a80; }
   </style>
 
   <div class="dt-onboarding" id="dtOnboarding">
@@ -382,6 +396,7 @@
         You can change the target language with the 🌐 button in the bottom right
       </div>
       <button class="dt-onboarding__btn" id="dtOnboardingClose" type="button">Got it</button>
+      <button class="dt-onboarding__snooze" id="dtOnboardingSnooze" type="button">Don't show for 4 hours</button>
     </div>
   </div>
 
@@ -392,11 +407,20 @@
       // - 이후 언어 토글을 눌러서 한국어로 "바뀔 때마다" 매번 다시 노출
       //   (lang-toggle.js가 언어 바뀔 때 쏘는 kkyeoklangchange 이벤트를 구독)
       const SITE_LANG_KEY = 'kkyeok_lang';
+      const SNOOZE_KEY = 'kkyd_dt_onboarding_snooze_until';
+      const SNOOZE_HOURS = 4;
       const overlay = document.getElementById('dtOnboarding');
       const closeBtn = document.getElementById('dtOnboardingClose');
+      const snoozeBtn = document.getElementById('dtOnboardingSnooze');
       if (!overlay) return;
 
+      function isSnoozed() {
+        const until = parseInt(localStorage.getItem(SNOOZE_KEY) || '0', 10);
+        return Date.now() < until;
+      }
+
       function showOnboarding(delay) {
+        if (isSnoozed()) return;
         setTimeout(() => overlay.classList.add('show'), delay);
       }
 
@@ -404,13 +428,18 @@
         overlay.classList.remove('show');
       }
 
-      // 최초 페이지 로드 시: 한국어 상태면 노출
+      function snoozeOnboarding() {
+        localStorage.setItem(SNOOZE_KEY, String(Date.now() + SNOOZE_HOURS * 60 * 60 * 1000));
+        closeOnboarding();
+      }
+
+      // 최초 페이지 로드 시: 한국어 상태면 노출 (단, 스누즈 중이면 안 뜸)
       const initialLang = localStorage.getItem(SITE_LANG_KEY) || 'ko';
       if (initialLang !== 'en') {
         showOnboarding(600);
       }
 
-      // 언어 토글을 눌러서 한국어로 바뀔 때마다 다시 노출
+      // 언어 토글을 눌러서 한국어로 바뀔 때마다 다시 노출 (단, 스누즈 중이면 안 뜸)
       document.addEventListener('kkyeoklangchange', (e) => {
         if (e.detail && e.detail.lang !== 'en') {
           showOnboarding(300);
@@ -420,6 +449,7 @@
       });
 
       closeBtn.addEventListener('click', closeOnboarding);
+      snoozeBtn.addEventListener('click', snoozeOnboarding);
       overlay.addEventListener('click', (e) => {
         if (e.target === overlay) closeOnboarding();
       });

@@ -72,7 +72,7 @@
       "hero.title.3": "is easier",
       "hero.sub.1": "A game-based Korean learning platform",
       "hero.sub.2": "made for learners from abroad.",
-      "hero.cta.start": "Start for Free",
+      "hero.cta.start": "Sign Up Now",
       "hero.cta.curriculum": "View Curriculum",
 
       // mainpage.html - login card (anonymous hero)
@@ -155,7 +155,7 @@
       "cta.title.3": "",
       "cta.title.4": "today",
       "cta.subtitle": "Try the first stage for free.",
-      "cta.start": "Start for Free Now",
+      "cta.start": "Sign Up Now",
       "cta.curriculum": "Browse the Curriculum",
 
       // chuga.html - left panel

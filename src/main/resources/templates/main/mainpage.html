@@ -13,6 +13,7 @@
     <link rel="stylesheet" th:href="@{/css/main/mainpage.css}">
     <link rel="stylesheet" th:href="@{/css/layout/navbar.css}">
     <link rel="stylesheet" th:href="@{/css/layout/footer.css}">
+    <style>html { scroll-behavior: smooth; }</style>
 </head>
 <body>
 
@@ -35,8 +36,8 @@
                 <span data-i18n="hero.sub.2">게임형 한국어 학습 플랫폼입니다.</span>
             </p>
             <div class="hero-actions">
-                <a href="#" class="btn btn-navy btn-lg" data-i18n="hero.cta.start">무료로 시작하기</a>
-                <a href="#" class="btn btn-mint-outline btn-lg" data-i18n="hero.cta.curriculum">커리큘럼 보기</a>
+                <a th:href="@{/siteUser/chuga}" class="btn btn-navy btn-lg" data-i18n="hero.cta.start">지금 가입하기</a>
+                <a href="#curriculum" class="btn btn-mint-outline btn-lg" data-i18n="hero.cta.curriculum">커리큘럼 보기</a>
             </div>
         </div>
 
@@ -198,7 +199,7 @@
 </div>
 
 <!-- CURRICULUM -->
-<div class="curriculum">
+<div class="curriculum" id="curriculum" style="scroll-margin-top: 80px;">
     <div class="curriculum-inner">
         <p class="section-tag" data-i18n="curriculum.tag">커리큘럼</p>
         <h2 class="section-title"><span data-i18n="curriculum.title.1">케이팝부터 심화까지,</span><br /><span data-i18n="curriculum.title.2">재미있게 완성해요</span></h2>
@@ -381,8 +382,8 @@
                 <p data-i18n="cta.subtitle">첫 단계는 무료로 체험할 수 있어요.</p>
             </div>
             <div class="cta-actions">
-                <a href="#" class="btn btn-mint btn-lg" data-i18n="cta.start">지금 무료로 시작하기</a>
-                <a href="#" class="btn btn-ghost-white btn-lg" data-i18n="cta.curriculum">커리큘럼 살펴보기</a>
+                <a th:href="@{/siteUser/chuga}" class="btn btn-mint btn-lg" data-i18n="cta.start">지금 가입하기</a>
+                <a th:href="@{/category/list}" class="btn btn-ghost-white btn-lg" data-i18n="cta.curriculum">커리큘럼 살펴보기</a>
             </div>
         </div>
     </div>

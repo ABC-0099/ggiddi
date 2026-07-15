@@ -67,6 +67,8 @@ public class SecurityConfig {
                                 "/faq",
                                 "/lectures",
                                 "/lectures/**",
+                                "/category/main",    // ★ 학습센터 드롭다운/커리큘럼 CTA - 비로그인도 강의 목록은 둘러볼 수 있어야 함
+                                "/category/list",     // ★ (회원가입 유도 목적상 카탈로그 자체는 공개, 실제 시청/이어보기는 로그인 페이지에서 자연히 걸림)
                                 "/games/**",         // ★ 유니티 WebGL 빌드 정적 파일 인증 없이 접근 허용
                                 "/practice/main",
                                 "/practice/mock",     // ★ 배움터 메인/모의고사 메인은 비로그인도 열람 가능
