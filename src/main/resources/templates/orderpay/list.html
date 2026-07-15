@@ -95,62 +95,17 @@
 
         </div>
 
-        <!-- 2. 결제 수단 -->
+        <!-- 2. 결제 수단 (토스 결제위젯이 이 영역에 직접 렌더링됩니다) -->
         <div class="section-title">
             <div class="step-badge">2</div>
             결제 수단
         </div>
 
-        <div class="pay-methods">
-            <div class="pay-method selected" onclick="selectPay(this)">
-                <span class="pay-icon">💳</span>
-                <span>신용 / 체크카드</span>
-                <div class="pay-radio"></div>
-            </div>
-            <div class="pay-method" onclick="selectPay(this)">
-                <span class="pay-icon" style="font-size:18px;background:#FEE500;padding:2px 6px;border-radius:4px;">K</span>
-                <span>카카오페이</span>
-                <div class="pay-radio"></div>
-            </div>
-            <div class="pay-method" onclick="selectPay(this)">
-                <span class="pay-icon">🔵</span>
-                <span>토스페이</span>
-                <div class="pay-radio"></div>
-            </div>
-            <div class="pay-method" onclick="selectPay(this)">
-                <span class="pay-icon">🏦</span>
-                <span>계좌이체</span>
-                <div class="pay-radio"></div>
-            </div>
-        </div>
-
-        <!-- 카드 입력 (참고용 UI - 실제 카드정보는 토스 결제창에서 입력받음) -->
-        <div class="card-form" id="card-form">
-            <div class="card-form-title">💳 카드 정보 입력</div>
-            <p style="font-size:12px;color:#8595a6;margin:-4px 0 12px;">
-                * 실제 카드 정보는 다음 단계의 토스페이먼츠 결제창에서 안전하게 입력해요.
-            </p>
-            <div class="field">
-                <label>카드 번호</label>
-                <input type="text" placeholder="0000 - 0000 - 0000 - 0000" maxlength="19"
-                       oninput="formatCard(this)" />
-            </div>
-            <div class="field-row">
-                <div class="field">
-                    <label>유효기간</label>
-                    <input type="text" placeholder="MM / YY" maxlength="7"
-                           oninput="formatExpiry(this)" />
-                </div>
-                <div class="field">
-                    <label>CVC</label>
-                    <input type="text" placeholder="000" maxlength="3" />
-                </div>
-            </div>
-            <div class="field">
-                <label>카드 소유자 이름</label>
-                <input type="text" placeholder="카드에 표시된 이름" />
-            </div>
-        </div>
+        <!-- ★ 토스페이먼츠 결제위젯 렌더링 영역 -->
+        <div id="payment-method"></div>
+        <!-- ★ 토스페이먼츠 이용약관 위젯 렌더링 영역 -->
+        <div id="agreement"></div>
+        <div id="widget-loading" style="padding:16px;color:#8595a6;font-size:14px;">결제 UI를 불러오는 중...</div>
 
         <!-- 3. 쿠폰 -->
         <div class="section-title">
@@ -209,18 +164,9 @@
             <div class="benefit-item">다음 결제일 전 알림 발송</div>
         </div>
 
-        <!-- 약관 동의 -->
-        <label class="agree-check">
-            <input type="checkbox" id="agree" />
-            <span>
-        <a href="#">이용약관</a> 및 <a href="#">개인정보처리방침</a>,
-        <a href="#">구독 및 결제 정책</a>에 동의합니다.
-      </span>
-        </label>
-
-        <!-- 결제 버튼 -->
-        <button class="pay-btn" onclick="handlePay()">
-            49,900원 결제하기
+        <!-- 결제 버튼 (약관 동의 체크는 위젯의 약관 UI에서 처리) -->
+        <button class="pay-btn" id="pay-btn" onclick="handlePay()" disabled>
+            결제 UI 준비 중...
         </button>
 
         <div class="pay-security">🔒 SSL 보안 결제</div>
@@ -231,17 +177,39 @@
 <!-- FOOTER -->
 <div th:replace="~{layout/footer :: footer}"></div>
 
-<!-- ★★★ 토스페이먼츠 SDK ★★★ -->
-<script src="https://js.tosspayments.com/v1/payment"></script>
+<!-- ★★★ 토스페이먼츠 결제위젯 SDK (v2) ★★★ -->
+<script src="https://js.tosspayments.com/v2/standard"></script>
 <script th:inline="javascript">
-    // 서버(OrderPayController)에서 넘겨준 토스 클라이언트 키
-    const tossClientKey = /*[[${tossClientKey}]]*/ "test_ck_xxx";
+    // 서버(OrderPayController)에서 넘겨준 값
+    const tossClientKey = /*[[${tossClientKey}]]*/ "test_gck_xxx";
+    const customerKey = /*[[${customerKey}]]*/ "ANONYMOUS";
 
-    if (!tossClientKey || tossClientKey === "test_ck_xxx") {
-        console.error("[토스] tossClientKey가 정상적으로 주입되지 않았습니다. 컨트롤러에서 model.addAttribute(\"tossClientKey\", ...)가 실행되는지 확인하세요.");
+    if (!tossClientKey || tossClientKey === "test_gck_xxx") {
+        console.error("[토스] tossClientKey가 정상적으로 주입되지 않았습니다. 컨트롤러의 model.addAttribute(\"tossClientKey\", ...)를 확인하세요.");
     }
 
     const tossPayments = TossPayments(tossClientKey);
+    const widgets = tossPayments.widgets({ customerKey });
+
+    let widgetsReady = false;
+
+    // 페이지 로드 시 위젯 초기화 (금액 설정 → 결제UI 렌더 → 약관UI 렌더 순서 반드시 지켜야 함)
+    (async () => {
+        try {
+            await widgets.setAmount({ currency: "KRW", value: 89900 }); // 기본 선택된 '연 구독' 금액
+            await widgets.renderPaymentMethods({ selector: "#payment-method", variantKey: "DEFAULT" });
+            await widgets.renderAgreement({ selector: "#agreement", variantKey: "AGREEMENT" });
+
+            widgetsReady = true;
+            document.getElementById("widget-loading").style.display = "none";
+            const payBtn = document.getElementById("pay-btn");
+            payBtn.disabled = false;
+            payBtn.textContent = document.getElementById("total-price").textContent + " 구독 시작하기";
+        } catch (err) {
+            console.error("[토스] 결제위젯 초기화 실패:", err);
+            document.getElementById("widget-loading").textContent = "결제 UI를 불러오지 못했어요. 새로고침 해주세요.";
+        }
+    })();
 </script>
 
 <script>
@@ -292,32 +260,21 @@
       updateTotal();
     }
 
-    function updateTotal() {
+    // 금액이 바뀔 때마다 위젯에도 새 금액을 반영해야 함 (안 하면 실제 승인 단계에서 금액 불일치 에러 남)
+    async function updateTotal() {
       const total = selectedPlan.price - couponDiscount;
       document.getElementById('total-price').textContent = total.toLocaleString() + '원';
       const lbl = document.querySelector('.pay-btn').dataset.label || '구독 시작하기';
-      document.querySelector('.pay-btn').textContent = total.toLocaleString() + '원 ' + lbl;
-    }
 
-    // 결제 수단 선택
-    function selectPay(el) {
-      document.querySelectorAll('.pay-method').forEach(m => m.classList.remove('selected'));
-      el.classList.add('selected');
-      const isCard = el.querySelector('span:nth-child(2)').textContent.includes('카드');
-      document.getElementById('card-form').style.display = isCard ? 'block' : 'none';
-    }
-
-    // 카드 번호 포맷
-    function formatCard(el) {
-      let v = el.value.replace(/\D/g, '').substring(0, 16);
-      el.value = v.replace(/(.{4})/g, '$1 - ').trim().replace(/ - $/, '');
-    }
-
-    // 유효기간 포맷
-    function formatExpiry(el) {
-      let v = el.value.replace(/\D/g, '').substring(0, 4);
-      if (v.length >= 2) v = v.substring(0, 2) + ' / ' + v.substring(2);
-      el.value = v;
+      const payBtn = document.getElementById('pay-btn');
+      if (widgetsReady) {
+        try {
+          await widgets.setAmount({ currency: 'KRW', value: total });
+          payBtn.textContent = total.toLocaleString() + '원 ' + lbl;
+        } catch (err) {
+          console.error('[토스] 금액 변경 실패:', err);
+        }
+      }
     }
 
     // 쿠폰 적용
@@ -335,20 +292,17 @@
       }
     }
 
-    // 결제 (토스페이먼츠 결제창 호출)
-    function handlePay() {
-      if (!document.getElementById('agree').checked) {
-        alert('약관에 동의해주세요.');
+    // 결제 (토스 결제위젯 결제 요청 - 약관 동의 체크는 위젯 자체 UI가 처리)
+    async function handlePay() {
+      if (!widgetsReady) {
+        alert('결제 UI가 아직 준비되지 않았어요. 잠시만 기다려주세요.');
         return;
       }
 
       const tag = selectedPlan.tag || '';
       const total = selectedPlan.price - couponDiscount;
 
-      const payMethodEl = document.querySelector('.pay-method.selected span:nth-child(2)');
-      const payType = payMethodEl ? payMethodEl.textContent.trim() : '신용/체크카드';
-
-      const payBtn = document.querySelector('.pay-btn');
+      const payBtn = document.getElementById('pay-btn');
       payBtn.disabled = true;
       payBtn.textContent = '결제창 여는 중...';
 
@@ -357,20 +311,20 @@
 
       // successUrl에 planName/payType을 미리 실어 보냄
       // -> 토스가 리다이렉트할 때 paymentKey/orderId/amount를 자동으로 붙여줘서
-      //    /payment/toss/success 에서 5개 파라미터를 한번에 받을 수 있음
+      //    /payment/toss/success 에서 필요한 값들을 한번에 받을 수 있음
       const successUrl = window.location.origin + '/payment/toss/success'
         + '?planName=' + encodeURIComponent(tag)
-        + '&payType=' + encodeURIComponent(payType);
+        + '&payType=' + encodeURIComponent('결제위젯');
       const failUrl = window.location.origin + '/payment/toss/fail';
 
-      tossPayments.requestPayment('카드', {
-        amount: total,
-        orderId: orderId,
-        orderName: '끼역띠귿 ' + (document.getElementById('summary-plan-name')?.textContent || tag),
-        successUrl: successUrl,
-        failUrl: failUrl,
-      }).catch(function (err) {
-        // 사용자가 결제창을 직접 닫은 경우(취소) 등은 여기서 잡힘
+      try {
+        await widgets.requestPayment({
+          orderId: orderId,
+          orderName: '끼역띠귿 ' + (document.getElementById('summary-plan-name')?.textContent || tag),
+          successUrl: successUrl,
+          failUrl: failUrl,
+        });
+      } catch (err) {
         if (err.code === 'USER_CANCEL') {
           alert('결제가 취소되었어요.');
         } else {
@@ -379,7 +333,7 @@
         payBtn.disabled = false;
         const lbl = payBtn.dataset.label || '구독 시작하기';
         payBtn.textContent = total.toLocaleString() + '원 ' + lbl;
-      });
+      }
     }
 </script>
 

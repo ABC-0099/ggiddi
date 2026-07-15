@@ -65,6 +65,9 @@ public class OrderPayController {
                 .orElse(plans.get(0)));
 
         model.addAttribute("tossClientKey", tossClientKey); // ★ 결제창 호출용 클라이언트 키 전달
+        // ★ 결제위젯은 구매자를 식별하는 customerKey가 필수. 비로그인이면 위젯 쪽 익명 처리 규칙(ANONYMOUS)에 맞춤.
+        //   주의: username은 유추 가능한 값이라 실제 운영 단계에서는 UUID 기반으로 바꾸는 걸 권장.
+        model.addAttribute("customerKey", principal != null ? principal.getName() : "ANONYMOUS");
 
         return "orderPay/list";
     }
