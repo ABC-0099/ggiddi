@@ -85,6 +85,14 @@ public class SecurityConfig {
                         ).permitAll()
                         // ★ 연습퀴즈 풀이/제출은 로그인 필요 (QuizService가 로그인 유저 기준으로 채점·잠금체크함)
                         .requestMatchers("/quiz/**", "/api/quiz/**").authenticated()
+                        // ★★★ 관리자 페이지 - URL을 직접 쳐서 들어와도 ADMIN 권한 없으면 차단
+                        //   (기존엔 이 경로가 아무 규칙에도 안 걸려서 anyRequest().authenticated()로
+                        //   빠졌었음 → 로그인만 하면 일반 유저도 /admin 진입 가능했던 구멍)
+                        //   /admin/quiz/**, /api/admin/quiz/** 도 이 패턴에 포함되므로 아래 authenticated()
+                        //   규칙보다 반드시 먼저 와야 함 (매칭은 먼저 선언된 규칙이 우선 적용됨)
+                        //   ★ "/admin/**"만 쓰면 슬래시 없는 "/admin" 자체는 매칭 안 될 수 있어서
+                        //   (Ant 스타일 매칭 특성) "/admin"도 명시적으로 같이 등록해둠
+                        .requestMatchers("/admin", "/admin/**", "/api/admin", "/api/admin/**").hasRole("ADMIN")
                         // ★ 연습퀴즈 관리자 CRUD - 로그인 필요 (역할 체크는 컨트롤러/서비스 단에서 추가로 확인 권장)
                         .requestMatchers("/admin/quiz/**", "/api/admin/quiz/**").authenticated()
                         // ★ 커뮤니티는 로그인한 회원(및 관리자)만 열람 가능하도록 명시적으로 인증 필요 처리
