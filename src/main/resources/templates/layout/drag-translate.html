@@ -20,6 +20,11 @@
   (dragTranslate 없이 이것만 단독으로 넣으면 안내만 뜨고 실제 번역 기능은
    동작하지 않으니 항상 두 fragment를 같이 넣을 것)
   localStorage에 1회 노출 여부가 저장되므로 페이지마다 넣어도 유저 기준 1번만 뜸.
+  ※ 노출 정책: 페이지 로드 시 사이트 언어가 한국어면 1번 노출 + 이후 언어 토글을 눌러서
+    한국어로 "바뀔 때마다" 매번 다시 노출 (영어로 전환된 상태면 안 뜸)
+  ※ 팝업 내용 자체는 언어 토글과 무관하게 항상 영어로 고정 (아직 EN 버튼을 못 찾은
+    외국인 유저에게 "드래그하면 번역된다"는 걸 영어로 알려주는 게 목적이라, 한국어일 땐
+    안 만들어둠)
   ================================
 -->
 
@@ -33,18 +38,18 @@
       <path d="M4 5h9M8 3v2M11 5c-.3 3-2 6-5 8" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
       <path d="M6 12l3-1.5M13 21l4-9 4 9M14.5 18h5" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
     </svg>
-    번역
+    <span data-i18n="dt.trigger_btn">번역</span>
   </button>
 
   <!-- 번역 결과 팝업 -->
   <div id="dtPopup" class="dt-popup" hidden>
     <div class="dt-popup-header">
-      <span class="dt-popup-title">번역</span>
+      <span class="dt-popup-title" data-i18n="dt.popup_title">번역</span>
       <button id="dtCloseBtn" class="dt-close-btn" type="button" aria-label="닫기">×</button>
     </div>
     <div id="dtOriginal" class="dt-original"></div>
     <div id="dtResult" class="dt-result">
-      <span class="dt-loading">번역 중...</span>
+      <span class="dt-loading" data-i18n="dt.loading">번역 중...</span>
     </div>
   </div>
 
@@ -368,34 +373,51 @@
   <div class="dt-onboarding" id="dtOnboarding">
     <div class="dt-onboarding__card">
       <div class="dt-onboarding__emoji">👆</div>
-      <div class="dt-onboarding__title">본문을 드래그해보세요</div>
+      <div class="dt-onboarding__title">Try dragging the text</div>
       <div class="dt-onboarding__desc">
-        궁금한 문장을 <strong>마우스로 드래그</strong>하면<br />
-        "번역" 버튼이 나타나요!
+        Select any sentence with your <strong>mouse</strong> and<br />
+        a "Translate" button will appear!
       </div>
       <div class="dt-onboarding__subdesc">
-        번역 언어는 우측 하단 🌐 버튼에서 바꿀 수 있어요
+        You can change the target language with the 🌐 button in the bottom right
       </div>
-      <button class="dt-onboarding__btn" id="dtOnboardingClose" type="button">알겠어요</button>
+      <button class="dt-onboarding__btn" id="dtOnboardingClose" type="button">Got it</button>
     </div>
   </div>
 
   <script th:inline="javascript">
     (function () {
-      const STORAGE_KEY = 'kkyd_dt_onboarding_seen';
+      // 사이트 언어가 한국어일 때만 노출 (영어로 전환된 상태면 안 뜸)
+      // - 페이지 처음 로드될 때 한국어 상태면 1번 노출
+      // - 이후 언어 토글을 눌러서 한국어로 "바뀔 때마다" 매번 다시 노출
+      //   (lang-toggle.js가 언어 바뀔 때 쏘는 kkyeoklangchange 이벤트를 구독)
+      const SITE_LANG_KEY = 'kkyeok_lang';
       const overlay = document.getElementById('dtOnboarding');
       const closeBtn = document.getElementById('dtOnboardingClose');
       if (!overlay) return;
 
-      const seen = localStorage.getItem(STORAGE_KEY);
-      if (!seen) {
-        setTimeout(() => overlay.classList.add('show'), 600);
+      function showOnboarding(delay) {
+        setTimeout(() => overlay.classList.add('show'), delay);
       }
 
       function closeOnboarding() {
         overlay.classList.remove('show');
-        localStorage.setItem(STORAGE_KEY, '1');
       }
+
+      // 최초 페이지 로드 시: 한국어 상태면 노출
+      const initialLang = localStorage.getItem(SITE_LANG_KEY) || 'ko';
+      if (initialLang !== 'en') {
+        showOnboarding(600);
+      }
+
+      // 언어 토글을 눌러서 한국어로 바뀔 때마다 다시 노출
+      document.addEventListener('kkyeoklangchange', (e) => {
+        if (e.detail && e.detail.lang !== 'en') {
+          showOnboarding(300);
+        } else {
+          closeOnboarding();
+        }
+      });
 
       closeBtn.addEventListener('click', closeOnboarding);
       overlay.addEventListener('click', (e) => {
