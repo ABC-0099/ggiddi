@@ -121,3 +121,32 @@ window.changeMonth = function(delta) {
     window.currentViewDate.setMonth(window.currentViewDate.getMonth() + delta);
     fetchAndRenderHeatmap(window.currentViewDate.getFullYear(), window.currentViewDate.getMonth());
 };
+
+// 4. 새로고침(페이지네이션) 후 원래 있던 위치로 스크롤 복원
+document.addEventListener('DOMContentLoaded', function () {
+    const params = new URLSearchParams(window.location.search);
+    const tab = params.get('tab');
+    const subtab = params.get('subtab');
+
+    if (tab) {
+        const menuBtn = document.querySelector(`.menu-item[data-tab="${tab}"]`);
+        if (menuBtn) {
+            document.querySelectorAll('.menu-item').forEach(m => m.classList.remove('active'));
+            menuBtn.classList.add('active');
+        }
+
+        if (subtab) {
+            document.querySelectorAll('.subtab-item').forEach(s => s.classList.remove('active'));
+            document.querySelectorAll('.subtab-panel').forEach(p => p.classList.remove('active'));
+            const subBtn = document.querySelector(`.subtab-item[data-subtab="${subtab}"]`);
+            const subPanel = document.getElementById('subtab-' + subtab);
+            if (subBtn) subBtn.classList.add('active');
+            if (subPanel) subPanel.classList.add('active');
+        }
+
+        const target = document.getElementById('panel-' + tab);
+        if (target) {
+            target.scrollIntoView({ behavior: 'auto', block: 'start' });
+        }
+    }
+});
