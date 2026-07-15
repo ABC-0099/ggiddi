@@ -1,0 +1,158 @@
+<!--
+  끼역띠귿 - 언어 토글 버튼 & 드래그 번역 온보딩 툴팁
+  -------------------------------------------------
+  사용법:
+  1) <style> 내용은 기존 CSS 파일(common.css 등)에 합쳐도 되고, 그대로 <head>에 넣어도 됨
+  2) 언어 토글 버튼(.lang-toggle-btn)은 헤더/네비게이션 원하는 위치에 복사해서 삽입
+     - lang-toggle.js 와 세트로 동작함 (id="langToggleBtn" 유지 필수)
+  3) 온보딩 툴팁(.dt-onboarding)은 </body> 직전, 강의/학습 페이지에 1번만 삽입
+     - localStorage 로 "본 적 있음" 체크 → 첫 진입 시 1회만 노출
+     - 이미 있는 드래그 번역 위젯을 건드리지 않고, 화면 위에 안내만 얹는 방식
+-->
+
+<style>
+    :root {
+      --kkyeok-navy: #185FA5;
+      --kkyeok-mint-1: #9FE1CB;
+      --kkyeok-mint-2: #5DCAA5;
+    }
+
+    /* ---------- 언어 토글 버튼 ---------- */
+    .lang-toggle-btn {
+      font-family: 'Noto Sans KR', sans-serif;
+      font-weight: 700;
+      font-size: 14px;
+      padding: 8px 16px;
+      border-radius: 999px;
+      border: 1.5px solid var(--kkyeok-navy);
+      background: rgba(255, 255, 255, 0.6);
+      backdrop-filter: blur(6px);
+      color: var(--kkyeok-navy);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .lang-toggle-btn:hover {
+      background: var(--kkyeok-navy);
+      color: #fff;
+    }
+
+    /* ---------- 온보딩 툴팁 (드래그 번역 안내) ---------- */
+    .dt-onboarding {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 30, 50, 0.45);
+      backdrop-filter: blur(2px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+
+    .dt-onboarding.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .dt-onboarding__card {
+      max-width: 340px;
+      width: calc(100% - 48px);
+      background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(159,225,203,0.35));
+      border: 1px solid rgba(255,255,255,0.5);
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      box-shadow: 0 12px 40px rgba(24, 95, 165, 0.25);
+      font-family: 'Noto Sans KR', sans-serif;
+      transform: translateY(10px);
+      transition: transform 0.25s ease;
+    }
+
+    .dt-onboarding.show .dt-onboarding__card {
+      transform: translateY(0);
+    }
+
+    .dt-onboarding__emoji {
+      font-size: 40px;
+      margin-bottom: 8px;
+    }
+
+    .dt-onboarding__title {
+      font-weight: 700;
+      font-size: 17px;
+      color: var(--kkyeok-navy);
+      margin-bottom: 8px;
+    }
+
+    .dt-onboarding__desc {
+      font-size: 14px;
+      color: #33495e;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+
+    .dt-onboarding__desc strong {
+      color: var(--kkyeok-mint-2);
+    }
+
+    .dt-onboarding__btn {
+      background: linear-gradient(135deg, var(--kkyeok-mint-2), var(--kkyeok-navy));
+      color: #fff;
+      border: none;
+      padding: 10px 28px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+    }
+
+    .dt-onboarding__btn:hover {
+      opacity: 0.9;
+    }
+</style>
+
+<!-- 언어 토글 버튼: 헤더/네비게이션 안에 삽입 -->
+<button id="langToggleBtn" class="lang-toggle-btn">EN</button>
+
+
+<!-- 드래그 번역 온보딩 툴팁: 강의/학습 페이지 </body> 직전에 삽입 -->
+<div class="dt-onboarding" id="dtOnboarding">
+    <div class="dt-onboarding__card">
+        <div class="dt-onboarding__emoji">👆</div>
+        <div class="dt-onboarding__title">본문을 드래그해보세요</div>
+        <div class="dt-onboarding__desc">
+            궁금한 문장이 있으면 <strong>마우스로 드래그</strong>만 하면<br />
+            바로 번역이 나타나요!
+        </div>
+        <button class="dt-onboarding__btn" id="dtOnboardingClose">알겠어요</button>
+    </div>
+</div>
+
+<script>
+    (function () {
+      const STORAGE_KEY = "kkyeok_dt_onboarding_seen";
+      const overlay = document.getElementById("dtOnboarding");
+      const closeBtn = document.getElementById("dtOnboardingClose");
+
+      if (!overlay) return;
+
+      const seen = localStorage.getItem(STORAGE_KEY);
+      if (!seen) {
+        // 페이지 진입 후 살짝 딜레이 주고 노출 (바로 뜨면 부담스러움)
+        setTimeout(() => overlay.classList.add("show"), 600);
+      }
+
+      function closeOnboarding() {
+        overlay.classList.remove("show");
+        localStorage.setItem(STORAGE_KEY, "1");
+      }
+
+      closeBtn.addEventListener("click", closeOnboarding);
+      overlay.addEventListener("click", function (e) {
+        if (e.target === overlay) closeOnboarding();
+      });
+    })();
+</script>

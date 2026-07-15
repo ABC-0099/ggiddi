@@ -24,20 +24,19 @@
 
 <!-- 네브바 -->
 <div th:replace="~{layout/navbar :: navbar(currentMenu='home')}"></div>
-
 <!-- HERO -->
 <div style="max-width:1440px;margin:0 auto;">
     <div class="hero">
         <div class="hero-content">
-            <div class="hero-badge">한국어 학습 플랫폼</div>
-            <h1>한국어,<br /><em>함께 배우면</em><br />더 쉬워요</h1>
+            <div class="hero-badge" data-i18n="hero.badge">한국어 학습 플랫폼</div>
+            <h1><span data-i18n="hero.title.1">한국어,</span><br /><em data-i18n="hero.title.2">함께 배우면</em><br /><span data-i18n="hero.title.3">더 쉬워요</span></h1>
             <p class="hero-sub">
-                외국인을 위한<br />
-                게임형 한국어 학습 플랫폼입니다.
+                <span data-i18n="hero.sub.1">외국인을 위한</span><br />
+                <span data-i18n="hero.sub.2">게임형 한국어 학습 플랫폼입니다.</span>
             </p>
             <div class="hero-actions">
-                <a href="#" class="btn btn-navy btn-lg">무료로 시작하기</a>
-                <a href="#" class="btn btn-mint-outline btn-lg">커리큘럼 보기</a>
+                <a href="#" class="btn btn-navy btn-lg" data-i18n="hero.cta.start">무료로 시작하기</a>
+                <a href="#" class="btn btn-mint-outline btn-lg" data-i18n="hero.cta.curriculum">커리큘럼 보기</a>
             </div>
         </div>
 
@@ -60,20 +59,20 @@
                 <div class="dash-stats dash-stats-3">
                     <div class="dash-stat">
                         <div class="dash-stat-num" th:text="${todayNewUsers}">12</div>
-                        <div class="dash-stat-label">오늘 신규 가입</div>
+                        <div class="dash-stat-label" data-i18n="dash.admin.new_users">오늘 신규 가입</div>
                     </div>
                     <div class="dash-stat">
                         <div class="dash-stat-num" th:text="${pendingReports}">3</div>
-                        <div class="dash-stat-label">미처리 신고</div>
+                        <div class="dash-stat-label" data-i18n="dash.admin.reports">미처리 신고</div>
                     </div>
                     <div class="dash-stat">
                         <div class="dash-stat-num" th:text="${pendingQna}">5</div>
-                        <div class="dash-stat-label">답변 대기 문의</div>
+                        <div class="dash-stat-label" data-i18n="dash.admin.qna">답변 대기 문의</div>
                     </div>
                 </div>
 
                 <!-- 관리자 페이지 이동 버튼 -->
-                <a th:href="@{/admin}" class="dash-btn">
+                <a th:href="@{/admin}" class="dash-btn" data-i18n="dash.admin.goto">
                     관리자 페이지로 이동 →
                 </a>
             </div>
@@ -87,7 +86,7 @@
                         <div class="dash-name">
                             <span sec:authentication="name">유니</span>님 안녕하세요
                         </div>
-                        <div class="dash-sub">오늘도 한국어 모험을 시작해봐요!</div>
+                        <div class="dash-sub" data-i18n="dash.user.greeting">오늘도 한국어 모험을 시작해봐요!</div>
                     </div>
                 </div>
 
@@ -95,18 +94,18 @@
                 <div class="dash-stats">
                     <div class="dash-stat">
                         <div class="dash-stat-num" th:text="${completedCount} + '강'">8강</div>
-                        <div class="dash-stat-label">완료 강의</div>
+                        <div class="dash-stat-label" data-i18n="dash.user.completed">완료 강의</div>
                     </div>
                     <div class="dash-stat">
                         <div class="dash-stat-num" th:text="${streakDays} + '일'">7일</div>
-                        <div class="dash-stat-label">연속 출석</div>
+                        <div class="dash-stat-label" data-i18n="dash.user.streak">연속 출석</div>
                     </div>
                 </div>
 
                 <!-- 진도 바 -->
                 <div class="dash-progress">
                     <div class="dash-prog-label">
-                        <span>전체 진도율</span>
+                        <span data-i18n="dash.user.progress">전체 진도율</span>
                         <span th:text="${progressPercent} + '%'">30%</span>
                     </div>
                     <div class="dash-prog-bar"><div class="dash-prog-fill" th:style="'width:' + ${progressPercent} + '%'" style="width:30%"></div></div>
@@ -117,7 +116,7 @@
                     <path d="M22 10L12 5 2 10l10 5 10-5z"/>
                     <path d="M6 12v5c0 1.5 2.7 3 6 3s6-1.5 6-3v-5"/>
                 </svg>
-                    학습 이어가기 →
+                    <span data-i18n="dash.user.continue">학습 이어가기 →</span>
                 </a>
             </div>
         </div>
@@ -132,27 +131,27 @@
                         <path d="M18 5l2 2"/>
                         <path d="M15 8l2 2"/>
                     </svg>
-                    로그인
+                    <span data-i18n="login.title">로그인</span>
                 </div>
-                <p class="login-card-sub">학습을 시작하려면 로그인해주세요</p>
+                <p class="login-card-sub" data-i18n="login.subtitle">학습을 시작하려면 로그인해주세요</p>
                 <form th:action="@{/siteUser/login}" method="post" style="display:flex;flex-direction:column;gap:10px;">
                     <input type="hidden" th:name="${_csrf.parameterName}" th:value="${_csrf.token}" />
                     <div class="lc-field">
-                        <label class="lc-label">아이디</label>
-                        <input type="text" name="username" class="lc-input" placeholder="아이디 입력" />
+                        <label class="lc-label" data-i18n="login.id">아이디</label>
+                        <input type="text" name="username" class="lc-input" placeholder="아이디 입력" data-i18n-placeholder="login.id_ph" />
                     </div>
                     <div class="lc-field">
-                        <label class="lc-label">비밀번호</label>
-                        <input type="password" name="password" class="lc-input" placeholder="비밀번호 입력" />
+                        <label class="lc-label" data-i18n="login.pw">비밀번호</label>
+                        <input type="password" name="password" class="lc-input" placeholder="비밀번호 입력" data-i18n-placeholder="login.pw_ph" />
                     </div>
-                    <button type="submit" class="lc-btn-login">로그인</button>
+                    <button type="submit" class="lc-btn-login" data-i18n="login.submit">로그인</button>
                 </form>
-                <div class="lc-divider"><span>또는</span></div>
-                <a th:href="@{/siteUser/chuga}" class="lc-btn-signup">회원가입하기</a>
+                <div class="lc-divider"><span data-i18n="login.or">또는</span></div>
+                <a th:href="@{/siteUser/chuga}" class="lc-btn-signup" data-i18n="login.go_signup">회원가입하기</a>
                 <div class="lc-find">
-                    <a th:href="@{/siteUser/login}">아이디 찾기</a>
+                    <a th:href="@{/siteUser/login}" data-i18n="login.find_id">아이디 찾기</a>
                     <span>·</span>
-                    <a th:href="@{/siteUser/login}">비밀번호 찾기</a>
+                    <a th:href="@{/siteUser/login}" data-i18n="login.find_pw">비밀번호 찾기</a>
                 </div>
             </div>
         </div>
@@ -164,15 +163,15 @@
     <div class="stats-inner">
         <div class="stat-item">
             <div class="stat-num">1,200+</div>
-            <div class="stat-label">누적 학습자</div>
+            <div class="stat-label" data-i18n="stats.learners">누적 학습자</div>
         </div>
         <div class="stat-item">
             <div class="stat-num">4.8★</div>
-            <div class="stat-label">평균 만족도</div>
+            <div class="stat-label" data-i18n="stats.rating">평균 만족도</div>
         </div>
         <div class="stat-item">
             <div class="stat-num">4단계</div>
-            <div class="stat-label">체계적 커리큘럼</div>
+            <div class="stat-label" data-i18n="stats.curriculum">체계적 커리큘럼</div>
         </div>
     </div>
 </div>
@@ -180,19 +179,19 @@
 <!-- WHY (문제 인식 & 해결책) -->
 <div class="why">
     <div class="why-inner">
-        <p class="section-tag">왜 끼역띠귿인가</p>
-        <h2 class="section-title">지루해서 포기하는 학습,<br />이제는 달라야 해요</h2>
+        <p class="section-tag" data-i18n="why.tag">왜 끼역띠귿인가</p>
+        <h2 class="section-title"><span data-i18n="why.title.1">지루해서 포기하는 학습,</span><br /><span data-i18n="why.title.2">이제는 달라야 해요</span></h2>
         <div class="why-cards">
             <div class="why-card problem">
-                <span class="why-card-label">문제 인식</span>
-                <h3>반복 학습에 지치는 학습자들</h3>
-                <p>전 세계적으로 한국어 학습 수요는 폭발적으로 증가하고 있지만, 기존 서비스는 지루한 반복 학습으로 학습자의 흥미와 지속성을 확보하지 못하고 있어요.</p>
+                <span class="why-card-label" data-i18n="why.problem.label">문제 인식</span>
+                <h3 data-i18n="why.problem.title">반복 학습에 지치는 학습자들</h3>
+                <p data-i18n="why.problem.desc">전 세계적으로 한국어 학습 수요는 폭발적으로 증가하고 있지만, 기존 서비스는 지루한 반복 학습으로 학습자의 흥미와 지속성을 확보하지 못하고 있어요.</p>
             </div>
             <div class="why-arrow">→</div>
             <div class="why-card solution">
-                <span class="why-card-label">우리의 해결책</span>
-                <h3>게임처럼 몰입하는 한국어 학습</h3>
-                <p>그래서 끼역띠귿은 단어게임, 액션게임, 실시간 퀴즈, 커뮤니티를 하나로 엮어 학습자가 스스로 계속하고 싶어지는 한국어 학습 경험을 만들었어요.</p>
+                <span class="why-card-label" data-i18n="why.solution.label">우리의 해결책</span>
+                <h3 data-i18n="why.solution.title">게임처럼 몰입하는 한국어 학습</h3>
+                <p data-i18n="why.solution.desc">그래서 끼역띠귿은 단어게임, 액션게임, 실시간 퀴즈, 커뮤니티를 하나로 엮어 학습자가 스스로 계속하고 싶어지는 한국어 학습 경험을 만들었어요.</p>
             </div>
         </div>
     </div>
@@ -201,9 +200,9 @@
 <!-- CURRICULUM -->
 <div class="curriculum">
     <div class="curriculum-inner">
-        <p class="section-tag">커리큘럼</p>
-        <h2 class="section-title">케이팝부터 심화까지,<br />재미있게 완성해요</h2>
-        <p class="section-desc">케이팝·드라마로 흥미를 붙이고, 일상 회화를 거쳐 심화 표현까지 자연스럽게 쌓아갑니다.</p>
+        <p class="section-tag" data-i18n="curriculum.tag">커리큘럼</p>
+        <h2 class="section-title"><span data-i18n="curriculum.title.1">케이팝부터 심화까지,</span><br /><span data-i18n="curriculum.title.2">재미있게 완성해요</span></h2>
+        <p class="section-desc" data-i18n="curriculum.desc">케이팝·드라마로 흥미를 붙이고, 일상 회화를 거쳐 심화 표현까지 자연스럽게 쌓아갑니다.</p>
         <div class="curriculum-grid">
             <div class="stage-card s1">
                 <span class="stage-icon">
@@ -214,8 +213,8 @@
                         <path d="M12 17l0 4"/>
                     </svg>
                 </span>
-                <span class="stage-num-badge">테마 1</span>
-                <h3>케이팝</h3>
+                <span class="stage-num-badge" data-i18n="curriculum.theme1.badge">테마 1</span>
+                <h3 data-i18n="curriculum.theme1.title">케이팝</h3>
                 <p>
                     <strong>상황</strong> · 아이돌 가사 따라하기, 자주 쓰는 표현<br />
                     <strong>핵심 표현</strong> · "사랑해", "보고싶어", "최고야"
@@ -234,8 +233,8 @@
                         <path d="M16 16l4 0"/>
                     </svg>
                 </span>
-                <span class="stage-num-badge">테마 2</span>
-                <h3>드라마 명대사</h3>
+                <span class="stage-num-badge" data-i18n="curriculum.theme2.badge">테마 2</span>
+                <h3 data-i18n="curriculum.theme2.title">드라마 명대사</h3>
                 <p>
                     <strong>상황</strong> · 오징어게임·우영우 등 유명 대사<br />
                     <strong>핵심 표현</strong> · "괜찮아요", "같이 가요", "고마워"
@@ -247,8 +246,8 @@
                         <path d="M3 20l1.3 -3.9a9 8 0 1 1 3.4 2.9l-4.7 1"/>
                     </svg>
                 </span>
-                <span class="stage-num-badge">테마 3</span>
-                <h3>일상 회화</h3>
+                <span class="stage-num-badge" data-i18n="curriculum.theme3.badge">테마 3</span>
+                <h3 data-i18n="curriculum.theme3.title">일상 회화</h3>
                 <p>
                     <strong>상황</strong> · 실제 한국인이 쓰는 생활 표현<br />
                     <strong>핵심 표현</strong> · "밥 먹었어?", "어디야?", "대박"
@@ -261,8 +260,8 @@
                         <path d="M14 7l7 0l0 7"/>
                     </svg>
                 </span>
-                <span class="stage-num-badge">테마 4</span>
-                <h3>심화</h3>
+                <span class="stage-num-badge" data-i18n="curriculum.theme4.badge">테마 4</span>
+                <h3 data-i18n="curriculum.theme4.title">심화</h3>
                 <p>
                     <strong>상황</strong> · 뉘앙스, 존댓말·반말 구분, 실전 소통<br />
                     <strong>핵심 표현</strong> · "~잖아요", "~거든요", 뉘앙스 구분
@@ -275,9 +274,9 @@
 <!-- FEATURES -->
 <div class="features">
     <div class="features-inner">
-        <p class="section-tag">학습 방식</p>
-        <h2 class="section-title">배우는 게 재밌어야<br />오래 할 수 있어요</h2>
-        <p class="section-desc">게임, 퀴즈, 커뮤니티가 하나로 연결된 몰입형 학습 경험을 제공합니다.</p>
+        <p class="section-tag" data-i18n="features.tag">학습 방식</p>
+        <h2 class="section-title"><span data-i18n="features.title.1">배우는 게 재밌어야</span><br /><span data-i18n="features.title.2">오래 할 수 있어요</span></h2>
+        <p class="section-desc" data-i18n="features.desc">게임, 퀴즈, 커뮤니티가 하나로 연결된 몰입형 학습 경험을 제공합니다.</p>
         <div class="features-grid">
             <div class="feature-card">
                 <div class="feature-icon-wrap">
@@ -288,8 +287,8 @@
                         <path d="M9 17l6 0"/>
                     </svg>
                 </div>
-                <h3>단어게임</h3>
-                <p>제한 시간 안에 단어를 맞추며 어휘력을 키워요. 게임처럼 빠르게 반복하다 보면 단어가 저절로 외워집니다.</p>
+                <h3 data-i18n="features.word.title">단어게임</h3>
+                <p data-i18n="features.word.desc">제한 시간 안에 단어를 맞추며 어휘력을 키워요. 게임처럼 빠르게 반복하다 보면 단어가 저절로 외워집니다.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon-wrap">
@@ -297,8 +296,8 @@
                         <path d="M13 3l0 7l6 0l-8 11l0 -7l-6 0l8 -11"/>
                     </svg>
                 </div>
-                <h3>액션게임</h3>
-                <p>캐릭터를 직접 조작하며 잃어버린 자음을 찾아요. 몸으로 움직이며 자음을 익히니 오래 기억에 남습니다.</p>
+                <h3 data-i18n="features.action.title">액션게임</h3>
+                <p data-i18n="features.action.desc">캐릭터를 직접 조작하며 잃어버린 자음을 찾아요. 몸으로 움직이며 자음을 익히니 오래 기억에 남습니다.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon-wrap">
@@ -308,8 +307,8 @@
                         <path d="M9 14l2 2l4 -4"/>
                     </svg>
                 </div>
-                <h3>단계별 퀴즈</h3>
-                <p>각 단계를 마친 후 퀴즈로 실력을 확인해요. 틀린 문제는 다시 복습해 완벽하게 익힙니다.</p>
+                <h3 data-i18n="features.quiz.title">단계별 퀴즈</h3>
+                <p data-i18n="features.quiz.desc">각 단계를 마친 후 퀴즈로 실력을 확인해요. 틀린 문제는 다시 복습해 완벽하게 익힙니다.</p>
             </div>
             <div class="feature-card">
                 <div class="feature-icon-wrap">
@@ -322,8 +321,8 @@
                         <path d="M3 13v-1a2 2 0 0 1 2 -2h2"/>
                     </svg>
                 </div>
-                <h3>학습자 커뮤니티</h3>
-                <p>비슷한 상황의 학습자들과 소통하고 경험을 나눠요. 혼자가 아니라 함께 배웁니다.</p>
+                <h3 data-i18n="features.community.title">학습자 커뮤니티</h3>
+                <p data-i18n="features.community.desc">비슷한 상황의 학습자들과 소통하고 경험을 나눠요. 혼자가 아니라 함께 배웁니다.</p>
             </div>
         </div>
     </div>
@@ -332,9 +331,9 @@
 <!-- REVIEWS -->
 <div class="reviews">
     <div class="reviews-inner">
-        <p class="section-tag">학습자 후기</p>
-        <h2 class="section-title">실제로 배운 분들의<br />이야기를 들어보세요</h2>
-        <p class="section-desc" style="margin-bottom:40px;">끼역띠귿과 함께 한국어를 배운 학습자들의 솔직한 후기예요.</p>
+        <p class="section-tag" data-i18n="reviews.tag">학습자 후기</p>
+        <h2 class="section-title"><span data-i18n="reviews.title.1">실제로 배운 분들의</span><br /><span data-i18n="reviews.title.2">이야기를 들어보세요</span></h2>
+        <p class="section-desc" style="margin-bottom:40px;" data-i18n="reviews.desc">끼역띠귿과 함께 한국어를 배운 학습자들의 솔직한 후기예요.</p>
         <div class="reviews-grid">
             <div class="review-card">
                 <div class="stars">★★★★★</div>
@@ -378,12 +377,12 @@
     <div class="cta-box">
         <div class="cta-box-inner">
             <div class="cta-text">
-                <h2>오늘부터 <span>한국어 여정</span>을<br />시작해보세요</h2>
-                <p>첫 단계는 무료로 체험할 수 있어요.</p>
+                <h2><span data-i18n="cta.title.1">오늘부터 </span><span data-i18n="cta.title.2">한국어 여정</span><span data-i18n="cta.title.3">을</span><br /><span data-i18n="cta.title.4">시작해보세요</span></h2>
+                <p data-i18n="cta.subtitle">첫 단계는 무료로 체험할 수 있어요.</p>
             </div>
             <div class="cta-actions">
-                <a href="#" class="btn btn-mint btn-lg">지금 무료로 시작하기</a>
-                <a href="#" class="btn btn-ghost-white btn-lg">커리큘럼 살펴보기</a>
+                <a href="#" class="btn btn-mint btn-lg" data-i18n="cta.start">지금 무료로 시작하기</a>
+                <a href="#" class="btn btn-ghost-white btn-lg" data-i18n="cta.curriculum">커리큘럼 살펴보기</a>
             </div>
         </div>
     </div>

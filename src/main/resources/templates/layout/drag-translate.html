@@ -12,6 +12,14 @@
   타깃 언어는 우측 하단 지구본 버튼으로 바꿀 수 있고 localStorage에 기억됨.
   (띠귿이 AI 튜터 버튼 바로 위에 쌓이도록 배치되어 있고, 띠귿이 패널이 열리면
    z-index가 더 낮아서 패널 뒤로 자연스럽게 가려짐 — 겹침 문제 없음)
+
+  ── 최초 1회 온보딩 안내 (선택) ──
+  강의/학습 페이지처럼 첫 진입 유저에게 "드래그하면 번역 버튼이 떠요"를
+  안내하고 싶은 곳에서 위 fragment와 같이 한 줄 추가:
+  <div th:replace="~{layout/drag-translate :: dragTranslateOnboarding}"></div>
+  (dragTranslate 없이 이것만 단독으로 넣으면 안내만 뜨고 실제 번역 기능은
+   동작하지 않으니 항상 두 fragment를 같이 넣을 것)
+  localStorage에 1회 노출 여부가 저장되므로 페이지마다 넣어도 유저 기준 1번만 뜸.
   ================================
 -->
 
@@ -280,6 +288,119 @@
       });
 
       applyStoredPosition();
+    })();
+  </script>
+</div>
+
+<!--
+  최초 1회 온보딩 안내: "드래그하면 번역 버튼이 떠요"
+  실제 동작 순서(드래그 → 번역 버튼 → 클릭 → 팝업)에 맞춘 문구.
+  dragTranslate fragment와 함께 삽입해야 함 (위 사용법 참고).
+-->
+<div th:fragment="dragTranslateOnboarding">
+  <style>
+    .dt-onboarding {
+      position: fixed;
+      inset: 0;
+      background: rgba(15, 30, 50, 0.45);
+      backdrop-filter: blur(2px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 9999;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.25s ease;
+    }
+    .dt-onboarding.show {
+      opacity: 1;
+      pointer-events: auto;
+    }
+    .dt-onboarding__card {
+      max-width: 340px;
+      width: calc(100% - 48px);
+      background: linear-gradient(135deg, rgba(255,255,255,0.9), rgba(159,225,203,0.35));
+      border: 1px solid rgba(255,255,255,0.5);
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      box-shadow: 0 12px 40px rgba(24, 95, 165, 0.25);
+      font-family: 'Noto Sans KR', sans-serif;
+      transform: translateY(10px);
+      transition: transform 0.25s ease;
+    }
+    .dt-onboarding.show .dt-onboarding__card {
+      transform: translateY(0);
+    }
+    .dt-onboarding__emoji { font-size: 40px; margin-bottom: 8px; }
+    .dt-onboarding__title {
+      font-weight: 700;
+      font-size: 17px;
+      color: #185FA5;
+      margin-bottom: 8px;
+    }
+    .dt-onboarding__desc {
+      font-size: 14px;
+      color: #33495e;
+      line-height: 1.6;
+      margin-bottom: 8px;
+    }
+    .dt-onboarding__desc strong { color: #5DCAA5; }
+    .dt-onboarding__subdesc {
+      font-size: 12.5px;
+      color: #7a8ba0;
+      line-height: 1.5;
+      margin-bottom: 20px;
+    }
+    .dt-onboarding__btn {
+      background: linear-gradient(135deg, #5DCAA5, #185FA5);
+      color: #fff;
+      border: none;
+      padding: 10px 28px;
+      border-radius: 999px;
+      font-weight: 700;
+      font-size: 14px;
+      cursor: pointer;
+    }
+    .dt-onboarding__btn:hover { opacity: 0.9; }
+  </style>
+
+  <div class="dt-onboarding" id="dtOnboarding">
+    <div class="dt-onboarding__card">
+      <div class="dt-onboarding__emoji">👆</div>
+      <div class="dt-onboarding__title">본문을 드래그해보세요</div>
+      <div class="dt-onboarding__desc">
+        궁금한 문장을 <strong>마우스로 드래그</strong>하면<br />
+        "번역" 버튼이 나타나요!
+      </div>
+      <div class="dt-onboarding__subdesc">
+        번역 언어는 우측 하단 🌐 버튼에서 바꿀 수 있어요
+      </div>
+      <button class="dt-onboarding__btn" id="dtOnboardingClose" type="button">알겠어요</button>
+    </div>
+  </div>
+
+  <script th:inline="javascript">
+    (function () {
+      const STORAGE_KEY = 'kkyd_dt_onboarding_seen';
+      const overlay = document.getElementById('dtOnboarding');
+      const closeBtn = document.getElementById('dtOnboardingClose');
+      if (!overlay) return;
+
+      const seen = localStorage.getItem(STORAGE_KEY);
+      if (!seen) {
+        setTimeout(() => overlay.classList.add('show'), 600);
+      }
+
+      function closeOnboarding() {
+        overlay.classList.remove('show');
+        localStorage.setItem(STORAGE_KEY, '1');
+      }
+
+      closeBtn.addEventListener('click', closeOnboarding);
+      overlay.addEventListener('click', (e) => {
+        if (e.target === overlay) closeOnboarding();
+      });
     })();
   </script>
 </div>
