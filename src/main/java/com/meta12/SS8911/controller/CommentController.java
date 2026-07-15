@@ -29,6 +29,17 @@ public class CommentController {
         return "redirect:/community/" + postId;
     }
 
+    // 대댓글 등록
+    @PostMapping("/{commentId}/reply")
+    public String reply(@PathVariable Long postId,
+                        @PathVariable Long commentId,
+                        @RequestParam String content,
+                        Principal principal) {
+        SiteUser user = siteUserService.getUserByUsername(principal.getName());
+        commentService.createReply(communityService.getPost(postId), commentId, content, user);
+        return "redirect:/community/" + postId;
+    }
+
     // 댓글 수정
     @PostMapping("/{commentId}/edit")
     public String edit(@PathVariable Long postId,
@@ -40,7 +51,7 @@ public class CommentController {
         return "redirect:/community/" + postId;
     }
 
-    // 댓글 삭제
+    // 댓글 삭제 (작성자 본인 또는 관리자)
     @PostMapping("/{commentId}/delete")
     public String delete(@PathVariable Long postId,
                          @PathVariable Long commentId,

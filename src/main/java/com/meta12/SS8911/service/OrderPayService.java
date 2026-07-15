@@ -11,6 +11,7 @@ package com.meta12.SS8911.service;
 //import com.example.masil.repository.OrderPayRepository;
 //
 //import com.example.masil.repository.SiteUserRepository;
+import com.meta12.SS8911.dto.MyPaymentDTO;
 import com.meta12.SS8911.dto.OrderPayDTO;
 import com.meta12.SS8911.entity.Category;
 
@@ -130,10 +131,10 @@ public class OrderPayService {
         return orderPayRepository.findAll();
     }
 
-    public OrderPay view(long id){
+    public OrderPay view(long id) {
         OrderPay orderPay = null;
         Optional<OrderPay> op = orderPayRepository.findById(id);
-        if(op.isPresent()){
+        if (op.isPresent()) {
             orderPay = op.get();
         }
         return orderPay;
@@ -208,7 +209,7 @@ public class OrderPayService {
 
 
     // OrderPayService.java 내부의 createEntity 메서드 수정
-    private OrderPay createEXntity(OrderPayDTO orderPayDTO, SiteUser siteUser){
+    private OrderPay createEXntity(OrderPayDTO orderPayDTO, SiteUser siteUser) {
         OrderPay orderPay = new OrderPay();
         orderPay.setId(orderPayDTO.getId());
         orderPay.setCategory(orderPayDTO.getCategory());
@@ -288,5 +289,70 @@ public class OrderPayService {
                 .filter(user -> user != null) // 혹시 모를 null 방지
                 .distinct()                // 🌟 핵심: 동일한 사용자 객체 중복 제거
                 .collect(Collectors.toList());
+    }
+
+    public List<MyPaymentDTO> getMyPayments(String username) {
+
+        SiteUser user = siteUserRepository.findByUsername(username)
+                .orElseThrow();
+
+        List<OrderPay> list = orderPayRepository.findBySiteUser(user);
+
+        return list.stream()
+                .filter(o ->
+                        o.getPayType() == null ||
+                                (!o.getPayType().equals("강사 칭찬 도장")
+                                        && !o.getPayType().equals("구독 강의 접근")))
+                .map(this::convert)
+                .toList();
+    }
+
+    private MyPaymentDTO convert(OrderPay order) {
+
+        MyPaymentDTO dto = new MyPaymentDTO();
+
+        dto.setPrice(order.getPrice());
+        dto.setPayType(order.getPayType());
+        dto.setPayday(order.getPayday());
+
+        // 구매 상품명
+        if (order.getPlanType() != null) {
+
+            dto.setProductName(order.getPlanType());
+
+        } else if (order.getCategory() != null) {
+
+            dto.setProductName(order.getCategory().getTitle());
+
+        }
+
+        // 유효기간
+        if (order.getPayday() != null) {
+
+            if ("월구독".equals(order.getPlanType())) {
+
+                dto.setPeriod(
+                        order.getPayday().toLocalDate()
+                                + " ~ "
+                                + order.getPayday().plusMonths(1).toLocalDate()
+                );
+
+            } else if ("연구독".equals(order.getPlanType())) {
+
+                dto.setPeriod(
+                        order.getPayday().toLocalDate()
+                                + " ~ "
+                                + order.getPayday().plusYears(1).toLocalDate()
+                );
+
+            } else {
+
+                dto.setPeriod("평생 이용");
+
+            }
+
+        }
+
+        return dto;
     }
 }
