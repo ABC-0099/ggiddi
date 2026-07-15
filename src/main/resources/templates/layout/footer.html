@@ -23,7 +23,10 @@
         <img th:src="@{/images/logo-admin.png}" alt="끼역띠귿" class="footer-logo-img footer-logo-img-admin" />
         <img th:src="@{/images/logo-gold.png}" alt="끼역띠귿" class="footer-logo-img footer-logo-img-game" />
       </a>
-      <p class="footer-tagline">외국인과 다문화 가족을 위한<br>한국어 학습 플랫폼</p>
+      <p class="footer-tagline">
+        <span data-i18n="footer.tagline.line1">외국인과 다문화 가족을 위한</span><br>
+        <span data-i18n="footer.tagline.line2">한국어 학습 플랫폼</span>
+      </p>
       <div class="footer-sns">
         <a th:href="@{/}" class="sns-btn" aria-label="인스타그램">
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
@@ -45,34 +48,34 @@
     <div class="footer-links">
 
       <div class="footer-col">
-        <h4>학습</h4>
+        <h4 data-i18n="footer.col.learn">학습</h4>
         <ul>
-          <li><a th:href="@{/category/list}">동영상 강의</a></li>
-          <li><a th:href="@{/game}">학습 게임</a></li>
-          <li><a th:href="@{/pricing}">구독 안내</a></li>
+          <li><a th:href="@{/category/list}" data-i18n="footer.learn.lecture">동영상 강의</a></li>
+          <li><a th:href="@{/game}" data-i18n="footer.learn.game">학습 게임</a></li>
+          <li><a th:href="@{/pricing}" data-i18n="footer.learn.pricing">구독 안내</a></li>
         </ul>
       </div>
 
       <div class="footer-col">
-        <h4>커뮤니티</h4>
+        <h4 data-i18n="footer.col.community">커뮤니티</h4>
         <ul>
-          <li><a th:href="@{/notice/list}">공지사항</a></li>
-          <li><a th:href="@{/community}">커뮤니티</a></li>
-          <li><a th:href="@{/faq/list}">자주 묻는 질문</a></li>
-          <li><a th:href="@{/qna/write}">1:1 질문하기</a></li>
+          <li><a th:href="@{/notice/list}" data-i18n="nav.notice">공지사항</a></li>
+          <li><a th:href="@{/community}" data-i18n="nav.community">커뮤니티</a></li>
+          <li><a th:href="@{/faq/list}" data-i18n="nav.qna.faq">자주 묻는 질문</a></li>
+          <li><a th:href="@{/qna/write}" data-i18n="nav.qna.ask">1:1 질문하기</a></li>
         </ul>
       </div>
 
       <div class="footer-col">
-        <h4>고객지원</h4>
+        <h4 data-i18n="footer.col.support">고객지원</h4>
         <ul>
-          <li><a th:href="@{/terms}">이용약관</a></li>
-          <li><a th:href="@{/privacy}">개인정보처리방침</a></li>
+          <li><a th:href="@{/terms}" data-i18n="footer.support.terms">이용약관</a></li>
+          <li><a th:href="@{/privacy}" data-i18n="footer.support.privacy">개인정보처리방침</a></li>
           <li th:unless="${#authorization.expression('hasRole(''ADMIN'') or authentication.name == ''admin888''')}">
-            <a th:href="@{/siteUser/mypage}">마이페이지</a>
+            <a th:href="@{/siteUser/mypage}" data-i18n="footer.support.mypage">마이페이지</a>
           </li>
           <li th:if="${#authorization.expression('hasRole(''ADMIN'') or authentication.name == ''admin888''')}">
-            <a th:href="@{/admin}">관리자 대시보드</a>
+            <a th:href="@{/admin}" data-i18n="footer.support.admin">관리자 대시보드</a>
           </li>
         </ul>
       </div>
