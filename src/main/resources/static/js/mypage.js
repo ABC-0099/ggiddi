@@ -122,6 +122,28 @@ window.changeMonth = function(delta) {
     fetchAndRenderHeatmap(window.currentViewDate.getFullYear(), window.currentViewDate.getMonth());
 };
 
+// 3-1. 주간 출석 그리드 렌더링 (누락되어 있던 함수 - 추가)
+function renderWeeklyGrid(weeklyAttendance) {
+    const grid = document.getElementById('weeklyGrid');
+    if (!grid) return;
+
+    grid.innerHTML = '';
+    weeklyAttendance.forEach(attended => {
+        const box = document.createElement('div');
+        box.className = 'week-box' + (attended ? ' attended' : '');
+        grid.appendChild(box);
+    });
+}
+
+// 3-2. 주간 라벨(기간/이번 주 표시) 렌더링 (누락되어 있던 함수 - 추가)
+function renderWeekLabel(weekLabel, isCurrentWeek) {
+    const rangeEl = document.getElementById('weeklyRange');
+    if (rangeEl) rangeEl.textContent = weekLabel;
+
+    const titleEl = document.querySelector('.weekly-title');
+    if (titleEl) titleEl.textContent = isCurrentWeek ? '이번 주 출석' : '지난 주 출석';
+}
+
 // 4. 새로고침(페이지네이션) 후 원래 있던 위치로 스크롤 복원
 document.addEventListener('DOMContentLoaded', function () {
     const params = new URLSearchParams(window.location.search);
