@@ -240,6 +240,7 @@
       "login.card_sub": "Log in to your account and keep learning",
       "login.err_invalid": "Incorrect username or password.",
       "login.msg_logout": "You've been logged out.",
+      "login.msg_duplicated": "You've been logged out automatically because you logged in elsewhere.",
       "login.id_ph2": "Enter your username",
       "login.pw_ph2": "Enter your password",
       "login.remember": "Keep me logged in",

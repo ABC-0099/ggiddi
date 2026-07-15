@@ -10,6 +10,7 @@ import org.springframework.security.config.annotation.web.configuration.WebSecur
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.csrf.CookieCsrfTokenRepository;
 import org.springframework.security.web.csrf.CsrfTokenRequestAttributeHandler;
+import org.springframework.security.web.session.HttpSessionEventPublisher;
 
 import lombok.RequiredArgsConstructor;
 
@@ -129,6 +130,19 @@ public class SecurityConfig {
                 .headers(headers -> headers
                         // ★ 기본값 DENY는 iframe(유니티 게임 창)을 전부 막으므로 같은 출처는 허용하도록 변경
                         .frameOptions(frame -> frame.sameOrigin())
+                )
+                // ★★★ 중복 로그인 제어: 같은 계정으로 다른 곳(다른 브라우저/기기)에서 새로 로그인하면
+                //   기존 세션은 강제로 만료시키고 새 로그인을 허용함 (반대로 새 로그인을 막고 기존
+                //   세션을 유지하고 싶으면 maxSessionsPreventsLogin(true)로 바꾸면 됨)
+                //   ★ expiredUrl: 강제 만료된 기존 세션 쪽에서 다음 요청을 보내면 이 경로로
+                //   리다이렉트됨 → 로그인 페이지에서 param.duplicated로 안내 문구 노출
+                //   ★ HttpSessionEventPublisher 빈 등록 필수 - 이게 없으면 로그아웃/세션 만료 시
+                //   세션 레지스트리가 갱신 안 돼서 실제로는 로그아웃했는데도 "세션 1개 사용 중"으로
+                //   잘못 카운트되는 문제가 생김
+                .sessionManagement(session -> session
+                        .maximumSessions(1)
+                        .maxSessionsPreventsLogin(false)
+                        .expiredUrl("/siteUser/login?duplicated")
                 );
         // ★ csrf.disable() 제거 → CSRF 기본 활성화 (다른 요청에는 그대로 적용됨)
 
@@ -138,6 +152,13 @@ public class SecurityConfig {
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
+    }
+
+    // ★ 중복 로그인 제어(sessionManagement().maximumSessions)가 정확히 동작하려면 필수.
+    //   로그아웃/세션 타임아웃 시 세션 소멸 이벤트를 Security의 세션 레지스트리에 전달해줌.
+    @Bean
+    public HttpSessionEventPublisher httpSessionEventPublisher() {
+        return new HttpSessionEventPublisher();
     }
 
 }
