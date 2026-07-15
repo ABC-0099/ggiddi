@@ -32,6 +32,26 @@ public class CommentService {
         commentRepository.save(comment);
     }
 
+    // 대댓글 작성
+    public void createReply(Community community, Long parentId, String content, SiteUser author) {
+        Comment parent = getComment(parentId);
+
+        if (!parent.getCommunity().getId().equals(community.getId())) {
+            throw new RuntimeException("잘못된 접근입니다.");
+        }
+
+        // 대댓글의 대댓글은 최상위 댓글 아래로 묶어서 depth를 1단계로 제한한다.
+        Comment topParent = (parent.getParent() != null) ? parent.getParent() : parent;
+
+        Comment reply = new Comment();
+        reply.setCommunity(community);
+        reply.setContent(content);
+        reply.setAuthor(author);
+        reply.setCreatedDate(LocalDateTime.now());
+        reply.setParent(topParent);
+        commentRepository.save(reply);
+    }
+
     public Comment getComment(Long id) {
         return commentRepository.findById(id)
                 .orElseThrow(() -> new RuntimeException("댓글 없음"));
@@ -47,6 +67,15 @@ public class CommentService {
     public void delete(Long id, SiteUser user) {
         Comment comment = getComment(id);
         checkPermission(comment, user);
+
+        // 최상위 댓글이면 거기 달린 대댓글도 함께 삭제
+        if (comment.getParent() == null) {
+            List<Comment> replies = commentRepository.findByParent(comment);
+            if (!replies.isEmpty()) {
+                commentRepository.deleteAll(replies);
+            }
+        }
+
         commentRepository.delete(comment);
     }
 

@@ -79,6 +79,50 @@ public class CommunityController {
         return "community/view";
     }
 
+    // 댓글 작성
+    @PostMapping("/{id}/comment")
+    public String writeComment(@PathVariable Long id,
+                               @RequestParam String content,
+                               Principal principal) {
+        Community post = communityService.getPost(id);
+        SiteUser user = siteUserService.getUserByUsername(principal.getName());
+        commentService.create(post, content, user);
+        return "redirect:/community/" + id;
+    }
+
+    // 대댓글 작성
+    @PostMapping("/{id}/comment/{commentId}/reply")
+    public String writeReply(@PathVariable Long id,
+                             @PathVariable Long commentId,
+                             @RequestParam String content,
+                             Principal principal) {
+        Community post = communityService.getPost(id);
+        SiteUser user = siteUserService.getUserByUsername(principal.getName());
+        commentService.createReply(post, commentId, content, user);
+        return "redirect:/community/" + id;
+    }
+
+    // 댓글 수정
+    @PostMapping("/{id}/comment/{commentId}/edit")
+    public String editComment(@PathVariable Long id,
+                              @PathVariable Long commentId,
+                              @RequestParam String content,
+                              Principal principal) {
+        SiteUser user = siteUserService.getUserByUsername(principal.getName());
+        commentService.update(commentId, content, user);
+        return "redirect:/community/" + id;
+    }
+
+    // 댓글 삭제
+    @PostMapping("/{id}/comment/{commentId}/delete")
+    public String deleteComment(@PathVariable Long id,
+                                @PathVariable Long commentId,
+                                Principal principal) {
+        SiteUser user = siteUserService.getUserByUsername(principal.getName());
+        commentService.delete(commentId, user);
+        return "redirect:/community/" + id;
+    }
+
     // 수정 폼
     @GetMapping("/{id}/edit")
     public String editForm(@PathVariable Long id, Model model, Principal principal) {
