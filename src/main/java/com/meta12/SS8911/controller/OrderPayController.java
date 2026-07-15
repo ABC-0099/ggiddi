@@ -1,5 +1,6 @@
 package com.meta12.SS8911.controller;
 
+import com.meta12.SS8911.dto.MyPaymentDTO;
 import com.meta12.SS8911.dto.OrderPayDTO;
 import com.meta12.SS8911.dto.SubscriptionPlanDTO;
 import com.meta12.SS8911.entity.Category;
@@ -352,39 +353,28 @@ public class OrderPayController {
     // OrderPayController.java 수정
 
     @GetMapping("/information/list")
-    public String showMyRoom(Model model, Principal principal) {
-        if (principal == null) return "redirect:/siteUser/login";
+    public String showMyRoom(Model model,
+                             Principal principal) {
 
-        // 1. 서비스에서 사용자의 모든 내역(결제 + 도장 등)을 가져옵니다.
-        List<OrderPay> allList = orderPayService.list(principal.getName());
-
-        // 2. 필터링: "강사 칭찬 도장"인 항목은 제외하고 "진짜 결제 내역"만 추출합니다.
-        List<OrderPay> realPaymentList = new java.util.ArrayList<>();
-        for (OrderPay pay : allList) {
-            // 도장 데이터의 payType이 정확히 "강사 칭찬 도장"인지 확인합니다.
-            // 데이터베이스에 공백이 있을 수 있으니 trim()을 사용합니다.
-            if (pay.getPayType() == null ||
-                    (!pay.getPayType().trim().equals("강사 칭찬 도장")      // 도장 데이터 제외
-                            && !pay.getPayType().trim().equals("구독 강의 접근"))) { // 구독 카테고리 접근권한용 레코드 제외
-                realPaymentList.add(pay);
-            }
+        if (principal == null) {
+            return "redirect:/siteUser/login";
         }
 
-        // 3. 필터링 된 리스트를 모델에 담습니다.
-        model.addAttribute("list", realPaymentList);
+        List<MyPaymentDTO> list =
+                orderPayService.getMyPayments(principal.getName());
 
-        // 4. 기존 출석 체크 로직 유지
-
-        SiteUser siteUser = siteUserService.getUser(principal.getName());
+        model.addAttribute("list", list);
 
         SiteUser user = siteUserService.getUser(principal.getName());
+
         double avg = contentService.getAverageProgress(user);
+
         model.addAttribute("avgProgress", Math.round(avg));
 
-        model.addAttribute("courseProgressList", contentService.getCourseProgressList(user));
+        model.addAttribute("courseProgressList",
+                contentService.getCourseProgressList(user));
 
-
-        return "information/list"; // 리턴할 HTML 경로가 맞는지 다시 확인하세요!
+        return "information/list";
     }
 
 

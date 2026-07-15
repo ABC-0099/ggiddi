@@ -1,6 +1,7 @@
 package com.meta12.SS8911.controller;
 
 import com.meta12.SS8911.dto.AttendanceDTO;
+import com.meta12.SS8911.dto.MyPaymentDTO;
 import com.meta12.SS8911.dto.SiteUserDTO;
 import com.meta12.SS8911.dto.SiteUserEditDTO;
 import com.meta12.SS8911.entity.Comment;
@@ -30,10 +31,7 @@ import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.HashMap;
+import java.util.*;
 import java.time.LocalDate;
 import java.time.DayOfWeek;
 import java.util.stream.Collectors;
@@ -159,24 +157,22 @@ public class SiteUserController {
         Page<Progress> myProgress = contentService.getMyProgress(user, progressPageable);
         // ▲▲▲ 영상 시청 내역 끝 ▲▲▲
 
-        // ▼▼▼ 결제(구매) 내역 - 실제 결제 완료건만, 최근 결제순, 페이지네이션 ▼▼▼
-        // OrderPayRepository엔 Pageable 메서드가 없어서, 전체를 가져온 뒤 필터링/정렬/수동 페이징합니다.
-        List<OrderPay> allOrders = orderPayService.list(username);
-        List<OrderPay> realPayments = allOrders.stream()
-                .filter(o -> o.getPayday() != null) // 결제일 없는(미결제) 건 제외
-                .filter(o -> o.getPayType() == null ||
-                        (!o.getPayType().trim().equals("강사 칭찬 도장")      // 도장 데이터 제외
-                                && !o.getPayType().trim().equals("구독 강의 접근"))) // 구독 카테고리 접근권한용 레코드 제외
-                .sorted(Comparator.comparing(OrderPay::getPayday).reversed()) // 최근 결제순
-                .collect(Collectors.toList());
+        List<MyPaymentDTO> allPayments = orderPayService.getMyPayments(username);
+
+        Collections.reverse(allPayments); // 최신 결제순
 
         int purchaseSize = 5;
         Pageable purchasePageable = PageRequest.of(purchasePage, purchaseSize);
-        int fromIndex = Math.min((int) purchasePageable.getOffset(), realPayments.size());
-        int toIndex = Math.min(fromIndex + purchaseSize, realPayments.size());
-        Page<OrderPay> myPurchases = new PageImpl<>(
-                realPayments.subList(fromIndex, toIndex), purchasePageable, realPayments.size());
-        // ▲▲▲ 결제(구매) 내역 끝 ▲▲▲
+
+        int fromIndex = Math.min((int) purchasePageable.getOffset(), allPayments.size());
+        int toIndex = Math.min(fromIndex + purchaseSize, allPayments.size());
+
+        Page<MyPaymentDTO> myPurchases =
+                new PageImpl<>(
+                        allPayments.subList(fromIndex, toIndex),
+                        purchasePageable,
+                        allPayments.size()
+                );
 
         model.addAttribute("siteUser", user);
         model.addAttribute("myPosts", myPosts);
