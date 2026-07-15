@@ -4,6 +4,10 @@ document.addEventListener('DOMContentLoaded', function () {
     const subtabItems = document.querySelectorAll('.subtab-item');
     const subtabPanels = document.querySelectorAll('.subtab-panel');
 
+    // ★ 스크롤스파이용: 클릭으로 인한 스무스 스크롤 중엔 옵저버가 active를 안 건드리게 하는 플래그
+    let isProgrammaticScroll = false;
+    let programmaticScrollTimer = null;
+
     function activateMenu(tab) {
         menuItems.forEach(m => m.classList.remove('active'));
         const menuBtn = document.querySelector(`.menu-item[data-tab="${tab}"]`);
@@ -24,7 +28,16 @@ document.addEventListener('DOMContentLoaded', function () {
             const tab = this.getAttribute('data-tab');
             activateMenu(tab);
             const target = document.getElementById('panel-' + tab);
-            if (target) target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+            if (target) {
+                // ★ 클릭으로 스크롤하는 동안엔 아래 스크롤스파이가 끼어들어 active를
+                //   덮어쓰지 않도록 잠깐 꺼둠 (스무스 스크롤 애니메이션 시간만큼)
+                isProgrammaticScroll = true;
+                clearTimeout(programmaticScrollTimer);
+                target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                programmaticScrollTimer = setTimeout(() => {
+                    isProgrammaticScroll = false;
+                }, 700);
+            }
         });
     });
 
@@ -33,6 +46,31 @@ document.addEventListener('DOMContentLoaded', function () {
             activateSubtab(this.getAttribute('data-subtab'));
         });
     });
+
+    // ★ 스크롤스파이: 사용자가 직접 스크롤할 때도 현재 보이는 섹션에 맞춰
+    //   사이드바 메뉴 active 표시가 자동으로 따라 바뀌게 함
+    //   (기존엔 클릭했을 때만 active가 바뀌고, 손으로 스크롤하면 안 바뀌던 문제)
+    const contentPanels = document.querySelectorAll('.content-panel[id^="panel-"]');
+    if (contentPanels.length > 0 && 'IntersectionObserver' in window) {
+        const spy = new IntersectionObserver((entries) => {
+            if (isProgrammaticScroll) return; // 클릭으로 스크롤 중이면 무시
+
+            // 여러 섹션이 동시에 걸쳐 보일 수 있으므로, 화면 상단에 가장 가까운(=가장 위에 있는) 섹션을 active로 함
+            const visible = entries.filter(e => e.isIntersecting);
+            if (visible.length === 0) return;
+
+            visible.sort((a, b) => a.boundingClientRect.top - b.boundingClientRect.top);
+            const topId = visible[0].target.id.replace('panel-', '');
+            activateMenu(topId);
+        }, {
+            root: null,
+            // 상단 고정 네브바(약 64px) + 여유분만큼 위쪽을 당겨서, 섹션이 상단 영역에 걸리면 바로 active 되게 함
+            rootMargin: '-96px 0px -60% 0px',
+            threshold: 0
+        });
+
+        contentPanels.forEach(panel => spy.observe(panel));
+    }
 
     // 2. 출석 달력 로직 (새로 추가/교체)
     window.currentViewDate = new Date();

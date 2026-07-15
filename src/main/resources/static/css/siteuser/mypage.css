@@ -412,14 +412,17 @@ html, body {
 
 .my-post-tag {
     flex-shrink: 0;
-    width: 64px;
+    width: 72px;
     text-align: center;
     font-size: 10.5px;
     font-weight: 700;
     color: var(--mint-dark);
     background: var(--white);
-    padding: 3px 9px;
+    padding: 3px 6px;
     border-radius: 20px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
 }
 
 .my-post-title {
