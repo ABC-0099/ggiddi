@@ -18,21 +18,21 @@ class Ss8911ApplicationTests {
 	void contextLoads() {
 	}
 
-	@Test
-	void admin(){
-		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
-		String password = passwordEncoder.encode("1234");
-
-		SiteUser siteUser = new SiteUser();
-
-		siteUser.setUsername("admin888");
-		siteUser.setName("관리자");
-		siteUser.setPassword(password);
-		siteUser.setPhone("010-0000-0000");
-		siteUser.setBirth("1999-01-01");
-		siteUser.setRole(Role.ADMIN);
-		siteUserRepository.save(siteUser);
-
-	}
+//	@Test
+//	void admin(){
+//		BCryptPasswordEncoder passwordEncoder = new BCryptPasswordEncoder();
+//		String password = passwordEncoder.encode("1234");
+//
+//		SiteUser siteUser = new SiteUser();
+//
+//		siteUser.setUsername("admin888");
+//		siteUser.setName("관리자");
+//		siteUser.setPassword(password);
+//		siteUser.setPhone("010-0000-0000");
+//		siteUser.setBirth("1999-01-01");
+//		siteUser.setRole(Role.ADMIN);
+//		siteUserRepository.save(siteUser);
+//
+//	}
 
 }

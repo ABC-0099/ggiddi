@@ -35,3 +35,93 @@
 .btn-action-edit:hover { background: rgba(24,95,165,0.08); }
 .btn-action-delete { color: var(--red); }
 .btn-action-delete:hover { background: rgba(239,68,68,0.08); }
+
+/* ── 콘텐츠 관리 - 카테고리(테마)별 아코디언 섹션 ── */
+.qa-expand-all-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--gray-600);
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    padding: 6px 12px;
+    cursor: pointer;
+    margin-bottom: 14px;
+}
+.qa-expand-all-btn:hover {
+    border-color: var(--navy);
+    color: var(--navy);
+}
+
+.qa-category-section {
+    margin-bottom: 28px;
+}
+.qa-category-section:last-child {
+    margin-bottom: 0;
+}
+
+.qa-category-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+    cursor: pointer;
+    user-select: none;
+}
+
+.qa-category-chevron {
+    display: inline-flex;
+    align-items: center;
+    transition: transform 0.2s ease;
+    color: var(--gray-400);
+    flex-shrink: 0;
+}
+.qa-category-section.open .qa-category-chevron {
+    transform: rotate(90deg);
+}
+
+.qa-category-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--navy);
+    background: rgba(24, 95, 165, 0.08);
+    padding: 4px 13px;
+    border-radius: 20px;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.qa-category-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gray-800);
+}
+
+.qa-category-count {
+    margin-left: auto;
+    font-size: 12.5px;
+    color: var(--gray-400);
+}
+
+.qa-category-body {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.25s ease;
+}
+.qa-category-section.open .qa-category-body {
+    max-height: 3000px;
+}
+
+@media (max-width: 640px) {
+    .qa-category-head { flex-wrap: wrap; gap: 6px; }
+    .qa-category-title { font-size: 14px; }
+    .qa-category-count { margin-left: 0; width: 100%; order: 5; }
+    .qa-expand-all-btn { width: 100%; justify-content: center; }
+    .qa-category-section .card { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    .qa-category-section .data-table { min-width: 480px; }
+}

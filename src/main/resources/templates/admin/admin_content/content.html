@@ -30,63 +30,97 @@
             </div>
         </div>
 
-        <div class="card">
-            <table class="data-table">
-                <thead>
-                <tr>
-                    <th style="width:40px">#</th>
-                    <th>카테고리</th>
-                    <th>콘텐츠</th>
-                    <th>단계</th>
-                    <th>무료여부</th>
-                    <th>상태</th>
-                    <th>등록일</th>
-                    <th style="width:80px; text-align:center;">관리</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:if="${#lists.isEmpty(contents)}">
-                    <td colspan="8" style="text-align: center; color: var(--gray-400); padding: 50px 0;">
-                        등록된 콘텐츠가 없습니다. '콘텐츠 추가' 버튼을 눌러 첫 데이터를 등록해 보세요!
-                    </td>
-                </tr>
-                <tr th:each="c, loop : ${contents}">
-                    <td style="color:var(--gray-400)" th:text="${loop.count}">1</td>
-                    <td th:text="${c.category != null ? c.category.title : '미지정'}">카테고리</td>
-                    <td>
-                        <div class="content-title-cell">
-                            <div class="content-thumb"><i class="ti ti-video"></i></div>
-                            <div class="content-name" th:text="${c.title}">제목</div>
-                        </div>
-                    </td>
-                    <td th:text="${c.stage != null ? c.stage : '-'}">1</td>
-                    <td>
-                        <span class="badge badge-success" th:if="${c.free}">무료</span>
-                        <span class="badge badge-gray" th:unless="${c.free}">유료</span>
-                    </td>
-                    <td>
-                        <span class="badge"
-                              th:classappend="${c.status == 'PUBLISHED' ? 'badge-success' : (c.status == 'SCHEDULED' ? 'badge-info' : 'badge-gray')}"
-                              th:text="${c.status == 'PUBLISHED' ? '공개' : (c.status == 'SCHEDULED' ? '예약공개' : '임시저장')}">임시저장</span>
-                    </td>
-                    <td th:text="${c.createdDate != null ? #temporals.format(c.createdDate, 'yyyy-MM-dd') : '-'}">-</td>
-                    <td style="text-align:center;">
-                        <div class="action-buttons-cell">
-                            <a class="btn-action-icon btn-action-edit" title="수정" th:href="@{|/admin/content/edit/${c.id}|}">
-                                <i class="ti ti-edit"></i>
-                            </a>
-                            <a th:href="@{|/admin/content/delete/${c.id}|}" class="btn-action-icon btn-action-delete" title="삭제"
-                               onclick="return confirm('이 콘텐츠를 정말 삭제하시겠습니까? 관련 파일도 함께 제거됩니다.');">
-                                <i class="ti ti-trash"></i>
-                            </a>
-                        </div>
-                    </td>
-                </tr>
-                </tbody>
-            </table>
+        <!-- 전체 펼치기/접기 -->
+        <button type="button" class="qa-expand-all-btn" id="qaExpandAllBtn" onclick="toggleAllCategories()">
+            <i class="ti ti-arrows-maximize" id="qaExpandAllIcon"></i>
+            <span id="qaExpandAllLabel">전체 펼치기</span>
+        </button>
+
+        <!-- 카테고리(테마)별 섹션 -->
+        <div class="qa-category-section" th:each="entry, catIter : ${groupedContents}" th:classappend="${catIter.index == 0} ? 'open'">
+
+            <div class="qa-category-head" onclick="toggleCategory(this)">
+                <i class="ti ti-chevron-right qa-category-chevron"></i>
+                <span class="qa-category-badge" th:text="'테마 ' + (${catIter.index} + 1)">테마 1</span>
+                <span class="qa-category-title" th:text="${entry.key}">케이팝</span>
+                <span class="qa-category-count" th:text="${#lists.size(entry.value)} + '개'">0개</span>
+            </div>
+
+            <div class="qa-category-body">
+                <div class="card">
+                    <table class="data-table">
+                        <thead>
+                        <tr>
+                            <th style="width:40px">#</th>
+                            <th>콘텐츠</th>
+                            <th>단계</th>
+                            <th>무료여부</th>
+                            <th>상태</th>
+                            <th>등록일</th>
+                            <th style="width:80px; text-align:center;">관리</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        <tr th:each="c, loop : ${entry.value}">
+                            <td style="color:var(--gray-400)" th:text="${loop.count}">1</td>
+                            <td>
+                                <div class="content-title-cell">
+                                    <div class="content-thumb"><i class="ti ti-video"></i></div>
+                                    <div class="content-name" th:text="${c.title}">제목</div>
+                                </div>
+                            </td>
+                            <td th:text="${c.stage != null ? c.stage : '-'}">1</td>
+                            <td>
+                                <span class="badge badge-success" th:if="${c.free}">무료</span>
+                                <span class="badge badge-gray" th:unless="${c.free}">유료</span>
+                            </td>
+                            <td>
+                            <span class="badge"
+                                  th:classappend="${c.status == 'PUBLISHED' ? 'badge-success' : (c.status == 'SCHEDULED' ? 'badge-info' : 'badge-gray')}"
+                                  th:text="${c.status == 'PUBLISHED' ? '공개' : (c.status == 'SCHEDULED' ? '예약공개' : '임시저장')}">임시저장</span>
+                            </td>
+                            <td th:text="${c.createdDate != null ? #temporals.format(c.createdDate, 'yyyy-MM-dd') : '-'}">-</td>
+                            <td style="text-align:center;">
+                                <div class="action-buttons-cell">
+                                    <a class="btn-action-icon btn-action-edit" title="수정" th:href="@{|/admin/content/edit/${c.id}|}">
+                                        <i class="ti ti-edit"></i>
+                                    </a>
+                                    <a th:href="@{|/admin/content/delete/${c.id}|}" class="btn-action-icon btn-action-delete" title="삭제"
+                                       onclick="return confirm('이 콘텐츠를 정말 삭제하시겠습니까? 관련 파일도 함께 제거됩니다.');">
+                                        <i class="ti ti-trash"></i>
+                                    </a>
+                                </div>
+                            </td>
+                        </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 데이터 없을 때 -->
+        <div class="card" th:if="${groupedContents == null or #maps.isEmpty(groupedContents)}">
+            <div style="text-align: center; color: var(--gray-400); padding: 50px 0;">
+                등록된 콘텐츠가 없습니다. '콘텐츠 추가' 버튼을 눌러 첫 데이터를 등록해 보세요!
+            </div>
         </div>
     </div>
 </div>
+
+<script>
+    function toggleCategory(headEl) {
+        headEl.closest('.qa-category-section').classList.toggle('open');
+    }
+
+    function toggleAllCategories() {
+        const sections = document.querySelectorAll('.qa-category-section');
+        const allOpen = Array.from(sections).every(s => s.classList.contains('open'));
+        sections.forEach(s => s.classList.toggle('open', !allOpen));
+
+        document.getElementById('qaExpandAllLabel').textContent = allOpen ? '전체 펼치기' : '전체 접기';
+        document.getElementById('qaExpandAllIcon').className = allOpen ? 'ti ti-arrows-maximize' : 'ti ti-arrows-minimize';
+    }
+</script>
 
 </body>
 </html>

@@ -37,10 +37,22 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    // 엔터키 검색
+    // 입력이 멈추면(0.5초 후) 자동으로 검색 실행
     if (search_input) {
+        let searchTimer = null;
+        search_input.addEventListener("input", () => {
+            clearTimeout(searchTimer);
+            searchTimer = setTimeout(() => {
+                movePage(currentCategory, currentSort, search_input.value);
+            }, 500);
+        });
+
+        // 엔터키는 바로 검색 (디바운스 기다리지 않음)
         search_input.addEventListener("keydown", (e) => {
-            if (e.key === "Enter") btn_search.click();
+            if (e.key === "Enter") {
+                clearTimeout(searchTimer);
+                movePage(currentCategory, currentSort, search_input.value);
+            }
         });
     }
 

@@ -1,8 +1,10 @@
 package com.meta12.SS8911.service;
 
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
@@ -50,7 +52,12 @@ public class TossPaymentService {
         HttpEntity<Map<String, Object>> request = new HttpEntity<>(body, headers);
 
         try {
-            ResponseEntity<Map> response = restTemplate.postForEntity(confirmUrl, request, Map.class);
+            ResponseEntity<Map<String, Object>> response = restTemplate.exchange(
+                    confirmUrl,
+                    HttpMethod.POST,
+                    request,
+                    new ParameterizedTypeReference<Map<String, Object>>() {}
+            );
             return response.getBody();
         } catch (HttpClientErrorException e) {
             // 토스가 4xx로 거절한 경우 (금액 위변조, 이미 처리된 결제 등)

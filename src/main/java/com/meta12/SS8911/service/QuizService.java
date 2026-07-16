@@ -103,7 +103,7 @@ public class QuizService {
     public QuizBox getLastResult(Long quizId, String username) {
         SiteUser user = siteUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
-        return quizBoxRepository.findTopByQuizIdAndUserIdOrderBySolvedDateDesc(quizId, user.getId())
+        return quizBoxRepository.findTopByQuizIdAndUserIdAndEmbeddedFalseOrderBySolvedDateDesc(quizId, user.getId())
                 .orElse(null);
     }
 
@@ -130,7 +130,7 @@ public class QuizService {
             int questionCount = effectiveQuestionCount(quiz);
 
             QuizBox last = quizBoxRepository
-                    .findTopByQuizIdAndUserIdOrderBySolvedDateDesc(quiz.getId(), user.getId())
+                    .findTopByQuizIdAndUserIdAndEmbeddedFalseOrderBySolvedDateDesc(quiz.getId(), user.getId())
                     .orElse(null);
             Integer lastScore = (last == null || last.getTotal() == 0)
                     ? null
@@ -163,8 +163,8 @@ public class QuizService {
     public int[] getUserQuizStats(String username) {
         SiteUser user = siteUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
-        long count = quizBoxRepository.countByUserId(user.getId());
-        Double avg = quizBoxRepository.findAvgAccuracyByUserId(user.getId());
+        long count = quizBoxRepository.countByUserIdAndEmbeddedFalse(user.getId());
+        Double avg = quizBoxRepository.findAvgAccuracyByUserIdExcludingEmbedded(user.getId());
         int avgPct = avg == null ? 0 : (int) Math.round(avg * 100);
         return new int[]{(int) count, avgPct};
     }
@@ -296,7 +296,12 @@ public class QuizService {
      * 퀴즈 완주 - 클라이언트가 문항별 채점(checkAnswer)을 거쳐 집계한 최종 점수를 QuizBox에 기록.
      * (각 문항 채점 자체는 서버에서 이미 검증됐으므로, 여기서는 집계값만 저장)
      */
-    public void finishQuiz(Long quizId, int score, int total, String username) {
+    /**
+     * 퀴즈 완주 - 클라이언트가 문항별 채점(checkAnswer)을 거쳐 집계한 최종 점수를 QuizBox에 기록.
+     * (각 문항 채점 자체는 서버에서 이미 검증됐으므로, 여기서는 집계값만 저장)
+     * ★ embedded=true면 강의 시청 페이지에서 랜덤 문항으로 진행된 임베드 퀴즈 - 연습퀴즈 통계/최근점수에서 제외됨.
+     */
+    public void finishQuiz(Long quizId, int score, int total, String username, boolean embedded) {
         Quiz quiz = getQuizEntity(quizId);
         SiteUser user = siteUserRepository.findByUsername(username)
                 .orElseThrow(() -> new UsernameNotFoundException("사용자를 찾을 수 없습니다."));
@@ -307,6 +312,7 @@ public class QuizService {
         box.setScore(score);
         box.setTotal(total);
         box.setSolvedDate(LocalDateTime.now());
+        box.setEmbedded(embedded);
         quizBoxRepository.save(box);
     }
 
@@ -319,19 +325,19 @@ public class QuizService {
     }
 
     /**
-     * 배움터 히어로 통계 - 완료 퀴즈 수.
+     * 배움터 히어로 통계 - 완료 퀴즈 수. (임베드 퀴즈 제외, 연습퀴즈만)
      */
     @Transactional(readOnly = true)
     public long countCompletedByUser(Long userId) {
-        return quizBoxRepository.countByUserId(userId);
+        return quizBoxRepository.countByUserIdAndEmbeddedFalse(userId);
     }
 
     /**
-     * 배움터 히어로 통계 - 평균 정답률 (%).
+     * 배움터 히어로 통계 - 평균 정답률 (%). (임베드 퀴즈 제외, 연습퀴즈만)
      */
     @Transactional(readOnly = true)
     public int getAvgAccuracyByUser(Long userId) {
-        Double avg = quizBoxRepository.findAvgAccuracyByUserId(userId);
+        Double avg = quizBoxRepository.findAvgAccuracyByUserIdExcludingEmbedded(userId);
         return avg == null ? 0 : (int) Math.round(avg * 100);
     }
 

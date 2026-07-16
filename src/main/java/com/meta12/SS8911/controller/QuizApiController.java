@@ -43,12 +43,22 @@ public class QuizApiController {
         return quizService.checkAnswer(questionId, req.getSelectedOption(), username);
     }
     /**
-     * 퀴즈 완주 - 집계된 점수를 QuizBox에 기록.
+     * 퀴즈 완주 (배움터 연습퀴즈) - 집계된 점수를 QuizBox에 기록. 통계/최근점수에 반영됨.
      */
     @PostMapping("/{quizId}/finish")
     public void finish(@PathVariable Long quizId,
                        @RequestBody QuizFinishRequestDTO req,
                        Authentication authentication) {
-        quizService.finishQuiz(quizId, req.getScore(), req.getTotal(), authentication.getName());
+        quizService.finishQuiz(quizId, req.getScore(), req.getTotal(), authentication.getName(), false);
+    }
+
+    /**
+     * 퀴즈 완주 (강의 시청 페이지 임베드 퀴즈) - 랜덤 문항으로 진행된 결과라 연습퀴즈 통계/최근점수에는 포함되지 않음.
+     */
+    @PostMapping("/{quizId}/finish-embedded")
+    public void finishEmbedded(@PathVariable Long quizId,
+                               @RequestBody QuizFinishRequestDTO req,
+                               Authentication authentication) {
+        quizService.finishQuiz(quizId, req.getScore(), req.getTotal(), authentication.getName(), true);
     }
 }

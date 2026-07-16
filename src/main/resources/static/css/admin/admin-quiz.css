@@ -237,10 +237,122 @@
 @media (max-width: 640px) {
     .qa-page { padding: 20px 16px 60px; }
     .qa-header { flex-direction: column; gap: 10px; }
+
+    /* ── 카테고리 아코디언 모바일 대응 ── */
+    .qa-category-head {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .qa-category-title {
+        font-size: 14px;
+    }
+    .qa-category-count {
+        margin-left: 0;
+        width: 100%;
+        order: 5;
+    }
+    .qa-expand-all-btn {
+        width: 100%;
+        justify-content: center;
+    }
+
+    /* 테이블이 화면보다 넓으면 컬럼을 찌그러뜨리지 않고 가로 스크롤 */
+    .qa-category-section .card {
+        overflow-x: auto;
+        -webkit-overflow-scrolling: touch;
+    }
+    .qa-category-section .data-table {
+        min-width: 560px;
+    }
 }
 
 /* ── 링크형 버튼(<a class="btn ...">) 밑줄 제거 — .qa-page 래퍼 유무와 무관하게 적용 ── */
 .btn,
 a.btn {
     text-decoration: none;
+}
+
+/* ── 연습퀴즈/모의고사 관리 목록 - 카테고리(테마)별 섹션 구분 ── */
+.qa-category-section {
+    margin-bottom: 28px;
+}
+.qa-category-section:last-child {
+    margin-bottom: 0;
+}
+
+.qa-category-head {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 10px;
+}
+
+.qa-category-badge {
+    display: inline-flex;
+    align-items: center;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--navy);
+    background: rgba(24, 95, 165, 0.08);
+    padding: 4px 13px;
+    border-radius: 20px;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+
+.qa-category-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--gray-800);
+}
+
+.qa-category-count {
+    margin-left: auto;
+    font-size: 12.5px;
+    color: var(--gray-400);
+}
+
+/* ── 아코디언 토글 ── */
+.qa-expand-all-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--gray-600);
+    background: var(--white);
+    border: 1px solid var(--gray-200);
+    border-radius: var(--radius-md);
+    padding: 6px 12px;
+    cursor: pointer;
+    margin-bottom: 14px;
+}
+.qa-expand-all-btn:hover {
+    border-color: var(--navy);
+    color: var(--navy);
+}
+
+.qa-category-head {
+    cursor: pointer;
+    user-select: none;
+}
+
+.qa-category-chevron {
+    display: inline-flex;
+    align-items: center;
+    transition: transform 0.2s ease;
+    color: var(--gray-400);
+    flex-shrink: 0;
+}
+.qa-category-section.open .qa-category-chevron {
+    transform: rotate(90deg);
+}
+
+.qa-category-body {
+    overflow: hidden;
+    max-height: 0;
+    transition: max-height 0.25s ease;
+}
+.qa-category-section.open .qa-category-body {
+    max-height: 2000px;
 }

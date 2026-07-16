@@ -199,16 +199,27 @@ public class AdminController {
     // 콘텐츠 관리 (Content/Category 실데이터)
     // ==========================================
     @GetMapping("/content")
-    public String content(Model model,
-                          @RequestParam(value = "page", defaultValue = "0") int page) {
+    public String content(Model model) {
         model.addAttribute("activeMenu", "content");
         model.addAttribute("pageTitle", "콘텐츠 관리");
 
-        Page<Content> contents = contentService.getAllContentList(
-                PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "createdDate"))
-        );
-        model.addAttribute("contents", contents);
-        model.addAttribute("totalContentCount", contents.getTotalElements());
+        // ★ 페이지네이션 대신 테마(카테고리)별로 묶어서 전체 보여주기 (36개 = 4테마 × 9강 정도라 아코디언이 더 적합)
+        List<Content> allContents = contentService.getAllContentList(
+                PageRequest.of(0, 10000, Sort.by(Sort.Direction.ASC, "sequence"))
+        ).getContent();
+
+        // 카테고리 id 순서(K-POP → K-DRAMA → 일상회화 → 심화)로 정렬 (Sort는 stable이라 테마 내 순서(sequence)는 유지됨)
+        allContents.sort(java.util.Comparator.comparing(
+                c -> c.getCategory() != null ? c.getCategory().getId() : Long.MAX_VALUE));
+
+        java.util.LinkedHashMap<String, List<Content>> grouped = new java.util.LinkedHashMap<>();
+        for (Content c : allContents) {
+            String categoryName = c.getCategory() != null ? c.getCategory().getTitle() : "미지정";
+            grouped.computeIfAbsent(categoryName, k -> new ArrayList<>()).add(c);
+        }
+
+        model.addAttribute("groupedContents", grouped);
+        model.addAttribute("totalContentCount", allContents.size());
 
         return "admin/admin_content/content";
     }

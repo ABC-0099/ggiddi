@@ -47,12 +47,23 @@ public class AdminQuizController {
     private final MockExamBoxRepository mockExamBoxRepository;
     private final MockExamQuestionRepository mockExamQuestionRepository;
 
-    // 목록
+    // 목록 (테마/카테고리별로 그룹핑)
     @GetMapping
     public String list(Model model) {
         model.addAttribute("activeMenu", "quiz");
         model.addAttribute("pageTitle", "연습퀴즈 관리");
-        model.addAttribute("quizzes", quizService.getAllForAdmin());
+
+        List<Quiz> allQuizzes = quizRepository.findAll();
+        // 커리큘럼 테마 순서(K-POP → K-DRAMA → 일상회화 → 심화)에 맞춰 카테고리 id 기준 정렬
+        allQuizzes.sort(Comparator.comparing(q -> q.getContent().getCategory().getId()));
+
+        java.util.LinkedHashMap<String, List<QuizAdminDTO>> grouped = new java.util.LinkedHashMap<>();
+        for (Quiz quiz : allQuizzes) {
+            String categoryName = quiz.getContent().getCategory().getTitle();
+            grouped.computeIfAbsent(categoryName, k -> new ArrayList<>()).add(QuizAdminDTO.from(quiz));
+        }
+
+        model.addAttribute("groupedQuizzes", grouped);
         return "quiz/admin/list";
     }
 
@@ -106,7 +117,10 @@ public class AdminQuizController {
 
     // ── 연습퀴즈 통계 ──
     private void buildQuizStats(Model model) {
-        List<QuizBox> allBoxes = quizBoxRepository.findAll();
+        // ★ 강의 시청 페이지에 임베드된 퀴즈(랜덤 출제, 따로 저장됨)는 연습퀴즈 통계에서 제외
+        List<QuizBox> allBoxes = quizBoxRepository.findAll().stream()
+                .filter(b -> !b.isEmbedded())
+                .collect(Collectors.toList());
         List<Quiz> allQuizzes = quizRepository.findAll();
 
         long totalAttempts = allBoxes.size();

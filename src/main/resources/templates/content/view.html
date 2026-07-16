@@ -26,7 +26,7 @@
 <div class="breadcrumb">
     <a th:href="@{/category/list}">강의 목록</a>
     <span>›</span>
-    <a th:href="@{/category/view/{id}(id=${content.category.id})}" th:text="${content.category.title}">단계</a>
+    <a th:href="@{/category/list}" th:text="${content.category.title}">단계</a>
     <span>›</span>
     <span style="color:var(--ink);" th:text="${content.sequence} + '강 ' + ${content.title}">강의 제목</span>
 </div>
@@ -242,7 +242,7 @@
 
                     <div style="display:flex;justify-content:space-between;align-items:center;gap:8px;">
                         <button onclick="skipQuestion()" style="font-size:12px;padding:7px 12px;border-radius:8px;border:1px solid var(--border);background:transparent;color:var(--ink-faint);cursor:pointer;font-family:inherit;">건너뛰기</button>
-                        <div style="display:flex;gap:7px;">
+                        <div style="display:flex;gap:7px;margin-left:auto;">
                             <button id="qbtn-submit" onclick="submitAnswer()" disabled
                                     style="font-size:12px;padding:7px 16px;border-radius:8px;border:none;background:var(--mint);color:#fff;font-weight:700;cursor:pointer;font-family:inherit;opacity:0.5;">확인</button>
                             <button id="qbtn-next" onclick="nextQuestion()"
@@ -634,7 +634,7 @@
     }
 
     function finishQuiz() {
-      fetch('/api/quiz/' + quizId + '/finish', {
+      fetch('/api/quiz/' + quizId + '/finish-embedded', {
         method: 'POST',
         headers: apiHeaders(true),
         body: JSON.stringify({ score: score, total: quizQuestions.length })
