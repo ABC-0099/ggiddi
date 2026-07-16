@@ -10,6 +10,7 @@ import com.meta12.SS8911.entity.Content;
 import com.meta12.SS8911.entity.Event;
 import com.meta12.SS8911.entity.OrderPay;
 import com.meta12.SS8911.entity.Qna;
+import com.meta12.SS8911.entity.Answer;
 import com.meta12.SS8911.entity.SiteUser;
 import com.meta12.SS8911.repository.OrderPayRepository;
 import com.meta12.SS8911.service.CategoryService;
@@ -319,7 +320,7 @@ public class AdminController {
             String statusStr = (q.getStatus() != null) ? q.getStatus().name() : "PENDING";
             String dateStr = (q.getCreatedDate() != null) ? q.getCreatedDate().toLocalDate().toString() : "2026-07-08";
 
-            wrappedList.add(new QnaWrapper(q.getId(), q.getTitle(), q.getContent(), authorName, dateStr, statusStr));
+            wrappedList.add(new QnaWrapper(q.getId(), q.getTitle(), q.getContent(), authorName, dateStr, statusStr, q.getAnswers()));
         }
         Page<QnaWrapper> qnas = new PageImpl<>(wrappedList, realQnas.getPageable(), realQnas.getTotalElements());
         model.addAttribute("qnas", qnas);
@@ -568,9 +569,9 @@ public class AdminController {
 
     // ── 가짜/DTO 내부 클래스 구조들 ──
     public static class QnaWrapper {
-        private final Long id; private final String title; private final String content; private final AuthorMock author; private final String createdDate; private final String status;
-        public QnaWrapper(Long id, String title, String content, String username, String createdDate, String status) { this.id = id; this.title = title; this.content = content; this.author = new AuthorMock(username); this.createdDate = createdDate; this.status = status; }
-        public Long getId() { return id; } public String getTitle() { return title; } public String getContent() { return content; } public AuthorMock getAuthor() { return author; } public String getCreatedDate() { return createdDate; } public String getStatus() { return status; }
+        private final Long id; private final String title; private final String content; private final AuthorMock author; private final String createdDate; private final String status; private final List<Answer> answers;
+        public QnaWrapper(Long id, String title, String content, String username, String createdDate, String status, List<Answer> answers) { this.id = id; this.title = title; this.content = content; this.author = new AuthorMock(username); this.createdDate = createdDate; this.status = status; this.answers = answers; }
+        public Long getId() { return id; } public String getTitle() { return title; } public String getContent() { return content; } public AuthorMock getAuthor() { return author; } public String getCreatedDate() { return createdDate; } public String getStatus() { return status; } public List<Answer> getAnswers() { return answers; }
     }
     public static class AuthorMock { private final String username; public AuthorMock(String username) { this.username = username; } public String getUsername() { return username; } }
     public static class MonthlyStat {
