@@ -15,6 +15,7 @@
       --kkyeok-navy: #185FA5;
       --kkyeok-mint-1: #9FE1CB;
       --kkyeok-mint-2: #5DCAA5;
+      --kkyeok-mint-text: #2E8B6F; /* 밝은 배경 위 텍스트용 진한 민트 (대비 개선) */
     }
 
     /* ---------- 언어 토글 버튼 ---------- */
@@ -95,7 +96,8 @@
     }
 
     .dt-onboarding__desc strong {
-      color: var(--kkyeok-mint-2);
+      color: var(--kkyeok-mint-text);
+      font-weight: 700;
     }
 
     .dt-onboarding__btn {
@@ -133,21 +135,24 @@
 
 <script>
     (function () {
-      const STORAGE_KEY = "kkyeok_dt_onboarding_seen";
+      const STORAGE_KEY = "kkyeok_dt_onboarding_seen_at";
+      const EXPIRE_MS = 4 * 60 * 60 * 1000; // 4시간 지나면 다시 노출
       const overlay = document.getElementById("dtOnboarding");
       const closeBtn = document.getElementById("dtOnboardingClose");
 
       if (!overlay) return;
 
-      const seen = localStorage.getItem(STORAGE_KEY);
-      if (!seen) {
+      const seenAt = Number(localStorage.getItem(STORAGE_KEY));
+      const expired = !seenAt || (Date.now() - seenAt > EXPIRE_MS);
+
+      if (expired) {
         // 페이지 진입 후 살짝 딜레이 주고 노출 (바로 뜨면 부담스러움)
         setTimeout(() => overlay.classList.add("show"), 600);
       }
 
       function closeOnboarding() {
         overlay.classList.remove("show");
-        localStorage.setItem(STORAGE_KEY, "1");
+        localStorage.setItem(STORAGE_KEY, String(Date.now()));
       }
 
       closeBtn.addEventListener("click", closeOnboarding);
