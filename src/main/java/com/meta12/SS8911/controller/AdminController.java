@@ -204,9 +204,10 @@ public class AdminController {
         model.addAttribute("pageTitle", "콘텐츠 관리");
 
         // ★ 페이지네이션 대신 테마(카테고리)별로 묶어서 전체 보여주기 (36개 = 4테마 × 9강 정도라 아코디언이 더 적합)
-        List<Content> allContents = contentService.getAllContentList(
+        // Page.getContent()는 불변(읽기 전용) 리스트라 바로 sort()하면 UnsupportedOperationException이 남 → 새 ArrayList로 복사
+        List<Content> allContents = new ArrayList<>(contentService.getAllContentList(
                 PageRequest.of(0, 10000, Sort.by(Sort.Direction.ASC, "sequence"))
-        ).getContent();
+        ).getContent());
 
         // 카테고리 id 순서(K-POP → K-DRAMA → 일상회화 → 심화)로 정렬 (Sort는 stable이라 테마 내 순서(sequence)는 유지됨)
         allContents.sort(java.util.Comparator.comparing(
