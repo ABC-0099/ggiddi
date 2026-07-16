@@ -39,6 +39,11 @@ public class SiteUserService implements UserDetailsService {
         return siteUserRepository.findAll(pageable);
     }
 
+    // ★ 회원 관리 목록용 - 관리자(ADMIN) 계정은 빼고 조회
+    public Page<SiteUser> getNonAdminUsers(Pageable pageable) {
+        return siteUserRepository.findByRoleNot(Role.ADMIN, pageable);
+    }
+
     @Transactional
     public void chugaProc(SiteUserDTO dto) {
         if (siteUserRepository.existsByUsername(dto.getUsername())) {

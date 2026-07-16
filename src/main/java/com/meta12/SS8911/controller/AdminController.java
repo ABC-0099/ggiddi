@@ -288,7 +288,8 @@ public class AdminController {
         model.addAttribute("activeMenu", "members");
         model.addAttribute("pageTitle", "회원 관리");
 
-        Page<SiteUser> users = siteUserService.getAllUsers(
+        // ★ 회원 관리 목록에는 관리자(ADMIN) 계정은 보이지 않도록 제외
+        Page<SiteUser> users = siteUserService.getNonAdminUsers(
                 PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "joinDate"))
         );
         model.addAttribute("users", users);
@@ -497,10 +498,21 @@ public class AdminController {
         model.addAttribute("activeMenu", "category");
         model.addAttribute("pageTitle", "카테고리 관리");
 
+        // ★ 번호(#)는 "등록한 순서" 그대로 고정 (K-POP이 제일 먼저 만든 거면 항상 1번),
+        //   화면에 보이는 목록 순서는 최신 등록순(DESC) — 이 둘은 서로 다른 기준이라 분리해서 처리
+        List<Category> allAscById = new ArrayList<>(categoryService.findAll());
+        allAscById.sort(java.util.Comparator.comparing(Category::getId));
+
+        java.util.Map<Long, Integer> registrationNumberByCategoryId = new HashMap<>();
+        for (int i = 0; i < allAscById.size(); i++) {
+            registrationNumberByCategoryId.put(allAscById.get(i).getId(), i + 1);
+        }
+
         Page<Category> categories = categoryService.findAll(
                 PageRequest.of(page, 10, Sort.by(Sort.Direction.DESC, "id"))
         );
         model.addAttribute("categories", categories);
+        model.addAttribute("registrationNumberByCategoryId", registrationNumberByCategoryId);
 
         return "admin/admin_category/category";
     }

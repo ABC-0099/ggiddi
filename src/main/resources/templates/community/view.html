@@ -358,6 +358,29 @@
       charCount.textContent = commentTextarea.value.length + ' / 500';
     });
   }
+
+  // ── 댓글/답글 작성 시 페이지 스크롤 위치 유지 ──
+  // 폼 제출은 그냥 일반 POST(전체 새로고침)라서, 제출 직전 스크롤 위치를 저장해뒀다가
+  // 새로고침된 페이지가 다 로드된 뒤 그 위치로 다시 스크롤해줌 (댓글 단 자리 그대로 유지)
+  (function () {
+    const SCROLL_KEY = 'commentScrollY_' + window.location.pathname;
+
+    // 댓글 작성 폼 + 모든 답글 작성 폼 제출 직전에 현재 스크롤 위치 저장
+    document.querySelectorAll('.comment-write form, .comment-reply-form').forEach(form => {
+      form.addEventListener('submit', () => {
+        sessionStorage.setItem(SCROLL_KEY, String(window.scrollY));
+      });
+    });
+
+    // 페이지가 완전히 로드된 뒤(이미지 등 포함) 저장된 위치로 복원
+    window.addEventListener('load', () => {
+      const savedY = sessionStorage.getItem(SCROLL_KEY);
+      if (savedY !== null) {
+        window.scrollTo(0, parseInt(savedY, 10));
+        sessionStorage.removeItem(SCROLL_KEY);
+      }
+    });
+  })();
 </script>
 
 <!-- ==================== 게시글 본문 번역 (community list.html과 동일 방식) ==================== -->

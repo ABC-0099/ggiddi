@@ -58,7 +58,6 @@
     <div class="filter-tabs">
       <a class="tab" th:classappend="${category == null} ? 'active'" th:href="@{/notice/list(keyword=${keyword})}">전체</a>
       <a class="tab" th:classappend="${category == 'notice'} ? 'active'" th:href="@{/notice/list(category='notice', keyword=${keyword})}">공지</a>
-      <a class="tab" th:classappend="${category == 'event'} ? 'active'" th:href="@{/notice/list(category='event', keyword=${keyword})}">이벤트</a>
       <a class="tab" th:classappend="${category == 'system'} ? 'active'" th:href="@{/notice/list(category='system', keyword=${keyword})}">시스템</a>
       <a class="tab" th:classappend="${category == 'update'} ? 'active'" th:href="@{/notice/list(category='update', keyword=${keyword})}">업데이트</a>
     </div>

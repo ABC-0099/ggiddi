@@ -274,16 +274,16 @@
     document.querySelectorAll("[data-i18n]").forEach((el) => {
       const key = el.getAttribute("data-i18n");
 
-      // 원본 한국어 백업 (최초 1회)
+      // 원본 한국어 백업 (최초 1회) - innerHTML로 저장해야 <br> 같은 태그가 안 사라짐
       if (!el.hasAttribute("data-i18n-ko")) {
-        el.setAttribute("data-i18n-ko", el.textContent);
+        el.setAttribute("data-i18n-ko", el.innerHTML);
       }
 
       if (lang === "ko") {
-        el.textContent = el.getAttribute("data-i18n-ko");
+        el.innerHTML = el.getAttribute("data-i18n-ko");
       } else {
         const translated = DICTIONARY[lang] && DICTIONARY[lang][key];
-        el.textContent = translated || el.getAttribute("data-i18n-ko");
+        el.innerHTML = translated || el.getAttribute("data-i18n-ko");
       }
     });
 

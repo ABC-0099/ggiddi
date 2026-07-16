@@ -51,9 +51,9 @@
                     <table class="data-table">
                         <thead>
                         <tr>
-                            <th style="width:40px">#</th>
+                            <th style="width:50px">차시</th>
                             <th>콘텐츠</th>
-                            <th>단계</th>
+                            <th>테마</th>
                             <th>무료여부</th>
                             <th>상태</th>
                             <th>등록일</th>
@@ -62,14 +62,14 @@
                         </thead>
                         <tbody>
                         <tr th:each="c, loop : ${entry.value}">
-                            <td style="color:var(--gray-400)" th:text="${loop.count}">1</td>
+                            <td style="color:var(--gray-400)" th:text="${c.sequence != null ? c.sequence + '강' : '-'}">1강</td>
                             <td>
                                 <div class="content-title-cell">
                                     <div class="content-thumb"><i class="ti ti-video"></i></div>
                                     <div class="content-name" th:text="${c.title}">제목</div>
                                 </div>
                             </td>
-                            <td th:text="${c.stage != null ? c.stage : '-'}">1</td>
+                            <td th:text="${c.category != null ? c.category.title : '미지정'}">케이팝</td>
                             <td>
                                 <span class="badge badge-success" th:if="${c.free}">무료</span>
                                 <span class="badge badge-gray" th:unless="${c.free}">유료</span>
