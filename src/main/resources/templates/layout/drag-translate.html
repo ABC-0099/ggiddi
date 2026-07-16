@@ -223,9 +223,14 @@
         const rect = widget.getBoundingClientRect();
         const maxLeft = window.innerWidth - rect.width - 4;
         const maxTop = window.innerHeight - rect.height - 4;
+
+        // 네비바(고정 헤더) 뒤로 위젯이 들어가지 않도록, 네비바 높이만큼 위쪽 최소 여백을 확보
+        const navbarEl = document.querySelector('.navbar');
+        const minTop = (navbarEl ? navbarEl.offsetHeight : 64) + 8;
+
         return {
           left: Math.min(Math.max(4, left), Math.max(4, maxLeft)),
-          top: Math.min(Math.max(4, top), Math.max(4, maxTop))
+          top: Math.min(Math.max(minTop, top), Math.max(minTop, maxTop))
         };
       }
 

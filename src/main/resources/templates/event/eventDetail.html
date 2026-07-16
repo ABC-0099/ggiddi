@@ -83,56 +83,6 @@
 
 
 
-        <!-- 댓글 영역 -->
-        <div class="comment-section">
-
-
-            <h2 class="comment-title">
-                💬 댓글
-            </h2>
-
-
-
-            <!-- 댓글 목록 -->
-            <div class="comment-item" th:each="comment : ${comments}">
-                <div class="comment-header">
-                    <span class="comment-user" th:text="${comment.author.displayName}">
-                        파이리
-                    </span>
-                    <span class="comment-date" th:text="${#temporals.format(comment.createDate, 'yyyy-MM-dd HH:mm')}">
-                        방금 전
-                    </span>
-                </div>
-                <div class="comment-content-text" th:text="${comment.content}">
-                    너무 좋은 이벤트네요 😊
-                    저도 참여하겠습니다 (-영상첨부-)
-                </div>
-            </div>
-
-            <p class="comment-empty" th:if="${#lists.isEmpty(comments)}">
-                아직 댓글이 없습니다. 첫 댓글을 남겨보세요!
-            </p>
-
-
-
-
-
-            <!-- 댓글 작성 -->
-
-            <form th:action="@{/event/{id}/comment(id=${event.id})}" method="post">
-                <div class="comment-write">
-                    <textarea name="content" class="comment-input" placeholder="댓글을 입력해주세요." required></textarea>
-                    <button type="submit" class="comment-btn">
-                        등록
-                    </button>
-                </div>
-            </form>
-
-
-        </div>
-
-
-
     </section>
 
 
@@ -172,24 +122,27 @@
 
             <label class="input-label">
 
-                이름
-                <span class="required">*</span>
+                참여자
+                <span class="optional-label">(로그인 계정)</span>
 
             </label>
 
             <input
                     type="text"
+                    id="participantName"
                     class="modal-input"
-                    placeholder="홍길동">
+                    th:value="${#authentication != null and #authentication.name != 'anonymousUser'} ? ${#authentication.name} : ''"
+                    readonly>
 
             <label class="input-label">
 
                 영상 첨부
-                <span class="required">*</span>
+                <span class="optional-label">(선택)</span>
 
             </label>
             <input
                     type="file"
+                    id="participantFile"
                     class="modal-input"
                     accept="video/*">
 
@@ -211,7 +164,7 @@
         <div class="modal-footer">
 
 
-            <button class="submit-btn">
+            <button type="button" class="submit-btn" id="participateSubmitBtn" onclick="submitParticipation()">
 
                 참여하기
 
@@ -266,6 +219,37 @@
         }
 
 
+    }
+
+
+    // 참여하기 버튼 - 실제 전송 API가 아직 없어서, 전송되는 것처럼 흉내만 냄
+    // (백엔드 연동 시 여기 setTimeout 부분을 fetch(...)로 교체하면 됨)
+    function submitParticipation() {
+
+        const nameInput = document.getElementById("participantName");
+        const fileInput = document.getElementById("participantFile");
+        const btn = document.getElementById("participateSubmitBtn");
+
+        if (!nameInput.value.trim()) {
+            alert("로그인 후 참여할 수 있어요.");
+            window.location.href = "/login";
+            return;
+        }
+
+        btn.disabled = true;
+        const originalText = btn.textContent;
+        btn.textContent = "전송 중...";
+
+        // 실제 서버 전송 대신 잠깐 딜레이 후 완료 처리
+        setTimeout(() => {
+            alert("이벤트 참여가 접수되었습니다! 🎉");
+
+            fileInput.value = "";
+            btn.disabled = false;
+            btn.textContent = originalText;
+
+            closeModal();
+        }, 700);
     }
 
 
