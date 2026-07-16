@@ -12,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.util.Comparator;
 import java.util.List;
 import java.util.Map;
 
@@ -50,8 +51,13 @@ public class EventService {
 
 
     public List<Event> findAll(){
+        List<Event> events = eventRepository.findAll();
 
-        return eventRepository.findAll();
+        events.sort(Comparator
+                .comparing((Event e) -> statusPriority(e.getStatus()))
+                .thenComparing(Event::getCreatedDate, Comparator.reverseOrder()));
+
+        return events;
     }
 
 
@@ -124,5 +130,12 @@ public class EventService {
     public Page<Event> findAll(Pageable pageable) {
         return eventRepository.findAll(pageable);
     }
-
+    private int statusPriority(String status) {
+        return switch (status) {
+            case "ONGOING" -> 0;
+            case "UPCOMING" -> 1;
+            case "ENDED" -> 2;
+            default -> 3;
+        };
+    }
 }
