@@ -362,6 +362,8 @@
     const savedTime  = /*[[${savedTime}]]*/ 0;
     const quizId     = /*[[${quizId}]]*/ null;
     const quizUnlockedInitial = /*[[${quizUnlocked}]]*/ false;
+    // ★ 이미 100% 완료한 강의면, 재생바를 끝까지 자유롭게 움직일 수 있게 풀어줌
+    const isAlreadyCompleted = /*[[${content.progressPercent == 100}]]*/ false;
     const csrfToken  = document.querySelector('meta[name="_csrf"]')?.content;
     const csrfHeader = document.querySelector('meta[name="_csrf_header"]')?.content;
 
@@ -398,6 +400,10 @@
       if (savedTime > 0 && savedTime < video.duration) {
         video.currentTime = savedTime;
         maxWatchedTime = savedTime;
+      }
+      // 이미 완료한 강의는 어디든 자유롭게 넘나들 수 있어야 하니 제한을 풀어줌
+      if (isAlreadyCompleted) {
+        maxWatchedTime = video.duration;
       }
       updateProgressUI(video.duration > 0 ? (video.currentTime / video.duration * 100) : 0);
     });
