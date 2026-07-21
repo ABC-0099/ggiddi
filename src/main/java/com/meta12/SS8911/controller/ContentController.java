@@ -52,6 +52,9 @@ public class ContentController {
 //        if (category == null) return "redirect:/category/list";
         model.addAttribute("category", category);
 
+        // 학습 단계 <select>가 th:each로 순회할 전체 카테고리 목록
+        model.addAttribute("categoryList", categoryService.findAll());
+
         // 폼(th:object="${lectureForm}")이 바인딩할 빈 DTO. categoryId는 미리 채워서 hidden 필드로 내려보냄
         ContentDTO lectureForm = new ContentDTO();
         lectureForm.setCategoryId(categoryId);
