@@ -24,7 +24,11 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         // 클라이언트가 구독(수신)하는 prefix
-        registry.enableSimpleBroker("/topic");
+        // + heartbeat 설정: 서버-클라이언트 간 10초 간격으로 생존 확인
+        //   (탭을 그냥 닫는 등 DISCONNECT 프레임 없이 끊기는 경우를 빠르게 감지하기 위함)
+        registry.enableSimpleBroker("/topic")
+                .setHeartbeatValue(new long[]{10000, 10000})
+                .setTaskScheduler(taskScheduler());
         // 클라이언트가 메시지를 보낼 때(발행) 붙는 prefix
         registry.setApplicationDestinationPrefixes("/app");
     }
@@ -34,6 +38,9 @@ public class WebSocketConfig implements WebSocketMessageBrokerConfigurer {
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.setPoolSize(2);
         scheduler.setThreadNamePrefix("chat-cleanup-");
+        scheduler.setErrorHandler(throwable ->
+                throwable.printStackTrace() // 실제로는 log.error(...)로 교체 권장
+        );
         scheduler.initialize();
         return scheduler;
     }

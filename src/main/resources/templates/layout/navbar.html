@@ -60,16 +60,6 @@
         <a th:href="@{/notice/list}" data-i18n="nav.notice">공지사항</a>
       </li>
 
-      <!-- 커뮤니티 -->
-      <li th:classappend="${currentMenu == 'community'} ? 'active'">
-        <a th:href="@{/community}" data-i18n="nav.community">커뮤니티</a>
-      </li>
-
-      <!-- 이벤트 -->
-      <li th:classappend="${currentMenu == 'event'} ? 'active'">
-        <a th:href="@{/event}" data-i18n="nav.event">이벤트</a>
-      </li>
-
       <!-- 학습센터 드롭다운 -->
       <li class="has-dropdown"
           th:classappend="${currentMenu == 'lectures' or currentMenu == 'game'} ? 'active'">
@@ -112,6 +102,16 @@
             </a>
           </li>
         </ul>
+      </li>
+
+      <!-- 커뮤니티 -->
+      <li th:classappend="${currentMenu == 'community'} ? 'active'">
+        <a th:href="@{/community}" data-i18n="nav.community">커뮤니티</a>
+      </li>
+
+      <!-- 이벤트 -->
+      <li th:classappend="${currentMenu == 'event'} ? 'active'">
+        <a th:href="@{/event}" data-i18n="nav.event">이벤트</a>
       </li>
 
       <!-- 배움터 드롭다운 -->

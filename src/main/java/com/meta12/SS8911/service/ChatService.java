@@ -120,8 +120,13 @@ public class ChatService {
      */
     @Transactional
     public void clearRoomIfEmpty(Long roomId) {
-        if (chatPresenceService.getCount(roomId) == 0) {
+        int count = chatPresenceService.getCount(roomId);
+        System.out.println("[CLEAR CHECK] roomId=" + roomId + " count=" + count);
+        if (count == 0) {
             chatMessageRepository.deleteAllByRoomId(roomId);
+            System.out.println("[CLEARED] roomId=" + roomId + " 메시지 삭제 완료");
+        } else {
+            System.out.println("[SKIP] roomId=" + roomId + " count가 0이 아니라서 삭제 안 함 (count=" + count + ")");
         }
     }
 }
