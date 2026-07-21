@@ -53,4 +53,8 @@ public class Quiz {
         questions.add(question);
         question.setQuiz(this);
     }
+
+    @Builder.Default
+    @OneToMany(mappedBy = "quiz", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<QuizBox> quizBoxes = new ArrayList<>();
 }

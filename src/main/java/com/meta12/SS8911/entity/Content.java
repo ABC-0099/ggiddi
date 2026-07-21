@@ -6,6 +6,8 @@ import lombok.Getter;
 import lombok.Setter;
 
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Getter
@@ -54,5 +56,8 @@ public class Content {
         return (progressPercent == null) ? 0 : progressPercent;
     }
     public void setProgressPercent(int progressPercent) { this.progressPercent = progressPercent; }
+
+    @OneToMany(mappedBy = "content", cascade = CascadeType.REMOVE, orphanRemoval = true)
+    private List<Quiz> quizzes = new ArrayList<>();
 
 }

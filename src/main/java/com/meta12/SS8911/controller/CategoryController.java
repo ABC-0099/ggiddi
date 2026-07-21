@@ -240,7 +240,15 @@ public class CategoryController {
 
     @GetMapping("/category/{id}/content/add")
     public String addContentForm(@PathVariable("id") Long id, Model model) {
+        Category category = categoryService.view(id);
+        if (category == null) {
+            return "redirect:/category/list";
+        }
+
+        model.addAttribute("category", category);
         model.addAttribute("categoryId", id);
+        model.addAttribute("categoryList", categoryService.findAll());
+        // lectureForm 초기화도 필요하면 여기서 함께 addAttribute
         return "content/chuga";
     }
 

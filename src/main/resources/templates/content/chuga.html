@@ -65,10 +65,10 @@
                 <label class="field-label" for="stage">학습 단계 <span class="req">*</span></label>
                 <select class="field-select" id="stage" name="stage" th:field="*{stage}" required>
                   <option value="">단계 선택</option>
-                  <option value="1">1단계 — K-POP</option>
-                  <option value="2">2단계 — 드라마 대사</option>
-                  <option value="3">3단계 — 일상 회화</option>
-                  <option value="4">4단계 — 고급</option>
+                  <option th:each="cat : ${categoryList}"
+                          th:value="${cat.id}"
+                          th:text="(${cat.orderNum} != null ? ${cat.orderNum} + '단계 — ' : '') + ${cat.title}">
+                  </option>
                 </select>
               </div>
               <div class="field-group">

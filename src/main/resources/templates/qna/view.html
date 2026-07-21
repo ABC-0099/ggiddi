@@ -113,7 +113,8 @@
     </div>
 
     <div class="qna-back">
-      <a th:href="@{/siteUser/mypage}" class="btn-back">← 돌아가기</a>
+      <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin/board}" class="btn-back">← 돌아가기</a>
+      <a sec:authorize="!hasRole('USER')" th:href="@{/siteUser/mypage}" class="btn-back">← 돌아가기</a>
     </div>
   </div>
 </div>
